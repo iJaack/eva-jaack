@@ -720,7 +720,7 @@ function flowSpecFromCode(raw) {
   if (!raw) return null;
 
   if (raw.includes("Publishers (Human or AI)")) return FLOW_SPECS.solution;
-  if (raw.includes("CONSUMPTION LAYER") && raw.includes("BASE L2")) return FLOW_SPECS.architecture;
+  if (raw.includes("CONSUMPTION LAYER") && raw.includes("AVALANCHE C-CHAIN")) return FLOW_SPECS.architecture;
   if (raw.includes("CLAIM VERIFICATION") && raw.includes("Article Published")) return FLOW_SPECS.claimVerification;
   if (raw.includes("Users pay $EVA") && raw.includes("Treasury")) return FLOW_SPECS.revenueDistribution;
   if (raw.startsWith("More users") && raw.includes("cycle repeats")) return FLOW_SPECS.valueFlywheel;
@@ -843,9 +843,9 @@ const FLOW_SPECS = {
       },
       {
         id: "base",
-        label: "Base L2",
+        label: "Avalanche\nC-Chain",
         tone: "bad",
-        desc: "Fast finality and low fees on an EVM-compatible L2.",
+        desc: "Fast finality and low fees on Avalanche C-Chain.",
         x: 0,
         y: 260,
         z: 130,
