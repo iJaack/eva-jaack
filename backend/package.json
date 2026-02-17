@@ -1,0 +1,10 @@
+{
+  "name": "backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node -e \"console.log('Backend scaffold pending Phase 2')\"",
+    "build": "node -e \"console.log('Backend build pending Phase 2')\"",
+    "typecheck": "node -e \"console.log('Backend typecheck pending Phase 2')\""
+  }
+}

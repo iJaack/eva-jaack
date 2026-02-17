@@ -1,27 +1,28 @@
-# Eva Whitepaper (Interactive)
+# Eva Protocol
 
-Interactive single-page web version of `WHITEPAPER.md` with:
-- sidebar table of contents + active section highlight
-- collapsible H2 sections (persisted in `localStorage`)
-- light/dark theme toggle (persisted)
-- motion toggle + parallax background
-- interactive formula widgets (KaTeX) + charts (Chart.js)
-- inspectable 3D flow diagrams (drag to orbit, click nodes)
-- copy-to-clipboard buttons on code blocks
-- reading progress bar
+AI-powered truth verification with prediction markets on claims. Built on Avalanche with ERC-8004.
 
-## Run
+## Monorepo
+
+- `frontend/` — Next.js 15 landing page + whitepaper (Phase 0)
+- `contracts/` — Foundry smart contracts (Phase 1)
+- `backend/` — API pipeline (Phase 2)
+- `docs/` — architecture, design, and phased task specs
+
+## Phase 0 Scope
+
+- Landing page at `/`
+- Whitepaper at `/whitepaper`
+- Dark branded design
+- SEO metadata + OpenGraph card
+
+## Quick Start
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
-## Build (static)
+## Deployment
 
-```bash
-npm run build
-npm run preview
-```
-
-The static site output is in `dist/`.
+Frontend is configured for Vercel deployment and target domain `eva.jaack.me`.
