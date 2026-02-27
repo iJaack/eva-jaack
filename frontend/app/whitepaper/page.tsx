@@ -42,7 +42,7 @@ function ArchitectureDiagram() {
         </div>
         <div className="diagram-cell">
           <h4>On-Chain Layer</h4>
-          <p>EvaTrustGraph.sol + ERC-8004 registries + existing $EVA token on Avalanche. Agent wallets powered by <a href="https://github.com/iJaack/evalanche" target="_blank" rel="noreferrer">Evalanche SDK</a>.</p>
+          <p>EvaTrustGraph.sol + ERC-8004 registries + existing $EVA token on Avalanche. Agent wallets powered by <a href="/evalanche">Evalanche SDK</a>.</p>
         </div>
       </div>
       <div className="flow-line">
@@ -229,7 +229,7 @@ export default function WhitepaperPage() {
               <ArchitectureDiagram />
               <p>
                 The backend wallet and identity layer is powered by{" "}
-                <a href="https://github.com/iJaack/evalanche" target="_blank" rel="noreferrer">
+                <a href="/evalanche">
                   <strong>Evalanche</strong>
                 </a>{" "}
                 — a non-custodial agent wallet SDK built specifically for Eva Protocol and open-sourced for the Avalanche
