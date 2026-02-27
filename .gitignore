@@ -33,3 +33,4 @@ contracts/cache/
 
 # misc
 .vercel
+.next-output/
