@@ -19,9 +19,10 @@ export async function getEvaAgent() {
       network: 'avalanche',
       identity: { agentId: '1599' },
     });
-    console.log(
-      `[eva-agent] booted — credentials source: ${_agent.secretsSource} — address: ${_agent.agent.address}`
-    );
+    // secretsSource added in evalanche@0.3.4 — cast until package updates
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const src = (_agent as any).secretsSource ?? 'keystore';
+    console.log(`[eva-agent] booted — credentials source: ${src} — address: ${_agent.agent.address}`);
   }
   return _agent;
 }
