@@ -53,24 +53,24 @@ contract EvaTrustGraphTest is Test {
 
     function testRegisterCurator() external {
         vm.prank(curator);
-        graph.registerCurator(CURATOR_AGENT_ID, 20_000e18);
+        graph.registerCurator(CURATOR_AGENT_ID, 250_000e18);
 
         IEvaTrustGraph.Curator memory state = graph.getCurator(curator);
         assertTrue(state.registered);
-        assertEq(state.selfStake, 20_000e18);
+        assertEq(state.selfStake, 250_000e18);
         assertEq(state.trustScore, 50);
-        assertEq(eva.balanceOf(address(graph)), 20_000e18);
+        assertEq(eva.balanceOf(address(graph)), 250_000e18);
     }
 
     function testRegisterCuratorRevertsWithoutIdentityOwnership() external {
         vm.prank(backerA);
         vm.expectRevert(IEvaTrustGraph.IdentityOwnershipMismatch.selector);
-        graph.registerCurator(CURATOR_AGENT_ID, 20_000e18);
+        graph.registerCurator(CURATOR_AGENT_ID, 250_000e18);
     }
 
     function testBackAndUnbackCurator() external {
         vm.prank(curator);
-        graph.registerCurator(CURATOR_AGENT_ID, 20_000e18);
+        graph.registerCurator(CURATOR_AGENT_ID, 250_000e18);
 
         vm.prank(backerA);
         graph.backCurator(curator, 250e18);
@@ -182,7 +182,7 @@ contract EvaTrustGraphTest is Test {
 
     function testNoSlashingStakeRemainsWithdrawable() external {
         vm.prank(curator);
-        graph.registerCurator(CURATOR_AGENT_ID, 25_000e18);
+        graph.registerCurator(CURATOR_AGENT_ID, 300_000e18);
 
         vm.prank(curator);
         uint256 articleId = graph.submitArticle(keccak256("article-3"), "ipfs://article-3");
@@ -191,16 +191,16 @@ contract EvaTrustGraphTest is Test {
         graph.processVerification(articleId, 0, 0, "ipfs://evidence-3", keccak256("response-3"), "low_quality");
 
         IEvaTrustGraph.Curator memory stateBefore = graph.getCurator(curator);
-        assertEq(stateBefore.selfStake, 25_000e18);
+        assertEq(stateBefore.selfStake, 300_000e18);
         assertEq(stateBefore.trustScore, 45);
 
         uint256 balanceBefore = eva.balanceOf(curator);
         vm.prank(curator);
-        graph.withdrawSelfStake(5_000e18);
+        graph.withdrawSelfStake(50_000e18);
 
         IEvaTrustGraph.Curator memory stateAfter = graph.getCurator(curator);
-        assertEq(stateAfter.selfStake, 20_000e18);
-        assertEq(eva.balanceOf(curator), balanceBefore + 5_000e18);
+        assertEq(stateAfter.selfStake, 250_000e18);
+        assertEq(eva.balanceOf(curator), balanceBefore + 50_000e18);
     }
 
     function testClaimRevertsWhenNoYield() external {
@@ -317,7 +317,7 @@ contract EvaTrustGraphTest is Test {
 
     function testSubmitRevertsWhenCuratorFallsBelowStakeTierRequirement() external {
         vm.prank(curator);
-        graph.registerCurator(CURATOR_AGENT_ID, 20_000e18);
+        graph.registerCurator(CURATOR_AGENT_ID, 250_000e18);
 
         // Push trust low enough that required stake becomes 50,000 $EVA.
         for (uint256 i = 0; i < 3; i++) {
@@ -408,15 +408,15 @@ contract EvaTrustGraphTest is Test {
     }
 
     function testMinStakeTierExposedByContract() external view {
-        assertEq(graph.getMinStakeForScore(85), 10_000e18);
-        assertEq(graph.getMinStakeForScore(65), 10_000e18);
-        assertEq(graph.getMinStakeForScore(50), 20_000e18);
-        assertEq(graph.getMinStakeForScore(10), 50_000e18);
+        assertEq(graph.getMinStakeForScore(85), 250_000e18);
+        assertEq(graph.getMinStakeForScore(65), 250_000e18);
+        assertEq(graph.getMinStakeForScore(50), 250_000e18);
+        assertEq(graph.getMinStakeForScore(10), 1_000_000e18);
     }
 
     function _registerCurator() internal {
         vm.prank(curator);
-        graph.registerCurator(CURATOR_AGENT_ID, 20_000e18);
+        graph.registerCurator(CURATOR_AGENT_ID, 250_000e18);
     }
 
     function _mintAndApprove(address user, uint256 amount) internal {

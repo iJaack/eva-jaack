@@ -96,7 +96,7 @@ contract EvaTrustGraph is
         maxScoreDelta = 5;
         decayPerEpoch = 1;
         decayEpochSeconds = 7 days;
-        minSelfStake = 10_000e18;
+        minSelfStake = 250_000e18;
         minBacking = 100e18;
         submissionFee = 1_000e18;
         premiumSubmissionFee = 100_000e18;

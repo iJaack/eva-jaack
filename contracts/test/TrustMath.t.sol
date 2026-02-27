@@ -39,10 +39,10 @@ contract TrustMathTest is Test {
     }
 
     function testGetMinStakeTiers() external {
-        assertEq(TrustMath.getMinStake(90), 5_000e18);
-        assertEq(TrustMath.getMinStake(65), 10_000e18);
-        assertEq(TrustMath.getMinStake(50), 20_000e18);
-        assertEq(TrustMath.getMinStake(20), 50_000e18);
+        assertEq(TrustMath.getMinStake(90), 125_000e18);
+        assertEq(TrustMath.getMinStake(65), 250_000e18);
+        assertEq(TrustMath.getMinStake(50), 250_000e18);
+        assertEq(TrustMath.getMinStake(20), 500_000e18);
     }
 
     function testFuzz_BoundedDeltaAlwaysWithinMaxStep(uint8 current, uint8 signal, uint8 maxStep) external {

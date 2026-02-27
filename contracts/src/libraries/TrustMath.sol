@@ -4,10 +4,11 @@ pragma solidity ^0.8.24;
 library TrustMath {
     uint8 internal constant MIN_SCORE = 0;
     uint8 internal constant MAX_SCORE = 100;
-    uint256 internal constant LOW_TRUST_MIN_STAKE = 50_000e18;
-    uint256 internal constant MID_LOW_TRUST_MIN_STAKE = 20_000e18;
-    uint256 internal constant MID_TRUST_MIN_STAKE = 10_000e18;
-    uint256 internal constant HIGH_TRUST_MIN_STAKE = 5_000e18;
+    // Stake tiers — higher trust = lower required stake. Base = 250k $EVA at score 40-79.
+    uint256 internal constant VERY_LOW_TRUST_MIN_STAKE = 1_000_000e18; // score <20
+    uint256 internal constant LOW_TRUST_MIN_STAKE      =   500_000e18; // score 20-39
+    uint256 internal constant MID_TRUST_MIN_STAKE       =   250_000e18; // score 40-79 (base, initial=50 lands here)
+    uint256 internal constant HIGH_TRUST_MIN_STAKE      =   125_000e18; // score 80+
 
     /// @notice Clamps any value into the inclusive trust-score range [0, 100].
     function clamp(uint256 value) internal pure returns (uint8) {
@@ -97,15 +98,15 @@ library TrustMath {
         }
 
         if (trustScore >= 80) {
-            return HIGH_TRUST_MIN_STAKE;
-        }
-        if (trustScore >= 60) {
-            return MID_TRUST_MIN_STAKE;
+            return HIGH_TRUST_MIN_STAKE;   // 125k — discount for proven curators
         }
         if (trustScore >= 40) {
-            return MID_LOW_TRUST_MIN_STAKE;
+            return MID_TRUST_MIN_STAKE;    // 250k — base (initial score 50 lands here)
         }
-        return LOW_TRUST_MIN_STAKE;
+        if (trustScore >= 20) {
+            return LOW_TRUST_MIN_STAKE;    // 500k — penalty for low trust
+        }
+        return VERY_LOW_TRUST_MIN_STAKE;   // 1M — severe penalty
     }
 
     error InvalidScore();
