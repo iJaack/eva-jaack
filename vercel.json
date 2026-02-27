@@ -3,7 +3,7 @@
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "echo 'no build step'",
   "functions": {
-    "backend/api/index.ts": {
+    "api/index.ts": {
       "maxDuration": 60
     }
   },
@@ -14,7 +14,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/backend/api/index.ts"
+      "destination": "/api/index.ts"
     }
   ]
 }
