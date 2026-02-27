@@ -1,7 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-
-export const runtime = 'nodejs';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 
 const app = new Hono();
 app.use('*', cors({ origin: '*' }));
@@ -23,10 +22,35 @@ app.get('/.well-known/agent.json', (c) =>
   })
 );
 
-// Stub routes — full pipeline routes added once backend module resolution is confirmed
 app.post('/api/verify', (c) => c.json({ error: 'Payment required', amount: '0.05', currency: 'USDC', network: 'base' }, 402));
 app.post('/api/reputation/feedback', (c) => c.json({ error: 'Not yet implemented' }, 501));
 app.post('/api/submit', (c) => c.json({ error: 'Not yet implemented' }, 501));
 app.get('/api/curators', (c) => c.json([]));
 
-export default app.fetch;
+function readBody(req: IncomingMessage): Promise<Uint8Array> {
+  return new Promise((resolve) => {
+    const chunks: Uint8Array[] = [];
+    req.on('data', (chunk: Uint8Array) => chunks.push(chunk));
+    req.on('end', () => {
+      const total = chunks.reduce((acc, c) => acc + c.length, 0);
+      const merged = new Uint8Array(total);
+      let offset = 0;
+      for (const c of chunks) { merged.set(c, offset); offset += c.length; }
+      resolve(merged);
+    });
+  });
+}
+
+export default async function handler(req: IncomingMessage, res: ServerResponse) {
+  const url = `https://${req.headers.host}${req.url}`;
+  const headers = new Headers(req.headers as Record<string, string>);
+  let body: BodyInit | undefined;
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    body = await readBody(req) as unknown as BodyInit;
+  }
+  const response = await app.fetch(new Request(url, { method: req.method, headers, body }));
+  res.statusCode = response.status;
+  response.headers.forEach((v, k) => res.setHeader(k, v));
+  const arr = await response.arrayBuffer();
+  res.end(new Uint8Array(arr));
+}
