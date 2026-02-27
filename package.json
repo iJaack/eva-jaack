@@ -9,5 +9,8 @@
     "build": "pnpm --filter frontend build",
     "lint": "pnpm --filter frontend lint",
     "typecheck": "pnpm --filter frontend typecheck"
+  },
+  "dependencies": {
+    "hono": "^4.12.3"
   }
 }

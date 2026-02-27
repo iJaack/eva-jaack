@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    dependencies:
+      hono:
+        specifier: ^4.12.3
+        version: 4.12.3
 
   backend:
     dependencies:
