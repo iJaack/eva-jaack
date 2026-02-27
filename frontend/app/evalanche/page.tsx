@@ -197,7 +197,7 @@ const { agent, secretsSource } =
       </section>
 
       <footer className="ev-footer">
-        <p>built by <a href="https://eva.jaack.me">Eva Protocol</a> · open source · Avalanche ecosystem</p>
+        <p>built for <a href="https://eva.jaack.me">Eva Protocol</a> by Eva · open source · Avalanche ecosystem</p>
       </footer>
     </div>
   );
