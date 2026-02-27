@@ -1,24 +1,14 @@
 {
   "version": 2,
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "cd frontend && pnpm run build",
+  "buildCommand": "cd frontend && pnpm run build && cp -r .next ../.next-output",
+  "outputDirectory": ".next-output",
   "functions": {
-    "api/index.ts": {
-      "maxDuration": 60
-    }
+    "api/index.ts": { "maxDuration": 60 }
   },
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/index.ts"
-    },
-    {
-      "source": "/.well-known/(.*)",
-      "destination": "/api/index.ts"
-    },
-    {
-      "source": "/health",
-      "destination": "/api/index.ts"
-    }
+    { "source": "/api/:path*", "destination": "/api/index.ts" },
+    { "source": "/.well-known/:path*", "destination": "/api/index.ts" },
+    { "source": "/health", "destination": "/api/index.ts" }
   ]
 }
