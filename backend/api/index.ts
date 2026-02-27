@@ -16,13 +16,14 @@ const app = new Hono().basePath('/');
 app.use('*', logger());
 app.use('*', cors({ origin: '*' }));
 
-// .well-known served from public/ via vercel.json rewrites
 app.route('/api/verify', verifyRoutes);
 app.route('/api/reputation', reputationRoutes);
 app.route('/api/submit', submitRoutes);
 app.route('/api/curators', curatorRoutes);
 app.get('/api/curator/:id', (c) => curatorRoutes.fetch(c.req.raw));
 
-app.get('/health', (c) => c.json({ status: 'ok', agentId: config.evaAgentId, version: '0.1.0' }));
+app.get('/health', (c) =>
+  c.json({ status: 'ok', agentId: config.evaAgentId, version: '0.1.0' })
+);
 
 export default handle(app);

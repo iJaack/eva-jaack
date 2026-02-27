@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "echo 'no build step'",
+  "functions": {
+    "backend/api/index.ts": {
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/.well-known/(.*)",
+      "destination": "/backend/public/.well-known/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/backend/api/index.ts"
+    }
+  ]
+}
