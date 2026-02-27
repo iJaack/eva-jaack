@@ -2,13 +2,23 @@
   "version": 2,
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "cd frontend && pnpm run build",
-  "outputDirectory": "frontend/.next",
   "functions": {
-    "api/index.ts": { "maxDuration": 60 }
+    "api/index.ts": {
+      "maxDuration": 60
+    }
   },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.ts" },
-    { "source": "/.well-known/(.*)", "destination": "/api/index.ts" },
-    { "source": "/health", "destination": "/api/index.ts" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.ts"
+    },
+    {
+      "source": "/.well-known/(.*)",
+      "destination": "/api/index.ts"
+    },
+    {
+      "source": "/health",
+      "destination": "/api/index.ts"
+    }
   ]
 }
