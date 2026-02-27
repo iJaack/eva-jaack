@@ -122,7 +122,7 @@ export default function HomePage() {
           <p>
             Chain: Avalanche C-Chain<br />
             Eva Agent: #1599<br />
-            $EVA: <code>0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672</code>
+            $EVA: <a href="https://routescan.io/address/0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672" target="_blank" rel="noreferrer"><code>0x6Ae3b236...F27672</code></a>
           </p>
         </section>
 
@@ -234,10 +234,10 @@ export default function HomePage() {
             <a href="https://github.com/iJaack" target="_blank" rel="noreferrer">
               GitHub
             </a>
-            <a href="https://www.avax.network" target="_blank" rel="noreferrer">
-              Avalanche
+            <a href="https://routescan.io" target="_blank" rel="noreferrer">
+              Routescan
             </a>
-            <a href="https://erc8004.org" target="_blank" rel="noreferrer">
+            <a href="https://routescan.io/address/0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" target="_blank" rel="noreferrer">
               ERC-8004
             </a>
           </div>

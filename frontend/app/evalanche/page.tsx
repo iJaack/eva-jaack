@@ -16,7 +16,7 @@ const FEATURES = [
   agentId: '1599',
   network: 'avalanche'
 });
-// agent.address → 0x0fE6...8cA4`,
+// routescan.io/address/0x0fE6...8cA4`,
   },
   {
     badge: "x402 Payments",
@@ -49,7 +49,7 @@ const STEPS = [
     code: `import { Evalanche } from 'evalanche';
 
 const { agent, secretsSource } = await Evalanche.boot({
-  agentId: '1599',      // your ERC-8004 agent ID
+  agentId: '1599',      // routescan.io/nft/0x8004A169.../1599
   network: 'avalanche', // or 'fuji' for testnet
 });
 

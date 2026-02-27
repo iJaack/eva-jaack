@@ -125,13 +125,13 @@ export default function WhitepaperPage() {
             </div>
             <div className="surface toc-card stat-note">
               Avalanche C-Chain<br />
-              $EVA: <code>0x6Ae3b236...F27672</code>
+              $EVA: <a href="https://routescan.io/address/0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672" target="_blank" rel="noreferrer"><code>0x6Ae3b236...F27672</code></a>
               <br />
-              IdentityRegistry: <code>0x8004A169...9a432</code>
+              IdentityRegistry: <a href="https://routescan.io/address/0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" target="_blank" rel="noreferrer"><code>0x8004A169...9a432</code></a>
               <br />
-              ReputationRegistry: <code>0x8004BAa1...E9b63</code>
+              ReputationRegistry: <a href="https://routescan.io/address/0x8004BAa17C55a88189AE136b182e5fdA19dE9b63" target="_blank" rel="noreferrer"><code>0x8004BAa1...E9b63</code></a>
               <br />
-              ValidationRegistry: <code>0x5c2B454E...4ab47</code>
+              ValidationRegistry: <a href="https://routescan.io/address/0x5c2B454E34C8E173909EB36FC07DE6143A24ab47" target="_blank" rel="noreferrer"><code>0x5c2B454E...4ab47</code></a>
             </div>
           </aside>
 
@@ -290,7 +290,7 @@ natural decay applies when quality falls or activity degrades`}</pre>
                 <li>Bootstrap emissions: 5M $EVA distributed over 6 months to seed trust-aligned yield.</li>
               </ul>
               <p>
-                Token contract: <code>0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672</code>
+                Token contract: <a href="https://routescan.io/address/0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672" target="_blank" rel="noreferrer"><code>0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672</code></a>
               </p>
             </section>
 
