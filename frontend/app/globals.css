@@ -543,3 +543,13 @@ a {
     top: 88px;
   }
 }
+
+/* Evalanche nav highlight */
+.nav-pill-highlight {
+  background: rgba(226,72,92,0.12) !important;
+  border-color: rgba(226,72,92,0.5) !important;
+  color: #e2485c !important;
+}
+.nav-pill-highlight:hover {
+  background: rgba(226,72,92,0.22) !important;
+}

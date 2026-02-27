@@ -68,6 +68,13 @@ const builtOn = [
   }
 ] as const;
 
+const evalancheFeatures = [
+  "ERC-8004 Identity",
+  "x402 Payment Rails",
+  "Headless Wallet",
+  "OpenClaw Integration",
+] as const;
+
 export default function HomePage() {
   return (
     <>
@@ -82,6 +89,9 @@ export default function HomePage() {
         <nav className="nav-links">
           <Link href="/whitepaper" className="nav-pill">
             Whitepaper
+          </Link>
+          <Link href="/evalanche" className="nav-pill nav-pill-highlight">
+            Evalanche SDK
           </Link>
           <a href="https://github.com/iJaack" target="_blank" rel="noreferrer" className="nav-pill">
             GitHub
@@ -168,6 +178,42 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section style={{ marginTop: "44px" }}>
+          <p className="section-kicker">Open Source SDK</p>
+          <h2 className="section-title">Powered by Evalanche</h2>
+          <div className="surface built-card" style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <p style={{ margin: 0 }}>
+              Eva&#39;s sovereign wallet and onchain identity are managed by{" "}
+              <Link href="/evalanche" style={{ color: "#e2485c", fontWeight: 600, textDecoration: "none" }}>Evalanche</Link>
+              {" "}— a non-custodial agent wallet SDK built for Eva Protocol and open-sourced for the Avalanche ecosystem.
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+              {evalancheFeatures.map((f) => (
+                <span key={f} style={{
+                  padding: "0.3rem 0.8rem",
+                  border: "1px solid rgba(226,72,92,0.4)",
+                  borderRadius: "999px",
+                  fontSize: "0.78rem",
+                  color: "#e2485c",
+                  background: "rgba(226,72,92,0.06)",
+                  fontWeight: 500,
+                }}>{f}</span>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+              <Link href="/evalanche" className="btn btn-primary" style={{ fontSize: "0.85rem", padding: "0.5rem 1.2rem" }}>
+                View Evalanche →
+              </Link>
+              <a href="https://github.com/iJaack/evalanche" target="_blank" rel="noreferrer" className="btn btn-ghost" style={{ fontSize: "0.85rem", padding: "0.5rem 1.2rem" }}>
+                GitHub
+              </a>
+              <a href="https://www.npmjs.com/package/evalanche" target="_blank" rel="noreferrer" className="btn btn-ghost" style={{ fontSize: "0.85rem", padding: "0.5rem 1.2rem" }}>
+                npm
+              </a>
+            </div>
+          </div>
+        </section>
+
         <section className="callout">
           <h3>Coming Soon</h3>
           <p>
@@ -184,6 +230,7 @@ export default function HomePage() {
           <span>Built by Eva (Agent #1599) and Jaack.</span>
           <div className="footer-links">
             <Link href="/whitepaper">Whitepaper</Link>
+            <Link href="/evalanche">Evalanche</Link>
             <a href="https://github.com/iJaack" target="_blank" rel="noreferrer">
               GitHub
             </a>
