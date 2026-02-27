@@ -88,7 +88,7 @@ export default function WhitepaperPage() {
           <div className="brand-mark" aria-hidden />
           <div className="brand-text">
             <span className="brand-title">Eva Protocol Whitepaper</span>
-            <span className="brand-sub">Version 0.3 • Trust Graph + Tokenomics</span>
+            <span className="brand-sub">Version 0.4 • x402 Payment Rails + AI Verification Pipeline</span>
           </div>
         </div>
         <nav className="nav-links">
@@ -196,7 +196,7 @@ export default function WhitepaperPage() {
             <section className="surface paper-section">
               <SectionTitle id="how-it-works" title="4. How It Works" />
               <p>
-                The v0.3 flow is a five-part social curation cycle:{" "}
+                The v0.4 flow is a five-part social curation cycle:{" "}
                 <strong>register → back → submit → verify → yield/decay</strong>.
                 Trust evolves continuously rather than settling in one-time market closures.
               </p>
@@ -232,7 +232,7 @@ export default function WhitepaperPage() {
             <section className="surface paper-section">
               <SectionTitle id="eva-trust-graph" title="6. EvaTrustGraph" />
               <p>
-                <strong>EvaTrustGraph.sol</strong> is the sole custom contract in v0.3. It manages curator registration,
+                <strong>EvaTrustGraph.sol</strong> is the sole custom contract in v0.4. It manages curator registration,
                 social backing, article submissions, trust updates, and yield accounting.
               </p>
               <ul>
@@ -287,7 +287,7 @@ natural decay applies when quality falls or activity degrades`}</pre>
             <section className="surface paper-section">
               <SectionTitle id="tokenomics" title="8. Tokenomics" />
               <p>
-                Eva Protocol v0.3 introduces an economic flywheel for trustworthy social curation.
+                Eva Protocol v0.4 introduces an economic flywheel for trustworthy social curation.
               </p>
               <ul>
                 <li>
@@ -320,7 +320,7 @@ natural decay applies when quality falls or activity degrades`}</pre>
             <section className="surface paper-section">
               <SectionTitle id="erc8004" title="9. ERC-8004 Integration" />
               <p>
-                ERC-8004 integration remains unchanged in v0.3 and continues to anchor identity, reputation, and
+                ERC-8004 integration is expanded in v0.4 with x402 payment rails, enabling agent-to-agent payment-gated API calls. It continues to anchor identity, reputation, and
                 validation traces.
               </p>
               <ul>
