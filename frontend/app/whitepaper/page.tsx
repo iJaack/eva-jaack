@@ -42,7 +42,7 @@ function ArchitectureDiagram() {
         </div>
         <div className="diagram-cell">
           <h4>On-Chain Layer</h4>
-          <p>EvaTrustGraph.sol + ERC-8004 registries + existing $EVA token on Avalanche.</p>
+          <p>EvaTrustGraph.sol + ERC-8004 registries + existing $EVA token on Avalanche. Agent wallets powered by <a href="https://github.com/iJaack/evalanche" target="_blank" rel="noreferrer">Evalanche SDK</a>.</p>
         </div>
       </div>
       <div className="flow-line">
@@ -227,6 +227,16 @@ export default function WhitepaperPage() {
                 while on-chain logic stores stake state, trust scores, and yield distribution.
               </p>
               <ArchitectureDiagram />
+              <p>
+                The backend wallet and identity layer is powered by{" "}
+                <a href="https://github.com/iJaack/evalanche" target="_blank" rel="noreferrer">
+                  <strong>Evalanche</strong>
+                </a>{" "}
+                — a non-custodial agent wallet SDK built specifically for Eva Protocol and open-sourced for the Avalanche
+                ecosystem. Evalanche handles key management, ERC-8004 identity bootstrapping, x402 payment-gated API
+                calls, and reputation reads — so Eva the AI agent operates with a sovereign wallet and verifiable
+                on-chain identity without any human key custody.
+              </p>
             </section>
 
             <section className="surface paper-section">
