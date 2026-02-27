@@ -78,11 +78,13 @@ export async function giveFeedback(
   tag: string,
 ): Promise<Hex> {
   const wallet = getWalletClient();
-  return wallet.writeContract({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (wallet as any).writeContract({
     address: config.erc8004Reputation,
     abi: reputationRegistryAbi,
     functionName: 'addReputation',
     args: [subject, score, tag],
+    chain: avalanche,
   });
 }
 
@@ -95,11 +97,13 @@ export async function giveFeedbackToAgent(
 ): Promise<Hex> {
   const wallet = getWalletClient();
   console.log(`[erc8004] giveFeedback(agentId=${agentId}, score=${score}, tag1=${tag1})`);
-  return wallet.writeContract({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (wallet as any).writeContract({
     address: config.erc8004Reputation,
     abi: reputationRegistryAbi,
     functionName: 'giveFeedback',
     args: [agentId, score, tag1, tag2, feedbackURI],
+    chain: avalanche,
   });
 }
 
@@ -112,10 +116,12 @@ export async function validationResponse(
 ): Promise<Hex> {
   const wallet = getWalletClient();
   console.log(`[erc8004] validationResponse(requestHash=${requestHash})`);
-  return wallet.writeContract({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (wallet as any).writeContract({
     address: config.erc8004Validation,
     abi: validationRegistryAbi,
     functionName: 'validationResponse',
     args: [requestHash, response, responseURI, responseHash, tag],
+    chain: avalanche,
   });
 }
