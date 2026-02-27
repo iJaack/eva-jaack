@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
 import { computeInteractionHash } from '../lib/x402-reputation.js';
 import { config } from '../config.js';
-import type { Hex } from 'viem';
+import { runVerificationPipeline } from '../services/pipeline.js';
+import { keccak256, toHex, type Hex } from 'viem';
 
 export const verifyRoutes = new Hono();
 
@@ -38,23 +39,39 @@ verifyRoutes.post('/', async (c) => {
     );
   }
 
-  // With payment → stub verification pipeline
-  // TODO: integrate real x402 facilitator verification
+  // With payment → run real verification pipeline
   const body = await c.req.json<{ url?: string; content?: string }>();
 
-  const dataHash = '0x0000000000000000000000000000000000000000000000000000000000000000' as Hex;
-  const taskRef = `stub:${Date.now()}:/api/verify:43114`;
-  const interactionHash = computeInteractionHash(taskRef, dataHash);
+  if (!body.url) {
+    return c.json({ error: 'Missing required field: url' }, 400);
+  }
 
-  return c.json({
-    verified: true,
-    result: {
-      summary: 'Verification pipeline stub — full implementation pending',
-      url: body.url ?? null,
-    },
-    interactionHash,
-    agentRegistry: `eip155:43114:${config.erc8004Identity}`,
-    agentId: config.evaAgentId,
-    taskRef,
-  });
+  try {
+    const result = await runVerificationPipeline(body.url);
+
+    const dataHash = keccak256(toHex(JSON.stringify(result.report)));
+    const taskRef = `${dataHash.slice(0, 18)}:/api/verify:43114`;
+    const interactionHash = computeInteractionHash(taskRef, dataHash);
+
+    return c.json({
+      verified: true,
+      result: {
+        overallScore: result.overallScore,
+        claimCount: result.claimCount,
+        routescanClaimCount: result.routescanClaimCount,
+        ipfsURI: result.ipfsURI,
+        report: result.report,
+      },
+      interactionHash,
+      agentRegistry: `eip155:43114:${config.erc8004Identity}`,
+      agentId: config.evaAgentId,
+      taskRef,
+    });
+  } catch (e) {
+    console.error(`[verify] Pipeline failed: ${e}`);
+    return c.json(
+      { error: 'Verification pipeline failed', details: String(e) },
+      500,
+    );
+  }
 });

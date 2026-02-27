@@ -22,6 +22,19 @@ const reputationRegistryAbi = [
     ],
     outputs: [],
   },
+  {
+    name: 'giveFeedback',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'agentId', type: 'uint256' },
+      { name: 'score', type: 'uint8' },
+      { name: 'tag1', type: 'string' },
+      { name: 'tag2', type: 'string' },
+      { name: 'feedbackURI', type: 'string' },
+    ],
+    outputs: [],
+  },
 ] as const;
 
 const validationRegistryAbi = [
@@ -73,6 +86,23 @@ export async function giveFeedback(
   });
 }
 
+export async function giveFeedbackToAgent(
+  agentId: bigint,
+  score: number,
+  tag1: string,
+  tag2: string,
+  feedbackURI: string,
+): Promise<Hex> {
+  const wallet = getWalletClient();
+  console.log(`[erc8004] giveFeedback(agentId=${agentId}, score=${score}, tag1=${tag1})`);
+  return wallet.writeContract({
+    address: config.erc8004Reputation,
+    abi: reputationRegistryAbi,
+    functionName: 'giveFeedback',
+    args: [agentId, score, tag1, tag2, feedbackURI],
+  });
+}
+
 export async function validationResponse(
   requestHash: Hex,
   response: number,
@@ -81,6 +111,7 @@ export async function validationResponse(
   tag: string,
 ): Promise<Hex> {
   const wallet = getWalletClient();
+  console.log(`[erc8004] validationResponse(requestHash=${requestHash})`);
   return wallet.writeContract({
     address: config.erc8004Validation,
     abi: validationRegistryAbi,
