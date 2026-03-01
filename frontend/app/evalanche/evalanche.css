@@ -243,7 +243,9 @@
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.75rem;
   color: #94a3b8;
-  overflow-x: auto;
+  overflow-x: hidden;
+  white-space: pre-wrap;
+  word-break: break-all;
   border: 1px solid rgba(255,255,255,0.05);
 }
 .ev-feature-code code { color: #cbd5e1; }
@@ -278,7 +280,9 @@
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.8rem;
   color: #94a3b8;
-  overflow-x: auto;
+  overflow-x: hidden;
+  white-space: pre-wrap;
+  word-break: break-all;
   line-height: 1.7;
 }
 .ev-step-code code { color: #cbd5e1; }
@@ -329,4 +333,14 @@
   font-size: 0.8rem;
   color: var(--ev-muted);
   letter-spacing: 0.01em;
+}
+
+/* prevent horizontal scroll in code blocks */
+.ev-feature-code pre,
+.ev-feature-code code,
+.ev-step-code pre,
+.ev-step-code code {
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-x: hidden;
 }
