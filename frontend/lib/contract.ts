@@ -3,6 +3,7 @@ import { avalanche } from "viem/chains";
 import { evaTrustGraphAbi } from "./abi";
 
 const CONTRACT = "0xE84DdD5A03Fa4210c4217436afD2556B348A40a0" as const;
+const DEPLOY_BLOCK = 79554000n; // slightly before first deploy tx
 
 export const client = createPublicClient({
   chain: avalanche,
@@ -128,7 +129,7 @@ export async function getCuratorAddresses(): Promise<Address[]> {
   const logs = await client.getLogs({
     address: CONTRACT,
     event: evaTrustGraphAbi.find((e) => e.type === "event" && e.name === "CuratorRegistered")!,
-    fromBlock: 0n,
+    fromBlock: DEPLOY_BLOCK,
     toBlock: "latest",
   });
 
