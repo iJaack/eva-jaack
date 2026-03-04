@@ -6,8 +6,13 @@
   "contracts": {
     "EvaTrustGraph": {
       "proxy": "0xE84DdD5A03Fa4210c4217436afD2556B348A40a0",
-      "implementation": "0xb4354A33a9a4134C0954d6F1a6f3Ec9E2E2D3590",
-      "previousImplementation": "0x862E93e689628b6960C7Cd5244475Fa58F12A944"
+      "implementation": "0x30F1A422447C7765a59A832bDc3f2e68EED1b89C",
+      "implementationHistory": [
+        "0x862E93e689628b6960C7Cd5244475Fa58F12A944",
+        "0xb4354A33a9a4134C0954d6F1a6f3Ec9E2E2D3590",
+        "0x30F1A422447C7765a59A832bDc3f2e68EED1b89C"
+      ],
+      "verified": true
     }
   },
   "roles": {
