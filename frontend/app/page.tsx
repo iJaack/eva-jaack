@@ -41,8 +41,9 @@ export default function HomePage() {
 
         setStats(protocolStats);
 
-        // Sort articles by verifiedAt desc (unverified at end)
-        const sorted = [...allArticles].sort((a, b) => b.verifiedAt - a.verifiedAt);
+        // Filter out empty/ghost articles and sort by verifiedAt desc
+        const valid = allArticles.filter((a) => a.sourceURI && a.sourceURI.length > 0);
+        const sorted = [...valid].sort((a, b) => b.verifiedAt - a.verifiedAt);
         setArticles(sorted);
 
         setCuratorCount(addresses.length);

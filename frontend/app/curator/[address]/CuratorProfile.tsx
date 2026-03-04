@@ -36,7 +36,7 @@ export default function CuratorProfile() {
         setCurator(info);
         setArticles(
           allArticles
-            .filter((a) => a.curator.toLowerCase() === address.toLowerCase())
+            .filter((a) => a.curator.toLowerCase() === address.toLowerCase() && a.sourceURI && a.sourceURI.length > 0)
             .sort((a, b) => b.verifiedAt - a.verifiedAt)
         );
       } finally {

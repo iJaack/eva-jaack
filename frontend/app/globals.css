@@ -906,14 +906,66 @@ a {
   }
 
   .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
     gap: 4px;
-    flex-wrap: wrap;
+    padding: 12px var(--pad);
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--faint);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .nav-links.nav-open {
+    display: flex;
   }
 
   .nav-pill {
-    padding: 7px 10px;
-    font-size: 12px;
+    padding: 10px 14px;
+    font-size: 14px;
+    width: 100%;
+    justify-content: flex-start;
   }
+
+  .nav-hamburger {
+    display: flex;
+  }
+}
+
+/* Hamburger button */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.hamburger-line {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.hamburger-line.open:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-line.open:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-line.open:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
 }
 
 /* Evalanche nav highlight */

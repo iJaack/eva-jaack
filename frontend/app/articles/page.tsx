@@ -12,8 +12,9 @@ export default function ArticlesPage() {
   useEffect(() => {
     getAllArticles()
       .then((a) => {
-        a.sort((x, y) => y.verifiedAt - x.verifiedAt);
-        setArticles(a);
+        const valid = a.filter((x) => x.sourceURI && x.sourceURI.length > 0);
+        valid.sort((x, y) => y.verifiedAt - x.verifiedAt);
+        setArticles(valid);
       })
       .finally(() => setLoading(false));
   }, []);

@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 export default function Nav() {
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <header className="topbar">
@@ -15,29 +17,42 @@ export default function Nav() {
           <span className="brand-sub">Trust-Weighted Social News Network</span>
         </div>
       </Link>
-      <nav className="nav-links">
+      <button
+        className="nav-hamburger"
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Toggle menu"
+        aria-expanded={menuOpen}
+      >
+        <span className={`hamburger-line ${menuOpen ? "open" : ""}`} />
+        <span className={`hamburger-line ${menuOpen ? "open" : ""}`} />
+        <span className={`hamburger-line ${menuOpen ? "open" : ""}`} />
+      </button>
+      <nav className={`nav-links ${menuOpen ? "nav-open" : ""}`}>
         <Link
           href="/articles"
           className={`nav-pill${pathname === "/articles" ? " nav-pill-active" : ""}`}
+          onClick={() => setMenuOpen(false)}
         >
           Articles
         </Link>
         <Link
           href="/curators"
           className={`nav-pill${pathname === "/curators" ? " nav-pill-active" : ""}`}
+          onClick={() => setMenuOpen(false)}
         >
           Curators
         </Link>
         <Link
           href="/about"
           className={`nav-pill${pathname === "/about" ? " nav-pill-active" : ""}`}
+          onClick={() => setMenuOpen(false)}
         >
           About
         </Link>
-        <Link href="/whitepaper" className="nav-pill">
+        <Link href="/whitepaper" className="nav-pill" onClick={() => setMenuOpen(false)}>
           Whitepaper
         </Link>
-        <Link href="/evalanche" className="nav-pill nav-pill-highlight">
+        <Link href="/evalanche" className="nav-pill nav-pill-highlight" onClick={() => setMenuOpen(false)}>
           Evalanche SDK
         </Link>
         <a
@@ -45,6 +60,7 @@ export default function Nav() {
           target="_blank"
           rel="noreferrer"
           className="nav-pill"
+          onClick={() => setMenuOpen(false)}
         >
           GitHub
         </a>
