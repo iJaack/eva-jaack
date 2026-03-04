@@ -1,4 +1,4 @@
-import { createPublicClient, http, formatEther, type Address } from "viem";
+import { createPublicClient, http, formatEther, getAddress, type Address } from "viem";
 import { avalanche } from "viem/chains";
 import { evaTrustGraphAbi } from "./abi";
 
@@ -87,7 +87,7 @@ export async function getAllArticles(): Promise<Article[]> {
     const a = r.result as any;
     articles.push({
       id: i,
-      curator: a.curator ?? a[0],
+      curator: getAddress(a.curator ?? a[0]),
       articleHash: a.articleHash ?? a[1],
       sourceURI: a.sourceURI ?? a[2],
       requestHash: a.requestHash ?? a[3],
@@ -134,5 +134,5 @@ export async function getCuratorAddresses(): Promise<Address[]> {
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return logs.map((log) => (log as any).args.curator as Address);
+  return logs.map((log) => getAddress((log as any).args.curator) as Address);
 }
