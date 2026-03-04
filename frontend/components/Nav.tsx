@@ -28,6 +28,12 @@ export default function Nav() {
         >
           Curators
         </Link>
+        <Link
+          href="/about"
+          className={`nav-pill${pathname === "/about" ? " nav-pill-active" : ""}`}
+        >
+          About
+        </Link>
         <Link href="/whitepaper" className="nav-pill">
           Whitepaper
         </Link>
