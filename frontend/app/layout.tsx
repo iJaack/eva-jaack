@@ -43,7 +43,10 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)})();` }} />
+      </head>
       <body>
         <div className="site-backdrop" aria-hidden>
           <div className="blob blob-1" />

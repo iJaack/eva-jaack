@@ -19,6 +19,75 @@
   --pad: clamp(16px, 3.5vw, 72px);
   --max: 1508px;
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --topbar-bg: rgba(255, 255, 255, 0.86);
+  --nav-dropdown-bg: rgba(255, 255, 255, 0.96);
+  --nav-dropdown-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --hero-kicker-bg: rgba(255, 255, 255, 0.8);
+  --btn-ghost-bg: rgba(255, 255, 255, 0.8);
+  --surface-muted-bg: rgba(255, 255, 255, 0.82);
+  --diagram-bg: rgba(255, 255, 255, 0.75);
+  --formula-bg: rgba(0, 0, 0, 0.03);
+  --grid-line-h: rgba(0, 0, 0, 0.05);
+  --grid-line-v: rgba(0, 0, 0, 0.04);
+  --detail-link: #2a8a9e;
+  --nav-active-bg: rgba(133, 203, 218, 0.18);
+  --nav-active-border: rgba(133, 203, 218, 0.5);
+  --nav-active-color: #2a8a9e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg0: #0d0d0d;
+    --ink: #e8e8e8;
+    --muted: rgba(255, 255, 255, 0.68);
+    --faint: rgba(255, 255, 255, 0.12);
+    --card: rgba(30, 30, 30, 0.92);
+    --card2: rgba(255, 255, 255, 0.06);
+    --shadow-wide: 0 60px 130px rgba(0, 0, 0, 0.3);
+    --shadow-float: 0 20px 55px rgba(0, 0, 0, 0.25);
+
+    --topbar-bg: rgba(13, 13, 13, 0.86);
+    --nav-dropdown-bg: rgba(20, 20, 20, 0.96);
+    --nav-dropdown-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    --hero-kicker-bg: rgba(30, 30, 30, 0.8);
+    --btn-ghost-bg: rgba(30, 30, 30, 0.8);
+    --surface-muted-bg: rgba(30, 30, 30, 0.82);
+    --diagram-bg: rgba(30, 30, 30, 0.75);
+    --formula-bg: rgba(255, 255, 255, 0.05);
+    --grid-line-h: rgba(255, 255, 255, 0.05);
+    --grid-line-v: rgba(255, 255, 255, 0.04);
+    --detail-link: #5ec4d8;
+    --nav-active-bg: rgba(133, 203, 218, 0.18);
+    --nav-active-border: rgba(133, 203, 218, 0.5);
+    --nav-active-color: #5ec4d8;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg0: #0d0d0d;
+  --ink: #e8e8e8;
+  --muted: rgba(255, 255, 255, 0.68);
+  --faint: rgba(255, 255, 255, 0.12);
+  --card: rgba(30, 30, 30, 0.92);
+  --card2: rgba(255, 255, 255, 0.06);
+  --shadow-wide: 0 60px 130px rgba(0, 0, 0, 0.3);
+  --shadow-float: 0 20px 55px rgba(0, 0, 0, 0.25);
+
+  --topbar-bg: rgba(13, 13, 13, 0.86);
+  --nav-dropdown-bg: rgba(20, 20, 20, 0.96);
+  --nav-dropdown-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --hero-kicker-bg: rgba(30, 30, 30, 0.8);
+  --btn-ghost-bg: rgba(30, 30, 30, 0.8);
+  --surface-muted-bg: rgba(30, 30, 30, 0.82);
+  --diagram-bg: rgba(30, 30, 30, 0.75);
+  --formula-bg: rgba(255, 255, 255, 0.05);
+  --grid-line-h: rgba(255, 255, 255, 0.05);
+  --grid-line-v: rgba(255, 255, 255, 0.04);
+  --detail-link: #5ec4d8;
+  --nav-active-bg: rgba(133, 203, 218, 0.18);
+  --nav-active-border: rgba(133, 203, 218, 0.5);
+  --nav-active-color: #5ec4d8;
 }
 
 * {
@@ -115,8 +184,8 @@ a {
   position: absolute;
   inset: -30%;
   background:
-    linear-gradient(transparent 95%, rgba(0, 0, 0, 0.05) 96%),
-    linear-gradient(90deg, transparent 95%, rgba(0, 0, 0, 0.04) 96%);
+    linear-gradient(transparent 95%, var(--grid-line-h) 96%),
+    linear-gradient(90deg, transparent 95%, var(--grid-line-v) 96%);
   background-size: 64px 64px;
   opacity: 0.16;
   transform: rotate(6deg);
@@ -139,7 +208,7 @@ a {
   gap: 14px;
   padding: 18px var(--pad);
   border-bottom: 1px solid var(--faint);
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--topbar-bg);
   backdrop-filter: blur(10px);
 }
 
@@ -216,7 +285,7 @@ a {
   padding: 6px 12px;
   border-radius: 999px;
   border: 1px solid var(--faint);
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--hero-kicker-bg);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -269,7 +338,7 @@ a {
 }
 
 .btn-ghost {
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--btn-ghost-bg);
 }
 
 .section-title {
@@ -297,7 +366,7 @@ a {
 }
 
 .surface-muted {
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--surface-muted-bg);
 }
 
 .grid-2 {
@@ -470,7 +539,7 @@ a {
   padding: 14px;
   border-radius: 12px;
   border: 1px solid var(--faint);
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--diagram-bg);
 }
 
 .diagram-grid {
@@ -515,7 +584,7 @@ a {
   padding: 12px;
   border-radius: 10px;
   border: 1px solid var(--faint);
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--formula-bg);
   overflow-x: auto;
   font-family: var(--mono);
   font-size: 12px;
@@ -546,9 +615,9 @@ a {
 
 /* Active nav pill */
 .nav-pill-active {
-  background: rgba(133, 203, 218, 0.18) !important;
-  border-color: rgba(133, 203, 218, 0.5) !important;
-  color: #2a8a9e !important;
+  background: var(--nav-active-bg) !important;
+  border-color: var(--nav-active-border) !important;
+  color: var(--nav-active-color) !important;
 }
 
 /* Protocol stats */
@@ -789,7 +858,7 @@ a {
 }
 
 .detail-link {
-  color: #2a8a9e;
+  color: var(--detail-link);
   text-decoration: none;
 }
 
@@ -914,10 +983,10 @@ a {
     flex-direction: column;
     gap: 4px;
     padding: 12px var(--pad);
-    background: rgba(255, 255, 255, 0.96);
+    background: var(--nav-dropdown-bg);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--faint);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--nav-dropdown-shadow);
   }
 
   .nav-links.nav-open {
@@ -976,4 +1045,45 @@ a {
 }
 .nav-pill-highlight:hover {
   background: rgba(226,72,92,0.22) !important;
+}
+
+/* Dark mode: blob + selection adjustments */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .blob {
+    opacity: 0.3;
+    mix-blend-mode: screen;
+  }
+  :root:not([data-theme="light"]) ::selection {
+    background: rgba(133, 203, 218, 0.35);
+  }
+}
+
+:root[data-theme="dark"] .blob {
+  opacity: 0.3;
+  mix-blend-mode: screen;
+}
+
+:root[data-theme="dark"] ::selection {
+  background: rgba(133, 203, 218, 0.35);
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--faint);
+  background: var(--card2);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  transition: transform 0.2s ease, background 0.2s ease;
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-1px);
+  background: var(--card);
 }

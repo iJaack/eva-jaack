@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Nav() {
   const pathname = usePathname();
@@ -17,7 +18,9 @@ export default function Nav() {
           <span className="brand-sub">Trust-Weighted Social News Network</span>
         </div>
       </Link>
-      <button
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <ThemeToggle />
+        <button
         className="nav-hamburger"
         onClick={() => setMenuOpen(!menuOpen)}
         aria-label="Toggle menu"
@@ -27,6 +30,7 @@ export default function Nav() {
         <span className={`hamburger-line ${menuOpen ? "open" : ""}`} />
         <span className={`hamburger-line ${menuOpen ? "open" : ""}`} />
       </button>
+      </div>
       <nav className={`nav-links ${menuOpen ? "nav-open" : ""}`}>
         <Link
           href="/articles"
