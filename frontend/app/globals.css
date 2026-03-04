@@ -932,11 +932,11 @@ a {
   }
 
   .nav-hamburger {
-    display: flex;
+    display: flex !important;
   }
 }
 
-/* Hamburger button */
+/* Hamburger button — hidden by default, shown via media query above */
 .nav-hamburger {
   display: none;
   flex-direction: column;
