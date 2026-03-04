@@ -75,7 +75,9 @@ export const evaTrustGraphAbi = [
     name: "CuratorRegistered",
     inputs: [
       { name: "curator", type: "address", indexed: true },
-      { name: "agentId", type: "uint256", indexed: false },
+      { name: "agentId", type: "uint256", indexed: true },
+      { name: "stakeAmount", type: "uint256", indexed: false },
+      { name: "trustScore", type: "uint8", indexed: false },
     ],
   },
 ] as const;
