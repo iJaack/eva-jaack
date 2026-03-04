@@ -31,12 +31,14 @@ export interface AggregatorRequest {
   signature: Hex;
   taskRef: string;
   dataHash: Hex;
+  endpoint?: string;
 }
 
 export interface AggregatorResponse {
   success: boolean;
   txHash?: Hex;
   feedbackHash: Hex;
+  feedbackIndex?: bigint;
   error?: string;
 }
 

@@ -1,4 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import Nav from "@/components/Nav";
+import { getProtocolStats, getCuratorAddresses, getCuratorInfo, type ProtocolStats } from "@/lib/contract";
 
 const flowSteps = [
   {
@@ -76,28 +81,27 @@ const evalancheFeatures = [
 ] as const;
 
 export default function HomePage() {
+  const [stats, setStats] = useState<ProtocolStats | null>(null);
+  const [curatorCount, setCuratorCount] = useState<number | null>(null);
+  const [avgTrust, setAvgTrust] = useState<number | null>(null);
+
+  useEffect(() => {
+    getProtocolStats().then(setStats);
+    getCuratorAddresses().then(async (addrs) => {
+      setCuratorCount(addrs.length);
+      if (addrs.length > 0) {
+        const infos = await Promise.all(addrs.map((a) => getCuratorInfo(a)));
+        const avg = Math.round(
+          infos.reduce((s, c) => s + c.trustScore, 0) / infos.length
+        );
+        setAvgTrust(avg);
+      }
+    });
+  }, []);
+
   return (
     <>
-      <header className="topbar">
-        <div className="brand">
-          <div className="brand-mark" aria-hidden />
-          <div className="brand-text">
-            <span className="brand-title">Eva Protocol</span>
-            <span className="brand-sub">Trust-Weighted Social News Network</span>
-          </div>
-        </div>
-        <nav className="nav-links">
-          <Link href="/whitepaper" className="nav-pill">
-            Whitepaper
-          </Link>
-          <Link href="/evalanche" className="nav-pill nav-pill-highlight">
-            Evalanche SDK
-          </Link>
-          <a href="https://github.com/iJaack" target="_blank" rel="noreferrer" className="nav-pill">
-            GitHub
-          </a>
-        </nav>
-      </header>
+      <Nav />
 
       <main className="page-shell">
         <section className="hero">
@@ -124,6 +128,21 @@ export default function HomePage() {
             Eva Agent: #1599<br />
             $EVA: <a href="https://routescan.io/address/0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672" target="_blank" rel="noreferrer"><code>0x6Ae3b236...F27672</code></a>
           </p>
+        </section>
+
+        <section className="protocol-stats grid-3" style={{ marginTop: "18px" }}>
+          <div className="surface stat-card">
+            <span className="stat-value">{stats ? stats.totalArticles : "—"}</span>
+            <span className="stat-label">Articles Verified</span>
+          </div>
+          <div className="surface stat-card">
+            <span className="stat-value">{curatorCount ?? "—"}</span>
+            <span className="stat-label">Active Curators</span>
+          </div>
+          <div className="surface stat-card">
+            <span className="stat-value">{avgTrust !== null ? avgTrust : "—"}</span>
+            <span className="stat-label">Avg Trust Score</span>
+          </div>
         </section>
 
         <section style={{ marginTop: "40px" }}>

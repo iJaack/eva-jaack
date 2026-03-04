@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { keccak256, toHex, type Hex } from 'viem';
 import {
   computeFeedbackHash,
   verifyReviewerSignature,
@@ -6,7 +7,7 @@ import {
   type AggregatorResponse,
 } from '../lib/x402-reputation.js';
 import { giveFeedback } from '../lib/erc8004.js';
-import type { Hex } from 'viem';
+import { config } from '../config.js';
 
 export const reputationRoutes = new Hono();
 
@@ -45,10 +46,23 @@ reputationRoutes.post('/feedback', async (c) => {
     );
   }
 
-  // 4. Submit on-chain via ReputationRegistry.addReputation
+  // 4. Submit on-chain via ReputationRegistry.giveFeedback
   try {
-    const tag = `x402:feedback:${req.taskRef}`;
-    const txHash = await giveFeedback(req.reviewerAddress, req.score, tag);
+    const agentId = BigInt(config.evaAgentId);
+    const feedbackURI = `x402:feedback:${req.taskRef}`;
+    const onchainHash = keccak256(toHex(feedbackURI));
+    const endpoint = req.endpoint ?? '';
+
+    const txHash = await giveFeedback(
+      agentId,
+      BigInt(req.score),
+      0,
+      'x402',
+      'feedback',
+      endpoint,
+      feedbackURI,
+      onchainHash,
+    );
 
     return c.json<AggregatorResponse>({
       success: true,

@@ -142,6 +142,32 @@ contract EvaTrustGraph is
         emit CuratorRegistered(msg.sender, curatorAgentId, amount, INITIAL_TRUST_SCORE);
     }
 
+    /// @notice Admin-only bootstrap registration with zero stake (for protocol launch).
+    /// @param curatorAgentId ERC-8004 identity agent id that must be owned by the caller.
+    function bootstrapCurator(uint256 curatorAgentId) external onlyRole(DEFAULT_ADMIN_ROLE) nonReentrant {
+        Curator storage curator = _curators[msg.sender];
+        if (curator.registered) {
+            revert AlreadyRegistered();
+        }
+        if (_curatorByAgentId[curatorAgentId] != address(0)) {
+            revert AgentIdAlreadyRegistered();
+        }
+        if (identityRegistry.ownerOf(curatorAgentId) != msg.sender) {
+            revert IdentityOwnershipMismatch();
+        }
+
+        curator.registered = true;
+        curator.curatorAgentId = curatorAgentId;
+        curator.selfStake = 0;
+        curator.trustScore = INITIAL_TRUST_SCORE;
+        curator.registeredAt = uint64(block.timestamp);
+        curator.lastTrustUpdate = uint64(block.timestamp);
+        curator.lastArticleAt = uint64(block.timestamp);
+        _curatorByAgentId[curatorAgentId] = msg.sender;
+
+        emit CuratorRegistered(msg.sender, curatorAgentId, 0, INITIAL_TRUST_SCORE);
+    }
+
     /// @notice Increases curator self-stake.
     /// @param amount Additional amount in $EVA to lock as self-stake.
     function increaseSelfStake(uint256 amount) external nonReentrant {
@@ -383,7 +409,16 @@ contract EvaTrustGraph is
             article.requestHash, verificationScore, evidenceURI, responseHash, tag
         ) {}
             catch {}
-        try reputationRegistry.addReputation(curatorAddr, nextScore, tag) {} catch {}
+        try reputationRegistry.giveFeedback(
+            curator.curatorAgentId,
+            int128(uint128(nextScore)),
+            0,
+            "eva-trust",
+            "verification",
+            "https://eva.jaack.me/api/verify",
+            evidenceURI,
+            responseHash
+        ) {} catch {}
     }
 
     /// @notice Applies inactivity decay to a curator trust score.
@@ -468,7 +503,7 @@ contract EvaTrustGraph is
         if (decayEpochSeconds_ == 0) {
             revert InvalidAmount();
         }
-        if (minSelfStake_ == 0 || minBacking_ == 0) {
+        if (minSelfStake_ == 0 && minBacking_ != 0) {  // allow both 0 for bootstrap
             revert InvalidAmount();
         }
         if (minYieldMultiplierBps_ == 0 || maxYieldMultiplierBps_ < minYieldMultiplierBps_) {
@@ -611,15 +646,19 @@ contract EvaTrustGraph is
     }
 
     function _collectSubmissionFee(address submitter, uint256 fee) internal {
-        if (fee == 0) {
-            revert InvalidAmount();
-        }
+        if (fee == 0) return; // free submissions allowed during bootstrap
         evaToken.safeTransferFrom(submitter, address(this), fee);
         yieldReserve += fee;
         emit YieldFunded(submitter, fee, yieldReserve);
     }
 
+    function updateSubmissionFees(uint256 submissionFee_, uint256 premiumSubmissionFee_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        submissionFee = submissionFee_;
+        premiumSubmissionFee = premiumSubmissionFee_;
+    }
+
     function _requiredSelfStake(uint8 trustScore) internal view returns (uint256) {
+        if (minSelfStake == 0) return 0; // bootstrap mode — no stake required
         uint256 scoreTierStake = TrustMath.getMinStake(trustScore);
         return scoreTierStake > minSelfStake ? scoreTierStake : minSelfStake;
     }

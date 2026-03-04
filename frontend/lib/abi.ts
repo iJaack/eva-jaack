@@ -1,0 +1,81 @@
+export const evaTrustGraphAbi = [
+  {
+    type: "function",
+    name: "nextArticleId",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getArticle",
+    inputs: [{ name: "articleId", type: "uint256" }],
+    outputs: [
+      {
+        type: "tuple",
+        components: [
+          { name: "curator", type: "address" },
+          { name: "articleHash", type: "bytes32" },
+          { name: "sourceURI", type: "string" },
+          { name: "requestHash", type: "bytes32" },
+          { name: "evidenceURI", type: "string" },
+          { name: "responseHash", type: "bytes32" },
+          { name: "validationTag", type: "string" },
+          { name: "submittedAt", type: "uint64" },
+          { name: "verifiedAt", type: "uint64" },
+          { name: "verificationScore", type: "uint8" },
+          { name: "premium", type: "bool" },
+          { name: "status", type: "uint8" },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getCurator",
+    inputs: [{ name: "curator", type: "address" }],
+    outputs: [
+      {
+        type: "tuple",
+        components: [
+          { name: "registered", type: "bool" },
+          { name: "curatorAgentId", type: "uint256" },
+          { name: "selfStake", type: "uint256" },
+          { name: "delegatedStake", type: "uint256" },
+          { name: "accYieldPerStakeX18", type: "uint256" },
+          { name: "pendingSelfYield", type: "uint256" },
+          { name: "selfRewardDebt", type: "uint256" },
+          { name: "trustScore", type: "uint8" },
+          { name: "registeredAt", type: "uint64" },
+          { name: "lastTrustUpdate", type: "uint64" },
+          { name: "lastArticleAt", type: "uint64" },
+          { name: "articleCount", type: "uint64" },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "yieldReserve",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "minSelfStake",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "event",
+    name: "CuratorRegistered",
+    inputs: [
+      { name: "curator", type: "address", indexed: true },
+      { name: "agentId", type: "uint256", indexed: false },
+    ],
+  },
+] as const;

@@ -1,0 +1,24 @@
+{
+  "network": "avalanche-mainnet",
+  "chainId": 43114,
+  "deployedAt": "2026-03-04T16:22:00Z",
+  "deployer": "0x0fE61780BD5508b3C99E420662050E5560608cA4",
+  "contracts": {
+    "EvaTrustGraph": {
+      "proxy": "0xE84DdD5A03Fa4210c4217436afD2556B348A40a0",
+      "implementation": "0xb4354A33a9a4134C0954d6F1a6f3Ec9E2E2D3590",
+      "previousImplementation": "0x862E93e689628b6960C7Cd5244475Fa58F12A944"
+    }
+  },
+  "roles": {
+    "admin": "0x0fE61780BD5508b3C99E420662050E5560608cA4",
+    "oracle": "0x0fE61780BD5508b3C99E420662050E5560608cA4",
+    "treasury": "0x0fE61780BD5508b3C99E420662050E5560608cA4"
+  },
+  "externalContracts": {
+    "evaToken": "0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672",
+    "identityRegistry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+    "reputationRegistry": "0x8004BAa17C55a88189AE136b182e5fdA19dE9b63",
+    "validationRegistry": "0x5c2B454E34C8E173909EB36FC07DE6143A24ab47"
+  }
+}
