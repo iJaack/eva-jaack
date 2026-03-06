@@ -4,7 +4,7 @@ import "./evalanche.css";
 export const metadata: Metadata = {
   title: "Evalanche — Multi-EVM Agent Wallet SDK",
   description:
-    "Non-custodial agent wallet SDK for 21 EVM chains. ERC-8004 identity, x402 payment rails, cross-chain bridging via Li.Fi, and destination gas funding via Gas.zip. Built for autonomous agents.",
+    "Non-custodial agent wallet SDK for 21+ EVM chains. ERC-8004 identity, x402 payment rails, cross-chain bridging via Li.Fi, Gas.zip gas funding, Arena DEX, and Avalanche subnet/L1 management via platform-cli. Built for autonomous agents.",
 };
 
 const FEATURES = [
@@ -60,6 +60,29 @@ await agent.switchNetwork('base');
 // 2. env vars
 // 3. encrypted keystore
 const { secretsSource } = await boot();`,
+  },
+  {
+    badge: "Arena DEX",
+    title: "Community Token Trading",
+    body: "Buy and sell Arena community tokens on Avalanche via bonding curves. Price discovery, cost estimation, and token info — all programmatic.",
+    code: `await agent.call({
+  contract: ARENA_TOKEN_MANAGER,
+  method: 'buyAndCreateLpIfPossible',
+  args: [tokenId, amount, maxCost],
+});
+// bonding curve swap on Avalanche`,
+  },
+  {
+    badge: "Platform CLI",
+    title: "Subnet & L1 Management",
+    body: "Create subnets, convert to L1 blockchains, manage validators with BLS keys, and query node info. Wraps ava-labs/platform-cli as optional subprocess.",
+    code: `const cli = await agent.platformCLI();
+await cli.createSubnet();
+await cli.addValidator({
+  nodeId: 'NodeID-...',
+  stakeAvax: 2000,
+  blsPublicKey: '0x...',
+});`,
   },
 ];
 
@@ -145,11 +168,13 @@ export default function EvalanchePage() {
             </h1>
             <p className="ev-tagline">multi-EVM agent wallet SDK</p>
             <div className="ev-badges">
-              <span className="ev-badge">21 Chains</span>
+              <span className="ev-badge">21+ Chains</span>
               <span className="ev-badge">Li.Fi Bridging</span>
               <span className="ev-badge">Gas.zip</span>
               <span className="ev-badge">ERC-8004 Identity</span>
               <span className="ev-badge">x402 Payments</span>
+              <span className="ev-badge">Arena DEX</span>
+              <span className="ev-badge">Subnet/L1 Ops</span>
             </div>
             <div className="ev-hero-ctas">
               <a href="#install" className="ev-btn-primary">Get Started</a>
@@ -185,7 +210,7 @@ await agent.bridgeTokens({
       {/* CHAINS */}
       <section className="ev-section">
         <div className="ev-container">
-          <h2 className="ev-section-title">21 supported chains</h2>
+          <h2 className="ev-section-title">21+ supported chains</h2>
           <div className="ev-chain-grid">
             {CHAINS.map((c) => (
               <span key={c} className="ev-chain-pill">{c}</span>
@@ -259,7 +284,7 @@ await agent.bridgeTokens({
       </section>
 
       <footer className="ev-footer">
-        <p>built for <a href="https://eva.jaack.me">Eva Protocol</a> by Eva · open source · multi-EVM · v0.4.0</p>
+        <p>built for <a href="https://eva.jaack.me">Eva Protocol</a> by Eva · open source · multi-EVM · v0.6.0</p>
       </footer>
     </div>
   );
