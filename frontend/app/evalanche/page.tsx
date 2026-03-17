@@ -4,7 +4,7 @@ import "./evalanche.css";
 export const metadata: Metadata = {
   title: "Evalanche — Multi-EVM Agent Wallet SDK",
   description:
-    "Non-custodial agent wallet SDK for 21+ EVM chains. ERC-8004 identity, x402 payment rails, cross-chain bridging via Li.Fi, Gas.zip gas funding, Arena DEX, and Avalanche subnet/L1 management via platform-cli. Built for autonomous agents.",
+    "Non-custodial agent wallet SDK for 21+ EVM chains. ERC-8004 identity, x402 payment rails, Li.Fi bridging + DEX aggregation, DeFi Composer, liquid staking, EIP-4626 vaults, Polymarket CLOB, CoinGecko market data, Gas.zip, Arena DEX, and Avalanche subnet/L1 ops. 91 MCP tools. Built for autonomous agents.",
 };
 
 const FEATURES = [
@@ -22,7 +22,7 @@ await agent.switchNetwork('base');
   {
     badge: "Cross-Chain Bridging",
     title: "Bridge via Li.Fi + Gas.zip",
-    body: "Bridge any token across chains via Li.Fi's optimal routing. Fund gas on destination chains via Gas.zip before bridging — no stuck transactions.",
+    body: "Bridge any token across chains via Li.Fi's optimal routing (27+ bridges). Same-chain DEX swaps via 31+ aggregators. One-tx DeFi Composer: bridge + deposit into Morpho, Aave, Pendle, Lido in a single call.",
     code: `await agent.bridgeTokens({
   fromChain: 'avalanche',
   toChain:   'base',
@@ -34,7 +34,7 @@ await agent.switchNetwork('base');
   {
     badge: "ERC-8004 Identity",
     title: "Verifiable Agent Identity",
-    body: "Boot with an agentId and get a fully registered ERC-8004 identity on Avalanche. Reputation, validation receipts, and task completion — all onchain.",
+    body: "Boot with an agentId and get a fully registered ERC-8004 identity on Avalanche. Reputation, validation receipts, and task completion — all onchain. Resolve any agent's services, wallet, and transport endpoints.",
     code: `const { agent } = await Evalanche.boot({
   agentId: '1599',
   network: 'avalanche'
@@ -50,6 +50,41 @@ await agent.switchNetwork('base');
   { method: 'GET' }
 );
 // auto-pays x402 challenge`,
+  },
+  {
+    badge: "DeFi — v1.2.0",
+    title: "Liquid Staking + EIP-4626 Vaults",
+    body: "Stake AVAX → sAVAX via Benqi (instant or delayed unstake). Deposit/withdraw from any EIP-4626 vault: yoUSD, Morpho, Aave, Euler, and more.",
+    code: `const { staking, vaults } = agent.defi();
+
+// Stake AVAX → sAVAX
+await staking.sAvaxStake('10', 50); // 50bps slippage
+
+// Deposit into yoUSD vault on Base
+await vaults.deposit(YOUSD_VAULT, '1000', 'base');`,
+  },
+  {
+    badge: "Polymarket — v1.3.0",
+    title: "Prediction Market Trading",
+    body: "Search Polymarket markets, get orderbooks, buy YES/NO outcome shares on Polygon, and redeem winnings. On-chain position verification across any wallet.",
+    code: `const pm = agent.polymarket();
+
+const markets = await pm.searchMarkets('bitcoin');
+await pm.buy({
+  conditionId: '0x...',
+  outcome: 'NO',
+  amountUSDC: '20',
+});`,
+  },
+  {
+    badge: "CoinGecko — v1.3.0",
+    title: "Live Market Intelligence",
+    body: "Real-time prices, trending coins, top gainers/losers, market caps, historical OHLC, and coin search. Powers Mony's momentum scanner.",
+    code: `const cg = agent.coingecko();
+
+const trending = await cg.trending();
+const movers = await cg.topMovers('24h');
+const price = await cg.price('avalanche');`,
   },
   {
     badge: "Headless Wallet",
@@ -132,13 +167,18 @@ const txHash = await agent.send({
   },
   {
     step: "06",
-    label: "Make x402 API calls",
-    code: `const data = await agent.fetch(
-  'https://api.eva.jaack.me/api/verify',
-  { method: 'POST',
-    body: JSON.stringify({ url: 'https://...' }) }
-);
-// auto-handles 402 Payment Required`,
+    label: "Trade prediction markets",
+    code: `const pm = agent.polymarket();
+
+// Search active markets
+const markets = await pm.searchMarkets('iran');
+
+// Buy NO on a market
+await pm.buy({
+  conditionId: markets[0].conditionId,
+  outcome: 'NO',
+  amountUSDC: '20',
+});`,
   },
 ];
 
@@ -151,7 +191,7 @@ export default function EvalanchePage() {
         <div className="ev-nav-links">
           <a href="https://github.com/iJaack/evalanche" target="_blank" rel="noreferrer" className="ev-nav-link">GitHub</a>
           <a href="https://www.npmjs.com/package/evalanche" target="_blank" rel="noreferrer" className="ev-nav-link">npm</a>
-          <a href="https://clawhub.com" target="_blank" rel="noreferrer" className="ev-nav-link">ClawHub</a>
+          <a href="https://clawhub.com/skills/evalanche" target="_blank" rel="noreferrer" className="ev-nav-link">ClawHub</a>
         </div>
       </nav>
 
@@ -173,8 +213,11 @@ export default function EvalanchePage() {
               <span className="ev-badge">Gas.zip</span>
               <span className="ev-badge">ERC-8004 Identity</span>
               <span className="ev-badge">x402 Payments</span>
+              <span className="ev-badge">DeFi Vaults</span>
+              <span className="ev-badge">Polymarket</span>
+              <span className="ev-badge">CoinGecko</span>
               <span className="ev-badge">Arena DEX</span>
-              <span className="ev-badge">Subnet/L1 Ops</span>
+              <span className="ev-badge">91 MCP Tools</span>
             </div>
             <div className="ev-hero-ctas">
               <a href="#install" className="ev-btn-primary">Get Started</a>
@@ -185,7 +228,7 @@ export default function EvalanchePage() {
           <div className="ev-hero-code">
             <div className="ev-code-bar">
               <span className="ev-dot" /><span className="ev-dot" /><span className="ev-dot" />
-              <span className="ev-code-title">bridge.ts</span>
+              <span className="ev-code-title">agent.ts</span>
             </div>
             <pre className="ev-code-body"><code>{`import { Evalanche } from 'evalanche';
 
@@ -197,11 +240,18 @@ const { agent } = await Evalanche.boot({
 // bridge USDC to Base, gas funded
 await agent.bridgeTokens({
   fromChain: 'avalanche',
-  toChain:   'base',
-  token:     'USDC',
-  amount:    '100',
-  fundGas:   true,
+  toChain: 'base', token: 'USDC',
+  amount: '100', fundGas: true,
 });
+
+// trade prediction markets
+const pm = agent.polymarket();
+await pm.buy({ conditionId: '0x...',
+  outcome: 'NO', amountUSDC: '20' });
+
+// live market data
+const cg = agent.coingecko();
+const trending = await cg.trending();
 // trust is composable ✦`}</code></pre>
           </div>
         </div>
@@ -262,7 +312,7 @@ await agent.bridgeTokens({
             {[
               { label: "GitHub", sub: "iJaack/evalanche", href: "https://github.com/iJaack/evalanche" },
               { label: "npm package", sub: "npm install evalanche", href: "https://www.npmjs.com/package/evalanche" },
-              { label: "ClawHub Skill", sub: "clawhub install evalanche", href: "https://clawhub.com" },
+              { label: "ClawHub Skill", sub: "clawhub install evalanche", href: "https://clawhub.com/skills/evalanche" },
               { label: "Eva Protocol Whitepaper", sub: "eva.jaack.me/whitepaper", href: "/whitepaper" },
             ].map((l) => (
               <a
@@ -284,7 +334,7 @@ await agent.bridgeTokens({
       </section>
 
       <footer className="ev-footer">
-        <p>built for <a href="https://eva.jaack.me">Eva Protocol</a> by Eva · open source · multi-EVM · v0.6.0</p>
+        <p>built for <a href="https://eva.jaack.me">Eva Protocol</a> by Eva · open source · multi-EVM · v1.3.0</p>
       </footer>
     </div>
   );
