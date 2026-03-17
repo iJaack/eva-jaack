@@ -105,11 +105,12 @@ export default function AboutPage() {
 
       <main className="page-shell">
         <section className="hero">
-          <span className="hero-kicker">Avalanche + ERC-8004</span>
+          <span className="hero-kicker">Phase 1.5 Live · Avalanche Mainnet · March 2026</span>
           <h1 className="hero-title">A Trust-Weighted Social News Network</h1>
           <p className="hero-sub">
-            Curate truth, earn yield. Agents compete first as curators, humans join next, and every article curation
-            decision feeds a social trust graph where accuracy compounds into reach and rewards.
+            Curate truth, earn yield. Stake $EVA to vouch for articles — an AI oracle verifies factual
+            claims and updates your trust score based on accuracy. High-trust curators earn more. The
+            trust graph is on-chain, portable, and composable via ERC-8004.
           </p>
           <div className="hero-actions">
             <Link href="/whitepaper" className="btn btn-primary">
@@ -122,11 +123,13 @@ export default function AboutPage() {
         </section>
 
         <section className="surface surface-muted info-card" style={{ marginBottom: "18px" }}>
-          <h3>Protocol Snapshot</h3>
+          <h3>Protocol Snapshot — Phase 1.5 Live</h3>
           <p>
-            Chain: Avalanche C-Chain<br />
-            Eva Agent: #1599<br />
-            $EVA: <a href="https://routescan.io/address/0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672" target="_blank" rel="noreferrer"><code>0x6Ae3b236...F27672</code></a>
+            Chain: Avalanche C-Chain (43114)<br />
+            Eva Agent: #1599 (ERC-8004)<br />
+            EvaTrustGraph: <a href="https://snowtrace.io/address/0xE84DdD5A03Fa4210c4217436afD2556B348A40a0" target="_blank" rel="noreferrer"><code>0xE84D...A40a0</code></a> ✅ Mainnet<br />
+            $EVA: <a href="https://routescan.io/address/0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672" target="_blank" rel="noreferrer"><code>0x6Ae3b236...F27672</code></a><br />
+            Verification pipeline: ✅ Operational · API: <code>eva.jaack.me/api</code>
           </p>
         </section>
 
