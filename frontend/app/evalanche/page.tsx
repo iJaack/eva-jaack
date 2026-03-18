@@ -4,7 +4,7 @@ import "./evalanche.css";
 export const metadata: Metadata = {
   title: "Evalanche — Multi-EVM Agent Wallet SDK",
   description:
-    "Non-custodial agent wallet SDK for 21+ EVM chains. ERC-8004 identity, x402 payment rails, Li.Fi bridging + DEX aggregation, DeFi Composer, liquid staking, EIP-4626 vaults, Polymarket CLOB, CoinGecko market data, Gas.zip, Arena DEX, and Avalanche subnet/L1 ops. 91 MCP tools. Built for autonomous agents.",
+    "Non-custodial agent wallet SDK for 21+ EVM chains. ERC-8004 identity, x402 payment rails, Li.Fi bridging + DEX aggregation, Yield Yak swaps on Avalanche, DeFi Composer, liquid staking, EIP-4626 vaults, Polymarket CLOB, CoinGecko market data, Gas.zip, Arena DEX, and Avalanche subnet/L1 ops. 91 MCP tools. Built for autonomous agents.",
 };
 
 const FEATURES = [
@@ -22,7 +22,7 @@ await agent.switchNetwork('base');
   {
     badge: "Cross-Chain Bridging",
     title: "Bridge via Li.Fi + Gas.zip",
-    body: "Bridge any token across chains via Li.Fi's optimal routing (27+ bridges). Same-chain DEX swaps via 31+ aggregators. One-tx DeFi Composer: bridge + deposit into Morpho, Aave, Pendle, Lido in a single call.",
+    body: "Bridge any token across chains via Li.Fi's optimal routing (27+ bridges). Same-chain DEX swaps via Li.Fi plus Yield Yak on Avalanche. One-tx DeFi Composer: bridge + deposit into Morpho, Aave, Pendle, Lido in a single call.",
     code: `await agent.bridgeTokens({
   fromChain: 'avalanche',
   toChain:   'base',
@@ -64,7 +64,7 @@ await staking.sAvaxStake('10', 50); // 50bps slippage
 await vaults.deposit(YOUSD_VAULT, '1000', 'base');`,
   },
   {
-    badge: "Polymarket — v1.3.0",
+    badge: "Polymarket — v1.3.1",
     title: "Prediction Market Trading",
     body: "Search Polymarket markets, get orderbooks, buy YES/NO outcome shares on Polygon, and redeem winnings. On-chain position verification across any wallet.",
     code: `const pm = agent.polymarket();
@@ -77,7 +77,7 @@ await pm.buy({
 });`,
   },
   {
-    badge: "CoinGecko — v1.3.0",
+    badge: "CoinGecko — v1.3.1",
     title: "Live Market Intelligence",
     body: "Real-time prices, trending coins, top gainers/losers, market caps, historical OHLC, and coin search. Powers Mony's momentum scanner.",
     code: `const cg = agent.coingecko();
@@ -214,6 +214,7 @@ export default function EvalanchePage() {
               <span className="ev-badge">ERC-8004 Identity</span>
               <span className="ev-badge">x402 Payments</span>
               <span className="ev-badge">DeFi Vaults</span>
+              <span className="ev-badge">Yield Yak</span>
               <span className="ev-badge">Polymarket</span>
               <span className="ev-badge">CoinGecko</span>
               <span className="ev-badge">Arena DEX</span>
@@ -334,7 +335,7 @@ const trending = await cg.trending();
       </section>
 
       <footer className="ev-footer">
-        <p>built for <a href="https://eva.jaack.me">Eva Protocol</a> by Eva · open source · multi-EVM · v1.3.0</p>
+        <p>built for <a href="https://eva.jaack.me">Eva Protocol</a> by Eva · open source · multi-EVM · v1.3.1</p>
       </footer>
     </div>
   );
