@@ -1,28 +1,37 @@
-import { Evalanche } from 'evalanche';
+import { privateKeyToAccount } from 'viem/accounts';
+import { config } from '../config.js';
 
-let _agent: Awaited<ReturnType<typeof Evalanche.boot>> | null = null;
+type Hex = `0x${string}`;
+
+export interface EvaAgentHandle {
+  identity: { agentId: string };
+  agent: { address: `0x${string}` };
+  secretsSource: 'env';
+}
+
+let _agent: EvaAgentHandle | null = null;
 
 /**
- * Get Eva's singleton Evalanche agent (lazy init).
+ * Minimal Eva agent handle backed by EVA_PRIVATE_KEY.
  *
- * Credential resolution priority:
- * 1. OpenClaw external secrets (if `openclaw` CLI available + AGENT_PRIVATE_KEY=@secret:...)
- * 2. Raw AGENT_PRIVATE_KEY / AGENT_MNEMONIC env vars
- * 3. Encrypted keystore at ~/.evalanche/keys/agent.json
- *
- * No private keys should ever be stored in plaintext — use OpenClaw secrets
- * or the auto-managed keystore.
+ * The backend no longer pulls in Evalanche because its transitive dependency
+ * graph currently carries unresolved critical/high advisories. If richer agent
+ * bootstrapping is needed again later, reintroduce it behind a safer package set.
  */
-export async function getEvaAgent() {
+export async function getEvaAgent(): Promise<EvaAgentHandle> {
   if (!_agent) {
-    _agent = await Evalanche.boot({
-      network: 'avalanche',
-      identity: { agentId: '1599' },
-    });
-    // secretsSource added in evalanche@0.3.4 — cast until package updates
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const src = (_agent as any).secretsSource ?? 'keystore';
-    console.log(`[eva-agent] booted — credentials source: ${src} — address: ${_agent.agent.address}`);
+    const privateKey = config.evaPrivateKey as Hex;
+    if (!privateKey) throw new Error('EVA_PRIVATE_KEY not set');
+
+    const account = privateKeyToAccount(privateKey);
+    _agent = {
+      identity: { agentId: config.evaAgentId },
+      agent: { address: account.address },
+      secretsSource: 'env',
+    };
+
+    console.log(`[eva-agent] booted — credentials source: env — address: ${account.address}`);
   }
+
   return _agent;
 }
