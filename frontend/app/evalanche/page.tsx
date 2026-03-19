@@ -64,7 +64,7 @@ await staking.sAvaxStake('10', 50); // 50bps slippage
 await vaults.deposit(YOUSD_VAULT, '1000', 'base');`,
   },
   {
-    badge: "Polymarket — v1.3.1",
+    badge: "Polymarket — v1.3.6",
     title: "Prediction Market Trading",
     body: "Search Polymarket markets, get orderbooks, buy YES/NO outcome shares on Polygon, and redeem winnings. On-chain position verification across any wallet.",
     code: `const pm = agent.polymarket();
@@ -77,7 +77,7 @@ await pm.buy({
 });`,
   },
   {
-    badge: "CoinGecko — v1.3.1",
+    badge: "CoinGecko — v1.3.6",
     title: "Live Market Intelligence",
     body: "Real-time prices, trending coins, top gainers/losers, market caps, historical OHLC, and coin search. Powers Mony's momentum scanner.",
     code: `const cg = agent.coingecko();
@@ -219,6 +219,7 @@ export default function EvalanchePage() {
               <span className="ev-badge">CoinGecko</span>
               <span className="ev-badge">Arena DEX</span>
               <span className="ev-badge">91 MCP Tools</span>
+              <span className="ev-badge">v1.3.6</span>
             </div>
             <div className="ev-hero-ctas">
               <a href="#install" className="ev-btn-primary">Get Started</a>
