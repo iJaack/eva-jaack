@@ -1,23 +1,26 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { config } from '../backend/src/config.js';
+import { curatorRoutes } from '../backend/src/routes/curators.js';
+import { trustRoutes } from '../backend/src/routes/trust.js';
 
 const app = new Hono();
 app.use('*', cors({ origin: '*' }));
 
 app.get('/health', (c) =>
-  c.json({ status: 'ok', service: 'eva-protocol', agentId: '1599', version: '0.1.0' })
+  c.json({ status: 'ok', service: 'eva-protocol', agentId: config.evaAgentId, version: '0.1.0' })
 );
 
 app.get('/.well-known/agent.json', (c) =>
   c.json({
-    agentId: '1599',
-    agentRegistry: 'eip155:43114:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432',
+    agentId: config.evaAgentId,
+    agentRegistry: `eip155:43114:${config.erc8004Identity}`,
     agentURI: 'https://eva.jaack.me/.well-known/agent.json',
     x402Support: true,
     supportedTrust: ['erc-8004-reputation-v1'],
-    services: [{ type: 'agentWallet', id: 'eip155:43114:0x0fE61780BD5508b3C99E420662050E5560608cA4' }],
-    signers: [{ agentWallet: 'eip155:43114:0x0fE61780BD5508b3C99E420662050E5560608cA4' }],
+    services: [{ type: 'agentWallet', id: `eip155:43114:${config.evaSovereignWallet}` }],
+    signers: [{ agentWallet: `eip155:43114:${config.evaSovereignWallet}` }],
     feedbackAggregator: 'https://eva.jaack.me/api/reputation/feedback',
   })
 );
@@ -25,7 +28,9 @@ app.get('/.well-known/agent.json', (c) =>
 app.post('/api/verify', (c) => c.json({ error: 'Payment required', amount: '0.05', currency: 'USDC', network: 'base' }, 402));
 app.post('/api/reputation/feedback', (c) => c.json({ error: 'Not yet implemented' }, 501));
 app.post('/api/submit', (c) => c.json({ error: 'Not yet implemented' }, 501));
-app.get('/api/curators', (c) => c.json([]));
+app.route('/api/curators', curatorRoutes);
+app.route('/api/curator', curatorRoutes);
+app.route('/api/trust', trustRoutes);
 
 function readBody(req: IncomingMessage): Promise<Uint8Array> {
   return new Promise((resolve) => {

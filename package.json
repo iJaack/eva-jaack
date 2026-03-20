@@ -2,6 +2,7 @@
   "name": "eva-protocol",
   "private": true,
   "version": "0.1.0",
+  "type": "module",
   "description": "Eva Protocol monorepo",
   "packageManager": "pnpm@9.15.4",
   "scripts": {
@@ -11,7 +12,10 @@
     "typecheck": "pnpm --filter frontend typecheck"
   },
   "dependencies": {
-    "hono": "^4.12.3"
+    "hono": "^4.12.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
   },
   "pnpm": {
     "overrides": {
