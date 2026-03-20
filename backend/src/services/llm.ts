@@ -12,6 +12,8 @@ export interface LlmService {
   generateText(options: GenerateTextOptions): Promise<string>;
 }
 
+// ── Anthropic direct SDK ─────────────────────────────────────────────
+
 class AnthropicLlmService implements LlmService {
   readonly provider = 'anthropic';
   private client: Anthropic;
@@ -37,6 +39,17 @@ class AnthropicLlmService implements LlmService {
   }
 }
 
+// ── Gateway (OpenAI-compatible or custom) ────────────────────────────
+
+interface GatewayResponse {
+  // OpenAI-compatible shape
+  choices?: { message?: { content?: string } }[];
+  // Simple shape (custom gateways)
+  text?: string;
+  output?: string;
+  content?: string;
+}
+
 class GatewayLlmService implements LlmService {
   readonly provider = 'gateway';
 
@@ -55,6 +68,12 @@ class GatewayLlmService implements LlmService {
       },
       body: JSON.stringify({
         model: this.model,
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: prompt },
+        ],
+        max_tokens: maxTokens,
+        // Fallback fields for non-OpenAI gateways
         system,
         prompt,
         maxTokens,
@@ -65,12 +84,21 @@ class GatewayLlmService implements LlmService {
       throw new Error(`Gateway LLM request failed: ${res.status} ${await res.text()}`);
     }
 
-    const data = await res.json() as { text?: string; output?: string; content?: string };
-    const text = data.text ?? data.output ?? data.content;
+    const data = await res.json() as GatewayResponse;
+
+    // Try OpenAI-compatible shape first, then simple shape
+    const text =
+      data.choices?.[0]?.message?.content ??
+      data.text ??
+      data.output ??
+      data.content;
+
     if (!text) throw new Error('Gateway LLM response missing text content');
     return text.trim();
   }
 }
+
+// ── Unavailable fallback ─────────────────────────────────────────────
 
 class UnavailableLlmService implements LlmService {
   readonly provider = 'unavailable';
@@ -82,11 +110,15 @@ class UnavailableLlmService implements LlmService {
   }
 }
 
+// ── Helpers ──────────────────────────────────────────────────────────
+
 function normalizeJsonResponse(text: string): string {
   const trimmed = text.trim();
   const fenceMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
   return fenceMatch ? fenceMatch[1].trim() : trimmed;
 }
+
+// ── Singleton resolution ─────────────────────────────────────────────
 
 let cachedService: LlmService | null = null;
 

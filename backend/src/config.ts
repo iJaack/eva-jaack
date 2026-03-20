@@ -25,7 +25,7 @@ export const config = {
   anthropicApiKey: env('ANTHROPIC_API_KEY'),
   braveApiKey: env('BRAVE_API_KEY'),
 
-  storageProvider: env('EVA_STORAGE_PROVIDER', 'auto') as 'auto' | 'pinata',
+  storageProvider: env('EVA_STORAGE_PROVIDER', 'auto') as 'auto' | 'pinata' | 'local',
   pinataJwt: env('PINATA_JWT'),
   pinataEndpoint: env('PINATA_ENDPOINT', 'https://api.pinata.cloud/pinning/pinJSONToIPFS'),
 

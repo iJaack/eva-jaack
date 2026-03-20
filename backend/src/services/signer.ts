@@ -23,6 +23,8 @@ export interface SignerService {
   writeContract(request: WriteContractRequest): Promise<Hex>;
 }
 
+// ── Private-key signer (current production path) ─────────────────────
+
 class PrivateKeySignerService implements SignerService {
   readonly provider = 'private-key';
   private readonly account: Account;
@@ -47,25 +49,74 @@ class PrivateKeySignerService implements SignerService {
   }
 }
 
+// ── Evalanche HTTP bridge signer ─────────────────────────────────────
+//
+// Delegates transaction signing to an Evalanche agent-wallet service
+// over HTTP. The bridge accepts a JSON write-contract request and returns
+// a signed transaction hash once the wallet has broadcast it.
+//
+// Expected Evalanche bridge API:
+//   POST /sign
+//   Body: { address, abi, functionName, args, chainId }
+//   Response: { txHash: "0x..." }
+
+interface EvalancheBridgeResponse {
+  txHash?: string;
+  hash?: string;
+  error?: string;
+}
+
 class EvalancheSignerService implements SignerService {
   readonly provider = 'evalanche';
 
-  async writeContract(): Promise<Hex> {
-    throw new Error(
-      'Evalanche signer provider selected but runtime bridge is not wired yet. Use EVA_SIGNER_PROVIDER=private-key as the compatibility path for now.',
-    );
+  constructor(private readonly bridgeUrl: string) {}
+
+  async writeContract({ chain = avalanche, ...request }: WriteContractRequest): Promise<Hex> {
+    const res = await fetch(`${this.bridgeUrl}/sign`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        address: request.address,
+        abi: request.abi,
+        functionName: request.functionName,
+        args: request.args,
+        chainId: chain.id,
+      }),
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Evalanche bridge request failed: ${res.status} ${body}`);
+    }
+
+    const data = await res.json() as EvalancheBridgeResponse;
+
+    if (data.error) {
+      throw new Error(`Evalanche bridge returned error: ${data.error}`);
+    }
+
+    const txHash = (data.txHash ?? data.hash) as Hex | undefined;
+    if (!txHash) {
+      throw new Error('Evalanche bridge response missing txHash');
+    }
+
+    return txHash;
   }
 }
+
+// ── Unavailable fallback ─────────────────────────────────────────────
 
 class UnavailableSignerService implements SignerService {
   readonly provider = 'unavailable';
 
   async writeContract(): Promise<Hex> {
     throw new Error(
-      'No signer configured. Set EVA_SIGNER_PROVIDER=private-key with EVA_PRIVATE_KEY, or wire the Evalanche runtime provider.',
+      'No signer configured. Set EVA_SIGNER_PROVIDER=private-key with EVA_PRIVATE_KEY, or EVA_SIGNER_PROVIDER=evalanche with EVALANCHE_SIGNER_URL.',
     );
   }
 }
+
+// ── Singleton resolution ─────────────────────────────────────────────
 
 let cachedService: SignerService | null = null;
 
@@ -77,8 +128,8 @@ export function getSignerService(): SignerService {
     return cachedService;
   }
 
-  if (config.signerProvider === 'evalanche') {
-    cachedService = new EvalancheSignerService();
+  if (config.signerProvider === 'evalanche' && config.evalancheSignerUrl) {
+    cachedService = new EvalancheSignerService(config.evalancheSignerUrl);
     return cachedService;
   }
 

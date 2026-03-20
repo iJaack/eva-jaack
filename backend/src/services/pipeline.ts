@@ -4,7 +4,7 @@ import pLimit from 'p-limit';
 import { fetchArticle } from './fetcher.js';
 import { extractClaims, type Claim } from './claim-extractor.js';
 import { verifyClaim, type ClaimVerdict } from './claim-verifier.js';
-import { uploadJSON } from './ipfs.js';
+import { getStorageService } from './storage.js';
 import { submitVerificationOnchain } from './blockchain.js';
 
 export interface PipelineResult {
@@ -23,6 +23,12 @@ export interface VerificationReport {
   verifiedAt: string;
   oracleAgentId: number;
   routescanUsed: boolean;
+}
+
+async function uploadReport(report: VerificationReport): Promise<string> {
+  const storage = getStorageService();
+  console.log(`[pipeline] Uploading report via storage provider=${storage.provider}`);
+  return storage.uploadJSON(report, { name: `eva-verification-${Date.now()}` });
 }
 
 export async function runVerificationPipeline(
@@ -53,9 +59,9 @@ export async function runVerificationPipeline(
 
     let ipfsURI = '';
     try {
-      ipfsURI = await uploadJSON(report);
+      ipfsURI = await uploadReport(report);
     } catch (e) {
-      console.error(`[pipeline] IPFS upload failed: ${e}`);
+      console.error(`[pipeline] Storage upload failed: ${e}`);
       ipfsURI = 'ipfs://upload-failed';
     }
 
@@ -122,12 +128,12 @@ export async function runVerificationPipeline(
     `claims=${verdicts.length}, routescan=${routescanClaimCount}`,
   );
 
-  // 6. Upload to IPFS
+  // 6. Upload to storage (IPFS via configured provider)
   let ipfsURI = '';
   try {
-    ipfsURI = await uploadJSON(report);
+    ipfsURI = await uploadReport(report);
   } catch (e) {
-    console.error(`[pipeline] IPFS upload failed: ${e}`);
+    console.error(`[pipeline] Storage upload failed: ${e}`);
     ipfsURI = 'ipfs://upload-failed';
   }
 
