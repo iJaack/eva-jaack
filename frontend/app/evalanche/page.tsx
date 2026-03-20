@@ -3,31 +3,31 @@ import Link from "next/link";
 import "./evalanche.css";
 
 export const metadata: Metadata = {
-  title: "Evalanche — Agent wallet infrastructure for Eva Protocol",
+  title: "Evalanche — Multi-EVM agent wallet SDK",
   description:
-    "Evalanche is the agent wallet and identity stack behind Eva Protocol's long-term signing architecture: ERC-8004 identity, x402 payments, cross-chain operations, and programmable agent wallets.",
+    "Evalanche is a multi-EVM agent wallet SDK for identity, payments, cross-chain execution, market intelligence, prediction markets, DeFi, and perps.",
 };
 
 const features = [
   {
     badge: "Wallet stack",
-    title: "Agent-native signing infrastructure",
-    body: "Evalanche is the architectural direction for moving Eva away from hard-coded private-key assumptions and toward a reusable agent wallet layer.",
+    title: "Agent-native execution layer",
+    body: "Evalanche gives agents a reusable wallet and execution surface across 21+ EVM chains without browser popups or custodial dependencies.",
   },
   {
-    badge: "ERC-8004",
-    title: "Identity and reputation compatibility",
-    body: "Eva and Evalanche both center agent-native standards so trust, identity, and service endpoints remain legible across the Avalanche ecosystem.",
+    badge: "Identity",
+    title: "ERC-8004 native",
+    body: "Identity resolution, service endpoints, and trust-oriented agent workflows are built in instead of bolted on later.",
   },
   {
-    badge: "x402",
-    title: "Monetizable agent APIs",
-    body: "The same infrastructure that powers agent wallets also supports payment-gated access patterns for verification services and protocol tooling.",
+    badge: "Markets",
+    title: "More than just wallet plumbing",
+    body: "Evalanche now spans DeFi, dYdX perps, CoinGecko market intelligence, and Polymarket discovery for agent-native trading and research flows.",
   },
   {
     badge: "Multi-chain",
     title: "Built broader than one app",
-    body: "Evalanche is open-source infrastructure that can support many agent products, with Eva as the proving ground for real trust workflows.",
+    body: "Evalanche is open-source infrastructure that can support many agent products, with Eva as one proving ground rather than the full product boundary.",
   },
 ] as const;
 
@@ -58,7 +58,9 @@ export default function EvalanchePage() {
               <span className="ev-badge">ERC-8004</span>
               <span className="ev-badge">x402</span>
               <span className="ev-badge">Headless wallets</span>
-              <span className="ev-badge">Avalanche-native</span>
+              <span className="ev-badge">CoinGecko</span>
+              <span className="ev-badge">Polymarket</span>
+              <span className="ev-badge">dYdX</span>
               <span className="ev-badge">Multi-EVM</span>
             </div>
             <div className="ev-hero-ctas">
@@ -70,28 +72,31 @@ export default function EvalanchePage() {
           <div className="ev-hero-code">
             <div className="ev-code-bar">
               <span className="ev-dot" /><span className="ev-dot" /><span className="ev-dot" />
-              <span className="ev-code-title">signer-roadmap.ts</span>
+              <span className="ev-code-title">evalanche-v1.5.2.ts</span>
             </div>
-            <pre className="ev-code-body"><code>{`// SignerService picks the active provider
-const signer = getSignerService();
+            <pre className="ev-code-body"><code>{`const { agent } = await Evalanche.boot({ network: 'avalanche' });
 
-// private-key today, Evalanche bridge tomorrow
-await signer.writeContract({
-  address: erc8004Validation,
-  abi,
-  functionName: 'validationResponse',
-  args,
+const quote = await agent.swap({
+  fromChainId: 43114,
+  toChainId: 43114,
+  fromToken: 'native',
+  toToken: '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E',
+  fromAmount: '0.1',
+  fromAddress: agent.address,
 });
 
-// Set EVALANCHE_SIGNER_URL to switch
-// No pipeline code changes needed`}</code></pre>
+const markets = await agent.coinGecko().markets({
+  vs_currency: 'usd',
+  order: 'market_cap_desc',
+  per_page: 10,
+});`}</code></pre>
           </div>
         </div>
       </header>
 
       <section className="ev-section">
         <div className="ev-container">
-          <h2 className="ev-section-title">Why this page exists</h2>
+          <h2 className="ev-section-title">What Evalanche is now</h2>
           <div className="ev-features">
             {features.map((feature) => (
               <div key={feature.title} className="ev-feature-card">
@@ -106,12 +111,12 @@ await signer.writeContract({
 
       <section className="ev-section" id="install">
         <div className="ev-container">
-          <h2 className="ev-section-title">Eva integration direction</h2>
+          <h2 className="ev-section-title">Why v1.5.2 matters</h2>
           <div className="ev-steps">
             {[
-              ["01", "Abstract signing behind a service boundary", "Done: all blockchain writes flow through SignerService. The pipeline never touches private keys directly."],
-              ["02", "Private-key fallback for current production", "The PrivateKeySignerService remains the default path. Existing deployments work unchanged."],
-              ["03", "Evalanche HTTP bridge wired and ready", "EvalancheSignerService delegates to POST /sign on a configurable bridge URL. Set EVALANCHE_SIGNER_URL to activate."],
+              ["01", "Safer custom RPC handling", "Custom RPC overrides now map to the correct chain IDs across supported EVM aliases instead of defaulting everything to Avalanche/Fuji."],
+              ["02", "Polymarket MCP paths cleaned up", "Search, order book lookup, and positions now call real methods. Unsupported buy/approve/redeem paths fail honestly."],
+              ["03", "Sharper market workflow surface", "CoinGecko, Polymarket, dYdX references, README, ClawHub skill, and the public page are now aligned around the same product surface."],
             ].map(([step, label, text]) => (
               <div key={step} className="ev-step">
                 <div className="ev-step-meta">
@@ -126,7 +131,7 @@ await signer.writeContract({
       </section>
 
       <footer className="ev-footer">
-        <p>built for <a href="https://eva.jaack.me">Eva Protocol</a> by Eva · open source · Avalanche-first</p>
+        <p>built for <a href="https://eva.jaack.me">Eva Protocol</a> and broader agent infrastructure work · open source · Avalanche-first roots, multi-EVM scope</p>
       </footer>
     </div>
   );
