@@ -14,10 +14,28 @@ export const reputationRoutes = new Hono();
 // ── POST /api/reputation/feedback ──────────────────────────────────────
 
 reputationRoutes.post('/feedback', async (c) => {
-  const req = await c.req.json<AggregatorRequest>();
+  const req = await c.req.json<Partial<AggregatorRequest>>();
+
+  if (
+    typeof req.taskRef !== 'string' ||
+    typeof req.dataHash !== 'string' ||
+    typeof req.feedbackHash !== 'string' ||
+    typeof req.reviewerAddress !== 'string' ||
+    typeof req.signature !== 'string' ||
+    typeof req.score !== 'number'
+  ) {
+    return c.json<AggregatorResponse>(
+      {
+        success: false,
+        feedbackHash: (req.feedbackHash as Hex | undefined) ?? ('0x' as Hex),
+        error: 'Missing required feedback fields',
+      },
+      400,
+    );
+  }
 
   // 1. Recompute and verify feedbackHash
-  const expectedHash = computeFeedbackHash(req.taskRef, req.dataHash);
+  const expectedHash = computeFeedbackHash(req.taskRef, req.dataHash as Hex);
   if (expectedHash !== req.feedbackHash) {
     return c.json<AggregatorResponse>(
       { success: false, feedbackHash: req.feedbackHash, error: 'feedbackHash mismatch' },
