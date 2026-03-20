@@ -2,6 +2,9 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { config } from '../backend/src/config.js';
+import { verifyRoutes } from '../backend/src/routes/verify.js';
+import { reputationRoutes } from '../backend/src/routes/reputation.js';
+import { submitRoutes } from '../backend/src/routes/submit.js';
 import { curatorRoutes } from '../backend/src/routes/curators.js';
 import { trustRoutes } from '../backend/src/routes/trust.js';
 
@@ -25,9 +28,9 @@ app.get('/.well-known/agent.json', (c) =>
   })
 );
 
-app.post('/api/verify', (c) => c.json({ error: 'Payment required', amount: '0.05', currency: 'USDC', network: 'base' }, 402));
-app.post('/api/reputation/feedback', (c) => c.json({ error: 'Not yet implemented' }, 501));
-app.post('/api/submit', (c) => c.json({ error: 'Not yet implemented' }, 501));
+app.route('/api/verify', verifyRoutes);
+app.route('/api/reputation', reputationRoutes);
+app.route('/api/submit', submitRoutes);
 app.route('/api/curators', curatorRoutes);
 app.route('/api/curator', curatorRoutes);
 app.route('/api/trust', trustRoutes);
