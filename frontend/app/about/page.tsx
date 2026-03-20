@@ -35,24 +35,24 @@ const flowSteps = [
 
 const productSurface = [
   {
-    primitive: "Home",
-    mapping: "Protocol overview + live stats",
-    detail: "The homepage explains the product and surfaces the current verified feed and leaderboard.",
+    primitive: "Feed",
+    mapping: "Live verified articles",
+    detail: "A chronological feed of every article that has been through the verification pipeline.",
   },
   {
     primitive: "Curators",
     mapping: "Trust-ranked participants",
-    detail: "A live leaderboard of registered curators with score and activity context.",
+    detail: "A live leaderboard of registered curators with trust scores and verification history.",
   },
   {
     primitive: "Verify",
-    mapping: "API-facing verification surface",
-    detail: "A dedicated route describing the current article verification entrypoint and data flow.",
+    mapping: "Verification API surface",
+    detail: "The x402-gated endpoint for submitting articles and receiving scored evidence reports.",
   },
   {
     primitive: "Evalanche",
-    mapping: "Wallet and signer stack",
-    detail: "The agent-wallet infrastructure that informs Eva's long-term signing and identity architecture.",
+    mapping: "Agent wallet infrastructure",
+    detail: "The signing and identity stack that will replace hard-coded private keys with agent-native wallets.",
   },
 ] as const;
 
@@ -69,7 +69,7 @@ const builtOn = [
   },
   {
     title: "Provider abstractions",
-    description: "Eva's backend now separates LLM, storage, and signer concerns so infrastructure can evolve cleanly.",
+    description: "LLM (Anthropic/gateway), storage (Pinata/local), and signer (private-key/Evalanche) swap without touching the pipeline.",
     tone: "198, 244, 89",
   },
 ] as const;

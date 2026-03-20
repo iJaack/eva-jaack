@@ -89,10 +89,11 @@ export default function VerifyPage() {
         </section>
 
         <section className="surface callout">
-          <h3>Want the implementation details?</h3>
+          <h3>Provider-agnostic by design</h3>
           <p>
-            The verification backend now routes through provider abstractions for LLMs, storage, and signing so
-            Eva can swap gateway paths and infrastructure providers without rewriting the pipeline.
+            The verification pipeline routes through swappable service abstractions — Anthropic or gateway LLMs,
+            Pinata or local storage, private-key or Evalanche signing — so infrastructure evolves without
+            rewriting business logic.
           </p>
         </section>
 

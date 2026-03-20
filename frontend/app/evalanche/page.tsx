@@ -72,11 +72,10 @@ export default function EvalanchePage() {
               <span className="ev-dot" /><span className="ev-dot" /><span className="ev-dot" />
               <span className="ev-code-title">signer-roadmap.ts</span>
             </div>
-            <pre className="ev-code-body"><code>{`// Eva today: clean signer abstraction
-// Eva tomorrow: Evalanche-backed execution
-
+            <pre className="ev-code-body"><code>{`// SignerService picks the active provider
 const signer = getSignerService();
 
+// private-key today, Evalanche bridge tomorrow
 await signer.writeContract({
   address: erc8004Validation,
   abi,
@@ -84,8 +83,8 @@ await signer.writeContract({
   args,
 });
 
-// provider can evolve without
-// rewriting the verification pipeline`}</code></pre>
+// Set EVALANCHE_SIGNER_URL to switch
+// No pipeline code changes needed`}</code></pre>
           </div>
         </div>
       </header>
@@ -110,9 +109,9 @@ await signer.writeContract({
           <h2 className="ev-section-title">Eva integration direction</h2>
           <div className="ev-steps">
             {[
-              ["01", "Abstract signing in the backend", "Done in this pass: blockchain writes now flow through a signer service boundary."],
-              ["02", "Keep private-key mode as compatibility fallback", "Current production-safe path remains available for existing deployments."],
-              ["03", "Add Evalanche-backed provider when runtime wiring is ready", "Scaffolding is in place without forcing unfinished infrastructure into the core path."],
+              ["01", "Abstract signing behind a service boundary", "Done: all blockchain writes flow through SignerService. The pipeline never touches private keys directly."],
+              ["02", "Private-key fallback for current production", "The PrivateKeySignerService remains the default path. Existing deployments work unchanged."],
+              ["03", "Evalanche HTTP bridge wired and ready", "EvalancheSignerService delegates to POST /sign on a configurable bridge URL. Set EVALANCHE_SIGNER_URL to activate."],
             ].map(([step, label, text]) => (
               <div key={step} className="ev-step">
                 <div className="ev-step-meta">

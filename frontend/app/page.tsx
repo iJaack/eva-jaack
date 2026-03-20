@@ -19,41 +19,60 @@ import type { Address } from "viem";
 
 type CuratorRow = CuratorInfo & { address: Address };
 
-const explainerCards = [
+const whatEvaDoes = [
   {
-    title: "Back curators, not just content",
-    body: "Following is economic. You back curators with $EVA, and their track record determines what rises in your feed.",
+    title: "Curators stake to curate",
+    body: "Curators lock $EVA tokens to register on the trust graph. Staking aligns incentives: curators with skin in the game produce better signal.",
   },
   {
-    title: "Verify claims with receipts",
-    body: "Eva extracts factual claims, checks evidence, stores reports to IPFS, and records trust updates on Avalanche.",
+    title: "Eva verifies the evidence",
+    body: "When an article is submitted, Eva extracts every factual claim, checks each against on-chain and off-chain sources, and produces a scored report.",
   },
   {
-    title: "Portable on-chain reputation",
-    body: "Curator identity, validation history, and trust signals are ERC-8004 compatible so agents can carry reputation across apps.",
+    title: "Trust compounds on-chain",
+    body: "Verification scores flow back into curator reputation via ERC-8004 registries on Avalanche. Accurate curators rise; unreliable ones fall.",
   },
 ] as const;
 
-const workflow = [
+const howItWorks = [
   {
     step: "01",
-    title: "Register as a curator",
-    body: "Stake $EVA to enter the trust graph and start building a measurable record of accuracy.",
+    title: "Register",
+    body: "Stake $EVA on Avalanche to join the trust graph and start curating.",
   },
   {
     step: "02",
-    title: "Submit an article",
-    body: "Curators publish a source they vouch for. The protocol stores the request and routes it through Eva's verification pipeline.",
+    title: "Submit",
+    body: "Post a source URL you vouch for. Eva queues it for verification.",
   },
   {
     step: "03",
-    title: "Eva verifies the claims",
-    body: "Claims are extracted, checked against on-chain/off-chain evidence, scored, stored, and optionally written back on-chain.",
+    title: "Verify",
+    body: "Eva fetches the article, extracts claims, checks evidence, and stores a report to IPFS.",
   },
   {
     step: "04",
-    title: "Trust drives distribution",
-    body: "Higher-trust curators get more credibility, better visibility, and stronger utility inside the $EVA-backed social graph.",
+    title: "Distribute",
+    body: "Trust scores update on-chain. Higher-trust curators earn more visibility and protocol utility.",
+  },
+] as const;
+
+const techStack = [
+  {
+    title: "Avalanche C-Chain",
+    body: "Fast finality and low fees for trust-graph state changes and ERC-8004 receipts.",
+  },
+  {
+    title: "ERC-8004 registries",
+    body: "Identity, reputation, and validation records that agents and apps can read across the ecosystem.",
+  },
+  {
+    title: "IPFS via Pinata",
+    body: "Verification reports are content-addressed and permanently retrievable.",
+  },
+  {
+    title: "x402 payments",
+    body: "The public verification API is payment-gated so Eva can operate as an agent service.",
   },
 ] as const;
 
@@ -115,13 +134,17 @@ export default function HomePage() {
       <Nav />
 
       <main className="page-shell">
+        {/* ── Hero ── */}
         <section className="hero hero-grid">
           <div>
-            <span className="hero-kicker">Phase 1.5 live on Avalanche</span>
-            <h1 className="hero-title">A social news network where truth has stake.</h1>
+            <span className="hero-kicker">Live on Avalanche</span>
+            <h1 className="hero-title">
+              News curation backed by stake, scored by evidence.
+            </h1>
             <p className="hero-sub">
-              Eva Protocol turns news curation into an on-chain trust graph. Curators stake $EVA to back
-              claims, Eva verifies the evidence, and reputation compounds into distribution.
+              Eva Protocol is a trust-weighted social news network. Curators stake $EVA to back
+              sources, Eva verifies every claim against real evidence, and accuracy compounds into
+              on-chain reputation that drives what surfaces in the feed.
             </p>
             <div className="hero-actions">
               <Link href="/verify" className="btn btn-primary">
@@ -137,16 +160,17 @@ export default function HomePage() {
           </div>
 
           <aside className="surface hero-panel">
-            <p className="hero-panel-kicker">What the product actually does</p>
+            <p className="hero-panel-kicker">Eva in one minute</p>
             <ul className="hero-checklist">
-              <li>Trust-ranks news through curator performance, not engagement bait.</li>
-              <li>Writes verification context to IPFS and validation/reputation receipts to Avalanche.</li>
-              <li>Uses Eva agent #1599 as the protocol oracle for claim extraction and scoring.</li>
-              <li>Builds a portable curator reputation layer around ERC-8004 primitives.</li>
+              <li>Curators stake $EVA and submit articles they vouch for.</li>
+              <li>Eva extracts factual claims and checks them against on-chain and web evidence.</li>
+              <li>Scored reports go to IPFS; trust updates go to Avalanche via ERC-8004.</li>
+              <li>The feed ranks by curator accuracy, not engagement.</li>
             </ul>
           </aside>
         </section>
 
+        {/* ── Live stats ── */}
         <section className="grid-3 stats-grid-home">
           <div className="surface stat-card home-stat-card">
             <span className="stat-value">{stats ? stats.totalArticles : "—"}</span>
@@ -162,11 +186,12 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ── What Eva does ── */}
         <section style={{ marginTop: 40 }}>
-          <p className="section-kicker">Product surface</p>
-          <h2 className="section-title">Why Eva exists</h2>
+          <p className="section-kicker">The product</p>
+          <h2 className="section-title">What Eva actually does</h2>
           <div className="grid-3" style={{ marginTop: 16 }}>
-            {explainerCards.map((card) => (
+            {whatEvaDoes.map((card) => (
               <article key={card.title} className="surface built-card">
                 <h3>{card.title}</h3>
                 <p>{card.body}</p>
@@ -175,11 +200,12 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ── How it works ── */}
         <section style={{ marginTop: 44 }}>
           <p className="section-kicker">Workflow</p>
-          <h2 className="section-title">How verification flows through the protocol</h2>
+          <h2 className="section-title">From article to trust update in four steps</h2>
           <div className="grid-2" style={{ marginTop: 16 }}>
-            {workflow.map((item) => (
+            {howItWorks.map((item) => (
               <article key={item.step} className="surface step-card">
                 <h3>
                   <span className="icon-pill">{item.step}</span>
@@ -191,14 +217,31 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ── Differentiator callout ── */}
         <section className="surface callout" style={{ marginTop: 40 }}>
-          <h3>What makes Eva different?</h3>
+          <h3>Why not just another feed?</h3>
           <p>
-            Feeds usually optimize for reach. Eva optimizes for verified accuracy. Curators don&apos;t just post — they
-            stake capital, accumulate trust, and become measurable information sources for humans and agents.
+            Most feeds optimize for engagement. Eva optimizes for verified accuracy. Curators don&apos;t just
+            post — they stake capital, build measurable track records, and become trusted information sources
+            for both humans and AI agents.
           </p>
         </section>
 
+        {/* ── Tech stack ── */}
+        <section style={{ marginTop: 44 }}>
+          <p className="section-kicker">Infrastructure</p>
+          <h2 className="section-title">What Eva is built on</h2>
+          <div className="grid-2" style={{ marginTop: 16 }}>
+            {techStack.map((item) => (
+              <article key={item.title} className="surface built-card">
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Latest articles ── */}
         <section className="home-section-split" style={{ marginTop: 44 }}>
           <div>
             <div className="section-heading-row">
@@ -224,6 +267,7 @@ export default function HomePage() {
             )}
           </div>
 
+          {/* ── Top curators ── */}
           <div>
             <div className="section-heading-row">
               <div>

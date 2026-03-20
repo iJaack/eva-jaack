@@ -7,6 +7,7 @@ import ThemeToggle from "./ThemeToggle";
 
 const navItems: readonly { href: string; label: string; exact?: boolean; highlight?: boolean }[] = [
   { href: "/", label: "Home", exact: true },
+  { href: "/articles", label: "Feed" },
   { href: "/curators", label: "Curators" },
   { href: "/verify", label: "Verify" },
   { href: "/about", label: "About" },
@@ -23,7 +24,7 @@ export default function Nav() {
         <div className="brand-mark" aria-hidden />
         <div className="brand-text">
           <span className="brand-title">Eva Protocol</span>
-          <span className="brand-sub">Trust-weighted social news on Avalanche</span>
+          <span className="brand-sub">Trust-weighted news on Avalanche</span>
         </div>
       </Link>
 
@@ -55,13 +56,6 @@ export default function Nav() {
             </Link>
           );
         })}
-        <Link
-          href="/articles"
-          className={`nav-pill${pathname.startsWith("/articles") ? " nav-pill-active" : ""}`}
-          onClick={() => setMenuOpen(false)}
-        >
-          Feed
-        </Link>
       </nav>
     </header>
   );
