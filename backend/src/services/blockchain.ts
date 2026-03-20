@@ -1,43 +1,37 @@
-// ── Blockchain service — pipeline on-chain writes via erc8004 ────────
-
 import { type Hex, keccak256, toHex } from 'viem';
-import { giveFeedback, validationResponse } from '../lib/erc8004.js';
+import { avalanche } from 'viem/chains';
 import { config } from '../config.js';
+import { giveFeedbackAbi, validationResponseAbi } from '../lib/erc8004.js';
+import { getSignerService } from './signer.js';
 
 export async function submitVerificationOnchain(
   articleId: number,
   overallScore: number,
   ipfsURI: string,
 ): Promise<{ feedbackTxHash: Hex; validationTxHash: Hex }> {
+  const signer = getSignerService();
   const agentId = BigInt(config.evaAgentId);
   const value = BigInt(Math.max(0, Math.min(255, Math.round(overallScore))));
   const feedbackHash = keccak256(toHex(ipfsURI));
 
-  // giveFeedback — reputation update for the verified article
-  console.log(`[blockchain] Submitting on-chain feedback for article ${articleId}`);
-  const feedbackTxHash = await giveFeedback(
-    agentId,
-    value,
-    0,
-    'eva:verification',
-    `article:${articleId}`,
-    'https://eva.jaack.me/api/verify',
-    ipfsURI,
-    feedbackHash,
-  );
-  console.log(`[blockchain] giveFeedback tx: ${feedbackTxHash}`);
+  console.log(`[blockchain] Submitting on-chain feedback with signer=${signer.provider}`);
+  const feedbackTxHash = await signer.writeContract({
+    address: config.erc8004Reputation,
+    abi: giveFeedbackAbi,
+    functionName: 'giveFeedback',
+    args: [agentId, value, 0, 'eva:verification', `article:${articleId}`, 'https://eva.jaack.me/api/verify', ipfsURI, feedbackHash],
+    chain: avalanche,
+  });
 
-  // validationResponse — oracle validation record
   const requestHash = keccak256(toHex(`eva:article:${articleId}`));
   const responseHash = keccak256(toHex(ipfsURI));
-  const validationTxHash = await validationResponse(
-    requestHash,
-    Math.max(0, Math.min(255, Math.round(overallScore))),
-    ipfsURI,
-    responseHash,
-    'eva:oracle:verification',
-  );
-  console.log(`[blockchain] validationResponse tx: ${validationTxHash}`);
+  const validationTxHash = await signer.writeContract({
+    address: config.erc8004Validation,
+    abi: validationResponseAbi,
+    functionName: 'validationResponse',
+    args: [requestHash, Math.max(0, Math.min(255, Math.round(overallScore))), ipfsURI, responseHash, 'eva:oracle:verification'],
+    chain: avalanche,
+  });
 
   return { feedbackTxHash, validationTxHash };
 }

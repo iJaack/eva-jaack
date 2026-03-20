@@ -1,16 +1,8 @@
-import {
-  createPublicClient,
-  createWalletClient,
-  http,
-  type Hex,
-} from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
+import { createPublicClient, http } from 'viem';
 import { avalanche } from 'viem/chains';
 import { config } from '../config.js';
 
-// ── ABI fragments ──────────────────────────────────────────────────────
-
-const reputationRegistryAbi = [
+export const giveFeedbackAbi = [
   {
     name: 'giveFeedback',
     type: 'function',
@@ -27,6 +19,26 @@ const reputationRegistryAbi = [
     ],
     outputs: [],
   },
+] as const;
+
+export const validationResponseAbi = [
+  {
+    name: 'validationResponse',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'requestHash', type: 'bytes32' },
+      { name: 'response', type: 'uint8' },
+      { name: 'responseURI', type: 'string' },
+      { name: 'responseHash', type: 'bytes32' },
+      { name: 'tag', type: 'string' },
+    ],
+    outputs: [],
+  },
+] as const;
+
+const reputationReadAbi = [
+  ...giveFeedbackAbi,
   {
     name: 'getSummary',
     type: 'function',
@@ -85,104 +97,15 @@ const reputationRegistryAbi = [
     name: 'getClients',
     type: 'function',
     stateMutability: 'view',
-    inputs: [
-      { name: 'agentId', type: 'uint256' },
-    ],
-    outputs: [
-      { name: 'clients', type: 'address[]' },
-    ],
-  },
-  {
-    name: 'getLastIndex',
-    type: 'function',
-    stateMutability: 'view',
-    inputs: [
-      { name: 'agentId', type: 'uint256' },
-      { name: 'clientAddress', type: 'address' },
-    ],
-    outputs: [
-      { name: 'lastIndex', type: 'uint64' },
-    ],
+    inputs: [{ name: 'agentId', type: 'uint256' }],
+    outputs: [{ name: 'clients', type: 'address[]' }],
   },
 ] as const;
-
-const validationRegistryAbi = [
-  {
-    name: 'validationResponse',
-    type: 'function',
-    stateMutability: 'nonpayable',
-    inputs: [
-      { name: 'requestHash', type: 'bytes32' },
-      { name: 'response', type: 'uint8' },
-      { name: 'responseURI', type: 'string' },
-      { name: 'responseHash', type: 'bytes32' },
-      { name: 'tag', type: 'string' },
-    ],
-    outputs: [],
-  },
-] as const;
-
-// ── Clients ────────────────────────────────────────────────────────────
 
 export const publicClient = createPublicClient({
   chain: avalanche,
   transport: http(config.avalancheRpc),
 });
-
-function getWalletClient() {
-  if (!config.evaPrivateKey) throw new Error('EVA_PRIVATE_KEY not set');
-  const account = privateKeyToAccount(config.evaPrivateKey);
-  return createWalletClient({
-    account,
-    chain: avalanche,
-    transport: http(config.avalancheRpc),
-  });
-}
-
-// ── On-chain write calls ──────────────────────────────────────────────
-
-export async function giveFeedback(
-  agentId: bigint,
-  value: bigint,
-  valueDecimals: number,
-  tag1: string,
-  tag2: string,
-  endpoint: string,
-  feedbackURI: string,
-  feedbackHash: Hex,
-): Promise<Hex> {
-  const wallet = getWalletClient();
-  console.log(`[erc8004] giveFeedback(agentId=${agentId}, value=${value}, tag1=${tag1}, tag2=${tag2})`);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (wallet as any).writeContract({
-    address: config.erc8004Reputation,
-    abi: reputationRegistryAbi,
-    functionName: 'giveFeedback',
-    args: [agentId, value, valueDecimals, tag1, tag2, endpoint, feedbackURI, feedbackHash],
-    chain: avalanche,
-  });
-}
-
-export async function validationResponse(
-  requestHash: Hex,
-  response: number,
-  responseURI: string,
-  responseHash: Hex,
-  tag: string,
-): Promise<Hex> {
-  const wallet = getWalletClient();
-  console.log(`[erc8004] validationResponse(requestHash=${requestHash})`);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (wallet as any).writeContract({
-    address: config.erc8004Validation,
-    abi: validationRegistryAbi,
-    functionName: 'validationResponse',
-    args: [requestHash, response, responseURI, responseHash, tag],
-    chain: avalanche,
-  });
-}
-
-// ── On-chain read calls ───────────────────────────────────────────────
 
 export async function getSummary(
   agentId: bigint,
@@ -192,10 +115,11 @@ export async function getSummary(
 ): Promise<{ count: bigint; total: bigint; decimals: number }> {
   const result = await publicClient.readContract({
     address: config.erc8004Reputation,
-    abi: reputationRegistryAbi,
+    abi: reputationReadAbi,
     functionName: 'getSummary',
     args: [agentId, clientAddresses, tag1, tag2],
   });
+
   return { count: result[0], total: result[1], decimals: result[2] };
 }
 
@@ -206,19 +130,18 @@ export async function readFeedback(
 ): Promise<{ value: bigint; valueDecimals: number; tag1: string; tag2: string; revoked: boolean }> {
   const result = await publicClient.readContract({
     address: config.erc8004Reputation,
-    abi: reputationRegistryAbi,
+    abi: reputationReadAbi,
     functionName: 'readFeedback',
     args: [agentId, clientAddress, feedbackIndex],
   });
+
   return { value: result[0], valueDecimals: result[1], tag1: result[2], tag2: result[3], revoked: result[4] };
 }
 
-export async function getClients(
-  agentId: bigint,
-): Promise<`0x${string}`[]> {
+export async function getClients(agentId: bigint): Promise<`0x${string}`[]> {
   return publicClient.readContract({
     address: config.erc8004Reputation,
-    abi: reputationRegistryAbi,
+    abi: reputationReadAbi,
     functionName: 'getClients',
     args: [agentId],
   }) as Promise<`0x${string}`[]>;
@@ -233,10 +156,11 @@ export async function readAllFeedback(
 ) {
   const result = await publicClient.readContract({
     address: config.erc8004Reputation,
-    abi: reputationRegistryAbi,
+    abi: reputationReadAbi,
     functionName: 'readAllFeedback',
     args: [agentId, clientAddresses, tag1, tag2, includeRevoked],
   });
+
   return {
     clients: result[0],
     indices: result[1],

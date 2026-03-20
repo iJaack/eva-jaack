@@ -1,17 +1,17 @@
 import { Hono } from 'hono';
 import { keccak256, toHex, type Hex } from 'viem';
+import { avalanche } from 'viem/chains';
 import {
   computeFeedbackHash,
   verifyReviewerSignature,
   type AggregatorRequest,
   type AggregatorResponse,
 } from '../lib/x402-reputation.js';
-import { giveFeedback } from '../lib/erc8004.js';
+import { giveFeedbackAbi } from '../lib/erc8004.js';
 import { config } from '../config.js';
+import { getSignerService } from '../services/signer.js';
 
 export const reputationRoutes = new Hono();
-
-// ── POST /api/reputation/feedback ──────────────────────────────────────
 
 reputationRoutes.post('/feedback', async (c) => {
   const req = await c.req.json<Partial<AggregatorRequest>>();
@@ -34,7 +34,6 @@ reputationRoutes.post('/feedback', async (c) => {
     );
   }
 
-  // 1. Recompute and verify feedbackHash
   const expectedHash = computeFeedbackHash(req.taskRef, req.dataHash as Hex);
   if (expectedHash !== req.feedbackHash) {
     return c.json<AggregatorResponse>(
@@ -43,12 +42,7 @@ reputationRoutes.post('/feedback', async (c) => {
     );
   }
 
-  // 2. Verify reviewer signature
-  const sigValid = await verifyReviewerSignature(
-    req.feedbackHash,
-    req.reviewerAddress,
-    req.signature,
-  );
+  const sigValid = await verifyReviewerSignature(req.feedbackHash, req.reviewerAddress, req.signature);
   if (!sigValid) {
     return c.json<AggregatorResponse>(
       { success: false, feedbackHash: req.feedbackHash, error: 'Invalid reviewer signature' },
@@ -56,7 +50,6 @@ reputationRoutes.post('/feedback', async (c) => {
     );
   }
 
-  // 3. Score bounds check
   if (req.score < 0 || req.score > 100) {
     return c.json<AggregatorResponse>(
       { success: false, feedbackHash: req.feedbackHash, error: 'Score must be 0-100' },
@@ -64,23 +57,20 @@ reputationRoutes.post('/feedback', async (c) => {
     );
   }
 
-  // 4. Submit on-chain via ReputationRegistry.giveFeedback
   try {
+    const signer = getSignerService();
     const agentId = BigInt(config.evaAgentId);
     const feedbackURI = `x402:feedback:${req.taskRef}`;
     const onchainHash = keccak256(toHex(feedbackURI));
     const endpoint = req.endpoint ?? '';
 
-    const txHash = await giveFeedback(
-      agentId,
-      BigInt(req.score),
-      0,
-      'x402',
-      'feedback',
-      endpoint,
-      feedbackURI,
-      onchainHash,
-    );
+    const txHash = await signer.writeContract({
+      address: config.erc8004Reputation,
+      abi: giveFeedbackAbi,
+      functionName: 'giveFeedback',
+      args: [agentId, BigInt(req.score), 0, 'x402', 'feedback', endpoint, feedbackURI, onchainHash],
+      chain: avalanche,
+    });
 
     return c.json<AggregatorResponse>({
       success: true,

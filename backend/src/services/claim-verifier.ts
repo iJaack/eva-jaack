@@ -1,23 +1,17 @@
-// ── Claim verifier — Routescan-first onchain, Brave Search fallback ─
-
-import Anthropic from '@anthropic-ai/sdk';
 import { config } from '../config.js';
 import { lookupOnchainData } from './routescan-client.js';
 import type { Claim } from './claim-extractor.js';
+import { generateJson, getLlmService } from './llm.js';
 
 export interface ClaimVerdict {
   claim: Claim;
-  score: number; // 0–100
+  score: number;
   explanation: string;
   sources: string[];
   dataSource: 'routescan' | 'brave' | 'routescan+brave';
 }
 
-const anthropic = new Anthropic({ apiKey: config.anthropicApiKey });
-
 const BRAVE_SEARCH_URL = 'https://api.search.brave.com/res/v1/web/search';
-
-// ── Brave Search ───────────────────────────────────────────────────────
 
 async function braveSearch(query: string): Promise<string> {
   if (!config.braveApiKey) {
@@ -25,7 +19,6 @@ async function braveSearch(query: string): Promise<string> {
     return 'No web search results available (API key not configured)';
   }
 
-  console.log(`[verifier] Brave search: "${query.slice(0, 80)}..."`);
   const url = new URL(BRAVE_SEARCH_URL);
   url.searchParams.set('q', query);
   url.searchParams.set('count', '5');
@@ -39,124 +32,84 @@ async function braveSearch(query: string): Promise<string> {
   });
 
   if (!res.ok) {
-    console.log(`[verifier] Brave search failed: ${res.status}`);
-    return 'Web search failed';
+    return `Web search failed (${res.status})`;
   }
 
   const data = await res.json() as {
     web?: { results?: Array<{ title: string; url: string; description: string }> };
   };
-  const results = data.web?.results ?? [];
 
-  return results
-    .map((r) => `[${r.title}](${r.url}): ${r.description}`)
+  return (data.web?.results ?? [])
+    .map((result) => `[${result.title}](${result.url}): ${result.description}`)
     .join('\n\n');
 }
 
-// ── Verdict via Claude ─────────────────────────────────────────────────
+async function getVerdict(claim: Claim, evidence: string, dataSource: string) {
+  const llm = getLlmService();
+  console.log(`[verifier] Generating verdict using provider=${llm.provider}`);
 
-async function getClaudeVerdict(
-  claim: Claim,
-  evidence: string,
-  dataSource: string,
-): Promise<{ score: number; explanation: string }> {
-  const model = process.env.ANTHROPIC_MODEL ?? 'claude-opus-4-5';
-
-  const response = await anthropic.messages.create({
-    model,
-    max_tokens: 1024,
+  return generateJson<{ score: number; explanation: string }>({
     system: `You are a fact-checker. Given a claim and evidence, produce a verification verdict.
 
 Score scale:
 - 90-100: Verified true — evidence strongly supports the claim
 - 75-89: Mostly true — evidence largely supports with minor caveats
-- 60-74: Minor issues — partially supported but with notable gaps or inaccuracies
-- 40-59: Mixed — evidence is contradictory or insufficient
-- 20-39: Mostly false — evidence largely contradicts the claim
-- 0-19: Fabricated — no supporting evidence or clearly false
+- 60-74: Partially supported with notable gaps
+- 40-59: Mixed or insufficient
+- 20-39: Mostly false
+- 0-19: Fabricated or strongly contradicted
 
 Respond with ONLY a JSON object: {"score": <number>, "explanation": "<string>"}`,
-    messages: [
-      {
-        role: 'user',
-        content: `Claim: "${claim.text}"
-Type: ${claim.type}
-Data source used: ${dataSource}
-
-Evidence found:
-${evidence}
-
-Produce your verdict.`,
-      },
-    ],
+    prompt: `Claim: "${claim.text}"\nType: ${claim.type}\nData source used: ${dataSource}\n\nEvidence found:\n${evidence}\n\nProduce your verdict.`,
+    maxTokens: 1024,
   });
-
-  const content = response.content[0];
-  if (content.type !== 'text') throw new Error('Unexpected Claude response type');
-
-  let jsonStr = content.text.trim();
-  const fenceMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (fenceMatch) jsonStr = fenceMatch[1].trim();
-
-  return JSON.parse(jsonStr) as { score: number; explanation: string };
 }
-
-// ── Main verifier ──────────────────────────────────────────────────────
 
 export async function verifyClaim(claim: Claim): Promise<ClaimVerdict> {
   console.log(`[verifier] Verifying: "${claim.text.slice(0, 80)}..." (${claim.type})`);
 
   let evidence = '';
-  let sources: string[] = [];
+  const sources: string[] = [];
   let dataSource: ClaimVerdict['dataSource'] = 'brave';
 
   if (claim.type === 'onchain') {
-    // Routescan first for onchain claims
     try {
       const onchainResult = await lookupOnchainData(claim.text);
       if (onchainResult.found) {
         evidence = onchainResult.data;
         sources.push('Routescan API (api.routescan.io)');
         dataSource = 'routescan';
-        console.log(`[verifier] Routescan data found for onchain claim`);
-      } else {
-        console.log(`[verifier] No Routescan data, falling back to Brave Search`);
       }
-    } catch (e) {
-      console.log(`[verifier] Routescan lookup failed, falling back to Brave Search: ${e}`);
+    } catch (error) {
+      console.log(`[verifier] Routescan lookup failed, falling back: ${error}`);
     }
 
-    // Fallback to Brave if no Routescan data
+    const braveResult = await braveSearch(claim.text);
     if (!evidence) {
-      const braveResult = await braveSearch(claim.text);
       evidence = braveResult;
       sources.push('Brave Search');
       dataSource = 'brave';
-    } else {
-      // Supplement with web search for additional context
-      const braveResult = await braveSearch(claim.text);
-      if (braveResult && !braveResult.includes('failed') && !braveResult.includes('not configured')) {
-        evidence += '\n\nAdditional web search results:\n' + braveResult;
-        sources.push('Brave Search');
-        dataSource = 'routescan+brave';
-      }
+    } else if (braveResult && !braveResult.startsWith('Web search failed') && !braveResult.includes('not configured')) {
+      evidence += `\n\nAdditional web search results:\n${braveResult}`;
+      sources.push('Brave Search');
+      dataSource = 'routescan+brave';
     }
   } else {
-    // Offchain claims: Brave Search
-    const braveResult = await braveSearch(claim.text);
-    evidence = braveResult;
+    evidence = await braveSearch(claim.text);
     sources.push('Brave Search');
-    dataSource = 'brave';
   }
 
-  // Get Claude verdict
   try {
-    const verdict = await getClaudeVerdict(claim, evidence, dataSource);
-    const score = Math.max(0, Math.min(100, Math.round(verdict.score)));
-    console.log(`[verifier] Verdict: score=${score} source=${dataSource}`);
-    return { claim, score, explanation: verdict.explanation, sources, dataSource };
-  } catch (e) {
-    console.error(`[verifier] Claude verdict failed for claim: ${e}`);
+    const verdict = await getVerdict(claim, evidence, dataSource);
+    return {
+      claim,
+      score: Math.max(0, Math.min(100, Math.round(verdict.score))),
+      explanation: verdict.explanation,
+      sources,
+      dataSource,
+    };
+  } catch (error) {
+    console.error(`[verifier] Verdict generation failed: ${error}`);
     return {
       claim,
       score: 50,
