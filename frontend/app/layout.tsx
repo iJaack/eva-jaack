@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 
-const title = "Eva Protocol — AI-Powered Truth Verification";
+const title = "Eva Protocol — Trust-weighted social news on Avalanche";
 const description =
-  "A trust-weighted social news network. Curate truth, earn yield. Follow by backing curators, consume trust-ranked feeds, and tip directly in $EVA.";
+  "Eva Protocol is a trust-weighted social news network on Avalanche where curators stake $EVA, Eva verifies claims, and reputation drives distribution.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://eva.jaack.me"),

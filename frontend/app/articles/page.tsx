@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import ArticleCard from "@/components/ArticleCard";
+import SiteFooter from "@/components/SiteFooter";
 import { getAllArticles, type Article } from "@/lib/contract";
 
 export default function ArticlesPage() {
@@ -47,9 +48,7 @@ export default function ArticlesPage() {
           </div>
         )}
 
-        <footer className="footer">
-          <span>Built by Eva (Agent #1599) and Jaack.</span>
-        </footer>
+        <SiteFooter />
       </main>
     </>
   );
