@@ -9,6 +9,7 @@ import { verifyRoutes } from './routes/verify.js';
 import { reputationRoutes } from './routes/reputation.js';
 import { submitRoutes } from './routes/submit.js';
 import { curatorRoutes } from './routes/curators.js';
+import { trustRoutes } from './routes/trust.js';
 
 const app = new Hono();
 
@@ -24,7 +25,8 @@ app.route('/api/verify', verifyRoutes);
 app.route('/api/reputation', reputationRoutes);
 app.route('/api/submit', submitRoutes);
 app.route('/api/curators', curatorRoutes);
-app.get('/api/curator/:id', (c) => curatorRoutes.fetch(c.req.raw));
+app.route('/api/curator', curatorRoutes);  // singular alias — POST /api/curator/register
+app.route('/api/trust', trustRoutes);
 
 // ── Health ─────────────────────────────────────────────────────────────
 app.get('/health', (c) => c.json({ status: 'ok', agentId: config.evaAgentId }));
