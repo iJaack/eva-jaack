@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "installCommand": "pnpm install",
+  "installCommand": "cd frontend && pnpm install --no-frozen-lockfile",
   "functions": {
     "api/index.ts": {
       "maxDuration": 60
@@ -20,6 +20,6 @@
       "destination": "/api/index.ts"
     }
   ],
-  "buildCommand": "pnpm --filter frontend build",
+  "buildCommand": "cd frontend && pnpm build",
   "outputDirectory": "frontend/out"
 }
