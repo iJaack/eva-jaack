@@ -18,8 +18,32 @@ function readBody(req: IncomingMessage): Promise<Uint8Array> {
   });
 }
 
+function resolveOriginalPath(req: IncomingMessage): string {
+  const host = req.headers.host ?? 'localhost';
+  const incoming = new URL(req.url ?? '/', `https://${host}`);
+
+  const route = incoming.searchParams.get('route');
+  const path = incoming.searchParams.get('path');
+
+  if (route === 'api') {
+    return path ? `/api/${path}` : '/api';
+  }
+
+  if (route === 'well-known') {
+    return path ? `/.well-known/${path}` : '/.well-known';
+  }
+
+  if (route === 'health') {
+    return '/health';
+  }
+
+  return `${incoming.pathname}${incoming.search}`;
+}
+
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
-  const url = `https://${req.headers.host}${req.url}`;
+  const host = req.headers.host ?? 'localhost';
+  const originalPath = resolveOriginalPath(req);
+  const url = `https://${host}${originalPath}`;
   const headers = new Headers(req.headers as Record<string, string>);
   const body = req.method === 'GET' || req.method === 'HEAD'
     ? undefined

@@ -8,6 +8,7 @@ import { submitRoutes } from './routes/submit.js';
 import { curatorRoutes } from './routes/curators.js';
 import { trustRoutes } from './routes/trust.js';
 import { articleRoutes } from './routes/articles.js';
+import { analyticsRoutes } from './routes/analytics.js';
 
 function agentManifest() {
   return {
@@ -41,6 +42,7 @@ export function createApp() {
   app.route('/api/curator', curatorRoutes);
   app.route('/api/trust', trustRoutes);
   app.route('/api/article', articleRoutes);
+  app.route('/api/analytics', analyticsRoutes);
 
   return app;
 }

@@ -22,6 +22,7 @@ import {
   requestWalletConnection,
   switchToAvalancheCChain,
 } from "@/lib/injected-wallet";
+import { trackOnboardingEvent } from "@/lib/onboarding-analytics";
 
 const onboardingSteps = [
   {
@@ -43,6 +44,37 @@ const starterExamples = {
   agentId: "1599",
   stakeAmount: "250000",
 } as const;
+
+const evalancheExample = `import { Evalanche } from "evalanche";
+
+const { agent } = await Evalanche.boot({
+  network: "avalanche",
+  identity: { agentId: "1599" },
+});
+
+const preflight = await fetch("https://eva.jaack.me/api/curator/register", {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify({
+    walletAddress: agent.address,
+    agentId: "1599",
+    // optional: omit to use live minSelfStake
+    stakeAmount: "250000",
+  }),
+}).then((res) => res.json());
+
+if (!preflight.ready) {
+  throw new Error(JSON.stringify(preflight));
+}
+
+for (const tx of preflight.transactions) {
+  const result = await agent.send({
+    to: tx.to,
+    data: tx.data,
+  });
+
+  console.log("confirmed", tx.description, result.hash);
+}`;
 
 type BroadcastTxStatus = "idle" | "sending" | "submitted" | "confirmed" | "failed";
 
@@ -192,6 +224,17 @@ export default function CuratorRegisterPage() {
   }, [connectedWallet, walletAddress]);
 
   useEffect(() => {
+    void trackOnboardingEvent({
+      event: "onboarding_viewed",
+      page: "/curators/register",
+      walletMode: "evalanche",
+      walletAvailable,
+      walletConnected: Boolean(connectedWallet),
+      chainId: walletChainId,
+    });
+  }, []);
+
+  useEffect(() => {
     if (!isSuccess(response)) {
       setBroadcastTxs([]);
       setBroadcastError(null);
@@ -222,6 +265,15 @@ export default function CuratorRegisterPage() {
     setNetworkError(null);
     setResponse(null);
 
+    void trackOnboardingEvent({
+      event: "preflight_started",
+      page: "/curators/register",
+      walletMode: "evalanche",
+      walletAvailable,
+      walletConnected: Boolean(connectedWallet),
+      chainId: walletChainId,
+    });
+
     try {
       const payload = {
         walletAddress: normalizeWalletInput(walletAddress.trim()),
@@ -231,8 +283,31 @@ export default function CuratorRegisterPage() {
 
       const result = await preflightCuratorRegistration(payload);
       setResponse(result);
+
+      void trackOnboardingEvent({
+        event: "ready" in result && result.ready ? "preflight_ready" : "preflight_failed",
+        page: "/curators/register",
+        walletMode: "evalanche",
+        walletAvailable,
+        walletConnected: Boolean(connectedWallet),
+        chainId: walletChainId,
+        ready: "ready" in result && result.ready,
+        needsApproval: "ready" in result && result.ready ? result.needsApproval : undefined,
+        transactionCount: "ready" in result && result.ready ? result.transactions.length : undefined,
+        error: "error" in result ? result.error : undefined,
+      });
     } catch (error) {
-      setNetworkError(error instanceof Error ? error.message : "Unable to reach curator registration API.");
+      const message = error instanceof Error ? error.message : "Unable to reach curator registration API.";
+      setNetworkError(message);
+      void trackOnboardingEvent({
+        event: "preflight_network_error",
+        page: "/curators/register",
+        walletMode: "evalanche",
+        walletAvailable,
+        walletConnected: Boolean(connectedWallet),
+        chainId: walletChainId,
+        error: message,
+      });
     } finally {
       setSubmitting(false);
     }
@@ -266,8 +341,27 @@ export default function CuratorRegisterPage() {
       if (account && !walletAddress.trim()) {
         setWalletAddress(account);
       }
+
+      void trackOnboardingEvent({
+        event: "wallet_connected",
+        page: "/curators/register",
+        walletMode: "browser-wallet",
+        walletAvailable: true,
+        walletConnected: Boolean(account),
+        chainId,
+      });
     } catch (error) {
-      setWalletError(formatProviderError(error));
+      const message = formatProviderError(error);
+      setWalletError(message);
+      void trackOnboardingEvent({
+        event: "wallet_connect_failed",
+        page: "/curators/register",
+        walletMode: "browser-wallet",
+        walletAvailable: Boolean(provider),
+        walletConnected: false,
+        chainId: walletChainId,
+        error: message,
+      });
     } finally {
       setWalletConnecting(false);
     }
@@ -287,8 +381,26 @@ export default function CuratorRegisterPage() {
       await switchToAvalancheCChain(provider);
       const chainId = await getCurrentChainId(provider);
       setWalletChainId(chainId);
+      void trackOnboardingEvent({
+        event: "wallet_switched_to_avalanche",
+        page: "/curators/register",
+        walletMode: "browser-wallet",
+        walletAvailable: true,
+        walletConnected: Boolean(connectedWallet),
+        chainId,
+      });
     } catch (error) {
-      setWalletError(formatProviderError(error));
+      const message = formatProviderError(error);
+      setWalletError(message);
+      void trackOnboardingEvent({
+        event: "wallet_switch_failed",
+        page: "/curators/register",
+        walletMode: "browser-wallet",
+        walletAvailable: Boolean(provider),
+        walletConnected: Boolean(connectedWallet),
+        chainId: walletChainId,
+        error: message,
+      });
     } finally {
       setWalletSwitching(false);
     }
@@ -343,6 +455,18 @@ export default function CuratorRegisterPage() {
     setBroadcastError(null);
     setBroadcastTxs(response.transactions.map(() => ({ status: "idle" })));
 
+    void trackOnboardingEvent({
+      event: "broadcast_started",
+      page: "/curators/register",
+      walletMode: "browser-wallet",
+      walletAvailable: true,
+      walletConnected: true,
+      chainId: walletChainId,
+      ready: true,
+      needsApproval: response.needsApproval,
+      transactionCount: response.transactions.length,
+    });
+
     for (let index = 0; index < response.transactions.length; index += 1) {
       const tx = response.transactions[index];
 
@@ -370,12 +494,30 @@ export default function CuratorRegisterPage() {
           return { status: "submitted", hash };
         }));
 
+        void trackOnboardingEvent({
+          event: "transaction_submitted",
+          page: "/curators/register",
+          walletMode: "browser-wallet",
+          walletAvailable: true,
+          walletConnected: true,
+          chainId: walletChainId,
+        });
+
         await client.waitForTransactionReceipt({ hash: hash as `0x${string}` });
 
         setBroadcastTxs((current) => current.map((item, itemIndex) => {
           if (itemIndex !== index) return item;
           return { status: "confirmed", hash };
         }));
+
+        void trackOnboardingEvent({
+          event: "transaction_confirmed",
+          page: "/curators/register",
+          walletMode: "browser-wallet",
+          walletAvailable: true,
+          walletConnected: true,
+          chainId: walletChainId,
+        });
       } catch (error) {
         const message = formatProviderError(error);
         setBroadcastTxs((current) => current.map((item, itemIndex) => {
@@ -383,10 +525,31 @@ export default function CuratorRegisterPage() {
           return { status: "failed", error: message, hash: item.hash };
         }));
         setBroadcastError(`Stopped after transaction ${index + 1}: ${message}`);
+        void trackOnboardingEvent({
+          event: "broadcast_failed",
+          page: "/curators/register",
+          walletMode: "browser-wallet",
+          walletAvailable: true,
+          walletConnected: true,
+          chainId: walletChainId,
+          error: message,
+        });
         setBroadcasting(false);
         return;
       }
     }
+
+    void trackOnboardingEvent({
+      event: "registration_completed",
+      page: "/curators/register",
+      walletMode: "browser-wallet",
+      walletAvailable: true,
+      walletConnected: true,
+      chainId: walletChainId,
+      ready: true,
+      needsApproval: response.needsApproval,
+      transactionCount: response.transactions.length,
+    });
 
     setBroadcasting(false);
   }
@@ -816,6 +979,41 @@ export default function CuratorRegisterPage() {
                 </p>
               </div>
             )}
+          </div>
+        </section>
+
+        <section style={{ marginTop: 40 }}>
+          <div className="surface register-guide-card">
+            <div className="section-heading-row" style={{ alignItems: "start" }}>
+              <div>
+                <p className="section-kicker">Agent guide</p>
+                <h2 className="section-title section-title-sm">Register with Evalanche in one script</h2>
+              </div>
+              <Link href="/evalanche" className="btn btn-ghost">
+                Open Evalanche page
+              </Link>
+            </div>
+
+            <p style={{ marginTop: 12, color: "var(--muted)" }}>
+              This is the canonical agent path: boot an Evalanche wallet on Avalanche, call Eva&apos;s preflight endpoint,
+              then execute the returned transactions in order. The same prepared payloads also power the browser-wallet flow above.
+            </p>
+
+            <div className="flow-line">
+              <span>Evalanche boot</span>
+              <span>→</span>
+              <span>Preflight `/api/curator/register`</span>
+              <span>→</span>
+              <span>Approval if needed</span>
+              <span>→</span>
+              <span>`registerCurator`</span>
+            </div>
+
+            <pre className="formula" style={{ marginTop: 16 }}><code>{evalancheExample}</code></pre>
+
+            <p className="field-help" style={{ marginTop: 12 }}>
+              Preferred human path: Core wallet on Avalanche. Preferred agent path: Evalanche. Shared source of truth: the backend preflight response and prepared transaction payloads.
+            </p>
           </div>
         </section>
 
