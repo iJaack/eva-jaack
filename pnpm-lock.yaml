@@ -35,8 +35,8 @@ importers:
         specifier: ^1.19.11
         version: 1.19.11(hono@4.12.8)
       evalanche:
-        specifier: file:../../evalanche
-        version: file:../evalanche(bn.js@5.2.3)(node-fetch@2.7.0)(react@19.0.0)(typescript@5.9.3)(zod@4.3.6)
+        specifier: ^1.6.1
+        version: 1.6.1(bn.js@5.2.3)(node-fetch@2.7.0)(react@19.0.0)(typescript@5.9.3)(zod@4.3.6)
       hono:
         specifier: ^4.12.8
         version: 4.12.8
@@ -1728,8 +1728,8 @@ packages:
     resolution: {integrity: sha512-U1wulmetNymijEhpSEQ7Ct/P/Jw9/e7R1j5XIbPRydgV2DjLVMsULDlNksq3RQnFgKoLlZf88ijYtWEXcPa07A==}
     engines: {node: '>=14.0.0'}
 
-  evalanche@file:../evalanche:
-    resolution: {directory: ../evalanche, type: directory}
+  evalanche@1.6.1:
+    resolution: {integrity: sha512-uK/H+gVgwR6ddzBKUZwBvCTau6/F76Q/ykHeDb3wTpgwcjk6mgm6hAWHU2k5q0K6ClvYiKTLBMZaT8xOjbVlNw==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -3729,7 +3729,7 @@ snapshots:
 
   '@ledgerhq/hw-app-btc@10.2.4':
     dependencies:
-      '@ledgerhq/hw-transport': 6.30.6
+      '@ledgerhq/hw-transport': 6.34.0
       '@ledgerhq/logs': 6.16.0
       bip32-path: 0.4.2
       bitcoinjs-lib: 5.2.0
@@ -3750,7 +3750,7 @@ snapshots:
       '@ledgerhq/domain-service': 1.7.1
       '@ledgerhq/errors': 6.31.0
       '@ledgerhq/evm-tools': 1.12.1
-      '@ledgerhq/hw-transport': 6.30.6
+      '@ledgerhq/hw-transport': 6.34.0
       '@ledgerhq/hw-transport-mocker': 6.33.0
       '@ledgerhq/logs': 6.16.0
       '@ledgerhq/types-live': 6.101.0(react@19.0.0)
@@ -3769,7 +3769,7 @@ snapshots:
       '@ledgerhq/domain-service': 1.7.1
       '@ledgerhq/errors': 6.31.0
       '@ledgerhq/evm-tools': 1.12.1
-      '@ledgerhq/hw-transport': 6.30.6
+      '@ledgerhq/hw-transport': 6.34.0
       '@ledgerhq/hw-transport-mocker': 6.33.0
       '@ledgerhq/logs': 6.16.0
       '@ledgerhq/types-live': 6.101.0(react@19.0.0)
@@ -5087,7 +5087,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  evalanche@file:../evalanche(bn.js@5.2.3)(node-fetch@2.7.0)(react@19.0.0)(typescript@5.9.3)(zod@4.3.6):
+  evalanche@1.6.1(bn.js@5.2.3)(node-fetch@2.7.0)(react@19.0.0)(typescript@5.9.3)(zod@4.3.6):
     dependencies:
       '@avalabs/avalanchejs': 5.0.0
       '@avalabs/core-wallets-sdk': 3.0.2(big.js@7.0.1)(bn.js@5.2.3)(ethers@6.16.0)(node-fetch@2.7.0)(react@19.0.0)
@@ -5540,7 +5540,7 @@ snapshots:
     dependencies:
       '@bitcoinerlab/descriptors': 1.1.1(ledger-bitcoin@0.2.3)
       '@bitcoinerlab/secp256k1': 1.2.0
-      '@ledgerhq/hw-transport': 6.30.6
+      '@ledgerhq/hw-transport': 6.34.0
       bip32-path: 0.4.2
       bitcoinjs-lib: 6.1.7
 
@@ -5599,14 +5599,14 @@ snapshots:
       '@ethereumjs/rlp': 5.0.0
       '@noble/curves': 1.3.0
       '@noble/hashes': 1.3.3
-      '@scure/base': 1.1.5
+      '@scure/base': 1.1.9
       micro-packed: 0.5.3
 
   micro-ftch@0.3.1: {}
 
   micro-packed@0.5.3:
     dependencies:
-      '@scure/base': 1.1.5
+      '@scure/base': 1.1.9
 
   micromatch@4.0.8:
     dependencies:
