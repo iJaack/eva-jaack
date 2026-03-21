@@ -7,6 +7,7 @@ import { reputationRoutes } from './routes/reputation.js';
 import { submitRoutes } from './routes/submit.js';
 import { curatorRoutes } from './routes/curators.js';
 import { trustRoutes } from './routes/trust.js';
+import { articleRoutes } from './routes/articles.js';
 
 function agentManifest() {
   return {
@@ -39,6 +40,7 @@ export function createApp() {
   app.route('/api/curators', curatorRoutes);
   app.route('/api/curator', curatorRoutes);
   app.route('/api/trust', trustRoutes);
+  app.route('/api/article', articleRoutes);
 
   return app;
 }

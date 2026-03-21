@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { runVerificationPipeline } from '../services/pipeline.js';
+import { warmArticleCache } from './articles.js';
 
 export const submitRoutes = new Hono();
 
@@ -26,6 +27,8 @@ submitRoutes.post('/', async (c) => {
 
   try {
     const result = await runVerificationPipeline(body.url, body.articleId);
+    warmArticleCache(body.articleId, body.url, result);
+
     return c.json({
       success: true,
       overallScore: result.overallScore,

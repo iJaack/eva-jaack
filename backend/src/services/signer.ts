@@ -9,6 +9,7 @@ import {
 import { privateKeyToAccount } from 'viem/accounts';
 import { avalanche } from 'viem/chains';
 import { config } from '../config.js';
+import { getEvalancheSigner, getSignerKey } from './signing.js';
 
 export interface WriteContractRequest {
   address: `0x${string}`;
@@ -23,7 +24,15 @@ export interface SignerService {
   writeContract(request: WriteContractRequest): Promise<Hex>;
 }
 
-// ── Private-key signer (current production path) ─────────────────────
+function createWriter(account: Account, chain: Chain) {
+  return createWalletClient({
+    account,
+    chain,
+    transport: http(config.avalancheRpc),
+  });
+}
+
+// ── Private-key signer (explicit env path) ────────────────────────────
 
 class PrivateKeySignerService implements SignerService {
   readonly provider = 'private-key';
@@ -34,11 +43,7 @@ class PrivateKeySignerService implements SignerService {
   }
 
   async writeContract({ chain = avalanche, ...request }: WriteContractRequest): Promise<Hex> {
-    const wallet = createWalletClient({
-      account: this.account,
-      chain,
-      transport: http(config.avalancheRpc),
-    });
+    const wallet = createWriter(this.account, chain);
 
     return wallet.writeContract({
       ...request,
@@ -49,58 +54,28 @@ class PrivateKeySignerService implements SignerService {
   }
 }
 
-// ── Evalanche HTTP bridge signer ─────────────────────────────────────
-//
-// Delegates transaction signing to an Evalanche agent-wallet service
-// over HTTP. The bridge accepts a JSON write-contract request and returns
-// a signed transaction hash once the wallet has broadcast it.
-//
-// Expected Evalanche bridge API:
-//   POST /sign
-//   Body: { address, abi, functionName, args, chainId }
-//   Response: { txHash: "0x..." }
-
-interface EvalancheBridgeResponse {
-  txHash?: string;
-  hash?: string;
-  error?: string;
-}
+// ── Evalanche signer (local SDK + encrypted keystore) ────────────────
 
 class EvalancheSignerService implements SignerService {
   readonly provider = 'evalanche';
 
-  constructor(private readonly bridgeUrl: string) {}
-
   async writeContract({ chain = avalanche, ...request }: WriteContractRequest): Promise<Hex> {
-    const res = await fetch(`${this.bridgeUrl}/sign`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        address: request.address,
-        abi: request.abi,
-        functionName: request.functionName,
-        args: request.args,
-        chainId: chain.id,
-      }),
-    });
+    const [{ address, secretsSource }, privateKey] = await Promise.all([
+      getEvalancheSigner(),
+      getSignerKey(),
+    ]);
 
-    if (!res.ok) {
-      const body = await res.text();
-      throw new Error(`Evalanche bridge request failed: ${res.status} ${body}`);
-    }
+    const account = privateKeyToAccount(privateKey);
+    const wallet = createWriter(account, chain);
 
-    const data = await res.json() as EvalancheBridgeResponse;
+    console.log(`[signer] Evalanche signer ready — address=${address} source=${secretsSource}`);
 
-    if (data.error) {
-      throw new Error(`Evalanche bridge returned error: ${data.error}`);
-    }
-
-    const txHash = (data.txHash ?? data.hash) as Hex | undefined;
-    if (!txHash) {
-      throw new Error('Evalanche bridge response missing txHash');
-    }
-
-    return txHash;
+    return wallet.writeContract({
+      ...request,
+      chain,
+      // viem type inference is strict around functionName/abi coupling here
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
   }
 }
 
@@ -111,7 +86,7 @@ class UnavailableSignerService implements SignerService {
 
   async writeContract(): Promise<Hex> {
     throw new Error(
-      'No signer configured. Set EVA_SIGNER_PROVIDER=private-key with EVA_PRIVATE_KEY, or EVA_SIGNER_PROVIDER=evalanche with EVALANCHE_SIGNER_URL.',
+      'No signer configured. Set EVA_SIGNER_PROVIDER=private-key with EVA_PRIVATE_KEY, or use EVA_SIGNER_PROVIDER=evalanche and let Evalanche resolve credentials from OpenClaw secrets, env, or its encrypted keystore.',
     );
   }
 }
@@ -123,13 +98,20 @@ let cachedService: SignerService | null = null;
 export function getSignerService(): SignerService {
   if (cachedService) return cachedService;
 
-  if ((config.signerProvider === 'private-key' || config.signerProvider === 'auto') && config.evaPrivateKey) {
+  if (config.signerProvider === 'private-key' && config.evaPrivateKey) {
     cachedService = new PrivateKeySignerService(config.evaPrivateKey);
     return cachedService;
   }
 
-  if (config.signerProvider === 'evalanche' && config.evalancheSignerUrl) {
-    cachedService = new EvalancheSignerService(config.evalancheSignerUrl);
+  if (config.signerProvider === 'evalanche') {
+    cachedService = new EvalancheSignerService();
+    return cachedService;
+  }
+
+  if (config.signerProvider === 'auto') {
+    cachedService = config.evaPrivateKey
+      ? new PrivateKeySignerService(config.evaPrivateKey)
+      : new EvalancheSignerService();
     return cachedService;
   }
 
