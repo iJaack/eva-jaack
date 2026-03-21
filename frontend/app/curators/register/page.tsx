@@ -403,7 +403,7 @@ export default function CuratorRegisterPage() {
             </h1>
             <p className="hero-sub">
               Bring an Avalanche wallet, an ERC-8004 agent ID you own, and enough $EVA to meet the self-stake.
-              Eva preflights the transaction flow and shows you exactly what needs to happen next. Agents should use Evalanche as the preferred wallet and execution layer; human operators can also connect a browser wallet and broadcast the same prepared transactions here.
+              Eva preflights the transaction flow and shows you exactly what needs to happen next. Agents should use Evalanche as the preferred wallet and execution layer; human operators get the best experience with Core wallet from Ava Labs, and can broadcast the same prepared transactions here.
             </p>
             <div className="hero-actions">
               <Link href="/evalanche" className="btn btn-primary">
@@ -427,6 +427,7 @@ export default function CuratorRegisterPage() {
             <p className="hero-panel-kicker">Agent-first onboarding</p>
             <ul className="hero-checklist">
               <li>Preferred for agents: use Evalanche as the wallet and execution layer.</li>
+              <li>Preferred for humans: use Core wallet from Ava Labs for the best Avalanche UX.</li>
               <li>Your wallet must own the ERC-8004 agent ID you submit.</li>
               <li>You need enough $EVA balance to cover your chosen self-stake.</li>
               <li>If allowance is too low, approval must be broadcast before registration.</li>
@@ -470,7 +471,7 @@ export default function CuratorRegisterPage() {
                 <p className="section-kicker" style={{ marginBottom: 8 }}>Execution paths</p>
                 <h3 style={{ margin: 0 }}>Evalanche first, injected wallet second</h3>
                 <p className="field-help" style={{ marginTop: 10 }}>
-                  Agents should use Evalanche as the preferred wallet and execution layer. This page also supports a lightweight injected EVM wallet if a human operator wants to broadcast the same prepared transactions directly in-browser.
+                  Agents should use Evalanche as the preferred wallet and execution layer. Human operators get the best experience with Core wallet from Ava Labs, while other injected EVM wallets remain a compatibility path for broadcasting the same prepared transactions in-browser.
                 </p>
               </div>
 
@@ -491,6 +492,14 @@ export default function CuratorRegisterPage() {
                 <Link href="/evalanche" className="btn btn-ghost">
                   Evalanche guide
                 </Link>
+                <a
+                  href="https://core.app/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-ghost"
+                >
+                  Get Core wallet
+                </a>
                 <button type="button" className="btn btn-ghost" onClick={handleConnectWallet} disabled={!walletAvailable || walletConnecting}>
                   {walletConnecting ? "Connecting..." : connectedWallet ? "Reconnect wallet" : "Connect browser wallet"}
                 </button>
@@ -515,7 +524,7 @@ export default function CuratorRegisterPage() {
               {walletError ? <p className="wallet-note wallet-note-error">{walletError}</p> : null}
               {!walletAvailable ? (
                 <p className="wallet-note">
-                  No injected wallet found in this browser. You can still run preflight and copy the raw transactions below.
+                  No injected wallet found in this browser. Core wallet is the recommended human option on Avalanche, but you can still run preflight and copy the raw transactions below.
                 </p>
               ) : null}
             </div>
@@ -671,7 +680,7 @@ export default function CuratorRegisterPage() {
                   {broadcastError ? <p className="wallet-note wallet-note-error">{broadcastError}</p> : null}
                   {!walletAvailable ? (
                     <p className="wallet-note">
-                      No injected wallet in this browser, so this page stays in honest fallback mode: copy the JSON payloads below.
+                      No injected wallet in this browser. Core wallet is the recommended human option on Avalanche; otherwise this page stays in honest fallback mode and exposes the JSON payloads below.
                     </p>
                   ) : null}
                 </div>
