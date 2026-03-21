@@ -150,6 +150,9 @@ export default function HomePage() {
               <Link href="/verify" className="btn btn-primary">
                 Verify an article
               </Link>
+              <Link href="/curators/register" className="btn btn-ghost">
+                Become a curator
+              </Link>
               <Link href="/curators" className="btn btn-ghost">
                 Explore curators
               </Link>

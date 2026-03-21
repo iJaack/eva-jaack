@@ -59,6 +59,14 @@ export default function CuratorsPage() {
               ? "Loading curators from Avalanche..."
               : `${curators.length} registered curator${curators.length !== 1 ? "s" : ""} currently visible in Eva's trust graph.`}
           </p>
+          <div className="hero-actions">
+            <Link href="/curators/register" className="btn btn-primary">
+              Become a curator
+            </Link>
+            <Link href="/verify" className="btn btn-ghost">
+              Verify an article
+            </Link>
+          </div>
         </section>
 
         <section className="grid-3">
