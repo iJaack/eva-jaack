@@ -1010,6 +1010,41 @@ a {
   margin-top: 18px;
 }
 
+.wallet-panel {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  margin-top: 18px;
+  border: 1px solid var(--faint);
+  border-radius: 16px;
+  background: var(--card2);
+}
+
+.wallet-panel-grid,
+.broadcast-panel-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.wallet-panel-actions,
+.tx-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.wallet-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.wallet-note-error {
+  color: var(--ink);
+}
+
 .field-group {
   display: grid;
   gap: 8px;
@@ -1097,12 +1132,46 @@ a {
   flex-wrap: wrap;
 }
 
+.tx-state-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--faint);
+  background: var(--card2);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.tx-state-chip.is-active {
+  background: rgba(133, 203, 218, 0.14);
+  border-color: rgba(133, 203, 218, 0.38);
+}
+
+.tx-state-chip.is-confirmed {
+  background: rgba(138, 216, 192, 0.14);
+  border-color: rgba(138, 216, 192, 0.38);
+}
+
+.tx-state-chip.is-failed {
+  background: rgba(243, 154, 142, 0.14);
+  border-color: rgba(243, 154, 142, 0.38);
+}
+
 @media (min-width: 980px) {
   .register-layout {
     grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
   }
 
   .register-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wallet-panel-grid,
+  .broadcast-panel-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 

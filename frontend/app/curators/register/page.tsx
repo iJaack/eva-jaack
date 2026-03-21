@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { getAddress, isAddress } from "viem";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
+import { client } from "@/lib/contract";
 import {
   formatTokenAmount,
   preflightCuratorRegistration,
@@ -11,6 +13,15 @@ import {
   type CuratorRegisterError,
   type CuratorRegisterSuccess,
 } from "@/lib/curator-onboarding";
+import {
+  formatProviderError,
+  getConnectedAccounts,
+  getCurrentChainId,
+  getInjectedProvider,
+  isAvalancheCChain,
+  requestWalletConnection,
+  switchToAvalancheCChain,
+} from "@/lib/injected-wallet";
 
 const onboardingSteps = [
   {
@@ -22,8 +33,8 @@ const onboardingSteps = [
     body: "Eva fetches the current minimum self-stake, your allowance status, and whether an approval transaction is required before registration.",
   },
   {
-    title: "Broadcast from your wallet",
-    body: "This page does not pretend to sign for you. If wallet-connect is not wired yet, it shows the exact prepared transactions you need to submit from your own wallet.",
+    title: "Execute with Evalanche or a browser wallet",
+    body: "Agents should treat Evalanche as the preferred wallet and execution layer. Browser-wallet broadcast on this page is available as a secondary convenience path using the same prepared transactions.",
   },
 ] as const;
 
@@ -32,6 +43,14 @@ const starterExamples = {
   agentId: "1599",
   stakeAmount: "250000",
 } as const;
+
+type BroadcastTxStatus = "idle" | "sending" | "submitted" | "confirmed" | "failed";
+
+type BroadcastTxState = {
+  status: BroadcastTxStatus;
+  hash?: string;
+  error?: string;
+};
 
 function isSuccess(
   value: CuratorRegisterSuccess | CuratorRegisterError | null
@@ -60,6 +79,39 @@ function statusTone(type: "error" | "success" | "info") {
   };
 }
 
+function txStatusLabel(status: BroadcastTxStatus): string {
+  switch (status) {
+    case "sending":
+      return "Awaiting wallet confirmation";
+    case "submitted":
+      return "Submitted";
+    case "confirmed":
+      return "Confirmed on Avalanche";
+    case "failed":
+      return "Failed";
+    default:
+      return "Prepared";
+  }
+}
+
+function txStatusClassName(status: BroadcastTxStatus): string {
+  if (status === "confirmed") return "tx-state-chip is-confirmed";
+  if (status === "failed") return "tx-state-chip is-failed";
+  if (status === "sending" || status === "submitted") return "tx-state-chip is-active";
+  return "tx-state-chip";
+}
+
+function formatWalletNetwork(chainId: number | null): string {
+  if (chainId === null) return "No wallet network detected yet";
+  if (isAvalancheCChain(chainId)) return "Avalanche C-Chain";
+  return `Wrong network (${chainId})`;
+}
+
+function normalizeWalletInput(address: string): string {
+  if (!isAddress(address)) return address.trim();
+  return getAddress(address);
+}
+
 export default function CuratorRegisterPage() {
   const [walletAddress, setWalletAddress] = useState("");
   const [agentId, setAgentId] = useState("");
@@ -69,10 +121,100 @@ export default function CuratorRegisterPage() {
   const [networkError, setNetworkError] = useState<string | null>(null);
   const [copiedTx, setCopiedTx] = useState<number | null>(null);
 
+  const [walletAvailable, setWalletAvailable] = useState(false);
+  const [walletConnecting, setWalletConnecting] = useState(false);
+  const [walletSwitching, setWalletSwitching] = useState(false);
+  const [connectedWallet, setConnectedWallet] = useState<string | null>(null);
+  const [walletChainId, setWalletChainId] = useState<number | null>(null);
+  const [walletError, setWalletError] = useState<string | null>(null);
+
+  const [broadcasting, setBroadcasting] = useState(false);
+  const [broadcastError, setBroadcastError] = useState<string | null>(null);
+  const [broadcastTxs, setBroadcastTxs] = useState<BroadcastTxState[]>([]);
+
+  useEffect(() => {
+    const provider = getInjectedProvider();
+    setWalletAvailable(Boolean(provider));
+
+    if (!provider) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const syncWalletState = async () => {
+      try {
+        const [accounts, chainId] = await Promise.all([
+          getConnectedAccounts(provider),
+          getCurrentChainId(provider),
+        ]);
+
+        if (cancelled) return;
+
+        const nextAccount = accounts[0] ? normalizeWalletInput(accounts[0]) : null;
+        setConnectedWallet(nextAccount);
+        setWalletChainId(chainId);
+      } catch (error) {
+        if (!cancelled) {
+          setWalletError(formatProviderError(error));
+        }
+      }
+    };
+
+    const handleAccountsChanged = (...args: unknown[]) => {
+      const accounts = Array.isArray(args[0]) ? args[0].filter((value): value is string => typeof value === "string") : [];
+      const nextAccount = accounts[0] ? normalizeWalletInput(accounts[0]) : null;
+      setConnectedWallet(nextAccount);
+      setWalletError(null);
+    };
+
+    const handleChainChanged = (...args: unknown[]) => {
+      const nextChainId = typeof args[0] === "string" || typeof args[0] === "number" ? Number(args[0]) : null;
+      setWalletChainId(typeof args[0] === "string" ? Number.parseInt(args[0], 16) : nextChainId);
+      setWalletError(null);
+    };
+
+    void syncWalletState();
+    provider.on?.("accountsChanged", handleAccountsChanged);
+    provider.on?.("chainChanged", handleChainChanged);
+
+    return () => {
+      cancelled = true;
+      provider.removeListener?.("accountsChanged", handleAccountsChanged);
+      provider.removeListener?.("chainChanged", handleChainChanged);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!walletAddress.trim() && connectedWallet) {
+      setWalletAddress(connectedWallet);
+    }
+  }, [connectedWallet, walletAddress]);
+
+  useEffect(() => {
+    if (!isSuccess(response)) {
+      setBroadcastTxs([]);
+      setBroadcastError(null);
+      setBroadcasting(false);
+      return;
+    }
+
+    setBroadcastTxs(response.transactions.map(() => ({ status: "idle" })));
+    setBroadcastError(null);
+    setBroadcasting(false);
+  }, [response]);
+
   const effectiveStakeCopy = useMemo(() => {
     if (!isSuccess(response)) return stakeAmount.trim() || "minimum network stake";
     return `${formatTokenAmount(response.stakeAmountEva)} EVA`;
   }, [response, stakeAmount]);
+
+  const walletMatchesResponse = useMemo(() => {
+    if (!isSuccess(response) || !connectedWallet) return false;
+    return connectedWallet.toLowerCase() === response.walletAddress.toLowerCase();
+  }, [connectedWallet, response]);
+
+  const canBroadcast = isSuccess(response) && walletAvailable && Boolean(connectedWallet) && isAvalancheCChain(walletChainId) && walletMatchesResponse && !broadcasting;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -82,7 +224,7 @@ export default function CuratorRegisterPage() {
 
     try {
       const payload = {
-        walletAddress: walletAddress.trim(),
+        walletAddress: normalizeWalletInput(walletAddress.trim()),
         agentId: agentId.trim(),
         ...(stakeAmount.trim() ? { stakeAmount: stakeAmount.trim() } : {}),
       };
@@ -103,6 +245,152 @@ export default function CuratorRegisterPage() {
     window.setTimeout(() => setCopiedTx((current) => (current === index ? null : current)), 1800);
   }
 
+  async function handleConnectWallet() {
+    const provider = getInjectedProvider();
+    if (!provider) {
+      setWalletError("No injected wallet detected. Open this page in MetaMask, Core, or another EVM wallet browser.");
+      return;
+    }
+
+    setWalletConnecting(true);
+    setWalletError(null);
+
+    try {
+      const accounts = await requestWalletConnection(provider);
+      const account = accounts[0] ? normalizeWalletInput(accounts[0]) : null;
+      const chainId = await getCurrentChainId(provider);
+
+      setConnectedWallet(account);
+      setWalletChainId(chainId);
+
+      if (account && !walletAddress.trim()) {
+        setWalletAddress(account);
+      }
+    } catch (error) {
+      setWalletError(formatProviderError(error));
+    } finally {
+      setWalletConnecting(false);
+    }
+  }
+
+  async function handleSwitchWalletNetwork() {
+    const provider = getInjectedProvider();
+    if (!provider) {
+      setWalletError("No injected wallet detected.");
+      return;
+    }
+
+    setWalletSwitching(true);
+    setWalletError(null);
+
+    try {
+      await switchToAvalancheCChain(provider);
+      const chainId = await getCurrentChainId(provider);
+      setWalletChainId(chainId);
+    } catch (error) {
+      setWalletError(formatProviderError(error));
+    } finally {
+      setWalletSwitching(false);
+    }
+  }
+
+  async function handleBroadcastTransactions() {
+    if (!isSuccess(response)) return;
+
+    const provider = getInjectedProvider();
+    if (!provider) {
+      setBroadcastError("No injected wallet detected. Copy the JSON payloads below into your own signer flow.");
+      return;
+    }
+
+    let account = connectedWallet;
+
+    if (!account) {
+      try {
+        const accounts = await requestWalletConnection(provider);
+        account = accounts[0] ? normalizeWalletInput(accounts[0]) : null;
+        setConnectedWallet(account);
+      } catch (error) {
+        setBroadcastError(formatProviderError(error));
+        return;
+      }
+    }
+
+    if (!account) {
+      setBroadcastError("Wallet connected, but no account is available to sign transactions.");
+      return;
+    }
+
+    if (account.toLowerCase() !== response.walletAddress.toLowerCase()) {
+      setBroadcastError(`Connected wallet ${shortenAddress(account)} does not match preflight wallet ${shortenAddress(response.walletAddress)}.`);
+      return;
+    }
+
+    try {
+      const chainId = await getCurrentChainId(provider);
+      setWalletChainId(chainId);
+
+      if (!isAvalancheCChain(chainId)) {
+        setBroadcastError("Switch your wallet to Avalanche C-Chain before broadcasting.");
+        return;
+      }
+    } catch (error) {
+      setBroadcastError(formatProviderError(error));
+      return;
+    }
+
+    setBroadcasting(true);
+    setBroadcastError(null);
+    setBroadcastTxs(response.transactions.map(() => ({ status: "idle" })));
+
+    for (let index = 0; index < response.transactions.length; index += 1) {
+      const tx = response.transactions[index];
+
+      setBroadcastTxs((current) => current.map((item, itemIndex) => {
+        if (itemIndex !== index) return item;
+        return { status: "sending" };
+      }));
+
+      try {
+        const hash = await provider.request({
+          method: "eth_sendTransaction",
+          params: [{
+            from: account,
+            to: tx.to,
+            data: tx.data,
+          }],
+        });
+
+        if (typeof hash !== "string") {
+          throw new Error("Wallet returned an invalid transaction hash.");
+        }
+
+        setBroadcastTxs((current) => current.map((item, itemIndex) => {
+          if (itemIndex !== index) return item;
+          return { status: "submitted", hash };
+        }));
+
+        await client.waitForTransactionReceipt({ hash: hash as `0x${string}` });
+
+        setBroadcastTxs((current) => current.map((item, itemIndex) => {
+          if (itemIndex !== index) return item;
+          return { status: "confirmed", hash };
+        }));
+      } catch (error) {
+        const message = formatProviderError(error);
+        setBroadcastTxs((current) => current.map((item, itemIndex) => {
+          if (itemIndex !== index) return item;
+          return { status: "failed", error: message, hash: item.hash };
+        }));
+        setBroadcastError(`Stopped after transaction ${index + 1}: ${message}`);
+        setBroadcasting(false);
+        return;
+      }
+    }
+
+    setBroadcasting(false);
+  }
+
   return (
     <>
       <Nav />
@@ -115,9 +403,12 @@ export default function CuratorRegisterPage() {
             </h1>
             <p className="hero-sub">
               Bring an Avalanche wallet, an ERC-8004 agent ID you own, and enough $EVA to meet the self-stake.
-              Eva will preflight the transaction flow and show you exactly what needs to happen next.
+              Eva preflights the transaction flow and shows you exactly what needs to happen next. Agents should use Evalanche as the preferred wallet and execution layer; human operators can also connect a browser wallet and broadcast the same prepared transactions here.
             </p>
             <div className="hero-actions">
+              <Link href="/evalanche" className="btn btn-primary">
+                Use Evalanche as your agent wallet
+              </Link>
               <Link href="/curators" className="btn btn-ghost">
                 Browse existing curators
               </Link>
@@ -133,8 +424,9 @@ export default function CuratorRegisterPage() {
           </div>
 
           <aside className="surface hero-panel">
-            <p className="hero-panel-kicker">Before you start</p>
+            <p className="hero-panel-kicker">Agent-first onboarding</p>
             <ul className="hero-checklist">
+              <li>Preferred for agents: use Evalanche as the wallet and execution layer.</li>
               <li>Your wallet must own the ERC-8004 agent ID you submit.</li>
               <li>You need enough $EVA balance to cover your chosen self-stake.</li>
               <li>If allowance is too low, approval must be broadcast before registration.</li>
@@ -171,6 +463,61 @@ export default function CuratorRegisterPage() {
               >
                 Fill example
               </button>
+            </div>
+
+            <div className="wallet-panel">
+              <div>
+                <p className="section-kicker" style={{ marginBottom: 8 }}>Execution paths</p>
+                <h3 style={{ margin: 0 }}>Evalanche first, injected wallet second</h3>
+                <p className="field-help" style={{ marginTop: 10 }}>
+                  Agents should use Evalanche as the preferred wallet and execution layer. This page also supports a lightweight injected EVM wallet if a human operator wants to broadcast the same prepared transactions directly in-browser.
+                </p>
+              </div>
+
+              <div className="wallet-panel-grid">
+                <div className="summary-item">
+                  <span className="summary-label">Wallet status</span>
+                  <span className="summary-value">
+                    {walletAvailable ? (connectedWallet ? shortenAddress(connectedWallet) : "Detected, not connected") : "No injected wallet detected"}
+                  </span>
+                </div>
+                <div className="summary-item">
+                  <span className="summary-label">Network</span>
+                  <span className="summary-value">{formatWalletNetwork(walletChainId)}</span>
+                </div>
+              </div>
+
+              <div className="wallet-panel-actions">
+                <Link href="/evalanche" className="btn btn-ghost">
+                  Evalanche guide
+                </Link>
+                <button type="button" className="btn btn-ghost" onClick={handleConnectWallet} disabled={!walletAvailable || walletConnecting}>
+                  {walletConnecting ? "Connecting..." : connectedWallet ? "Reconnect wallet" : "Connect browser wallet"}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => connectedWallet && setWalletAddress(connectedWallet)}
+                  disabled={!connectedWallet}
+                >
+                  Use connected wallet
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={handleSwitchWalletNetwork}
+                  disabled={!walletAvailable || walletSwitching || isAvalancheCChain(walletChainId)}
+                >
+                  {walletSwitching ? "Switching..." : "Switch to Avalanche"}
+                </button>
+              </div>
+
+              {walletError ? <p className="wallet-note wallet-note-error">{walletError}</p> : null}
+              {!walletAvailable ? (
+                <p className="wallet-note">
+                  No injected wallet found in this browser. You can still run preflight and copy the raw transactions below.
+                </p>
+              ) : null}
             </div>
 
             <form onSubmit={handleSubmit} className="register-form">
@@ -218,7 +565,7 @@ export default function CuratorRegisterPage() {
                   {submitting ? "Checking on-chain state..." : "Run preflight"}
                 </button>
                 <p className="field-help" style={{ margin: 0 }}>
-                  Honest UX: this page prepares the flow; it does not claim to sign transactions for you.
+                  Honest UX: preflight happens here, and wallet signing only happens if you explicitly connect and confirm in-wallet.
                 </p>
               </div>
             </form>
@@ -283,43 +630,108 @@ export default function CuratorRegisterPage() {
                 </div>
 
                 <div className="surface status-panel" style={statusTone("info")}>
-                  <p className="section-kicker" style={{ marginBottom: 8 }}>Next step</p>
-                  <h3 style={{ margin: 0 }}>Broadcast {response.transactions.length} transaction{response.transactions.length !== 1 ? "s" : ""} from your wallet</h3>
+                  <p className="section-kicker" style={{ marginBottom: 8 }}>Broadcast</p>
+                  <h3 style={{ margin: 0 }}>Send {response.transactions.length} transaction{response.transactions.length !== 1 ? "s" : ""} in order</h3>
                   <p style={{ marginTop: 10, color: "var(--muted)" }}>
-                    Wallet connect is not wired on this page yet, so use the payloads below in your wallet, script, or signer flow. Stake target: {effectiveStakeCopy}.
+                    Canonical agent path: run these prepared transactions through Evalanche or your own agent signer flow. If a matching browser wallet is connected on Avalanche, you can also broadcast here as a human convenience path. Stake target: {effectiveStakeCopy}.
                   </p>
+
+                  <div className="broadcast-panel-grid">
+                    <div className="summary-item">
+                      <span className="summary-label">Connected wallet</span>
+                      <span className="summary-value summary-mono">{connectedWallet ? shortenAddress(connectedWallet) : "Not connected"}</span>
+                    </div>
+                    <div className="summary-item">
+                      <span className="summary-label">Wallet / preflight match</span>
+                      <span className="summary-value">{connectedWallet ? (walletMatchesResponse ? "Yes" : "No") : "Waiting for wallet"}</span>
+                    </div>
+                    <div className="summary-item">
+                      <span className="summary-label">Wallet network</span>
+                      <span className="summary-value">{formatWalletNetwork(walletChainId)}</span>
+                    </div>
+                  </div>
+
+                  <div className="wallet-panel-actions" style={{ marginTop: 16 }}>
+                    <button type="button" className="btn btn-ghost" onClick={handleConnectWallet} disabled={!walletAvailable || walletConnecting || broadcasting}>
+                      {walletConnecting ? "Connecting..." : connectedWallet ? "Reconnect wallet" : "Connect wallet"}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      onClick={handleSwitchWalletNetwork}
+                      disabled={!walletAvailable || walletSwitching || isAvalancheCChain(walletChainId) || broadcasting}
+                    >
+                      {walletSwitching ? "Switching..." : "Switch to Avalanche"}
+                    </button>
+                    <button type="button" className="btn btn-primary" onClick={handleBroadcastTransactions} disabled={!canBroadcast}>
+                      {broadcasting ? "Broadcasting..." : "Broadcast prepared transactions"}
+                    </button>
+                  </div>
+
+                  {broadcastError ? <p className="wallet-note wallet-note-error">{broadcastError}</p> : null}
+                  {!walletAvailable ? (
+                    <p className="wallet-note">
+                      No injected wallet in this browser, so this page stays in honest fallback mode: copy the JSON payloads below.
+                    </p>
+                  ) : null}
                 </div>
 
                 <div className="register-transaction-stack">
-                  {response.transactions.map((tx, index) => (
-                    <article key={`${tx.to}-${index}`} className="surface tx-card">
-                      <div className="tx-card-header">
-                        <div>
-                          <p className="section-kicker" style={{ marginBottom: 8 }}>Transaction {index + 1}</p>
-                          <h3 style={{ margin: 0 }}>{tx.description}</h3>
-                        </div>
-                        <button
-                          type="button"
-                          className="btn btn-ghost"
-                          style={{ padding: "10px 16px" }}
-                          onClick={() => copyTransactionPayload(index, tx)}
-                        >
-                          {copiedTx === index ? "Copied" : "Copy JSON"}
-                        </button>
-                      </div>
+                  {response.transactions.map((tx, index) => {
+                    const broadcastTx = broadcastTxs[index];
 
-                      <div className="detail-grid" style={{ marginTop: 14 }}>
-                        <div className="detail-row">
-                          <span className="detail-label">To</span>
-                          <span className="detail-value summary-mono">{tx.to}</span>
+                    return (
+                      <article key={`${tx.to}-${index}`} className="surface tx-card">
+                        <div className="tx-card-header">
+                          <div>
+                            <p className="section-kicker" style={{ marginBottom: 8 }}>Transaction {index + 1}</p>
+                            <h3 style={{ margin: 0 }}>{tx.description}</h3>
+                          </div>
+                          <div className="tx-card-actions">
+                            {broadcastTx ? <span className={txStatusClassName(broadcastTx.status)}>{txStatusLabel(broadcastTx.status)}</span> : null}
+                            <button
+                              type="button"
+                              className="btn btn-ghost"
+                              style={{ padding: "10px 16px" }}
+                              onClick={() => copyTransactionPayload(index, tx)}
+                            >
+                              {copiedTx === index ? "Copied" : "Copy JSON"}
+                            </button>
+                          </div>
                         </div>
-                        <div className="detail-row">
-                          <span className="detail-label">Calldata</span>
-                          <span className="detail-value summary-mono">{tx.data}</span>
+
+                        <div className="detail-grid" style={{ marginTop: 14 }}>
+                          <div className="detail-row">
+                            <span className="detail-label">To</span>
+                            <span className="detail-value summary-mono">{tx.to}</span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="detail-label">Calldata</span>
+                            <span className="detail-value summary-mono">{tx.data}</span>
+                          </div>
+                          {broadcastTx?.hash ? (
+                            <div className="detail-row">
+                              <span className="detail-label">Tx hash</span>
+                              <a
+                                className="detail-value detail-link summary-mono"
+                                href={`https://snowtrace.io/tx/${broadcastTx.hash}`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                {broadcastTx.hash}
+                              </a>
+                            </div>
+                          ) : null}
+                          {broadcastTx?.error ? (
+                            <div className="detail-row">
+                              <span className="detail-label">Error</span>
+                              <span className="detail-value">{broadcastTx.error}</span>
+                            </div>
+                          ) : null}
                         </div>
-                      </div>
-                    </article>
-                  ))}
+                      </article>
+                    );
+                  })}
                 </div>
 
                 <div className="surface register-contracts-card">
