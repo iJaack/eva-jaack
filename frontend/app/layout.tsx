@@ -1,25 +1,26 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
+import { protocol } from "@/lib/protocol";
 
-const title = "Eva Protocol — Trust-weighted social news on Avalanche";
+const title = `${protocol.app.name} — Trust-weighted social news on Avalanche`;
 const description =
   "Eva Protocol is a trust-weighted social news network on Avalanche where curators stake $EVA, Eva verifies claims, and reputation drives distribution.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://eva.jaack.me"),
+  metadataBase: new URL(protocol.app.siteUrl),
   title,
   description,
-  applicationName: "Eva Protocol",
+  applicationName: protocol.app.name,
   icons: {
     icon: "/favicon.svg"
   },
   openGraph: {
     type: "website",
-    url: "https://eva.jaack.me",
+    url: protocol.app.siteUrl,
     title,
     description,
-    siteName: "Eva Protocol",
+    siteName: protocol.app.name,
     images: [
       {
         url: "/social-card.svg",

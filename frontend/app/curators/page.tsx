@@ -5,10 +5,7 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 import TrustScore from "@/components/TrustScore";
 import SiteFooter from "@/components/SiteFooter";
-import { getCuratorAddresses, getCuratorInfo, type CuratorInfo } from "@/lib/contract";
-import type { Address } from "viem";
-
-type CuratorRow = CuratorInfo & { address: Address };
+import { getCurators, type Curator } from "@/lib/api";
 
 function truncateAddress(addr: string): string {
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -24,25 +21,15 @@ function formatDate(ts: number): string {
 }
 
 export default function CuratorsPage() {
-  const [curators, setCurators] = useState<CuratorRow[]>([]);
+  const [curators, setCurators] = useState<Curator[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const addresses = await getCuratorAddresses();
-        const infos = await Promise.all(
-          addresses.map(async (addr) => {
-            const info = await getCuratorInfo(addr);
-            return { ...info, address: addr };
-          })
-        );
-        infos.sort((a, b) => b.trustScore - a.trustScore);
-        setCurators(infos);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    getCurators()
+      .then((response) => {
+        setCurators(response.curators);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   return (

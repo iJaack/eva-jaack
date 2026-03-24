@@ -1,3 +1,5 @@
+import { getApiBase } from "./protocol";
+
 export type OnboardingAnalyticsEvent = {
   event: string;
   page?: string;
@@ -12,15 +14,7 @@ export type OnboardingAnalyticsEvent = {
 };
 
 function getAnalyticsEndpoint(): string {
-  const configured = process.env.NEXT_PUBLIC_API_BASE?.trim();
-  if (configured) return `${configured.replace(/\/$/, '')}/analytics/onboarding`;
-
-  if (typeof window !== 'undefined') {
-    const { protocol, host } = window.location;
-    return `${protocol}//${host}/api/analytics/onboarding`;
-  }
-
-  return 'https://eva.jaack.me/api/analytics/onboarding';
+  return `${getApiBase()}/analytics/onboarding`;
 }
 
 export async function trackOnboardingEvent(payload: OnboardingAnalyticsEvent): Promise<void> {

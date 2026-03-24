@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
-import { getProtocolStats, getCuratorAddresses, getCuratorInfo, type ProtocolStats } from "@/lib/contract";
+import { getArticles, getCurators } from "@/lib/api";
 
 const flowSteps = [
   {
@@ -47,7 +47,7 @@ const productSurface = [
   {
     primitive: "Verify",
     mapping: "Verification API surface",
-    detail: "The x402-gated endpoint for submitting articles and receiving scored evidence reports.",
+    detail: "The live endpoint for submitting article URLs and receiving scored evidence reports. Payment enforcement is intentionally disabled until x402 verification exists end-to-end.",
   },
   {
     primitive: "Evalanche",
@@ -75,17 +75,18 @@ const builtOn = [
 ] as const;
 
 export default function AboutPage() {
-  const [stats, setStats] = useState<ProtocolStats | null>(null);
+  const [articleCount, setArticleCount] = useState<number | null>(null);
   const [curatorCount, setCuratorCount] = useState<number | null>(null);
   const [avgTrust, setAvgTrust] = useState<number | null>(null);
 
   useEffect(() => {
-    getProtocolStats().then(setStats);
-    getCuratorAddresses().then(async (addresses) => {
-      setCuratorCount(addresses.length);
-      if (addresses.length > 0) {
-        const infos = await Promise.all(addresses.map((address) => getCuratorInfo(address)));
-        const avg = Math.round(infos.reduce((sum, curator) => sum + curator.trustScore, 0) / infos.length);
+    Promise.all([getArticles(), getCurators()]).then(([articles, curators]) => {
+      setArticleCount(articles.count);
+      setCuratorCount(curators.count);
+      if (curators.curators.length > 0) {
+        const avg = Math.round(
+          curators.curators.reduce((sum, curator) => sum + curator.trustScore, 0) / curators.curators.length
+        );
         setAvgTrust(avg);
       }
     });
@@ -115,7 +116,7 @@ export default function AboutPage() {
 
         <section className="protocol-stats grid-3" style={{ marginTop: "18px" }}>
           <div className="surface stat-card">
-            <span className="stat-value">{stats ? stats.totalArticles : "—"}</span>
+            <span className="stat-value">{articleCount ?? "—"}</span>
             <span className="stat-label">Articles verified</span>
           </div>
           <div className="surface stat-card">

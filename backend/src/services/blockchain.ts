@@ -2,6 +2,7 @@ import { type Hex, keccak256, toHex } from 'viem';
 import { avalanche } from 'viem/chains';
 import { config } from '../config.js';
 import { giveFeedbackAbi, validationResponseAbi } from '../lib/erc8004.js';
+import { protocol } from '../protocol.js';
 import { getSignerService } from './signer.js';
 
 export async function submitVerificationOnchain(
@@ -19,7 +20,16 @@ export async function submitVerificationOnchain(
     address: config.erc8004Reputation,
     abi: giveFeedbackAbi,
     functionName: 'giveFeedback',
-    args: [agentId, value, 0, 'eva:verification', `article:${articleId}`, 'https://eva.jaack.me/api/verify', ipfsURI, feedbackHash],
+    args: [
+      agentId,
+      value,
+      0,
+      'eva:verification',
+      'article',
+      `${protocol.app.siteUrl}${protocol.app.apiBasePath}/verify`,
+      ipfsURI,
+      feedbackHash,
+    ],
     chain: avalanche,
   });
 

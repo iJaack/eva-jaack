@@ -1,52 +1,57 @@
-name: Deploy to GitHub Pages
+name: Validate Monorepo
 
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      - uses: pnpm/action-setup@v3
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build frontend
+      - name: Sync ABI output
+        run: pnpm sync:abi
+
+      - name: Backend typecheck
+        run: pnpm --filter backend typecheck
+
+      - name: Backend build
+        run: pnpm --filter backend build
+
+      - name: Backend tests
+        run: pnpm --filter backend test
+
+      - name: Frontend typecheck
+        run: pnpm --filter frontend typecheck
+
+      - name: Frontend lint
+        run: pnpm --filter frontend lint
+
+      - name: Frontend build
         run: pnpm --filter frontend build
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: frontend/out
+      - name: Install Playwright browser
+        run: pnpm --filter frontend exec playwright install --with-deps chromium
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Frontend E2E
+        run: pnpm --filter frontend test:e2e
+
+      - name: Contract tests
+        run: cd contracts && forge test

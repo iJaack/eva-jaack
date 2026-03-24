@@ -1,3 +1,5 @@
+import { getApiBase } from "./protocol";
+
 export type CuratorRegisterRequest = {
   walletAddress: string;
   agentId: string;
@@ -44,18 +46,6 @@ export type CuratorRegisterError = {
 };
 
 export type CuratorRegisterResponse = CuratorRegisterSuccess | CuratorRegisterError;
-
-function getApiBase(): string {
-  const configured = process.env.NEXT_PUBLIC_API_BASE?.trim();
-  if (configured) return configured.replace(/\/$/, "");
-
-  if (typeof window !== "undefined") {
-    const { protocol, host } = window.location;
-    return `${protocol}//${host}/api`;
-  }
-
-  return "https://eva.jaack.me/api";
-}
 
 export async function preflightCuratorRegistration(
   payload: CuratorRegisterRequest

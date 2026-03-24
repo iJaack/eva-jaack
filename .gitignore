@@ -34,3 +34,6 @@ contracts/cache/
 # misc
 .vercel
 .next-output/
+.data/
+frontend/test-results/
+frontend/playwright-report/

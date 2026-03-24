@@ -1,17 +1,12 @@
-// ── GET /api/article/:id — on-demand article verification + in-memory cache ──
-//
-// Cache strategy: simple in-memory LRU (max 100 entries, 1h TTL).
-// Backend is stateless — cache is per-process. Good enough for Phase 1.
-// Replace with Redis or DB when curator volume warrants it.
-
 import { Hono } from 'hono';
+import type { ArticleDetailResponse, ArticleListResponse } from '../lib/api-types.js';
 import { runVerificationPipeline } from '../services/pipeline.js';
 import type { PipelineResult } from '../services/pipeline.js';
-
-export const articleRoutes = new Hono();
+import { getStorageService } from '../services/storage.js';
+import { getArticle, listArticles } from '../services/trust-graph.js';
 
 const CACHE_MAX = 100;
-const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+const CACHE_TTL_MS = 60 * 60 * 1000;
 
 interface CacheEntry {
   result: PipelineResult;
@@ -19,9 +14,7 @@ interface CacheEntry {
   cachedAt: number;
 }
 
-// articleId → CacheEntry
 const cache = new Map<number, CacheEntry>();
-// insertion-order tracking for LRU eviction
 const insertionOrder: number[] = [];
 
 function evictIfNeeded(): void {
@@ -47,82 +40,84 @@ function cacheGet(articleId: number): CacheEntry | null {
   return entry;
 }
 
-// ── GET /api/article/:id?url=<url> ────────────────────────────────────
-//
-// If the article is cached: return cached result immediately.
-// If not cached: require `url` query param, run pipeline, cache + return.
+type ArticleRouteDeps = {
+  listArticles: typeof listArticles;
+  getArticle: typeof getArticle;
+  loadJSON: <T>(uri: string) => Promise<T | null>;
+};
 
-articleRoutes.get('/:id', async (c) => {
-  const rawId = c.req.param('id');
-  const articleId = parseInt(rawId, 10);
+export function createArticleRoutes(
+  deps: ArticleRouteDeps = {
+    listArticles,
+    getArticle,
+    loadJSON: <T>(uri: string) => getStorageService().loadJSON<T>(uri),
+  },
+) {
+  const articleRoutes = new Hono();
 
-  if (isNaN(articleId) || articleId < 0) {
-    return c.json({ error: 'Invalid article ID' }, 400);
-  }
+  articleRoutes.get('/', async (c) => {
+    const curator = c.req.query('curator')?.toLowerCase();
+    const limit = Number.parseInt(c.req.query('limit') ?? '0', 10);
+    const articles = await deps.listArticles();
 
-  const cached = cacheGet(articleId);
-  if (cached) {
-    return c.json({
-      articleId,
-      url: cached.url,
-      cached: true,
-      cachedAt: new Date(cached.cachedAt).toISOString(),
-      overallScore: cached.result.overallScore,
-      claimCount: cached.result.claimCount,
-      routescanClaimCount: cached.result.routescanClaimCount,
-      ipfsURI: cached.result.ipfsURI,
-      report: cached.result.report,
+    const filtered = articles.filter((article) => !curator || article.curator.toLowerCase() === curator);
+    const sliced = Number.isFinite(limit) && limit > 0 ? filtered.slice(0, limit) : filtered;
+
+    return c.json<ArticleListResponse>({
+      count: filtered.length,
+      chain: 'avalanche',
+      chainId: 43114,
+      articles: sliced,
     });
-  }
+  });
 
-  const url = c.req.query('url');
-  if (!url) {
-    return c.json(
-      { error: 'Article not in cache. Provide ?url=<article_url> to verify on demand.' },
-      404,
-    );
-  }
+  articleRoutes.get('/:id', async (c) => {
+    const articleId = Number.parseInt(c.req.param('id'), 10);
+    if (!Number.isFinite(articleId) || articleId <= 0) {
+      return c.json({ error: 'Invalid article ID' }, 400);
+    }
 
-  try {
-    console.log(`[articles] On-demand verification: articleId=${articleId} url=${url}`);
-    const result = await runVerificationPipeline(url, articleId);
-    cacheSet(articleId, url, result);
+    const article = await deps.getArticle(articleId);
+    if (!article) {
+      return c.json({ error: 'Article not found' }, 404);
+    }
 
-    return c.json({
-      articleId,
-      url,
-      cached: false,
-      cachedAt: new Date().toISOString(),
-      overallScore: result.overallScore,
-      claimCount: result.claimCount,
-      routescanClaimCount: result.routescanClaimCount,
-      ipfsURI: result.ipfsURI,
-      report: result.report,
+    const cached = cacheGet(articleId);
+    if (cached) {
+      return c.json<ArticleDetailResponse>({
+        chain: 'avalanche',
+        chainId: 43114,
+        article,
+        report: cached.result.report,
+        reportUri: cached.result.ipfsURI,
+        reportSource: 'cache',
+      });
+    }
+
+    let report: ArticleDetailResponse['report'] = null;
+    if (article.evidenceURI) {
+      try {
+        report = await deps.loadJSON<ArticleDetailResponse['report']>(article.evidenceURI);
+      } catch (error) {
+        console.warn(`[articles] Failed to load report for article=${articleId}: ${error}`);
+      }
+    }
+
+    return c.json<ArticleDetailResponse>({
+      chain: 'avalanche',
+      chainId: 43114,
+      article,
+      report,
+      reportUri: article.evidenceURI || null,
+      reportSource: report ? 'evidence-uri' : 'none',
     });
-  } catch (e) {
-    console.error(`[articles] Pipeline failed: ${e}`);
-    return c.json({ error: 'Verification pipeline failed', details: String(e) }, 500);
-  }
-});
+  });
 
-// ── POST /api/article/:id/cache — pre-warm cache from submit route ────
-// Called internally by submit route after a successful pipeline run.
+  return articleRoutes;
+}
+
+export const articleRoutes = createArticleRoutes();
 
 export function warmArticleCache(articleId: number, url: string, result: PipelineResult): void {
   cacheSet(articleId, url, result);
 }
-
-// ── GET /api/article — list cached articles ───────────────────────────
-
-articleRoutes.get('/', (c) => {
-  const entries = Array.from(cache.entries()).map(([id, entry]) => ({
-    articleId: id,
-    url: entry.url,
-    overallScore: entry.result.overallScore,
-    claimCount: entry.result.claimCount,
-    cachedAt: new Date(entry.cachedAt).toISOString(),
-    expiresAt: new Date(entry.cachedAt + CACHE_TTL_MS).toISOString(),
-  }));
-
-  return c.json({ count: entries.length, articles: entries });
-});

@@ -1,11 +1,9 @@
 import { Hono } from 'hono';
-import { createPublicClient, http, encodeFunctionData, parseUnits, formatUnits } from 'viem';
+import { createPublicClient, http, encodeFunctionData, parseUnits, formatUnits, type Address } from 'viem';
 import { avalanche } from 'viem/chains';
+import type { CuratorDetailResponse, CuratorListResponse } from '../lib/api-types.js';
+import { listArticlesForCurator, listCurators } from '../services/trust-graph.js';
 import { config } from '../config.js';
-
-export const curatorRoutes = new Hono();
-
-// ── ABI fragments ──────────────────────────────────────────────────────
 
 const evaTrustGraphAbi = [
   {
@@ -98,185 +96,221 @@ const publicClient = createPublicClient({
   transport: http(config.avalancheRpc),
 });
 
-// ── GET /api/curators ──────────────────────────────────────────────────
+type CuratorRouteDeps = {
+  listCurators: typeof listCurators;
+  listArticlesForCurator: typeof listArticlesForCurator;
+  publicClient: {
+    readContract: (args: {
+      address: Address;
+      abi: readonly unknown[];
+      functionName: string;
+      args?: readonly unknown[];
+    }) => Promise<unknown>;
+  };
+};
 
-curatorRoutes.get('/', async (c) => {
-  return c.json([]);
-});
+export function createCuratorRoutes(
+  deps: CuratorRouteDeps = {
+    listCurators,
+    listArticlesForCurator,
+    publicClient,
+  },
+) {
+  const curatorRoutes = new Hono();
 
-// ── GET /api/curator/:id ───────────────────────────────────────────────
+  curatorRoutes.get('/', async (c) => {
+    const curators = await deps.listCurators();
 
-curatorRoutes.get('/:id', async (c) => {
-  return c.json([]);
-});
-
-// ── POST /api/curator/register ─────────────────────────────────────────
-//
-// Validates on-chain state and returns prepared transaction calldata
-// for the client to sign and broadcast.
-//
-// Registration requires:
-//   - Caller owns the ERC-8004 agentId (identity check)
-//   - Caller is not already registered
-//   - Caller has sufficient $EVA balance
-//   - Caller pre-approves $EVA to EvaTrustGraph before broadcasting registerCurator
-//
-// This endpoint does NOT sign on behalf of the curator — the wallet that
-// owns the ERC-8004 identity must execute the returned transactions.
-
-interface RegisterBody {
-  walletAddress: string;   // EVM address of the curator's wallet
-  agentId: number | string; // ERC-8004 agent id they own
-  stakeAmount?: string;    // Optional: $EVA amount in human units (e.g. "250000")
-}
-
-curatorRoutes.post('/register', async (c) => {
-  let body: RegisterBody;
-  try {
-    body = await c.req.json<RegisterBody>();
-  } catch {
-    return c.json({ error: 'Invalid JSON body' }, 400);
-  }
-
-  if (!body.walletAddress || !body.walletAddress.match(/^0x[0-9a-fA-F]{40}$/)) {
-    return c.json({ error: 'Missing or invalid walletAddress (checksummed EVM address required)' }, 400);
-  }
-  if (body.agentId === undefined || body.agentId === null || body.agentId === '') {
-    return c.json({ error: 'Missing required field: agentId' }, 400);
-  }
-
-  const walletAddress = body.walletAddress as `0x${string}`;
-  const agentId = BigInt(body.agentId);
-
-  console.log(`[curator/register] Pre-registration check: wallet=${walletAddress} agentId=${agentId}`);
-
-  try {
-    // ── 1. Fetch on-chain state in parallel ───────────────────────────
-    const [minStakeRaw, curatorData, identityOwner, evaBalance, currentAllowance] = await Promise.all([
-      publicClient.readContract({
-        address: config.evaTrustGraph,
-        abi: evaTrustGraphAbi,
-        functionName: 'minSelfStake',
-      }),
-      publicClient.readContract({
-        address: config.evaTrustGraph,
-        abi: evaTrustGraphAbi,
-        functionName: 'getCurator',
-        args: [walletAddress],
-      }),
-      publicClient.readContract({
-        address: config.erc8004Identity,
-        abi: erc8004IdentityAbi,
-        functionName: 'ownerOf',
-        args: [agentId],
-      }).catch(() => null as string | null),
-      publicClient.readContract({
-        address: config.evaToken,
-        abi: erc20Abi,
-        functionName: 'balanceOf',
-        args: [walletAddress],
-      }),
-      publicClient.readContract({
-        address: config.evaToken,
-        abi: erc20Abi,
-        functionName: 'allowance',
-        args: [walletAddress, config.evaTrustGraph],
-      }),
-    ]);
-
-    // ── 2. Validation checks ───────────────────────────────────────────
-    if (curatorData.registered) {
-      return c.json({
-        error: 'Address is already registered as a curator',
-        alreadyRegistered: true,
-        curatorAgentId: curatorData.curatorAgentId.toString(),
-        trustScore: curatorData.trustScore,
-      }, 409);
-    }
-
-    if (identityOwner === null) {
-      return c.json({ error: `ERC-8004 agentId ${agentId} does not exist in the identity registry` }, 404);
-    }
-
-    if (identityOwner.toLowerCase() !== walletAddress.toLowerCase()) {
-      return c.json({
-        error: 'Identity ownership mismatch: walletAddress does not own the specified ERC-8004 agentId',
-        identityOwner,
-        agentId: agentId.toString(),
-      }, 400);
-    }
-
-    // Determine stake amount: use provided value or default to minSelfStake
-    const stakeAmount = body.stakeAmount
-      ? parseUnits(body.stakeAmount, 18)
-      : minStakeRaw;
-
-    if (stakeAmount < minStakeRaw) {
-      return c.json({
-        error: `Stake amount too low. Minimum required: ${formatUnits(minStakeRaw, 18)} EVA`,
-        minStakeEva: formatUnits(minStakeRaw, 18),
-        requestedEva: formatUnits(stakeAmount, 18),
-      }, 400);
-    }
-
-    if (evaBalance < stakeAmount) {
-      return c.json({
-        error: 'Insufficient $EVA balance for registration stake',
-        requiredEva: formatUnits(stakeAmount, 18),
-        balanceEva: formatUnits(evaBalance, 18),
-      }, 400);
-    }
-
-    // ── 3. Build prepared transactions ────────────────────────────────
-    const needsApproval = currentAllowance < stakeAmount;
-
-    const approveTx = needsApproval
-      ? {
-          to: config.evaToken,
-          data: encodeFunctionData({
-            abi: erc20Abi,
-            functionName: 'approve',
-            args: [config.evaTrustGraph, stakeAmount],
-          }),
-          description: `Approve EvaTrustGraph to spend ${formatUnits(stakeAmount, 18)} EVA`,
-        }
-      : null;
-
-    const registerTx = {
-      to: config.evaTrustGraph,
-      data: encodeFunctionData({
-        abi: evaTrustGraphAbi,
-        functionName: 'registerCurator',
-        args: [agentId, stakeAmount],
-      }),
-      description: `Register as curator with agentId=${agentId}, stake=${formatUnits(stakeAmount, 18)} EVA`,
-    };
-
-    // ── 4. Return registration package ────────────────────────────────
-    return c.json({
-      ready: true,
-      walletAddress,
-      agentId: agentId.toString(),
-      stakeAmount: stakeAmount.toString(),
-      stakeAmountEva: formatUnits(stakeAmount, 18),
-      minStakeEva: formatUnits(minStakeRaw, 18),
+    return c.json<CuratorListResponse>({
+      count: curators.length,
       chain: 'avalanche',
       chainId: 43114,
-      contracts: {
-        evaToken: config.evaToken,
-        evaTrustGraph: config.evaTrustGraph,
-        erc8004Identity: config.erc8004Identity,
-      },
-      needsApproval,
-      currentAllowanceEva: formatUnits(currentAllowance, 18),
-      transactions: [
-        ...(approveTx ? [approveTx] : []),
-        registerTx,
-      ],
+      curators,
     });
+  });
 
-  } catch (e) {
-    console.error(`[curator/register] On-chain check failed: ${e}`);
-    return c.json({ error: 'On-chain pre-registration check failed', details: String(e) }, 500);
+  curatorRoutes.get('/:id', async (c) => {
+    const id = c.req.param('id');
+    const curators = await deps.listCurators();
+
+    const curator = id.match(/^0x[0-9a-fA-F]{40}$/)
+      ? curators.find((candidate) => candidate.address.toLowerCase() === id.toLowerCase())
+      : curators.find((candidate) => candidate.curatorAgentId === id);
+
+    if (!curator) {
+      return c.json({ error: 'Curator not found' }, 404);
+    }
+
+    const articles = await deps.listArticlesForCurator(curator.address);
+    return c.json<CuratorDetailResponse>({
+      chain: 'avalanche',
+      chainId: 43114,
+      curator,
+      articles,
+    });
+  });
+
+  interface RegisterBody {
+    walletAddress: string;
+    agentId: number | string;
+    stakeAmount?: string;
   }
-});
+
+  curatorRoutes.post('/register', async (c) => {
+    let body: RegisterBody;
+    try {
+      body = await c.req.json<RegisterBody>();
+    } catch {
+      return c.json({ error: 'Invalid JSON body' }, 400);
+    }
+
+    if (!body.walletAddress || !body.walletAddress.match(/^0x[0-9a-fA-F]{40}$/)) {
+      return c.json({ error: 'Missing or invalid walletAddress (checksummed EVM address required)' }, 400);
+    }
+    if (body.agentId === undefined || body.agentId === null || body.agentId === '') {
+      return c.json({ error: 'Missing required field: agentId' }, 400);
+    }
+
+    const walletAddress = body.walletAddress as `0x${string}`;
+    const agentId = BigInt(body.agentId);
+
+    console.log(`[curator/register] Pre-registration check: wallet=${walletAddress} agentId=${agentId}`);
+
+    try {
+      const [minStakeRaw, curatorData, identityOwner, evaBalance, currentAllowance] = await Promise.all([
+        deps.publicClient.readContract({
+          address: config.evaTrustGraph,
+          abi: evaTrustGraphAbi,
+          functionName: 'minSelfStake',
+        }),
+        deps.publicClient.readContract({
+          address: config.evaTrustGraph,
+          abi: evaTrustGraphAbi,
+          functionName: 'getCurator',
+          args: [walletAddress],
+        }),
+        deps.publicClient.readContract({
+          address: config.erc8004Identity,
+          abi: erc8004IdentityAbi,
+          functionName: 'ownerOf',
+          args: [agentId],
+        }).catch(() => null as string | null),
+        deps.publicClient.readContract({
+          address: config.evaToken,
+          abi: erc20Abi,
+          functionName: 'balanceOf',
+          args: [walletAddress],
+        }),
+        deps.publicClient.readContract({
+          address: config.evaToken,
+          abi: erc20Abi,
+          functionName: 'allowance',
+          args: [walletAddress, config.evaTrustGraph],
+        }),
+      ]);
+
+      const curatorState = curatorData as {
+        registered: boolean;
+        curatorAgentId: bigint;
+        trustScore: number;
+      };
+      const minStake = minStakeRaw as bigint;
+      const balance = evaBalance as bigint;
+      const allowance = currentAllowance as bigint;
+
+      if (curatorState.registered) {
+        return c.json({
+          error: 'Address is already registered as a curator',
+          alreadyRegistered: true,
+          curatorAgentId: curatorState.curatorAgentId.toString(),
+          trustScore: curatorState.trustScore,
+        }, 409);
+      }
+
+      if (identityOwner === null) {
+        return c.json({ error: `ERC-8004 agentId ${agentId} does not exist in the identity registry` }, 404);
+      }
+
+      if ((identityOwner as string).toLowerCase() !== walletAddress.toLowerCase()) {
+        return c.json({
+          error: 'Identity ownership mismatch: walletAddress does not own the specified ERC-8004 agentId',
+          identityOwner,
+          agentId: agentId.toString(),
+        }, 400);
+      }
+
+      const stakeAmount = body.stakeAmount
+        ? parseUnits(body.stakeAmount, 18)
+        : minStake;
+
+      if (stakeAmount < minStake) {
+        return c.json({
+          error: `Stake amount too low. Minimum required: ${formatUnits(minStake, 18)} EVA`,
+          minStakeEva: formatUnits(minStake, 18),
+          requestedEva: formatUnits(stakeAmount, 18),
+        }, 400);
+      }
+
+      if (balance < stakeAmount) {
+        return c.json({
+          error: 'Insufficient $EVA balance for registration stake',
+          requiredEva: formatUnits(stakeAmount, 18),
+          balanceEva: formatUnits(balance, 18),
+        }, 400);
+      }
+
+      const needsApproval = allowance < stakeAmount;
+
+      const approveTx = needsApproval
+        ? {
+            to: config.evaToken,
+            data: encodeFunctionData({
+              abi: erc20Abi,
+              functionName: 'approve',
+              args: [config.evaTrustGraph, stakeAmount],
+            }),
+            description: `Approve EvaTrustGraph to spend ${formatUnits(stakeAmount, 18)} EVA`,
+          }
+        : null;
+
+      const registerTx = {
+        to: config.evaTrustGraph,
+        data: encodeFunctionData({
+          abi: evaTrustGraphAbi,
+          functionName: 'registerCurator',
+          args: [agentId, stakeAmount],
+        }),
+        description: `Register as curator with agentId=${agentId}, stake=${formatUnits(stakeAmount, 18)} EVA`,
+      };
+
+      return c.json({
+        ready: true,
+        walletAddress,
+        agentId: agentId.toString(),
+        stakeAmount: stakeAmount.toString(),
+        stakeAmountEva: formatUnits(stakeAmount, 18),
+        minStakeEva: formatUnits(minStake, 18),
+        chain: 'avalanche',
+        chainId: 43114,
+        contracts: {
+          evaToken: config.evaToken,
+          evaTrustGraph: config.evaTrustGraph,
+          erc8004Identity: config.erc8004Identity,
+        },
+        needsApproval,
+        currentAllowanceEva: formatUnits(allowance, 18),
+        transactions: [
+          ...(approveTx ? [approveTx] : []),
+          registerTx,
+        ],
+      });
+    } catch (e) {
+      console.error(`[curator/register] On-chain check failed: ${e}`);
+      return c.json({ error: 'On-chain pre-registration check failed', details: String(e) }, 500);
+    }
+  });
+
+  return curatorRoutes;
+}
+
+export const curatorRoutes = createCuratorRoutes();

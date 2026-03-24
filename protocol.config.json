@@ -1,0 +1,37 @@
+{
+  "app": {
+    "name": "Eva Protocol",
+    "domain": "eva.jaack.me",
+    "siteUrl": "https://eva.jaack.me",
+    "apiBasePath": "/api",
+    "healthPath": "/health",
+    "agentManifestPath": "/.well-known/agent.json"
+  },
+  "chain": {
+    "name": "Avalanche C-Chain",
+    "id": 43114,
+    "rpcUrl": "https://api.avax.network/ext/bc/C/rpc",
+    "publicRpcUrl": "https://avalanche-c-chain-rpc.publicnode.com",
+    "explorerUrl": "https://snowtrace.io"
+  },
+  "contracts": {
+    "deployBlock": 79554000,
+    "evaToken": "0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672",
+    "erc8004Identity": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+    "erc8004Reputation": "0x8004BAa17C55a88189AE136b182e5fdA19dE9b63",
+    "erc8004Validation": "0x5c2B454E34C8E173909EB36FC07DE6143A24ab47",
+    "evaTrustGraph": "0xE84DdD5A03Fa4210c4217436afD2556B348A40a0"
+  },
+  "agents": {
+    "eva": {
+      "id": "1599",
+      "wallet": "0x0fE61780BD5508b3C99E420662050E5560608cA4"
+    }
+  },
+  "verifyApi": {
+    "paymentRequired": false,
+    "paymentScheme": null,
+    "network": "avalanche",
+    "reason": "x402 is not enforced in production until request verification is implemented."
+  }
+}

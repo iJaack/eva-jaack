@@ -1,3 +1,5 @@
+import { protocol } from "@/lib/protocol";
+
 const AVALANCHE_C_CHAIN_ID = 43114;
 const AVALANCHE_C_CHAIN_HEX = "0xa86a";
 
@@ -22,14 +24,14 @@ export type EthereumProvider = {
 
 export const avalancheCChainParams: EthereumChainParams = {
   chainId: AVALANCHE_C_CHAIN_HEX,
-  chainName: "Avalanche C-Chain",
+  chainName: protocol.chain.name,
   nativeCurrency: {
     name: "Avalanche",
     symbol: "AVAX",
     decimals: 18,
   },
-  rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
-  blockExplorerUrls: ["https://snowtrace.io"],
+  rpcUrls: [protocol.chain.rpcUrl],
+  blockExplorerUrls: [protocol.chain.explorerUrl],
 };
 
 declare global {

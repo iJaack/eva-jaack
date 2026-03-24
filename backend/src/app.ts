@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { config } from './config.js';
+import { protocol } from './protocol.js';
 import { verifyRoutes } from './routes/verify.js';
 import { reputationRoutes } from './routes/reputation.js';
 import { submitRoutes } from './routes/submit.js';
@@ -14,12 +15,12 @@ function agentManifest() {
   return {
     agentId: config.evaAgentId,
     agentRegistry: `eip155:43114:${config.erc8004Identity}`,
-    agentURI: 'https://eva.jaack.me/.well-known/agent.json',
-    x402Support: true,
+    agentURI: `${protocol.app.siteUrl}${protocol.app.agentManifestPath}`,
+    x402Support: false,
     supportedTrust: ['erc-8004-reputation-v1'],
     services: [{ type: 'agentWallet', id: `eip155:43114:${config.evaSovereignWallet}` }],
     signers: [{ agentWallet: `eip155:43114:${config.evaSovereignWallet}` }],
-    feedbackAggregator: 'https://eva.jaack.me/api/reputation/feedback',
+    feedbackAggregator: `${protocol.app.siteUrl}${protocol.app.apiBasePath}/reputation/feedback`,
   };
 }
 
@@ -30,7 +31,7 @@ export function createApp() {
   app.use('*', cors({ origin: '*' }));
 
   app.get('/health', (c) =>
-    c.json({ status: 'ok', service: 'eva-protocol', agentId: config.evaAgentId, version: '0.1.0' }),
+    c.json({ status: 'ok', service: protocol.app.name, agentId: config.evaAgentId, version: '0.2.0' }),
   );
 
   app.get('/.well-known/agent.json', (c) => c.json(agentManifest()));
@@ -42,6 +43,7 @@ export function createApp() {
   app.route('/api/curator', curatorRoutes);
   app.route('/api/trust', trustRoutes);
   app.route('/api/article', articleRoutes);
+  app.route('/api/articles', articleRoutes);
   app.route('/api/analytics', analyticsRoutes);
 
   return app;

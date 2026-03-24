@@ -6,6 +6,7 @@ import { getAddress, isAddress } from "viem";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import { client } from "@/lib/contract";
+import { protocol } from "@/lib/protocol";
 import {
   formatTokenAmount,
   preflightCuratorRegistration,
@@ -41,7 +42,7 @@ const onboardingSteps = [
 
 const starterExamples = {
   walletAddress: "0x0000000000000000000000000000000000000000",
-  agentId: "1599",
+  agentId: "YOUR_AGENT_ID",
   stakeAmount: "250000",
 } as const;
 
@@ -49,15 +50,15 @@ const evalancheExample = `import { Evalanche } from "evalanche";
 
 const { agent } = await Evalanche.boot({
   network: "avalanche",
-  identity: { agentId: "1599" },
+  identity: { agentId: "YOUR_AGENT_ID" },
 });
 
-const preflight = await fetch("https://eva.jaack.me/api/curator/register", {
+const preflight = await fetch("${protocol.app.siteUrl}/api/curator/register", {
   method: "POST",
   headers: { "content-type": "application/json" },
   body: JSON.stringify({
     walletAddress: agent.address,
-    agentId: "1599",
+    agentId: "YOUR_AGENT_ID",
     // optional: omit to use live minSelfStake
     stakeAmount: "250000",
   }),
@@ -232,7 +233,7 @@ export default function CuratorRegisterPage() {
       walletConnected: Boolean(connectedWallet),
       chainId: walletChainId,
     });
-  }, []);
+  }, [connectedWallet, walletAvailable, walletChainId]);
 
   useEffect(() => {
     if (!isSuccess(response)) {
@@ -576,7 +577,7 @@ export default function CuratorRegisterPage() {
                 Browse existing curators
               </Link>
               <a
-                href="https://snowtrace.io/address/0xE84DdD5A03Fa4210c4217436afD2556B348A40a0"
+                href={`${protocol.chain.explorerUrl}/address/${protocol.contracts.evaTrustGraph}`}
                 target="_blank"
                 rel="noreferrer"
                 className="btn btn-ghost"
@@ -713,7 +714,7 @@ export default function CuratorRegisterPage() {
                   className="field-input"
                   value={agentId}
                   onChange={(event) => setAgentId(event.target.value)}
-                  placeholder="1599"
+                  placeholder="Your ERC-8004 agent ID"
                   inputMode="numeric"
                   required
                 />
@@ -886,7 +887,7 @@ export default function CuratorRegisterPage() {
                               <span className="detail-label">Tx hash</span>
                               <a
                                 className="detail-value detail-link summary-mono"
-                                href={`https://snowtrace.io/tx/${broadcastTx.hash}`}
+                                href={`${protocol.chain.explorerUrl}/tx/${broadcastTx.hash}`}
                                 target="_blank"
                                 rel="noreferrer"
                               >

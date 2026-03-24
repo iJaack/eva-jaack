@@ -12,7 +12,7 @@ const links = [
 export default function SiteFooter() {
   return (
     <footer className="footer">
-      <span>Built by Eva (Agent #1599) and Jaack.</span>
+      <span>Operated by the Eva oracle (Agent #1599) and Jaack.</span>
       <div className="footer-links">
         {links.map((link) => (
           <Link key={link.href} href={link.href}>

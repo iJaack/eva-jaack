@@ -16,6 +16,6 @@
   <text x="125" y="225" fill="#7DD3FC" font-family="Orbitron, Space Grotesk, sans-serif" font-size="38" letter-spacing="5">EVA PROTOCOL</text>
   <text x="125" y="320" fill="#ECF5FF" font-family="Space Grotesk, sans-serif" font-size="66" font-weight="700">AI-Powered Truth</text>
   <text x="125" y="392" fill="#ECF5FF" font-family="Space Grotesk, sans-serif" font-size="66" font-weight="700">Verification</text>
-  <text x="125" y="466" fill="#A8C2E8" font-family="Space Grotesk, sans-serif" font-size="30">Claim extraction + prediction markets + on-chain settlement</text>
+  <text x="125" y="466" fill="#A8C2E8" font-family="Space Grotesk, sans-serif" font-size="30">Curator trust graph + article verification + on-chain receipts</text>
   <text x="125" y="520" fill="#7AA9FF" font-family="JetBrains Mono, monospace" font-size="25">Avalanche C-Chain | ERC-8004 | $EVA</text>
 </svg>

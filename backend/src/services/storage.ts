@@ -1,9 +1,26 @@
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { config } from '../config.js';
 
 export interface StorageService {
   provider: string;
   uploadJSON(data: object, options?: { name?: string }): Promise<string>;
+  loadJSON<T>(uri: string): Promise<T | null>;
+}
+
+const defaultStorageDir = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../.data/eva-reports',
+);
+
+function gatewayUrlFromUri(uri: string): string {
+  if (uri.startsWith('ipfs://')) {
+    return `${config.ipfsGatewayBase.replace(/\/$/, '')}/${uri.slice('ipfs://'.length)}`;
+  }
+
+  return uri;
 }
 
 // ── Pinata (IPFS pinning service) ────────────────────────────────────
@@ -38,25 +55,58 @@ class PinataStorageService implements StorageService {
     const result = await res.json() as { IpfsHash: string };
     return `ipfs://${result.IpfsHash}`;
   }
+
+  async loadJSON<T>(uri: string): Promise<T | null> {
+    if (!uri) return null;
+
+    const res = await fetch(gatewayUrlFromUri(uri));
+    if (!res.ok) {
+      throw new Error(`Failed to load JSON from ${uri}: ${res.status}`);
+    }
+
+    return res.json() as Promise<T>;
+  }
 }
 
-// ── Local in-memory storage (development fallback) ───────────────────
+// ── Local filesystem storage (development fallback) ──────────────────
 //
-// Produces deterministic content-addressed URIs without network calls.
-// Reports are kept in memory for the lifetime of the process so they
-// can be retrieved during development/testing.
+// Produces deterministic content-addressed URIs without network calls and
+// persists them to disk so reports survive local restarts.
 
 class LocalStorageService implements StorageService {
   readonly provider = 'local';
-  private store = new Map<string, object>();
+
+  constructor(private readonly storageDir: string) {}
 
   async uploadJSON(data: object): Promise<string> {
     const content = JSON.stringify(data);
     const hash = createHash('sha256').update(content).digest('hex').slice(0, 46);
     const cid = `bafylocaldev${hash}`;
-    this.store.set(cid, data);
+
+    await mkdir(this.storageDir, { recursive: true });
+    await writeFile(resolve(this.storageDir, `${cid}.json`), content, 'utf8');
+
     console.log(`[storage:local] Stored report as ${cid} (${content.length} bytes)`);
     return `ipfs://${cid}`;
+  }
+
+  async loadJSON<T>(uri: string): Promise<T | null> {
+    if (!uri.startsWith('ipfs://')) {
+      const res = await fetch(uri);
+      if (!res.ok) {
+        throw new Error(`Failed to load JSON from ${uri}: ${res.status}`);
+      }
+
+      return res.json() as Promise<T>;
+    }
+
+    const cid = uri.slice('ipfs://'.length);
+    try {
+      const raw = await readFile(resolve(this.storageDir, `${cid}.json`), 'utf8');
+      return JSON.parse(raw) as T;
+    } catch {
+      return null;
+    }
   }
 }
 
@@ -69,6 +119,10 @@ class UnavailableStorageService implements StorageService {
     throw new Error(
       'No storage provider configured. Set EVA_STORAGE_PROVIDER=pinata and provide PINATA_JWT, or use EVA_STORAGE_PROVIDER=local for development.',
     );
+  }
+
+  async loadJSON(): Promise<null> {
+    return null;
   }
 }
 
@@ -87,14 +141,14 @@ export function getStorageService(): StorageService {
   }
 
   if (provider === 'local') {
-    cachedService = new LocalStorageService();
+    cachedService = new LocalStorageService(config.storageDir || defaultStorageDir);
     return cachedService;
   }
 
-  // In auto mode without Pinata credentials, fall back to local storage
+  // In auto mode without Pinata credentials, fall back to local filesystem storage
   if (provider === 'auto') {
-    console.warn('[storage] No Pinata credentials found, falling back to local storage');
-    cachedService = new LocalStorageService();
+    console.warn('[storage] No Pinata credentials found, falling back to local filesystem storage');
+    cachedService = new LocalStorageService(config.storageDir || defaultStorageDir);
     return cachedService;
   }
 

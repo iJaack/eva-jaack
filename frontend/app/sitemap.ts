@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
+import { protocol } from "@/lib/protocol";
 
 export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://eva.jaack.me";
+  const base = protocol.app.siteUrl;
 
   return [
     {

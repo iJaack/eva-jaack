@@ -6,10 +6,14 @@
   "description": "Eva Protocol monorepo",
   "packageManager": "pnpm@9.15.4",
   "scripts": {
+    "sync:abi": "node scripts/generate-eva-abi.mjs",
     "dev": "NEXT_TELEMETRY_DISABLED=1 pnpm --filter frontend dev",
     "build": "pnpm --filter frontend build",
     "lint": "pnpm --filter frontend lint",
-    "typecheck": "pnpm --filter frontend typecheck"
+    "typecheck": "pnpm --filter frontend typecheck",
+    "test:backend": "pnpm --filter backend test",
+    "test:e2e": "pnpm --filter frontend test:e2e",
+    "smoke:deploy": "node scripts/smoke-deployment.mjs"
   },
   "dependencies": {
     "hono": "^4.12.8"
@@ -25,8 +29,7 @@
       "minimatch@<3.1.3": ">=3.1.3",
       "minimatch@>=9.0.0 <9.0.6": ">=9.0.6",
       "minimatch@>=9.0.0 <9.0.7": ">=9.0.7",
-      "minimatch@<3.1.4": ">=3.1.4",
-      "ajv@<6.14.0": ">=6.14.0"
+      "minimatch@<3.1.4": ">=3.1.4"
     }
   }
 }

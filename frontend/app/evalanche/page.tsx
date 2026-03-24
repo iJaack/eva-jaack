@@ -5,7 +5,7 @@ import "./evalanche.css";
 export const metadata: Metadata = {
   title: "Evalanche — Multi-EVM agent wallet SDK",
   description:
-    "Evalanche is a multi-EVM agent wallet SDK for identity, payments, cross-chain execution, market intelligence, prediction markets, DeFi, and perps.",
+    "Evalanche is a multi-EVM agent wallet SDK for identity, payments, cross-chain execution, market intelligence, and agent-native signing.",
 };
 
 const features = [

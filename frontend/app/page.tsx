@@ -6,18 +6,7 @@ import Nav from "@/components/Nav";
 import ArticleCard from "@/components/ArticleCard";
 import TrustScore from "@/components/TrustScore";
 import SiteFooter from "@/components/SiteFooter";
-import {
-  getProtocolStats,
-  getAllArticles,
-  getCuratorAddresses,
-  getCuratorInfo,
-  type ProtocolStats,
-  type Article,
-  type CuratorInfo,
-} from "@/lib/contract";
-import type { Address } from "viem";
-
-type CuratorRow = CuratorInfo & { address: Address };
+import { getArticles, getCurators, type Article, type Curator } from "@/lib/api";
 
 const whatEvaDoes = [
   {
@@ -71,8 +60,8 @@ const techStack = [
     body: "Verification reports are content-addressed and permanently retrievable.",
   },
   {
-    title: "x402 payments",
-    body: "The public verification API is payment-gated so Eva can operate as an agent service.",
+    title: "Verification API",
+    body: "The backend exposes a stable verification endpoint now, with x402 remaining an explicit roadmap item until request verification is implemented.",
   },
 ] as const;
 
@@ -81,38 +70,22 @@ function truncateAddress(addr: string): string {
 }
 
 export default function HomePage() {
-  const [stats, setStats] = useState<ProtocolStats | null>(null);
+  const [articleCount, setArticleCount] = useState(0);
   const [articles, setArticles] = useState<Article[]>([]);
-  const [curators, setCurators] = useState<CuratorRow[]>([]);
+  const [curators, setCurators] = useState<Curator[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [protocolStats, allArticles, addresses] = await Promise.all([
-          getProtocolStats(),
-          getAllArticles(),
-          getCuratorAddresses(),
+        const [articleResponse, curatorResponse] = await Promise.all([
+          getArticles({ limit: 4 }),
+          getCurators(),
         ]);
 
-        setStats(protocolStats);
-
-        const validArticles = allArticles
-          .filter((article) => article.sourceURI && article.sourceURI.length > 0)
-          .sort((a, b) => b.verifiedAt - a.verifiedAt);
-        setArticles(validArticles);
-
-        if (addresses.length > 0) {
-          const infos = await Promise.all(
-            addresses.map(async (addr) => {
-              const info = await getCuratorInfo(addr);
-              return { ...info, address: addr };
-            })
-          );
-
-          infos.sort((a, b) => b.trustScore - a.trustScore);
-          setCurators(infos);
-        }
+        setArticleCount(articleResponse.count);
+        setArticles(articleResponse.articles);
+        setCurators(curatorResponse.curators);
       } finally {
         setLoading(false);
       }
@@ -126,7 +99,6 @@ export default function HomePage() {
     return Math.round(curators.reduce((sum, curator) => sum + curator.trustScore, 0) / curators.length);
   }, [curators]);
 
-  const featuredArticles = articles.slice(0, 4);
   const featuredCurators = curators.slice(0, 5);
 
   return (
@@ -176,7 +148,7 @@ export default function HomePage() {
         {/* ── Live stats ── */}
         <section className="grid-3 stats-grid-home">
           <div className="surface stat-card home-stat-card">
-            <span className="stat-value">{stats ? stats.totalArticles : "—"}</span>
+            <span className="stat-value">{articleCount || "—"}</span>
             <span className="stat-label">Verified articles</span>
           </div>
           <div className="surface stat-card home-stat-card">
@@ -259,11 +231,11 @@ export default function HomePage() {
               <div className="loading-state">
                 <div className="loading-spinner" />
               </div>
-            ) : featuredArticles.length === 0 ? (
+            ) : articles.length === 0 ? (
               <p className="empty-copy">No verified articles yet.</p>
             ) : (
               <div className="grid-2" style={{ marginTop: 16 }}>
-                {featuredArticles.map((article) => (
+                {articles.map((article) => (
                   <ArticleCard key={article.id} article={article} />
                 ))}
               </div>

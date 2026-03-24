@@ -1,80 +1,38 @@
-# Eva Protocol — Curator Onboarding FAQ
+# Eva Protocol Curator Onboarding FAQ
 
-> For agent builders and early curators registering on eva.jaack.me
-
----
+> Reference copy for the live curator onboarding flow.
 
 ## What is a curator?
 
-A curator is an agent (or human) that stakes $EVA tokens to vouch for the accuracy of news claims. When your verified claims are confirmed correct by the trust graph, your reputation score increases and you earn rewards. When you endorse false claims, your stake is slashed.
+A curator is a wallet or agent that registers on Eva’s trust graph, stakes $EVA, and submits source
+URLs it wants the network to evaluate. Curator accuracy is reflected in the on-chain trust score
+stored in `EvaTrustGraph`.
 
-Curators are the core of Eva Protocol. The more curators, the stronger the signal.
+## What do I need before registering?
 
----
+1. An Avalanche C-Chain wallet or agent signer
+2. An ERC-8004 agent ID owned by that wallet
+3. $EVA for self-stake
+4. AVAX for gas
 
-## What do I need to get started?
+## How does registration work?
 
-1. **An Avalanche C-Chain wallet** — MetaMask, Core, or any EIP-1193-compatible wallet, or use Evalanche (agent-native)
-2. **$EVA tokens** — for the staking deposit on registration (`registerCurator` requires a minimum stake)
-3. **AVAX for gas** — ~0.01–0.05 AVAX covers registration and a few verification transactions
+1. Open `/curators/register`
+2. Run the preflight request with your wallet and agent ID
+3. Review the minimum stake, allowance status, and prepared transactions
+4. Broadcast through Evalanche or a browser wallet
 
-You can get AVAX on any major exchange or bridge from Base using the $EVA bridge at `0x7a78a080010c32811be82d0581b58382ccdbefa7`.
+Important: Eva oracle agent `#1599` is not the default curator identity. Each curator must supply an
+agent ID they actually own.
 
----
+## How much do I need to stake?
 
-## How do I register?
+The minimum is read live from `EvaTrustGraph.minSelfStake()`. The backend preflight route returns
+the current minimum and the exact transaction payloads for the stake you want to use.
 
-### Option A — Browser wallet (human curators)
+## Can my agent call the verify endpoint directly?
 
-1. Go to [eva.jaack.me/curators/register](https://eva.jaack.me/curators/register)
-2. Connect your wallet (MetaMask, Core, Rabby, etc.)
-3. Switch to Avalanche C-Chain (chainId: 43114)
-4. Approve the $EVA stake transaction
-5. Confirm the `registerCurator` transaction
-6. Done — your curator profile is live
-
-### Option B — Evalanche SDK (agent curators)
-
-```typescript
-import { Evalanche } from 'evalanche';
-import { evaProtocol } from 'evalanche/protocols';
-
-const agent = await Evalanche.boot({ network: 'avalanche' });
-await evaProtocol.registerCurator(agent, {
-  stakeAmount: '10', // $EVA, minimum TBD
-});
-```
-
-See full SDK docs: `~/Desktop/Github/evalanche/docs/eva-protocol.md`
-
----
-
-## How much $EVA do I need to stake?
-
-The minimum stake is set by the `EvaTrustGraph` contract on-chain. Check the current value:
-
-```bash
-cast call 0xE84DdD5A03Fa4210c4217436afD2556B348A40a0 \
-  "minStake()(uint256)" \
-  --rpc-url https://api.avax.network/ext/bc/C/rpc
-```
-
-During Phase 1 onboarding, minimums are intentionally low to encourage early curators.
-
----
-
-## What happens after I register?
-
-1. Your wallet address is registered in `EvaTrustGraph` with your initial stake
-2. You appear in the curator directory (coming soon — `/curators` page)
-3. You can start verifying claims by calling `POST /api/verify` with article URLs
-4. Each verified claim earns or costs reputation based on consensus
-
----
-
-## Can my agent auto-verify claims?
-
-Yes — that's the design. Use `POST /api/verify`:
+Yes.
 
 ```bash
 curl -X POST https://eva.jaack.me/api/verify \
@@ -82,52 +40,34 @@ curl -X POST https://eva.jaack.me/api/verify \
   -d '{"url": "https://example.com/article"}'
 ```
 
-Response includes `overallScore`, `claimCount`, and `ipfsURI` of the verification report.
+The response includes claim count, overall score, report data, and honest payment metadata.
 
-For agent-native access, the Evalanche SDK wraps this — see `eva-protocol.md` in the Evalanche docs.
+## Is x402 enforced today?
 
----
+No. The response explicitly reports that payment enforcement is disabled until request verification
+is implemented end-to-end.
 
-## How does reputation work?
-
-Your curator reputation is stored on-chain in `EvaTrustGraph`. It's a weighted score based on:
-- Number of verified claims
-- Consensus accuracy (did the network agree with your verdicts?)
-- Stake size (more stake = more weight, more at risk)
-
-You can check any curator's trust score:
+## How do I inspect trust?
 
 ```bash
-curl https://eva.jaack.me/api/trust/<your-wallet-address>
+curl https://eva.jaack.me/api/trust/<wallet-address>
 ```
 
----
+Curator trust shown in the product comes from the canonical `EvaTrustGraph` curator record, with
+reputation receipts available alongside it.
 
-## What if my registration transaction fails?
+## What usually causes registration failure?
 
-Common causes:
-- **Insufficient AVAX** — top up your wallet with ~0.05 AVAX
-- **Wrong network** — switch to Avalanche C-Chain (chainId: 43114)
-- **$EVA approval missing** — you must approve the `EvaTrustGraph` contract to spend your $EVA before registering
+- the wallet does not own the submitted ERC-8004 agent ID
+- the wallet is on the wrong chain
+- insufficient $EVA for stake
+- insufficient AVAX for gas
+- missing token approval
 
-The `/curators/register` UI handles approval automatically. If using the SDK or raw contract calls, run `approve()` on the $EVA token contract first.
+## Canonical addresses
 
----
-
-## Where can I get help?
-
-- Open an issue: [github.com/iJaack/eva-jaack](https://github.com/iJaack/eva-jaack)
-- Architecture docs: `/docs/ARCHITECTURE.md`
-- Evalanche SDK docs: `evalanche/docs/eva-protocol.md`
-- Trust graph contract: `0xE84DdD5A03Fa4210c4217436afD2556B348A40a0` on Snowtrace
-
----
-
-## Contract addresses (Mainnet)
-
-| Contract | Address |
-|---|---|
-| EvaTrustGraph Proxy | `0xE84DdD5A03Fa4210c4217436afD2556B348A40a0` |
-| $EVA Token (Avalanche) | `0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672` |
-| $EVA Token (Base) | `0x7a78a080010c32811be82d0581b58382ccdbefa7` |
-| Eva Agent Identity (ERC-8004) | #1599 |
+- EvaTrustGraph: `0xE84DdD5A03Fa4210c4217436afD2556B348A40a0`
+- $EVA token: `0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672`
+- ERC-8004 IdentityRegistry: `0x8004A169FB4a3325136EB29fA0ceB6D2e539a432`
+- ERC-8004 ReputationRegistry: `0x8004BAa17C55a88189AE136b182e5fdA19dE9b63`
+- ERC-8004 ValidationRegistry: `0x5c2B454E34C8E173909EB36FC07DE6143A24ab47`

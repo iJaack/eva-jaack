@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import type { Address } from "viem";
 import Nav from "@/components/Nav";
 import TrustScore from "@/components/TrustScore";
 import ArticleCard from "@/components/ArticleCard";
-import { getCuratorInfo, getAllArticles, type CuratorInfo, type Article } from "@/lib/contract";
+import SiteFooter from "@/components/SiteFooter";
+import { getCuratorDetail, type CuratorDetail } from "@/lib/api";
+import { protocol } from "@/lib/protocol";
 
 function formatDate(ts: number): string {
   if (!ts) return "—";
@@ -21,29 +22,23 @@ function formatDate(ts: number): string {
 export default function CuratorProfile() {
   const params = useParams();
   const address = params.address as string;
-  const [curator, setCurator] = useState<CuratorInfo | null>(null);
-  const [articles, setArticles] = useState<Article[]>([]);
+  const [detail, setDetail] = useState<CuratorDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!address) return;
-    (async () => {
-      try {
-        const [info, allArticles] = await Promise.all([
-          getCuratorInfo(address as Address),
-          getAllArticles(),
-        ]);
-        setCurator(info);
-        setArticles(
-          allArticles
-            .filter((a) => a.curator.toLowerCase() === address.toLowerCase() && a.sourceURI && a.sourceURI.length > 0)
-            .sort((a, b) => b.verifiedAt - a.verifiedAt)
-        );
-      } finally {
-        setLoading(false);
-      }
-    })();
+
+    getCuratorDetail(address)
+      .then(setDetail)
+      .catch((reason) => {
+        setError(reason instanceof Error ? reason.message : "Failed to load curator.");
+      })
+      .finally(() => setLoading(false));
   }, [address]);
+
+  const curator = detail?.curator ?? null;
+  const articles = detail?.articles ?? [];
 
   return (
     <>
@@ -59,12 +54,10 @@ export default function CuratorProfile() {
           <div className="loading-state">
             <div className="loading-spinner" />
           </div>
-        ) : !curator || !curator.registered ? (
+        ) : error || !curator || !curator.registered ? (
           <div className="surface" style={{ padding: 32, textAlign: "center" }}>
             <h2>Curator not found</h2>
-            <p style={{ color: "var(--muted)" }}>
-              Address {address} is not a registered curator.
-            </p>
+            <p style={{ color: "var(--muted)" }}>{error ?? `Address ${address} is not a registered curator.`}</p>
           </div>
         ) : (
           <>
@@ -73,11 +66,11 @@ export default function CuratorProfile() {
                 <TrustScore score={curator.trustScore} size={120} label="Trust Score" />
                 <div className="curator-profile-info">
                   <h1 style={{ margin: 0, fontSize: "clamp(18px, 2.5vw, 28px)", fontFamily: "var(--mono)" }}>
-                    {address}
+                    {curator.address}
                   </h1>
                   <div className="curator-profile-meta">
                     <div className="profile-stat">
-                      <span className="profile-stat-value">#{curator.curatorAgentId.toString()}</span>
+                      <span className="profile-stat-value">#{curator.curatorAgentId}</span>
                       <span className="profile-stat-label">Agent ID</span>
                     </div>
                     <div className="profile-stat">
@@ -90,7 +83,7 @@ export default function CuratorProfile() {
                     </div>
                   </div>
                   <a
-                    href={`https://snowtrace.io/address/${address}`}
+                    href={`${protocol.chain.explorerUrl}/address/${curator.address}`}
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-ghost"
@@ -109,8 +102,8 @@ export default function CuratorProfile() {
                   {articles.length} Article{articles.length !== 1 ? "s" : ""} Submitted
                 </h2>
                 <div className="grid-2" style={{ marginTop: 16 }}>
-                  {articles.map((a) => (
-                    <ArticleCard key={a.id} article={a} />
+                  {articles.map((article) => (
+                    <ArticleCard key={article.id} article={article} />
                   ))}
                 </div>
               </section>
@@ -118,9 +111,7 @@ export default function CuratorProfile() {
           </>
         )}
 
-        <footer className="footer">
-          <span>Built by Eva (Agent #1599) and Jaack.</span>
-        </footer>
+        <SiteFooter />
       </main>
     </>
   );

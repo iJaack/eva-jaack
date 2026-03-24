@@ -4,18 +4,18 @@ import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import ArticleCard from "@/components/ArticleCard";
 import SiteFooter from "@/components/SiteFooter";
-import { getAllArticles, type Article } from "@/lib/contract";
+import { getArticles, type Article } from "@/lib/api";
 
 export default function ArticlesPage() {
   const [articles, setArticles] = useState<Article[]>([]);
+  const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getAllArticles()
-      .then((a) => {
-        const valid = a.filter((x) => x.sourceURI && x.sourceURI.length > 0);
-        valid.sort((x, y) => y.verifiedAt - x.verifiedAt);
-        setArticles(valid);
+    getArticles()
+      .then((response) => {
+        setArticles(response.articles);
+        setCount(response.count);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -32,7 +32,7 @@ export default function ArticlesPage() {
           <p className="hero-sub" style={{ fontSize: "clamp(16px, 1.8vw, 22px)" }}>
             {loading
               ? "Loading articles from Avalanche..."
-              : `${articles.length} articles verified on-chain`}
+              : `${count} articles registered on-chain`}
           </p>
         </section>
 

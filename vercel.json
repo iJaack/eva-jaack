@@ -1,7 +1,7 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "installCommand": "cd frontend && npm install",
+  "installCommand": "pnpm install --frozen-lockfile",
   "functions": {
     "api/index.ts": {
       "maxDuration": 60
@@ -21,6 +21,5 @@
       "destination": "/api/index?route=health"
     }
   ],
-  "buildCommand": "cd frontend && npm run build",
-  "outputDirectory": "frontend/out"
+  "buildCommand": "pnpm --filter frontend build"
 }

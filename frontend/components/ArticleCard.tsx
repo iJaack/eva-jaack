@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { Article } from "@/lib/contract";
+import type { Article } from "@/lib/api";
 import { ScoreBadge } from "./TrustScore";
 
 const STATUS_LABELS = ["Pending", "Verified", "Rejected"] as const;
