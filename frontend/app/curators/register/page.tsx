@@ -1014,6 +1014,13 @@ export default function CuratorRegisterPage() {
             <p className="field-help" style={{ marginTop: 12 }}>
               Preferred human path: Core wallet on Avalanche. Preferred agent path: Evalanche. Shared source of truth: the backend preflight response and prepared transaction payloads.
             </p>
+
+            <p className="field-help" style={{ marginTop: 16 }}>
+              Have questions?{" "}
+              <Link href="/curators/faq" style={{ color: "var(--accent)", textDecoration: "underline" }}>
+                Read the onboarding FAQ →
+              </Link>
+            </p>
           </div>
         </section>
 
