@@ -1,25 +1,38 @@
 {
   "version": 2,
-  "cleanUrls": true,
   "installCommand": "pnpm install --frozen-lockfile",
-  "functions": {
-    "api/index.ts": {
-      "maxDuration": 60
-    }
-  },
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/index?route=api&path=:path*"
+      "src": "frontend/package.json",
+      "use": "@vercel/next"
     },
     {
-      "source": "/.well-known/:path*",
-      "destination": "/api/index?route=well-known&path=:path*"
-    },
-    {
-      "source": "/health",
-      "destination": "/api/index?route=health"
+      "src": "api/index.ts",
+      "use": "@vercel/node",
+      "config": {
+        "maxDuration": 60
+      }
     }
   ],
-  "buildCommand": "pnpm --filter frontend build"
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.ts?route=api&path=$1"
+    },
+    {
+      "src": "/.well-known/(.*)",
+      "dest": "/api/index.ts?route=well-known&path=$1"
+    },
+    {
+      "src": "/health",
+      "dest": "/api/index.ts?route=health"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
+    },
+    {
+      "handle": "filesystem"
+    }
+  ]
 }
