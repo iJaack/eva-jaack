@@ -7,6 +7,7 @@ import ArticleCard from "@/components/ArticleCard";
 import TrustScore from "@/components/TrustScore";
 import SiteFooter from "@/components/SiteFooter";
 import { getArticles, getCurators, type Article, type Curator } from "@/lib/api";
+import { formatBlogDate, getFeaturedPosts } from "@/lib/blog";
 
 const whatEvaDoes = [
   {
@@ -100,6 +101,7 @@ export default function HomePage() {
   }, [curators]);
 
   const featuredCurators = curators.slice(0, 5);
+  const featuredPost = getFeaturedPosts()[0] ?? null;
 
   return (
     <>
@@ -215,6 +217,34 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+
+        {featuredPost ? (
+          <section className="blog-home-section">
+            <div className="section-heading-row">
+              <div>
+                <p className="section-kicker">Journal</p>
+                <h2 className="section-title section-title-sm">One plain-English note on Eva</h2>
+              </div>
+              <Link href="/blog" className="section-link">View blog</Link>
+            </div>
+
+            <p className="blog-home-intro">
+              A minimal editorial layer for explaining the product clearly, without turning the site into a content farm.
+            </p>
+
+            <Link href={`/blog/${featuredPost.slug}`} className="surface blog-feature-card blog-feature-card-home">
+              <div className="blog-feature-accent" aria-hidden />
+              <div className="blog-meta-row">
+                <span className="blog-meta-pill">Featured post</span>
+                <span>{formatBlogDate(featuredPost.publishedAt)}</span>
+                <span>{featuredPost.readingTime}</span>
+              </div>
+              <h3 className="blog-feature-title">{featuredPost.title}</h3>
+              <p className="blog-feature-excerpt">{featuredPost.excerpt}</p>
+              <span className="blog-feature-cta">Read the post →</span>
+            </Link>
+          </section>
+        ) : null}
 
         {/* ── Latest articles ── */}
         <section className="home-section-split" style={{ marginTop: 44 }}>

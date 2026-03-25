@@ -7,6 +7,7 @@ import ThemeToggle from "./ThemeToggle";
 
 const navItems: readonly { href: string; label: string; exact?: boolean; highlight?: boolean }[] = [
   { href: "/", label: "Home", exact: true },
+  { href: "/blog", label: "Blog" },
   { href: "/articles", label: "Feed" },
   { href: "/curators", label: "Curators" },
   { href: "/verify", label: "Verify" },
