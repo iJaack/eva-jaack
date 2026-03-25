@@ -119,35 +119,45 @@ export function createCuratorRoutes(
   const curatorRoutes = new Hono();
 
   curatorRoutes.get('/', async (c) => {
-    const curators = await deps.listCurators();
+    try {
+      const curators = await deps.listCurators();
 
-    return c.json<CuratorListResponse>({
-      count: curators.length,
-      chain: 'avalanche',
-      chainId: 43114,
-      curators,
-    });
+      return c.json<CuratorListResponse>({
+        count: curators.length,
+        chain: 'avalanche',
+        chainId: 43114,
+        curators,
+      });
+    } catch (e) {
+      console.error(`[curators] list failed: ${e}`);
+      return c.json({ error: 'Failed to fetch curators', details: String(e) }, 500);
+    }
   });
 
   curatorRoutes.get('/:id', async (c) => {
-    const id = c.req.param('id');
-    const curators = await deps.listCurators();
+    try {
+      const id = c.req.param('id');
+      const curators = await deps.listCurators();
 
-    const curator = id.match(/^0x[0-9a-fA-F]{40}$/)
-      ? curators.find((candidate) => candidate.address.toLowerCase() === id.toLowerCase())
-      : curators.find((candidate) => candidate.curatorAgentId === id);
+      const curator = id.match(/^0x[0-9a-fA-F]{40}$/)
+        ? curators.find((candidate) => candidate.address.toLowerCase() === id.toLowerCase())
+        : curators.find((candidate) => candidate.curatorAgentId === id);
 
-    if (!curator) {
-      return c.json({ error: 'Curator not found' }, 404);
+      if (!curator) {
+        return c.json({ error: 'Curator not found' }, 404);
+      }
+
+      const articles = await deps.listArticlesForCurator(curator.address);
+      return c.json<CuratorDetailResponse>({
+        chain: 'avalanche',
+        chainId: 43114,
+        curator,
+        articles,
+      });
+    } catch (e) {
+      console.error(`[curators] detail failed: ${e}`);
+      return c.json({ error: 'Failed to fetch curator', details: String(e) }, 500);
     }
-
-    const articles = await deps.listArticlesForCurator(curator.address);
-    return c.json<CuratorDetailResponse>({
-      chain: 'avalanche',
-      chainId: 43114,
-      curator,
-      articles,
-    });
   });
 
   interface RegisterBody {

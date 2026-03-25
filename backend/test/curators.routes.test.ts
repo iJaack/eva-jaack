@@ -76,4 +76,20 @@ describe('curator routes', () => {
     });
     expect((response.body as { transactions: unknown[] }).transactions).toHaveLength(2);
   });
+
+  it('returns a structured 500 when curator listing fails', async () => {
+    const app = new Hono();
+    app.route('/api/curators', createCuratorRoutes({
+      listCurators: vi.fn().mockRejectedValue(new Error('rpc exploded')),
+      listArticlesForCurator: vi.fn(),
+      publicClient: { readContract: vi.fn() },
+    }));
+
+    const response = await fetchJson(app, '/api/curators');
+
+    expect(response.status).toBe(500);
+    expect(response.body).toMatchObject({
+      error: 'Failed to fetch curators',
+    });
+  });
 });

@@ -9,10 +9,15 @@ const publicClient = createPublicClient({
   chain: avalanche,
   transport: http(config.avalancheRpc),
 });
+const publicLogClient = createPublicClient({
+  chain: avalanche,
+  transport: http(protocol.chain.publicRpcUrl),
+});
 
 const curatorRegisteredEvent = evaTrustGraphAbi.find(
   (entry) => entry.type === "event" && entry.name === "CuratorRegistered",
 );
+const PUBLIC_LOG_BLOCK_WINDOW = 50_000n;
 
 function toAddress(value: string): Address {
   return getAddress(value);
@@ -100,12 +105,25 @@ export async function listCuratorAddresses(): Promise<Address[]> {
     return [];
   }
 
-  const logs = await publicClient.getLogs({
-    address: config.evaTrustGraph,
-    event: curatorRegisteredEvent,
-    fromBlock: BigInt(protocol.contracts.deployBlock),
-    toBlock: "latest",
-  });
+  const fromBlock = BigInt(protocol.contracts.deployBlock);
+  const latestBlock = await publicLogClient.getBlockNumber();
+  if (fromBlock > latestBlock) {
+    return [];
+  }
+
+  const logs = [];
+
+  for (let startBlock = fromBlock; startBlock <= latestBlock; startBlock += PUBLIC_LOG_BLOCK_WINDOW + 1n) {
+    const endBlock = startBlock + PUBLIC_LOG_BLOCK_WINDOW;
+    const toBlock = endBlock > latestBlock ? latestBlock : endBlock;
+    const batch = await publicLogClient.getLogs({
+      address: config.evaTrustGraph,
+      event: curatorRegisteredEvent,
+      fromBlock: startBlock,
+      toBlock,
+    });
+    logs.push(...batch);
+  }
 
   const seen = new Set<string>();
   const addresses: Address[] = [];
