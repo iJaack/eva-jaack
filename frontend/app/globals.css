@@ -1589,7 +1589,7 @@ a {
 
 .blog-post-section p {
   margin: 12px 0 0;
-  max-width: min(100%, 1120px);
+  max-width: min(100%, 1280px);
   color: var(--muted);
   font-size: 17px;
   line-height: 1.7;
