@@ -35,7 +35,7 @@ function registrationPayload() {
 }
 
 async function mockSharedApi(page: Page) {
-  await page.route("**/api/analytics", async (route) => {
+  await page.route("**/api/analytics/onboarding", async (route) => {
     await route.fulfill({ status: 204, body: "" });
   });
 

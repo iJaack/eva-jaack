@@ -49,12 +49,13 @@ test("verify flow renders scored report output", async ({ page }) => {
   });
 
   await page.goto("/verify");
-  await page.getByPlaceholder("https://example.com/article").fill("https://example.com/article");
-  await page.getByRole("button", { name: "Verify article" }).click();
+  await page.getByPlaceholder("https://example.com/article…").fill("https://example.com/article");
+  await page.getByRole("button", { name: "Check Evidence" }).click();
 
-  await expect(page.getByText("Verification result")).toBeVisible();
+  await expect(page.getByText("Evidence Report")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Sample article" })).toBeVisible();
-  await expect(page.getByText("Score: 88")).toBeVisible();
+  await expect(page.locator(".verify-result-card").getByText("Score")).toBeVisible();
+  await expect(page.locator(".verify-result-card").getByText("88")).toBeVisible();
   await expect(page.getByRole("link", { name: "Article #42" })).toBeVisible();
   await expect(page.getByText("Avalanche is an EVM chain.")).toBeVisible();
 });

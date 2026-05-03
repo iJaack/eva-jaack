@@ -28,12 +28,30 @@ export type ProtocolConfig = {
     erc8004Reputation: `0x${string}`;
     erc8004Validation: `0x${string}`;
     evaTrustGraph: `0x${string}`;
+    evaVerificationMarket: `0x${string}`;
+    evaVerificationReputationAdapter: `0x${string}`;
   };
   agents: {
     eva: {
       id: string;
       wallet: `0x${string}`;
     };
+  };
+  channels: {
+    x: {
+      enabled: boolean;
+      handles: string[];
+      acknowledgementSlaSeconds: number;
+      sourcePlatforms: string[];
+    };
+  };
+  market: {
+    enabled: boolean;
+    reviewWindowSeconds: number;
+    challengeWindowSeconds: number;
+    resolverAddress: `0x${string}`;
+    treasuryAddress: `0x${string}`;
+    sourcePlatforms: string[];
   };
   verifyApi: {
     paymentRequired: boolean;

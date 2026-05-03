@@ -37,21 +37,21 @@ export default function CuratorsPage() {
       <Nav />
       <main className="page-shell">
         <section className="hero">
-          <span className="hero-kicker">Trust graph</span>
+          <span className="hero-kicker">Graph-Backed Predictors</span>
           <h1 className="hero-title" style={{ fontSize: "clamp(32px, 5vw, 64px)" }}>
-            Curators ranked by verified accuracy.
+            Registered curator identities now back predictor trust.
           </h1>
           <p className="hero-sub" style={{ fontSize: "clamp(16px, 1.8vw, 22px)" }}>
             {loading
               ? "Loading curators from Avalanche..."
-              : `${curators.length} registered curator${curators.length !== 1 ? "s" : ""} currently visible in Eva's trust graph.`}
+              : `${curators.length} graph-backed predictor ${curators.length !== 1 ? "identities" : "identity"} currently visible in Eva's trust graph.`}
           </p>
           <div className="hero-actions">
-            <Link href="/curators/register" className="btn btn-primary">
-              Become a curator
+            <Link href="/predictors" className="btn btn-primary">
+              See predictors
             </Link>
-            <Link href="/verify" className="btn btn-ghost">
-              Verify an article
+            <Link href="/curators/register" className="btn btn-ghost">
+              Register graph identity
             </Link>
           </div>
         </section>
@@ -59,7 +59,7 @@ export default function CuratorsPage() {
         <section className="grid-3">
           <article className="surface built-card">
             <h3>Staked identity</h3>
-            <p>Curators enter the network by staking $EVA and registering a portable identity.</p>
+            <p>Predictors can register wallet-backed identities and attach stake to their public record.</p>
           </article>
           <article className="surface built-card">
             <h3>Trust-weighted reach</h3>
@@ -86,7 +86,7 @@ export default function CuratorsPage() {
                   <h3 className="curator-card-address">{truncateAddress(curator.address)}</h3>
                   <div className="curator-card-meta">
                     <span>Agent #{curator.curatorAgentId.toString()}</span>
-                    <span>{curator.articleCount} verified articles</span>
+                    <span>{curator.articleCount} verified sources</span>
                     <span>Since {formatDate(curator.registeredAt)}</span>
                     <span>Trust {curator.trustScore}</span>
                   </div>

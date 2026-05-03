@@ -81,6 +81,11 @@ test("curator profile renders arbitrary registered curator addresses", async ({ 
           lastArticleAt: 1710000600,
           articleCount: 1,
         },
+        marketActivity: {
+          claimsCreated: 2,
+          openClaims: 1,
+          resolvedClaims: 1,
+        },
         articles: [
           {
             id: 42,
@@ -107,6 +112,6 @@ test("curator profile renders arbitrary registered curator addresses", async ({ 
   await expect(page.getByRole("heading", { name: curatorAddress })).toBeVisible();
   await expect(page.getByText("Agent ID")).toBeVisible();
   await expect(page.getByText("#2001")).toBeVisible();
-  await expect(page.getByText("Curated Articles")).toBeVisible();
+  await expect(page.getByText("Verified Sources")).toBeVisible();
   await expect(page.getByRole("link", { name: "View on Snowtrace →" })).toBeVisible();
 });

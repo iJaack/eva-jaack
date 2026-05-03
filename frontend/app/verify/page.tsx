@@ -1,16 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import { verifyArticleUrl, type VerificationResult } from "@/lib/api";
 
 function claimTone(score: number): string {
-  if (score >= 75) return "#34a853";
-  if (score >= 50) return "#f5b731";
-  if (score >= 25) return "#e8803a";
-  return "#e74c3c";
+  if (score >= 75) return "#237a4b";
+  if (score >= 50) return "#9a6a00";
+  if (score >= 25) return "#b35a18";
+  return "#b42318";
 }
 
 export default function VerifyPage() {
@@ -18,18 +18,28 @@ export default function VerifyPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<VerificationResult | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const sourceUrl = url.trim();
+
+    if (!sourceUrl) {
+      setError("Enter a source URL before running an evidence check.");
+      inputRef.current?.focus();
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
     try {
-      const response = await verifyArticleUrl(url.trim());
+      const response = await verifyArticleUrl(sourceUrl);
       setResult(response);
     } catch (reason) {
       setResult(null);
-      setError(reason instanceof Error ? reason.message : "Verification failed.");
+      setError(reason instanceof Error ? reason.message : "Verification failed. Check the URL and try again.");
+      inputRef.current?.focus();
     } finally {
       setSubmitting(false);
     }
@@ -38,148 +48,138 @@ export default function VerifyPage() {
   return (
     <>
       <Nav />
-      <main className="page-shell">
-        <section className="hero">
-          <span className="hero-kicker">Live verification</span>
-          <h1 className="hero-title" style={{ fontSize: "clamp(34px, 6vw, 78px)" }}>
-            Run Eva against a source URL.
-          </h1>
-          <p className="hero-sub">
-            This is the real product surface now: paste a source URL, let Eva extract factual claims,
-            verify them, and return a scored report you can inspect immediately.
+      <main id="main-content" className="mobile-shell verify-tool-shell">
+        <section className="mobile-page-head">
+          <p className="eyebrow">Evidence Tool</p>
+          <h1>Check a source before it backs a thesis.</h1>
+          <p>
+            Paste a source URL and Eva will extract factual claims, score the evidence, and return a report
+            you can use when publishing or challenging a market thesis.
           </p>
-        </section>
-
-        <section className="surface register-guide-card">
-          <div className="section-heading-row" style={{ alignItems: "start" }}>
-            <div>
-              <p className="section-kicker">Verification API</p>
-              <h2 className="section-title section-title-sm">Submit a source URL</h2>
-            </div>
-            <Link href="/about" className="btn btn-ghost">
-              Protocol overview
+          <div className="mobile-hero-actions">
+            <Link href="/compose" className="mobile-action mobile-action-primary">
+              Make a thesis
+            </Link>
+            <Link href="/claims" className="mobile-action">
+              Evidence queue
             </Link>
           </div>
+        </section>
 
-          <p style={{ marginTop: 12, color: "var(--muted)" }}>
-            Payment enforcement is intentionally disabled until x402 request verification is implemented
-            end-to-end. The endpoint is usable now and returns the real verification report shape.
-          </p>
+        <section className="prediction-card verify-tool-card">
+          <div className="card-topline">
+            <span>Source URL</span>
+            <span>Secondary Tool</span>
+          </div>
+          <form onSubmit={handleSubmit} className="compose-form" noValidate>
+            <label className="field-group" htmlFor="source-url">
+              <span className="field-label">URL to Check</span>
+              <input
+                ref={inputRef}
+                id="source-url"
+                name="sourceUrl"
+                type="url"
+                inputMode="url"
+                autoComplete="off"
+                spellCheck={false}
+                className="field-input"
+                placeholder="https://example.com/article…"
+                value={url}
+                onChange={(event) => setUrl(event.target.value)}
+                aria-describedby={error ? "verify-error" : undefined}
+                required
+              />
+            </label>
 
-          <form onSubmit={handleSubmit} style={{ marginTop: 18, display: "grid", gap: 14 }}>
-            <input
-              type="url"
-              className="register-input"
-              placeholder="https://example.com/article"
-              value={url}
-              onChange={(event) => setUrl(event.target.value)}
-              required
-            />
-            <div className="hero-actions">
-              <button className="btn btn-primary" type="submit" disabled={submitting}>
-                {submitting ? "Verifying..." : "Verify article"}
-              </button>
-            </div>
+            {error ? (
+              <p id="verify-error" className="claim-warning" aria-live="polite">
+                {error}
+              </p>
+            ) : null}
+
+            <button className="mobile-action mobile-action-primary compose-submit" type="submit" disabled={submitting}>
+              {submitting ? "Checking…" : "Check Evidence"}
+            </button>
           </form>
         </section>
 
-        {error ? (
-          <section className="surface status-panel" style={{ marginTop: 24, background: "rgba(243, 154, 142, 0.12)", borderColor: "rgba(243, 154, 142, 0.35)" }}>
-            <p className="section-kicker" style={{ marginBottom: 8 }}>Verification failed</p>
-            <h3 style={{ margin: 0 }}>{error}</h3>
-          </section>
-        ) : null}
-
         {result ? (
-          <>
-            <section className="surface" style={{ marginTop: 24, padding: 24 }}>
-              <div className="section-heading-row" style={{ alignItems: "start" }}>
-                <div>
-                  <p className="section-kicker">Verification result</p>
-                  <h2 className="section-title section-title-sm" style={{ marginBottom: 0 }}>
-                    {result.verification.report.title || result.verification.report.url}
-                  </h2>
-                </div>
-                <span className="score-badge" style={{ color: claimTone(result.verification.overallScore), borderColor: `${claimTone(result.verification.overallScore)}40`, background: `${claimTone(result.verification.overallScore)}18` }}>
-                  Score: {result.verification.overallScore}
-                </span>
-              </div>
-
-              <div className="curator-card-meta" style={{ marginTop: 14 }}>
+          <section className="prediction-section" aria-live="polite">
+            <article className="prediction-card verify-result-card">
+              <div className="card-topline">
+                <span>Evidence Report</span>
                 <span>{result.verification.claimCount} claims</span>
-                <span>{result.verification.routescanClaimCount} onchain-assisted</span>
-                <span>Payment required: {result.payment.required ? "Yes" : "No"}</span>
+              </div>
+              <h2>{result.verification.report.title || result.verification.report.url}</h2>
+              <div className="odds-row">
+                <div>
+                  <span>Score</span>
+                  <strong style={{ color: claimTone(result.verification.overallScore) }}>
+                    {result.verification.overallScore}
+                  </strong>
+                </div>
+                <div>
+                  <span>Onchain</span>
+                  <strong>{result.verification.routescanClaimCount}</strong>
+                </div>
+                <div>
+                  <span>Payment</span>
+                  <strong>{result.payment.required ? "Yes" : "No"}</strong>
+                </div>
               </div>
 
-              <p style={{ marginTop: 14, color: "var(--muted)" }}>
-                {result.payment.reason}
-              </p>
-
-              <div className="detail-grid" style={{ marginTop: 18 }}>
-                <div className="detail-row">
-                  <span className="detail-label">Source URL</span>
-                  <a href={result.verification.report.url} target="_blank" rel="noreferrer" className="detail-value detail-link">
-                    {result.verification.report.url}
-                  </a>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">Report URI</span>
-                  <a href={result.verification.ipfsURI} target="_blank" rel="noreferrer" className="detail-value detail-link">
-                    {result.verification.ipfsURI}
-                  </a>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">Existing on-chain submission</span>
-                  <span className="detail-value">
-                    {result.articleMatch.matchesExistingSubmission && result.articleMatch.articleId ? (
-                      <Link href={`/article/${result.articleMatch.articleId}`} className="detail-link">
-                        Article #{result.articleMatch.articleId}
-                      </Link>
-                    ) : (
-                      "No match"
-                    )}
-                  </span>
-                </div>
+              <div className="evidence-list">
+                <a href={result.verification.report.url} target="_blank" rel="noreferrer">
+                  {result.verification.report.url}
+                </a>
+                <a href={result.verification.ipfsURI} target="_blank" rel="noreferrer">
+                  {result.verification.ipfsURI}
+                </a>
+                {result.articleMatch.matchesExistingSubmission && result.articleMatch.articleId ? (
+                  <Link href={`/article/${result.articleMatch.articleId}`}>Article #{result.articleMatch.articleId}</Link>
+                ) : null}
               </div>
-            </section>
+            </article>
 
-            <section style={{ marginTop: 24 }}>
-              <div className="surface" style={{ padding: 24 }}>
-                <p className="section-kicker">Claim breakdown</p>
-                <div className="register-transaction-stack" style={{ marginTop: 18 }}>
-                  {result.verification.report.claims.map((claim, index) => {
-                    const tone = claimTone(claim.score);
-                    return (
-                      <article key={`${claim.claim.text}-${index}`} className="surface tx-card">
-                        <div className="tx-card-header">
-                          <div>
-                            <p className="section-kicker" style={{ marginBottom: 8 }}>Claim {index + 1}</p>
-                            <h3 style={{ margin: 0 }}>{claim.claim.text}</h3>
-                          </div>
-                          <span className="score-badge" style={{ color: tone, borderColor: `${tone}40`, background: `${tone}18` }}>
-                            {claim.score}
-                          </span>
-                        </div>
-                        <p style={{ marginTop: 14, color: "var(--muted)" }}>{claim.explanation}</p>
-                        <div className="curator-card-meta" style={{ marginTop: 12 }}>
-                          <span>Type: {claim.claim.type}</span>
-                          <span>Difficulty: {claim.claim.difficulty}</span>
-                          <span>Source: {claim.dataSource}</span>
-                        </div>
-                        {claim.sources.length > 0 ? (
-                          <div className="curator-card-meta" style={{ marginTop: 12 }}>
-                            {claim.sources.map((source) => (
-                              <span key={source}>{source}</span>
-                            ))}
-                          </div>
-                        ) : null}
-                      </article>
-                    );
-                  })}
-                </div>
-              </div>
-            </section>
-          </>
+            <div className="thesis-stack">
+              {result.verification.report.claims.map((claim, index) => {
+                const tone = claimTone(claim.score);
+                return (
+                  <article key={`${claim.claim.text}-${index}`} className="prediction-card verify-claim-card">
+                    <div className="card-topline">
+                      <span>Claim {index + 1}</span>
+                      <span style={{ color: tone }}>Score {claim.score}</span>
+                    </div>
+                    <h2>{claim.claim.text}</h2>
+                    <p>{claim.explanation}</p>
+                    <div className="odds-row">
+                      <div>
+                        <span>Type</span>
+                        <strong>{claim.claim.type}</strong>
+                      </div>
+                      <div>
+                        <span>Difficulty</span>
+                        <strong>{claim.claim.difficulty}</strong>
+                      </div>
+                      <div>
+                        <span>Source</span>
+                        <strong>{claim.dataSource}</strong>
+                      </div>
+                    </div>
+                    {claim.sources.length > 0 ? (
+                      <div className="evidence-list">
+                        {claim.sources.map((source) => (
+                          <a key={source} href={source} target="_blank" rel="noreferrer">
+                            {source}
+                          </a>
+                        ))}
+                      </div>
+                    ) : null}
+                  </article>
+                );
+              })}
+            </div>
+          </section>
         ) : null}
 
         <SiteFooter />

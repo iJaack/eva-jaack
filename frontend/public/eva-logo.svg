@@ -1,0 +1,59 @@
+<svg width="936" height="256" viewBox="0 0 936 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="eva-wordmark-accent" x1="18" y1="28" x2="214" y2="220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7ED8E7"/>
+      <stop offset="0.34" stop-color="#B5A1D2"/>
+      <stop offset="0.68" stop-color="#F29C79"/>
+      <stop offset="1" stop-color="#C8F35D"/>
+    </linearGradient>
+    <linearGradient id="eva-wordmark-core" x1="68" y1="50" x2="195" y2="205" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0C1222"/>
+      <stop offset="1" stop-color="#16233D"/>
+    </linearGradient>
+    <linearGradient id="eva-wordmark-stroke" x1="92" y1="76" x2="173" y2="176" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4FBFF"/>
+      <stop offset="1" stop-color="#AFE1EA"/>
+    </linearGradient>
+    <linearGradient id="eva-text-fill" x1="292" y1="60" x2="735" y2="180" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7FBFF"/>
+      <stop offset="1" stop-color="#D3E6F4"/>
+    </linearGradient>
+  </defs>
+
+  <g>
+    <circle cx="128" cy="128" r="95" fill="#0A101D"/>
+    <circle cx="128" cy="128" r="84" fill="url(#eva-wordmark-core)" stroke="url(#eva-wordmark-accent)" stroke-width="10"/>
+    <circle cx="128" cy="128" r="62" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+
+    <path
+      d="M154 83H100C93.3726 83 88 88.3726 88 95V161C88 167.627 93.3726 173 100 173H154"
+      stroke="url(#eva-wordmark-stroke)"
+      stroke-width="12"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path d="M101 128H149" stroke="url(#eva-wordmark-stroke)" stroke-width="12" stroke-linecap="round"/>
+
+    <circle cx="65" cy="92" r="9" fill="#7ED8E7"/>
+    <circle cx="187" cy="77" r="8" fill="#B5A1D2"/>
+    <circle cx="197" cy="171" r="9" fill="#C8F35D"/>
+    <circle cx="74" cy="191" r="8" fill="#F29C79"/>
+
+    <path d="M72 97L90 103" stroke="url(#eva-wordmark-accent)" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+    <path d="M180 83L160 92" stroke="url(#eva-wordmark-accent)" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+    <path d="M188 164L165 152" stroke="url(#eva-wordmark-accent)" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+    <path d="M82 184L97 166" stroke="url(#eva-wordmark-accent)" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+  </g>
+
+  <g fill="url(#eva-text-fill)">
+    <path d="M310.093 77.6364V96.1818H388.502V77.6364H310.093ZM320.866 180V63.0909H378.979V81.6364H337.684V111.25H375.843V129.739H337.684V161.455H379.15V180H320.866Z"/>
+    <path d="M441.589 180H423.612L464.396 63.0909H485.191L526.032 180H508.055L475.136 81.9886H474.227L441.589 180ZM442.18 134.148H507.07V151.841H442.18V134.148Z"/>
+    <path d="M548.426 63.0909H567.54L598.79 157.102H600.04L631.29 63.0909H650.403L609.677 180H589.153L548.426 63.0909Z"/>
+  </g>
+
+  <g fill="#9CB7CF">
+    <path d="M683.199 98.6364V84.3182H776.438V98.6364H738.972V193H720.665V98.6364H683.199Z"/>
+    <path d="M792.252 193V84.3182H810.559V130.352H863.525V84.3182H881.832V193H863.525V145.864H810.559V193H792.252Z"/>
+    <path d="M905.031 193V84.3182H977.935V98.6364H923.338V130.352H974.104V144.614H923.338V178.682H978.617V193H905.031Z"/>
+  </g>
+</svg>

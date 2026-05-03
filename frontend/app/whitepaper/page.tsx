@@ -9,7 +9,7 @@ type TocItem = {
 const toc: TocItem[] = [
   { id: "abstract", title: "1. Abstract" },
   { id: "product", title: "2. Product" },
-  { id: "flow", title: "3. Verification Flow" },
+  { id: "flow", title: "3. Prediction Flow" },
   { id: "architecture", title: "4. Architecture" },
   { id: "contract", title: "5. Contract Boundary" },
   { id: "api", title: "6. Public API" },
@@ -27,11 +27,11 @@ function StackDiagram() {
       <div className="diagram-grid">
         <div className="diagram-cell">
           <h4>Frontend</h4>
-          <p>Next.js on Vercel. Curator onboarding, live article views, and verification UI.</p>
+          <p>Next.js on Vercel. Markets, thesis pages, predictor profiles, and evidence tools.</p>
         </div>
         <div className="diagram-cell">
           <h4>Backend</h4>
-          <p>Hono API for verification, article detail, curator detail, and trust summaries.</p>
+          <p>Hono API for markets, theses, predictors, X commands, verification, and trust summaries.</p>
         </div>
         <div className="diagram-cell">
           <h4>On-chain</h4>
@@ -39,11 +39,11 @@ function StackDiagram() {
         </div>
       </div>
       <div className="flow-line">
-        <span>Register curator</span>
+        <span>Publish thesis</span>
         <span>→</span>
-        <span>Submit source</span>
+        <span>Attach evidence</span>
         <span>→</span>
-        <span>Verify claims</span>
+        <span>Resolve outcome</span>
         <span>→</span>
         <span>Update trust</span>
       </div>
@@ -58,8 +58,8 @@ export default function WhitepaperPage() {
         <div className="brand">
           <div className="brand-mark" aria-hidden />
           <div className="brand-text">
-            <span className="brand-title">Eva Protocol Whitepaper</span>
-            <span className="brand-sub">Aligned edition · March 2026</span>
+            <span className="brand-title">Eva Protocol Reference</span>
+            <span className="brand-sub">Prediction edition · April 2026</span>
           </div>
         </div>
         <nav className="nav-links">
@@ -75,11 +75,10 @@ export default function WhitepaperPage() {
       <main className="page-shell">
         <section className="hero" style={{ paddingBottom: 8 }}>
           <span className="hero-kicker">Public whitepaper</span>
-          <h1 className="hero-title">A trust graph for article verification on Avalanche.</h1>
+          <h1 className="hero-title">A trust graph for prediction reputation on Avalanche.</h1>
           <p className="hero-sub">
-            Eva Protocol is a curator network. Curators register with stake, submit source URLs, and
-            build a measurable track record as Eva verifies claims and writes evidence-linked results
-            back to Avalanche.
+            Eva Protocol is a prediction reputation system. External markets provide odds; Eva records theses,
+            evidence, copy intent, and graph-backed predictor trust.
           </p>
         </section>
 
@@ -120,42 +119,40 @@ export default function WhitepaperPage() {
             <section className="surface paper-section">
               <SectionTitle id="abstract" title="1. Abstract" />
               <p>
-                The current Eva Protocol product is not a prediction market and not a marketing-only
-                landing page. It is a live trust graph with three product surfaces: curator
-                onboarding, article verification, and curator or article detail pages that read the
-                same canonical on-chain state the backend writes to.
+                The current Eva Protocol product is not a trading venue and not a marketing-only
+                landing page. It is a prediction reputation layer with market pages, thesis pages,
+                predictor profiles, and evidence tools backed by the same trust graph.
               </p>
               <p>
-                The system is Avalanche-first. `EvaTrustGraph` is the canonical source of article
-                and curator state. ERC-8004 registries remain part of the trust boundary for
-                identity, validation receipts, and reputation events.
+                The system is Avalanche-first. `EvaTrustGraph` is the canonical source of registered
+                predictor identity and trust. ERC-8004 registries remain part of the trust boundary
+                for identity, validation receipts, and reputation events.
               </p>
             </section>
 
             <section className="surface paper-section">
               <SectionTitle id="product" title="2. Product" />
               <ul>
-                <li>Curators register with an owned ERC-8004 agent identity and self-stake.</li>
-                <li>Curators submit source URLs they want Eva to verify.</li>
-                <li>Eva extracts factual claims, checks evidence, stores a report, and updates trust.</li>
-                <li>Readers and agents consume the resulting trust graph through the UI and API.</li>
+                <li>Predictors publish market theses through the website or explicit @evapredicts commands.</li>
+                <li>External venues provide odds; Eva stores rationale, source links, and copy intent.</li>
+                <li>Evidence tools verify supporting claims when a thesis needs a stronger proof trail.</li>
+                <li>Registered Eva identities make predictor reputation graph-backed instead of purely social.</li>
               </ul>
               <p>
-                The key product decision is alignment: the frontend now consumes backend response
-                schemas for verification and detail views, while the backend reads canonical on-chain
-                state from the deployed trust-graph contract.
+                Prediction theses are the primary product record, while article verification remains a
+                supporting evidence primitive.
               </p>
             </section>
 
             <section className="surface paper-section">
-              <SectionTitle id="flow" title="3. Verification Flow" />
+              <SectionTitle id="flow" title="3. Prediction Flow" />
               <ol style={{ paddingLeft: 20, lineHeight: 1.9 }}>
-                <li>Fetch the submitted article and normalize the content.</li>
-                <li>Extract factual claims suitable for verification.</li>
-                <li>Check on-chain claims against blockchain data and off-chain claims against web evidence.</li>
-                <li>Score each claim and compute an overall article score.</li>
-                <li>Store the report and write feedback or validation receipts on Avalanche.</li>
-                <li>Surface the result through `/api/verify`, `/api/article/:id`, and the UI.</li>
+                <li>User publishes or is credited with a market thesis.</li>
+                <li>Eva stores the market, selected outcome, odds snapshot, rationale, and evidence links.</li>
+                <li>Other users can copy, counter, or inspect the claim trail.</li>
+                <li>Unclaimed X profiles can accumulate offchain market records.</li>
+                <li>Registered identities can later receive reputation feedback after durable resolutions.</li>
+                <li>Verification reports remain available through `/api/verify` as evidence objects.</li>
               </ol>
             </section>
 
@@ -165,7 +162,7 @@ export default function WhitepaperPage() {
               <p>
                 Vercel is the canonical deployment target for the product surface. The frontend is a
                 dynamic Next.js app, and the backend routes are exposed through the same domain so
-                article, curator, trust, and verification views do not drift across environments.
+                markets, theses, predictors, trust, and evidence views do not drift across environments.
               </p>
             </section>
 
@@ -181,8 +178,9 @@ export default function WhitepaperPage() {
                   ABIs.
                 </li>
                 <li>
-                  <strong>Identity model:</strong> the Eva oracle uses agent #{protocol.agents.eva.id},
-                  but curator onboarding requires each curator to supply and own their own agent ID.
+                  <strong>Identity model:</strong> the Eva oracle uses agent #{protocol.agents.eva.id}.
+                  Graph-backed predictors register their own wallet and agent identity before resolved
+                  outcomes can affect canonical trust.
                 </li>
               </ul>
             </section>
@@ -191,17 +189,20 @@ export default function WhitepaperPage() {
               <SectionTitle id="api" title="6. Public API" />
               <p>The public surface is intentionally narrow and explicit:</p>
               <ul>
+                <li><code>GET /api/markets</code> and <code>GET /api/markets/:id</code> return external market context.</li>
+                <li><code>POST /api/theses</code> and <code>GET /api/theses/:id</code> create and read prediction theses.</li>
+                <li><code>GET /api/predictors</code> returns product and graph-backed predictor records.</li>
+                <li><code>POST /api/copy-preview</code> records external-link-only copy intent.</li>
                 <li>
-                  <code>POST /api/verify</code> accepts a source URL and returns a scored report plus
-                  honest payment metadata.
+                  <code>POST /api/verify</code> accepts a source URL and returns a scored evidence report.
                 </li>
                 <li>
-                  <code>GET /api/article</code> and <code>GET /api/article/:id</code> return on-chain
-                  article state plus stored report data when available.
+                  <code>GET /api/article</code> and <code>GET /api/article/:id</code> remain available
+                  as the verified source archive for older links and evidence references.
                 </li>
                 <li>
-                  <code>GET /api/curators</code> and <code>GET /api/curator/:id</code> return live
-                  curator detail instead of placeholders.
+                  <code>GET /api/curators</code> and <code>GET /api/curator/:id</code> remain available
+                  for graph identity records that now appear in-product as predictor trust.
                 </li>
                 <li>
                   <code>GET /api/trust/:address</code> reads trust against the same tag semantics the
@@ -209,8 +210,8 @@ export default function WhitepaperPage() {
                 </li>
               </ul>
               <p>
-                x402 remains a roadmap item. Payment enforcement is not claimed as live unless request
-                verification is actually implemented end-to-end.
+                x402 and native trade execution remain out of scope for v1. Payment enforcement is not claimed as
+                live unless request verification is actually implemented end-to-end.
               </p>
             </section>
 
@@ -221,22 +222,22 @@ export default function WhitepaperPage() {
                   {
                     phase: "Now",
                     detail:
-                      "Dynamic article and curator routes, real curator APIs, shared config, honest verification responses, and ABI generation from the deployed contract.",
+                      "Prediction feed, market pages, thesis pages, predictor profiles, explicit X command ingestion, and evidence tools.",
                   },
                   {
                     phase: "Next",
                     detail:
-                      "Harden verification persistence, add broader route coverage, and formalize deployment smoke tests for Vercel previews.",
+                      "Harden external market providers, add resolved-thesis scoring, and improve product freshness controls.",
                   },
                   {
                     phase: "Later",
                     detail:
-                      "Implement real x402 request verification if payment gating remains a product requirement.",
+                      "Promote resolved thesis outcomes into reputation adapters once the product record proves useful.",
                   },
                   {
                     phase: "Future research",
                     detail:
-                      "Explore broader trust distribution mechanics without letting speculative concepts replace the core trust-graph product.",
+                      "Explore native settlement only after the external-market social layer has real active predictors.",
                   },
                 ].map((item) => (
                   <article key={item.phase} className="surface roadmap-card">
@@ -248,16 +249,13 @@ export default function WhitepaperPage() {
             </section>
 
             <section className="surface paper-section">
-              <SectionTitle id="archive" title="8. Archived Concepts" />
+              <SectionTitle id="archive" title="8. Boundary" />
               <p>
-                Earlier drafts of Eva Protocol described prediction markets, cross-chain x402
-                settlement, and broader tokenomics as if they were active product features. They are
-                not the live product surface and should be treated as archived research material
-                unless they are reintroduced behind a concrete implementation plan.
+                Eva does not execute trades in v1. It does not custody funds, place market orders, or operate a native
+                prediction market. The live product records theses and reputation around external markets.
               </p>
               <p>
-                The repo now treats those concepts as roadmap context only. The trust graph,
-                verification pipeline, and curator onboarding flow are the canonical product.
+                The trust graph, prediction-layer APIs, and evidence tools are the canonical product surface.
               </p>
             </section>
           </article>

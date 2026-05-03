@@ -19,19 +19,55 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${base}/about`,
       lastModified: new Date(),
       changeFrequency: "monthly",
-      priority: 0.8
+      priority: 0.45
     },
     {
       url: `${base}/whitepaper`,
       lastModified: new Date(),
       changeFrequency: "monthly",
+      priority: 0.4
+    },
+    {
+      url: `${base}/markets`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.95
+    },
+    {
+      url: `${base}/compose`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9
+    },
+    {
+      url: `${base}/predictors`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
       priority: 0.9
     },
     {
       url: `${base}/blog`,
       lastModified: new Date(),
       changeFrequency: "monthly",
-      priority: 0.7
+      priority: 0.85
+    },
+    {
+      url: `${base}/claims`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.55
+    },
+    {
+      url: `${base}/verify`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.55
+    },
+    {
+      url: `${base}/curators/register`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.55
     },
     ...posts.map((post) => ({
       url: `${base}/blog/${post.slug}`,

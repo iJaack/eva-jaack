@@ -3,9 +3,9 @@ import type { ReactNode } from "react";
 import "./globals.css";
 import { protocol } from "@/lib/protocol";
 
-const title = `${protocol.app.name} — Trust-weighted social news on Avalanche`;
+const title = `${protocol.app.name} — Prediction reputation OS`;
 const description =
-  "Eva Protocol is a trust-weighted social news network on Avalanche where curators stake $EVA, Eva verifies claims, and reputation drives distribution.";
+  "Eva connects markets, thesis pages, evidence, and graph-backed predictor reputation in one product surface.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(protocol.app.siteUrl),

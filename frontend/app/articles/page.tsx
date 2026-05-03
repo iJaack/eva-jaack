@@ -25,14 +25,14 @@ export default function ArticlesPage() {
       <Nav />
       <main className="page-shell">
         <section className="hero" style={{ paddingBottom: 0 }}>
-          <span className="hero-kicker">On-Chain Evidence</span>
+          <span className="hero-kicker">Verified Sources Archive</span>
           <h1 className="hero-title" style={{ fontSize: "clamp(28px, 5vw, 56px)" }}>
-            Article Feed
+            Source reports that can support market theses.
           </h1>
           <p className="hero-sub" style={{ fontSize: "clamp(16px, 1.8vw, 22px)" }}>
             {loading
-              ? "Loading articles from Avalanche..."
-              : `${count} articles registered on-chain`}
+              ? "Loading source reports from Avalanche…"
+              : `${count} source reports registered on-chain`}
           </p>
         </section>
 

@@ -1,38 +1,42 @@
 # Eva Protocol Architecture
 
-> Canonical product: trust graph, curator onboarding, and article verification on Avalanche.
+> Canonical product: X-native prediction reputation, with `EvaTrustGraph` as the long-lived trust primitive.
 
 ## Product boundary
 
-Eva Protocol currently has three live surfaces:
+Eva Protocol now has four live product surfaces and supporting evidence infrastructure:
 
-1. Curator onboarding against the deployed `EvaTrustGraph` contract
-2. Article verification through `POST /api/verify`
-3. Read surfaces for curators, articles, and trust summaries
+1. Mobile-first prediction feed, market pages, thesis pages, and predictor profiles
+2. `@evapredicts` X command ingestion for explicit track/verify/counter/copy requests
+3. Curator/predictor onboarding against the deployed `EvaTrustGraph` contract
+4. Article and claim verification as supporting evidence infrastructure
 
-Prediction-market concepts from older drafts are archived and are not part of the live system.
+External prediction markets are v1 venues. Eva does not execute trades; it tracks public theses,
+copy intent, evidence, and predictor reputation. Native settlement remains future scope.
 
 ## System overview
 
 ```text
 ┌──────────────────────────────────────────────────────────────┐
 │ Frontend (Next.js on Vercel)                                │
-│ / · /verify · /articles · /article/:id · /curators          │
-│ /curator/:address · /curators/register · /whitepaper        │
+│ / · /markets · /markets/:id · /thesis/:id · /compose        │
+│ /predictors · /predictors/:id · /verify · /claims           │
 └──────────────────────────────┬───────────────────────────────┘
                                │
 ┌──────────────────────────────▼───────────────────────────────┐
 │ Backend (Hono)                                               │
 │ /api/verify                                                  │
 │ /api/article, /api/article/:id                               │
-│ /api/curators, /api/curator/:id                              │
+│ /api/markets, /api/theses, /api/predictors                  │
+│ /api/x/ingest, /api/copy-preview, /api/claims               │
 │ /api/trust, /.well-known/agent.json, /health                │
 └───────────────┬───────────────────────────────┬──────────────┘
                 │                               │
 ┌───────────────▼──────────────┐   ┌────────────▼──────────────┐
-│ Verification pipeline         │   │ Avalanche C-Chain         │
-│ fetch → extract → verify      │   │ EvaTrustGraph             │
-│ score → store report          │   │ ERC-8004 registries       │
+│ Prediction + evidence layer   │   │ Avalanche C-Chain         │
+│ markets → theses → profiles   │   │ EvaTrustGraph             │
+│ verify → reports → claims     │   │ EvaVerificationMarket     │
+│ X mention ingest → claims     │   │ ERC-8004 registries       │
 └───────────────────────────────┘   └───────────────────────────┘
 ```
 
@@ -40,10 +44,26 @@ Prediction-market concepts from older drafts are archived and are not part of th
 
 The deployed `EvaTrustGraph` contract is the primary source of truth for:
 
-- article IDs and article metadata
-- curator registration status
-- curator trust score
-- curator article counts
+- registered predictor/curator identity
+- wallet and ERC-8004 agent ownership assumptions
+- self-stake and graph-backed trust score
+- long-lived reputation state
+
+Offchain prediction storage is the primary source of truth for:
+
+- external market references and odds snapshots
+- theses and counter-theses
+- X command records
+- copy-preview events
+- unclaimed X predictor profiles
+
+The additive verification market is still the primary source of truth for:
+
+- X-originated claim IDs
+- claim funding pools
+- verdict staking positions
+- challenge state
+- claim settlement outcomes
 
 ERC-8004 registries remain part of the trust boundary for:
 
@@ -60,12 +80,29 @@ ERC-8004 registries remain part of the trust boundary for:
 - explorer URL
 - deployed contract addresses
 - Eva oracle identity
+- X channel handles and market timing defaults
+- additive market deployment placeholders
 - verify API payment metadata
 
 Frontend and backend both import from this file. Docs should reference it rather than duplicating
 values manually.
 
 ## Request flow
+
+### X-native thesis tracking
+
+1. User tags `@evapredicts` or opens `/compose` from a shared thesis page
+2. Backend records an explicit X command or direct composer submission
+3. Eva links the thesis to an external market, odds snapshot, source post, and evidence
+4. Frontend renders a mobile thesis page with copy, counter, and share actions
+5. Resolved outcomes remain offchain until a reputation adapter promotes durable results into trust feedback
+
+### Market and predictor discovery
+
+1. Frontend requests `GET /api/prediction-summary`, `/api/markets`, or `/api/predictors`
+2. Backend reads offchain markets/theses and registered `EvaTrustGraph` identities
+3. Predictor profiles display two layers: graph-backed trust score and app-derived market record
+4. Unclaimed X profiles stay offchain until the user explicitly links a wallet/agent identity
 
 ### Curator onboarding
 
@@ -90,6 +127,14 @@ values manually.
    - payment metadata
    - optional matching on-chain article ID
 
+### X claim verification
+
+1. User mentions `@evapredicts` on X against a tweet or quoted tweet
+2. Backend ingests the mention and normalizes a canonical claim
+3. Backend creates/stores offchain claim metadata and, when configured, creates the onchain market claim
+4. Frontend renders the public claim page with machine assessment and curator consensus
+5. Market settlement feeds resolved outcomes into reputation/trust via an adapter boundary
+
 ### Article and curator detail
 
 1. Frontend requests `GET /api/article/:id` or `GET /api/curator/:id`
@@ -99,11 +144,16 @@ values manually.
 
 ## Alignment rules
 
+- Mobile web is the primary product interface after X.
+- Prediction theses are offchain in v1; only resolved outcomes may later affect canonical trust.
+- X identity to wallet/agent linking requires explicit user opt-in.
+- Eva does not execute trades in v1; copy preview is external-link-only.
 - Dynamic article and curator pages must be server-rendered or runtime-rendered. Static export is not allowed.
 - Frontend article indexing must map to on-chain IDs `1..nextArticleId`.
 - Placeholder curator endpoints are not allowed in the public API.
 - `/api/verify` must describe payment honestly. If x402 is not enforced, the response must say so.
 - Trust reads must query the same tags the backend writes.
+- The verification market is additive. No new market module may replace curator identity or long-lived trust state in `EvaTrustGraph`.
 
 ## Deployment model
 
@@ -113,11 +163,11 @@ Vercel is the sole production target.
 - Frontend is built as a dynamic Next.js app.
 - API functions are exposed on the same domain for `/api/*`, `/.well-known/*`, and `/health`.
 
-## Archived concepts
+## Future scope
 
-The following are archived roadmap concepts, not live product claims:
+The following remain future scope, not live product claims:
 
-- prediction-market settlement on article claims
+- native Eva prediction-market settlement
 - Base-native production deployment
 - live x402 payment enforcement without request verification
 - public tokenomics claims that are not reflected in the current contract and app surface

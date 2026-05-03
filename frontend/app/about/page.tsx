@@ -8,26 +8,26 @@ import { getArticles, getCurators } from "@/lib/api";
 
 const flowSteps = [
   {
-    title: "Curators stake $EVA",
-    description: "Registration starts with skin in the game. Curation is an economic act, not a free spam channel.",
+    title: "Predictors post theses",
+    description: "A thesis records the market, selected outcome, odds snapshot, rationale, and source context.",
     tone: "138, 216, 192",
     icon: "1",
   },
   {
-    title: "Articles enter the trust graph",
-    description: "Curators submit URLs they want the network to evaluate and stand behind.",
+    title: "Eva stores the record",
+    description: "Markets, theses, counters, source links, and copy intent stay readable in the product surface.",
     tone: "133, 203, 218",
     icon: "2",
   },
   {
-    title: "Eva verifies claims",
-    description: "The backend fetches content, extracts factual claims, checks evidence, and produces a verifiable report.",
+    title: "Evidence supports calls",
+    description: "Source verification and claim pages remain useful when they make a prediction easier to inspect.",
     tone: "156, 183, 235",
     icon: "3",
   },
   {
-    title: "Trust compounds into distribution",
-    description: "Over time, accurate curators become the highest-signal nodes in the feed and broader protocol surface.",
+    title: "Trust compounds later",
+    description: "Resolved outcomes can feed graph-backed reputation when a predictor links an Eva identity.",
     tone: "243, 154, 142",
     icon: "4",
   },
@@ -35,24 +35,24 @@ const flowSteps = [
 
 const productSurface = [
   {
-    primitive: "Feed",
-    mapping: "Live verified articles",
-    detail: "A chronological feed of every article that has been through the verification pipeline.",
+    primitive: "Markets",
+    mapping: "Prediction context",
+    detail: "External markets provide odds. Eva adds theses, counters, evidence, and predictor records.",
   },
   {
-    primitive: "Curators",
+    primitive: "Predictors",
     mapping: "Trust-ranked participants",
-    detail: "A live leaderboard of registered curators with trust scores and verification history.",
+    detail: "Profiles can start unclaimed, then become graph-backed when a user links wallet and agent identity.",
   },
   {
     primitive: "Verify",
-    mapping: "Verification API surface",
-    detail: "The live endpoint for submitting article URLs and receiving scored evidence reports. Payment enforcement is intentionally disabled until x402 verification exists end-to-end.",
+    mapping: "Evidence tool",
+    detail: "The live endpoint for checking source URLs before or after publishing a prediction thesis.",
   },
   {
-    primitive: "Evalanche",
-    mapping: "Agent wallet infrastructure",
-    detail: "The signing and identity stack that will replace hard-coded private keys with agent-native wallets.",
+    primitive: "EvaTrustGraph",
+    mapping: "Canonical trust primitive",
+    detail: "Registered curator identities are reinterpreted as graph-backed predictors in the new product surface.",
   },
 ] as const;
 
@@ -98,18 +98,18 @@ export default function AboutPage() {
 
       <main className="page-shell">
         <section className="hero">
-          <span className="hero-kicker">Protocol overview</span>
-          <h1 className="hero-title">Eva is building trust-weighted news distribution.</h1>
+          <span className="hero-kicker">Protocol Notes</span>
+          <h1 className="hero-title">EvaTrustGraph now backs prediction reputation.</h1>
           <p className="hero-sub">
-            The core product is simple: curators stake $EVA behind sources, Eva verifies the evidence, and the
-            network turns consistent accuracy into on-chain reputation. The trust graph becomes the feed.
+            Eva is a product surface for markets, theses, evidence, and predictor records. The trust primitive
+            underneath is durable identity, stake, and reputation for people who earn trust.
           </p>
           <div className="hero-actions">
-            <Link href="/verify" className="btn btn-primary">
-              See verification surface
+            <Link href="/markets" className="btn btn-primary">
+              See markets
             </Link>
-            <Link href="/curators" className="btn btn-ghost">
-              See curator graph
+            <Link href="/predictors" className="btn btn-ghost">
+              See predictors
             </Link>
           </div>
         </section>
@@ -117,11 +117,11 @@ export default function AboutPage() {
         <section className="protocol-stats grid-3" style={{ marginTop: "18px" }}>
           <div className="surface stat-card">
             <span className="stat-value">{articleCount ?? "—"}</span>
-            <span className="stat-label">Articles verified</span>
+            <span className="stat-label">Source reports</span>
           </div>
           <div className="surface stat-card">
             <span className="stat-value">{curatorCount ?? "—"}</span>
-            <span className="stat-label">Active curators</span>
+            <span className="stat-label">Graph identities</span>
           </div>
           <div className="surface stat-card">
             <span className="stat-value">{avgTrust !== null ? avgTrust : "—"}</span>
@@ -131,7 +131,7 @@ export default function AboutPage() {
 
         <section style={{ marginTop: "40px" }}>
           <p className="section-kicker">How it works</p>
-          <h2 className="section-title">Four steps from article to trust update</h2>
+          <h2 className="section-title">Four steps from market call to trust update</h2>
           <div className="grid-2" style={{ marginTop: "16px" }}>
             {flowSteps.map((step) => (
               <article
@@ -151,7 +151,7 @@ export default function AboutPage() {
 
         <section style={{ marginTop: "44px" }}>
           <p className="section-kicker">Current product surface</p>
-          <h2 className="section-title">What is live today</h2>
+          <h2 className="section-title">What the product shows</h2>
           <div className="grid-2" style={{ marginTop: "16px" }}>
             {productSurface.map((item) => (
               <article key={item.primitive} className="surface built-card">
@@ -182,10 +182,10 @@ export default function AboutPage() {
         </section>
 
         <section className="surface callout">
-          <h3>North-star behavior</h3>
+          <h3>Product behavior</h3>
           <p>
-            Eva becomes useful when curator reputation is reliable enough that agents and people can delegate
-            attention to it. The job is not just verification accuracy — it is making high-signal curation economically legible.
+            Eva becomes useful when predictor reputation is reliable enough that people can follow, copy, and
+            challenge market calls without losing the evidence trail behind them.
           </p>
         </section>
 

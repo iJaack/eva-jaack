@@ -1,0 +1,46 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="eva-ring" x1="44" y1="36" x2="212" y2="220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7ED8E7"/>
+      <stop offset="0.34" stop-color="#B5A1D2"/>
+      <stop offset="0.68" stop-color="#F29C79"/>
+      <stop offset="1" stop-color="#C8F35D"/>
+    </linearGradient>
+    <linearGradient id="eva-core" x1="82" y1="70" x2="173" y2="179" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0C1222"/>
+      <stop offset="1" stop-color="#16233D"/>
+    </linearGradient>
+    <linearGradient id="eva-stroke" x1="94" y1="79" x2="167" y2="171" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4FBFF"/>
+      <stop offset="1" stop-color="#AFE1EA"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="128" cy="128" r="95" fill="#0A101D"/>
+  <circle cx="128" cy="128" r="84" fill="url(#eva-core)" stroke="url(#eva-ring)" stroke-width="10"/>
+  <circle cx="128" cy="128" r="62" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+
+  <path
+    d="M154 83H100C93.3726 83 88 88.3726 88 95V161C88 167.627 93.3726 173 100 173H154"
+    stroke="url(#eva-stroke)"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M101 128H149"
+    stroke="url(#eva-stroke)"
+    stroke-width="12"
+    stroke-linecap="round"
+  />
+
+  <circle cx="65" cy="92" r="9" fill="#7ED8E7"/>
+  <circle cx="187" cy="77" r="8" fill="#B5A1D2"/>
+  <circle cx="197" cy="171" r="9" fill="#C8F35D"/>
+  <circle cx="74" cy="191" r="8" fill="#F29C79"/>
+
+  <path d="M72 97L90 103" stroke="url(#eva-ring)" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+  <path d="M180 83L160 92" stroke="url(#eva-ring)" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+  <path d="M188 164L165 152" stroke="url(#eva-ring)" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+  <path d="M82 184L97 166" stroke="url(#eva-ring)" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+</svg>

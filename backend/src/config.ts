@@ -15,6 +15,11 @@ export const config = {
 
   evaToken: env('EVA_TOKEN', protocol.contracts.evaToken) as `0x${string}`,
   evaTrustGraph: env('EVA_TRUST_GRAPH', protocol.contracts.evaTrustGraph) as `0x${string}`,
+  evaVerificationMarket: env('EVA_VERIFICATION_MARKET', protocol.contracts.evaVerificationMarket) as `0x${string}`,
+  evaVerificationReputationAdapter: env(
+    'EVA_VERIFICATION_REPUTATION_ADAPTER',
+    protocol.contracts.evaVerificationReputationAdapter,
+  ) as `0x${string}`,
 
   evaAgentId: env('EVA_AGENT_ID', protocol.agents.eva.id),
   evaSovereignWallet: env('EVA_SOVEREIGN_WALLET', protocol.agents.eva.wallet) as `0x${string}`,

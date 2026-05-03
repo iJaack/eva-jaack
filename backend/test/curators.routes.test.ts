@@ -10,6 +10,11 @@ describe('curator routes', () => {
     app.route('/api/curators', createCuratorRoutes({
       listCurators: vi.fn().mockResolvedValue([sampleCurator]),
       listArticlesForCurator: vi.fn().mockResolvedValue([sampleArticle]),
+      getCuratorMarketActivity: vi.fn().mockResolvedValue({
+        claimsCreated: 0,
+        openClaims: 0,
+        resolvedClaims: 0,
+      }),
       publicClient: { readContract: vi.fn() },
     }));
 
@@ -55,6 +60,11 @@ describe('curator routes', () => {
     app.route('/api/curator', createCuratorRoutes({
       listCurators: vi.fn(),
       listArticlesForCurator: vi.fn(),
+      getCuratorMarketActivity: vi.fn().mockResolvedValue({
+        claimsCreated: 0,
+        openClaims: 0,
+        resolvedClaims: 0,
+      }),
       publicClient: { readContract },
     }));
 
@@ -82,6 +92,11 @@ describe('curator routes', () => {
     app.route('/api/curators', createCuratorRoutes({
       listCurators: vi.fn().mockRejectedValue(new Error('rpc exploded')),
       listArticlesForCurator: vi.fn(),
+      getCuratorMarketActivity: vi.fn().mockResolvedValue({
+        claimsCreated: 0,
+        openClaims: 0,
+        resolvedClaims: 0,
+      }),
       publicClient: { readContract: vi.fn() },
     }));
 

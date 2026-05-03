@@ -10,6 +10,8 @@ import { curatorRoutes } from './routes/curators.js';
 import { trustRoutes } from './routes/trust.js';
 import { articleRoutes } from './routes/articles.js';
 import { analyticsRoutes } from './routes/analytics.js';
+import { claimRoutes } from './routes/claims.js';
+import { predictionRoutes } from './routes/predictions.js';
 
 function agentManifest() {
   return {
@@ -44,7 +46,9 @@ export function createApp() {
   app.route('/api/trust', trustRoutes);
   app.route('/api/article', articleRoutes);
   app.route('/api/articles', articleRoutes);
+  app.route('/api/claims', claimRoutes);
   app.route('/api/analytics', analyticsRoutes);
+  app.route('/api', predictionRoutes);
 
   return app;
 }

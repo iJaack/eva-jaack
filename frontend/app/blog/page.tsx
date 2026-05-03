@@ -5,7 +5,8 @@ import { formatBlogDate, getAllPosts } from "@/lib/blog";
 
 export default function BlogIndexPage() {
   const posts = getAllPosts();
-  const featuredPost = posts[0] ?? null;
+  const featuredPost = posts.find((post) => post.featured) ?? posts[0] ?? null;
+  const remainingPosts = posts.filter((post) => post.slug !== featuredPost?.slug);
 
   return (
     <>
@@ -14,11 +15,11 @@ export default function BlogIndexPage() {
         <section className="hero">
           <span className="hero-kicker">Journal</span>
           <h1 className="hero-title" style={{ fontSize: "clamp(34px, 5vw, 72px)" }}>
-            Notes from the trust graph.
+            Notes from the prediction layer.
           </h1>
           <p className="hero-sub">
-            A simple editorial layer for product thinking, protocol updates, and plain-English
-            explanations of what Eva is building.
+            Product notes, protocol updates, and plain-English writing on markets, theses, evidence, and
+            reputation design.
           </p>
         </section>
 
@@ -35,6 +36,24 @@ export default function BlogIndexPage() {
               <p className="blog-feature-excerpt">{featuredPost.excerpt}</p>
               <span className="blog-feature-cta">Read post →</span>
             </Link>
+          </section>
+        ) : null}
+
+        {remainingPosts.length > 0 ? (
+          <section className="blog-index-section">
+            <p className="section-kicker">Archive</p>
+            <div className="thesis-stack">
+              {remainingPosts.map((post) => (
+                <Link key={post.slug} href={`/blog/${post.slug}`} className="prediction-card">
+                  <div className="blog-meta-row">
+                    <span>{formatBlogDate(post.publishedAt)}</span>
+                    <span>{post.readingTime}</span>
+                  </div>
+                  <h2>{post.title}</h2>
+                  <p>{post.excerpt}</p>
+                </Link>
+              ))}
+            </div>
           </section>
         ) : null}
 

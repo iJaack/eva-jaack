@@ -17,7 +17,19 @@ const publicLogClient = createPublicClient({
 const curatorRegisteredEvent = evaTrustGraphAbi.find(
   (entry) => entry.type === "event" && entry.name === "CuratorRegistered",
 );
-const PUBLIC_LOG_BLOCK_WINDOW = 50_000n;
+const PUBLIC_LOG_BLOCK_RANGE = 50_000n; // inclusive span; RPCs cap eth_getLogs at 50k blocks per request
+const CURATOR_ADDRESS_CACHE_TTL_MS = 60_000;
+const CURATOR_LIST_CACHE_TTL_MS = 60_000;
+
+type CacheEntry<T> = {
+  value: T;
+  cachedAt: number;
+};
+
+let curatorAddressCache: CacheEntry<Address[]> | null = null;
+let curatorAddressInflight: Promise<Address[]> | null = null;
+let curatorListCache: CacheEntry<CuratorDto[]> | null = null;
+let curatorListInflight: Promise<CuratorDto[]> | null = null;
 
 function toAddress(value: string): Address {
   return getAddress(value);
@@ -101,52 +113,90 @@ export async function getCurator(address: Address): Promise<CuratorDto> {
 }
 
 export async function listCuratorAddresses(): Promise<Address[]> {
+  const now = Date.now();
+  if (curatorAddressCache && now - curatorAddressCache.cachedAt < CURATOR_ADDRESS_CACHE_TTL_MS) {
+    return curatorAddressCache.value;
+  }
+  if (curatorAddressInflight) {
+    return curatorAddressInflight;
+  }
   if (!curatorRegisteredEvent) {
     return [];
   }
 
-  const fromBlock = BigInt(protocol.contracts.deployBlock);
-  const latestBlock = await publicLogClient.getBlockNumber();
-  if (fromBlock > latestBlock) {
-    return [];
+  curatorAddressInflight = (async () => {
+    const fromBlock = BigInt(protocol.contracts.deployBlock);
+    const latestBlock = await publicLogClient.getBlockNumber();
+    if (fromBlock > latestBlock) {
+      curatorAddressCache = { value: [], cachedAt: Date.now() };
+      return [];
+    }
+
+    const logs = [];
+
+    for (let startBlock = fromBlock; startBlock <= latestBlock; startBlock += PUBLIC_LOG_BLOCK_RANGE) {
+      const endBlock = startBlock + PUBLIC_LOG_BLOCK_RANGE - 1n;
+      const toBlock = endBlock > latestBlock ? latestBlock : endBlock;
+      const batch = await publicLogClient.getLogs({
+        address: config.evaTrustGraph,
+        event: curatorRegisteredEvent,
+        fromBlock: startBlock,
+        toBlock,
+      });
+      logs.push(...batch);
+    }
+
+    const seen = new Set<string>();
+    const addresses: Address[] = [];
+
+    for (const log of logs) {
+      const address = log.args.curator ? toAddress(log.args.curator) : null;
+      if (!address) continue;
+      if (seen.has(address)) continue;
+      seen.add(address);
+      addresses.push(address);
+    }
+
+    curatorAddressCache = { value: addresses, cachedAt: Date.now() };
+    return addresses;
+  })();
+
+  try {
+    return await curatorAddressInflight;
+  } finally {
+    curatorAddressInflight = null;
   }
-
-  const logs = [];
-
-  for (let startBlock = fromBlock; startBlock <= latestBlock; startBlock += PUBLIC_LOG_BLOCK_WINDOW + 1n) {
-    const endBlock = startBlock + PUBLIC_LOG_BLOCK_WINDOW;
-    const toBlock = endBlock > latestBlock ? latestBlock : endBlock;
-    const batch = await publicLogClient.getLogs({
-      address: config.evaTrustGraph,
-      event: curatorRegisteredEvent,
-      fromBlock: startBlock,
-      toBlock,
-    });
-    logs.push(...batch);
-  }
-
-  const seen = new Set<string>();
-  const addresses: Address[] = [];
-
-  for (const log of logs) {
-    const address = log.args.curator ? toAddress(log.args.curator) : null;
-    if (!address) continue;
-    if (seen.has(address)) continue;
-    seen.add(address);
-    addresses.push(address);
-  }
-
-  return addresses;
 }
 
 export async function listCurators(): Promise<CuratorDto[]> {
-  const addresses = await listCuratorAddresses();
-  if (addresses.length === 0) return [];
+  const now = Date.now();
+  if (curatorListCache && now - curatorListCache.cachedAt < CURATOR_LIST_CACHE_TTL_MS) {
+    return curatorListCache.value;
+  }
+  if (curatorListInflight) {
+    return curatorListInflight;
+  }
 
-  const curators = await Promise.all(addresses.map((address) => getCurator(address)));
-  return curators
-    .filter((curator) => curator.registered)
-    .sort((left, right) => right.trustScore - left.trustScore || right.articleCount - left.articleCount);
+  curatorListInflight = (async () => {
+    const addresses = await listCuratorAddresses();
+    if (addresses.length === 0) {
+      curatorListCache = { value: [], cachedAt: Date.now() };
+      return [];
+    }
+
+    const curators = await Promise.all(addresses.map((address) => getCurator(address)));
+    const result = curators
+      .filter((curator) => curator.registered)
+      .sort((left, right) => right.trustScore - left.trustScore || right.articleCount - left.articleCount);
+    curatorListCache = { value: result, cachedAt: Date.now() };
+    return result;
+  })();
+
+  try {
+    return await curatorListInflight;
+  } finally {
+    curatorListInflight = null;
+  }
 }
 
 export async function getArticle(articleId: number): Promise<OnchainArticleDto | null> {
@@ -212,8 +262,12 @@ export async function listArticlesForCurator(curatorAddress: Address): Promise<O
 export async function findArticleBySourceUri(url: string): Promise<OnchainArticleDto | null> {
   const normalizedUrl = normalizeUrl(url);
   const articles = await listArticles();
-  return (
-    articles.find((article) => normalizeUrl(article.sourceURI) === normalizedUrl) ??
-    null
-  );
+  return articles.find((article) => normalizeUrl(article.sourceURI) === normalizedUrl) ?? null;
+}
+
+export function resetTrustGraphCachesForTests(): void {
+  curatorAddressCache = null;
+  curatorAddressInflight = null;
+  curatorListCache = null;
+  curatorListInflight = null;
 }

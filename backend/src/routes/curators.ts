@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { createPublicClient, http, encodeFunctionData, parseUnits, formatUnits, type Address } from 'viem';
 import { avalanche } from 'viem/chains';
 import type { CuratorDetailResponse, CuratorListResponse } from '../lib/api-types.js';
+import { getClaimMarketService } from '../services/claim-market.js';
 import { listArticlesForCurator, listCurators } from '../services/trust-graph.js';
 import { config } from '../config.js';
 
@@ -99,6 +100,7 @@ const publicClient = createPublicClient({
 type CuratorRouteDeps = {
   listCurators: typeof listCurators;
   listArticlesForCurator: typeof listArticlesForCurator;
+  getCuratorMarketActivity: (curatorAddress: string) => Promise<NonNullable<CuratorDetailResponse['marketActivity']>>;
   publicClient: {
     readContract: (args: {
       address: Address;
@@ -113,6 +115,7 @@ export function createCuratorRoutes(
   deps: CuratorRouteDeps = {
     listCurators,
     listArticlesForCurator,
+    getCuratorMarketActivity: (curatorAddress) => getClaimMarketService().getCuratorMarketActivity(curatorAddress),
     publicClient,
   },
 ) {
@@ -148,11 +151,13 @@ export function createCuratorRoutes(
       }
 
       const articles = await deps.listArticlesForCurator(curator.address);
+      const marketActivity = await deps.getCuratorMarketActivity(curator.address);
       return c.json<CuratorDetailResponse>({
         chain: 'avalanche',
         chainId: 43114,
         curator,
         articles,
+        marketActivity,
       });
     } catch (e) {
       console.error(`[curators] detail failed: ${e}`);

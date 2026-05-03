@@ -5,9 +5,11 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  deployment_status:
 
 jobs:
   validate:
+    if: github.event_name != 'deployment_status'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,3 +57,43 @@ jobs:
 
       - name: Contract tests
         run: cd contracts && forge test
+
+  deployment-smoke:
+    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Resolve smoke base URL
+        id: smoke-url
+        env:
+          ENVIRONMENT_URL: ${{ github.event.deployment_status.environment_url }}
+          TARGET_URL: ${{ github.event.deployment_status.target_url }}
+        run: |
+          url="$ENVIRONMENT_URL"
+          if [ -z "$url" ]; then
+            url="$TARGET_URL"
+          fi
+          if [ -z "$url" ]; then
+            echo "Missing deployment_status environment_url/target_url" >&2
+            exit 1
+          fi
+          echo "base_url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke deployed surfaces
+        env:
+          SMOKE_BASE_URL: ${{ steps.smoke-url.outputs.base_url }}
+          SMOKE_CURATORS_MAX_MS: '5000'
+        run: pnpm smoke:deploy

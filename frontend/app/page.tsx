@@ -1,312 +1,317 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
-import ArticleCard from "@/components/ArticleCard";
-import TrustScore from "@/components/TrustScore";
 import SiteFooter from "@/components/SiteFooter";
-import { getArticles, getCurators, type Article, type Curator } from "@/lib/api";
-import { formatBlogDate, getFeaturedPosts } from "@/lib/blog";
+import {
+  getCopyPreview,
+  getPredictionSummary,
+  type PredictionMarket,
+  type PredictionSummary,
+  type Predictor,
+  type Thesis,
+} from "@/lib/api";
 
-const whatEvaDoes = [
+const compactUsdFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
+
+const percentFormatter = new Intl.NumberFormat("en-US", {
+  style: "percent",
+  maximumFractionDigits: 0,
+});
+
+function formatUsd(value: number | null): string {
+  if (value === null) return "—";
+  return compactUsdFormatter.format(value);
+}
+
+function formatOdds(value: number): string {
+  return percentFormatter.format(value);
+}
+
+function leadingOutcome(market: PredictionMarket): { label: string; price: number } | null {
+  return [...market.outcomes].sort((left, right) => right.price - left.price)[0] ?? null;
+}
+
+function thesisMarket(thesis: Thesis, markets: PredictionMarket[]): PredictionMarket | null {
+  return markets.find((market) => market.marketId === thesis.marketId) ?? null;
+}
+
+function MarketStrip({ markets }: { markets: PredictionMarket[] }) {
+  return (
+    <div className="mobile-strip" aria-label="Trending markets">
+      {markets.map((market) => {
+        const outcome = leadingOutcome(market);
+
+        return (
+          <Link key={market.marketId} href={`/markets/${market.marketId}`} className="market-chip">
+            <span>{market.category}</span>
+            <strong>{outcome ? `${outcome.label} ${formatOdds(outcome.price)}` : "No odds"}</strong>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+const productModules = [
   {
-    title: "Curators stake to curate",
-    body: "Curators lock $EVA tokens to register on the trust graph. Staking aligns incentives: curators with skin in the game produce better signal.",
+    title: "Markets",
+    body: "External odds and closing context for the questions Eva tracks.",
   },
   {
-    title: "Eva verifies the evidence",
-    body: "When an article is submitted, Eva extracts every factual claim, checks each against on-chain and off-chain sources, and produces a scored report.",
+    title: "Theses",
+    body: "Public reasoning tied to an outcome, timestamp, and odds snapshot.",
   },
   {
-    title: "Trust compounds on-chain",
-    body: "Verification scores flow back into curator reputation via ERC-8004 registries on Avalanche. Accurate curators rise; unreliable ones fall.",
+    title: "Evidence",
+    body: "Source links and claim checks that make a prediction inspectable.",
+  },
+  {
+    title: "Predictors",
+    body: "Trust score, market record, and graph-backed identity in one profile.",
   },
 ] as const;
 
-const howItWorks = [
-  {
-    step: "01",
-    title: "Register",
-    body: "Stake $EVA on Avalanche to join the trust graph and start curating.",
-  },
-  {
-    step: "02",
-    title: "Submit",
-    body: "Post a source URL you vouch for. Eva queues it for verification.",
-  },
-  {
-    step: "03",
-    title: "Verify",
-    body: "Eva fetches the article, extracts claims, checks evidence, and stores a report to IPFS.",
-  },
-  {
-    step: "04",
-    title: "Distribute",
-    body: "Trust scores update on-chain. Higher-trust curators earn more visibility and protocol utility.",
-  },
-] as const;
+function ThesisCard({ thesis, market }: { thesis: Thesis; market: PredictionMarket | null }) {
+  const [copyState, setCopyState] = useState<string | null>(null);
+  const [copyPending, setCopyPending] = useState(false);
 
-const techStack = [
-  {
-    title: "Avalanche C-Chain",
-    body: "Fast finality and low fees for trust-graph state changes and ERC-8004 receipts.",
-  },
-  {
-    title: "ERC-8004 registries",
-    body: "Identity, reputation, and validation records that agents and apps can read across the ecosystem.",
-  },
-  {
-    title: "IPFS via Pinata",
-    body: "Verification reports are content-addressed and permanently retrievable.",
-  },
-  {
-    title: "Verification API",
-    body: "The backend exposes a stable verification endpoint now, with x402 remaining an explicit roadmap item until request verification is implemented.",
-  },
-] as const;
+  const previewCopy = async () => {
+    setCopyPending(true);
+    setCopyState(null);
 
-function truncateAddress(addr: string): string {
-  return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+    try {
+      const preview = await getCopyPreview(thesis.thesisId);
+      setCopyState(preview.venueUrl ? "External venue opened as preview." : "Copy preview recorded. No execution in v1.");
+    } catch {
+      setCopyState("Copy preview failed. Refresh and try again.");
+    } finally {
+      setCopyPending(false);
+    }
+  };
+
+  return (
+    <article className="prediction-card thesis-card">
+      <div className="card-topline">
+        <Link href={`/predictors/${thesis.authorHandle.replace(/^@/, "")}`} className="handle-link">
+          {thesis.authorHandle}
+        </Link>
+        <span>{thesis.copiedCount} copied</span>
+      </div>
+      <Link href={`/thesis/${thesis.thesisId}`} className="thesis-card-main">
+        <span className="market-label">{market?.category ?? "Market"}</span>
+        <h2>{market?.title ?? "Prediction thesis"}</h2>
+        <p>{thesis.rationale}</p>
+      </Link>
+      <div className="odds-row">
+        <div>
+          <span>Outcome</span>
+          <strong>{thesis.selectedOutcomeLabel}</strong>
+        </div>
+        <div>
+          <span>Posted</span>
+          <strong>{formatOdds(thesis.oddsAtPost)}</strong>
+        </div>
+        <div>
+          <span>Now</span>
+          <strong>{formatOdds(thesis.currentOdds)}</strong>
+        </div>
+      </div>
+      <div className="sticky-action-row">
+        <button className="mobile-action mobile-action-primary" type="button" onClick={previewCopy} disabled={copyPending}>
+          {copyPending ? "Preparing…" : "Copy Thesis"}
+        </button>
+        <Link className="mobile-action" href={`/compose?counterTo=${thesis.thesisId}`}>
+          Counter
+        </Link>
+      </div>
+      {copyState ? <p className="inline-note" role="status" aria-live="polite">{copyState}</p> : null}
+    </article>
+  );
+}
+
+function PredictorRow({ predictor }: { predictor: Predictor }) {
+  return (
+    <Link href={`/predictors/${predictor.predictorId}`} className="predictor-row">
+      <div>
+        <strong>{predictor.handle}</strong>
+        <span>{predictor.profileState === "registered" ? "Graph-backed" : "Unclaimed X profile"}</span>
+      </div>
+      <div className="predictor-score">
+        <strong>{predictor.trustScore}</strong>
+        <span>{predictor.accuracy === null ? "pending" : `${predictor.accuracy}% acc`}</span>
+      </div>
+    </Link>
+  );
 }
 
 export default function HomePage() {
-  const [articleCount, setArticleCount] = useState(0);
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [curators, setCurators] = useState<Curator[]>([]);
+  const [summary, setSummary] = useState<PredictionSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const [articleResponse, curatorResponse] = await Promise.all([
-          getArticles({ limit: 4 }),
-          getCurators(),
-        ]);
-
-        setArticleCount(articleResponse.count);
-        setArticles(articleResponse.articles);
-        setCurators(curatorResponse.curators);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    load();
+    getPredictionSummary()
+      .then(setSummary)
+      .catch((reason) => setError(reason instanceof Error ? reason.message : "Failed to load prediction network."))
+      .finally(() => setLoading(false));
   }, []);
 
-  const avgTrust = useMemo(() => {
-    if (curators.length === 0) return null;
-    return Math.round(curators.reduce((sum, curator) => sum + curator.trustScore, 0) / curators.length);
-  }, [curators]);
-
-  const featuredCurators = curators.slice(0, 5);
-  const featuredPost = getFeaturedPosts()[0] ?? null;
+  const markets = summary?.markets ?? [];
+  const theses = summary?.theses ?? [];
+  const predictors = summary?.predictors ?? [];
+  const leadThesis = theses[0] ?? null;
+  const leadMarket = leadThesis ? thesisMarket(leadThesis, markets) : null;
 
   return (
     <>
       <Nav />
-
-      <main className="page-shell">
-        {/* ── Hero ── */}
-        <section className="hero hero-grid">
-          <div>
-            <span className="hero-kicker">Live on Avalanche</span>
-            <h1 className="hero-title">
-              News curation backed by stake, scored by evidence.
-            </h1>
-            <p className="hero-sub">
-              Eva Protocol is a trust-weighted social news network. Curators stake $EVA to back
-              sources, Eva verifies every claim against real evidence, and accuracy compounds into
-              on-chain reputation that drives what surfaces in the feed.
-            </p>
-            <div className="hero-actions">
-              <Link href="/verify" className="btn btn-primary">
-                Verify an article
-              </Link>
-              <Link href="/curators/register" className="btn btn-ghost">
-                Become a curator
-              </Link>
-              <Link href="/curators" className="btn btn-ghost">
-                Explore curators
-              </Link>
-              <Link href="/about" className="btn btn-ghost">
-                How it works
-              </Link>
-            </div>
-          </div>
-
-          <aside className="surface hero-panel">
-            <p className="hero-panel-kicker">Eva in one minute</p>
-            <ul className="hero-checklist">
-              <li>Curators stake $EVA and submit articles they vouch for.</li>
-              <li>Eva extracts factual claims and checks them against on-chain and web evidence.</li>
-              <li>Scored reports go to IPFS; trust updates go to Avalanche via ERC-8004.</li>
-              <li>The feed ranks by curator accuracy, not engagement.</li>
-            </ul>
-          </aside>
-        </section>
-
-        {/* ── Live stats ── */}
-        <section className="grid-3 stats-grid-home">
-          <div className="surface stat-card home-stat-card">
-            <span className="stat-value">{articleCount || "—"}</span>
-            <span className="stat-label">Verified articles</span>
-          </div>
-          <div className="surface stat-card home-stat-card">
-            <span className="stat-value">{curators.length || "—"}</span>
-            <span className="stat-label">Registered curators</span>
-          </div>
-          <div className="surface stat-card home-stat-card">
-            <span className="stat-value">{avgTrust ?? "—"}</span>
-            <span className="stat-label">Average trust score</span>
-          </div>
-        </section>
-
-        {/* ── What Eva does ── */}
-        <section style={{ marginTop: 40 }}>
-          <p className="section-kicker">The product</p>
-          <h2 className="section-title">What Eva actually does</h2>
-          <div className="grid-3" style={{ marginTop: 16 }}>
-            {whatEvaDoes.map((card) => (
-              <article key={card.title} className="surface built-card">
-                <h3>{card.title}</h3>
-                <p>{card.body}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        {/* ── How it works ── */}
-        <section style={{ marginTop: 44 }}>
-          <p className="section-kicker">Workflow</p>
-          <h2 className="section-title">From article to trust update in four steps</h2>
-          <div className="grid-2" style={{ marginTop: 16 }}>
-            {howItWorks.map((item) => (
-              <article key={item.step} className="surface step-card">
-                <h3>
-                  <span className="icon-pill">{item.step}</span>
-                  {item.title}
-                </h3>
-                <p>{item.body}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        {/* ── Differentiator callout ── */}
-        <section className="surface callout" style={{ marginTop: 40 }}>
-          <h3>Why not just another feed?</h3>
+      <main id="main-content" className="mobile-shell prediction-home">
+        <section className="mobile-hero">
+          <p className="eyebrow">Prediction OS</p>
+          <h1>Track markets, publish theses, follow predictor reputation.</h1>
           <p>
-            Most feeds optimize for engagement. Eva optimizes for verified accuracy. Curators don&apos;t just
-            post — they stake capital, build measurable track records, and become trusted information sources
-            for both humans and AI agents.
+            Eva connects external odds, thesis pages, evidence, and trust scores in one product surface.
           </p>
-        </section>
-
-        {/* ── Tech stack ── */}
-        <section style={{ marginTop: 44 }}>
-          <p className="section-kicker">Infrastructure</p>
-          <h2 className="section-title">What Eva is built on</h2>
-          <div className="grid-2" style={{ marginTop: 16 }}>
-            {techStack.map((item) => (
-              <article key={item.title} className="surface built-card">
-                <h3>{item.title}</h3>
-                <p>{item.body}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        {featuredPost ? (
-          <section className="blog-home-section">
-            <div className="section-heading-row">
-              <div>
-                <p className="section-kicker">Journal</p>
-                <h2 className="section-title section-title-sm">One plain-English note on Eva</h2>
-              </div>
-              <Link href="/blog" className="section-link">View blog</Link>
-            </div>
-
-            <p className="blog-home-intro">
-              A minimal editorial layer for explaining the product clearly, without turning the site into a content farm.
-            </p>
-
-            <Link href={`/blog/${featuredPost.slug}`} className="surface blog-feature-card blog-feature-card-home">
-              <div className="blog-feature-accent" aria-hidden />
-              <div className="blog-meta-row">
-                <span className="blog-meta-pill">Featured post</span>
-                <span>{formatBlogDate(featuredPost.publishedAt)}</span>
-                <span>{featuredPost.readingTime}</span>
-              </div>
-              <h3 className="blog-feature-title">{featuredPost.title}</h3>
-              <p className="blog-feature-excerpt">{featuredPost.excerpt}</p>
-              <span className="blog-feature-cta">Read the post →</span>
+          <div className="mobile-hero-actions">
+            <Link href="/compose" className="mobile-action mobile-action-primary">
+              Make a thesis
             </Link>
-          </section>
-        ) : null}
-
-        {/* ── Latest articles ── */}
-        <section className="home-section-split" style={{ marginTop: 44 }}>
-          <div>
-            <div className="section-heading-row">
-              <div>
-                <p className="section-kicker">Live feed</p>
-                <h2 className="section-title section-title-sm">Latest verified articles</h2>
-              </div>
-              <Link href="/articles" className="section-link">View all</Link>
-            </div>
-
-            {loading ? (
-              <div className="loading-state">
-                <div className="loading-spinner" />
-              </div>
-            ) : articles.length === 0 ? (
-              <p className="empty-copy">No verified articles yet.</p>
-            ) : (
-              <div className="grid-2" style={{ marginTop: 16 }}>
-                {articles.map((article) => (
-                  <ArticleCard key={article.id} article={article} />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* ── Top curators ── */}
-          <div>
-            <div className="section-heading-row">
-              <div>
-                <p className="section-kicker">Leaderboard</p>
-                <h2 className="section-title section-title-sm">Top curators</h2>
-              </div>
-              <Link href="/curators" className="section-link">See all</Link>
-            </div>
-
-            {loading ? (
-              <div className="loading-state">
-                <div className="loading-spinner" />
-              </div>
-            ) : featuredCurators.length === 0 ? (
-              <p className="empty-copy">No curators registered yet.</p>
-            ) : (
-              <div className="curator-list" style={{ marginTop: 16 }}>
-                {featuredCurators.map((curator) => (
-                  <Link key={curator.address} href={`/curator/${curator.address}`} className="curator-card surface">
-                    <TrustScore score={curator.trustScore} size={56} />
-                    <div className="curator-card-info">
-                      <h3 className="curator-card-address">{truncateAddress(curator.address)}</h3>
-                      <div className="curator-card-meta">
-                        <span>Agent #{curator.curatorAgentId.toString()}</span>
-                        <span>{curator.articleCount} articles</span>
-                        <span>Trust {curator.trustScore}</span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+            <Link href="/markets" className="mobile-action">
+              Browse markets
+            </Link>
           </div>
         </section>
+
+        {loading ? (
+          <div className="loading-state">
+            <div className="loading-spinner" />
+          </div>
+        ) : error || !summary ? (
+          <section className="prediction-card">
+            <h2>Network unavailable</h2>
+            <p>{error ?? "Eva could not load prediction activity."}</p>
+          </section>
+        ) : (
+          <>
+            <section className="mobile-metrics">
+              <div>
+                <strong>{summary.stats.weeklyActivePredictors}</strong>
+                <span>active predictors</span>
+              </div>
+              <div>
+                <strong>{summary.stats.openThesisCount}</strong>
+                <span>open theses</span>
+              </div>
+              <div>
+                <strong>{summary.stats.copiedThesisEvents}</strong>
+                <span>copied theses</span>
+              </div>
+            </section>
+
+            <MarketStrip markets={markets} />
+
+            <section className="lead-thesis">
+              <div className="section-heading-row prediction-heading">
+                <div>
+                  <p className="section-kicker">Featured thesis</p>
+                  <h2 className="section-title section-title-sm">Most copied thesis</h2>
+                </div>
+                <Link href="/markets" className="section-link">
+                  See all
+                </Link>
+              </div>
+              {leadThesis ? (
+                <ThesisCard thesis={leadThesis} market={leadMarket} />
+              ) : (
+                <article className="prediction-card empty-state-card">
+                  <h2>No Featured Thesis</h2>
+                  <p>Publish a thesis to create the first featured market record.</p>
+                </article>
+              )}
+            </section>
+
+            <section className="prediction-section">
+              <div className="section-heading-row prediction-heading">
+                <div>
+                  <p className="section-kicker">Markets</p>
+                  <h2 className="section-title section-title-sm">Where the network is focused</h2>
+                </div>
+                <Link href="/markets" className="section-link">
+                  Markets
+                </Link>
+              </div>
+              {markets.length > 0 ? (
+                <div className="market-list-mobile">
+                  {markets.map((market) => (
+                    <Link key={market.marketId} href={`/markets/${market.marketId}`} className="market-row">
+                      <div>
+                        <span>{market.category}</span>
+                        <strong>{market.title}</strong>
+                      </div>
+                      <div>
+                        <span>Vol</span>
+                        <strong>{formatUsd(market.volumeUsd)}</strong>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <article className="prediction-card empty-state-card">
+                  <h2>No Markets Loaded</h2>
+                  <p>Refresh or check the API connection.</p>
+                </article>
+              )}
+            </section>
+
+            <section className="prediction-section">
+              <div className="section-heading-row prediction-heading">
+                <div>
+                  <p className="section-kicker">Predictors</p>
+                  <h2 className="section-title section-title-sm">Trust graph plus market record</h2>
+                </div>
+                <Link href="/predictors" className="section-link">
+                  Rankings
+                </Link>
+              </div>
+              {predictors.length > 0 ? (
+                <div className="predictor-list">
+                  {predictors.map((predictor) => (
+                    <PredictorRow key={predictor.predictorId} predictor={predictor} />
+                  ))}
+                </div>
+              ) : (
+                <article className="prediction-card empty-state-card">
+                  <h2>No Predictors Yet</h2>
+                  <p>Published theses will create predictor records.</p>
+                </article>
+              )}
+            </section>
+
+            <section className="prediction-section product-system">
+              <div className="section-heading-row prediction-heading">
+                <div>
+                  <p className="section-kicker">Product system</p>
+                  <h2 className="section-title section-title-sm">One workflow for market reasoning</h2>
+                </div>
+              </div>
+              <div className="product-module-grid">
+                {productModules.map((module) => (
+                  <article key={module.title} className="product-module">
+                    <h3>{module.title}</h3>
+                    <p>{module.body}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
 
         <SiteFooter />
       </main>

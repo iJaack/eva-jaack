@@ -7,12 +7,10 @@ import ThemeToggle from "./ThemeToggle";
 
 const navItems: readonly { href: string; label: string; exact?: boolean; highlight?: boolean }[] = [
   { href: "/", label: "Home", exact: true },
+  { href: "/markets", label: "Markets" },
+  { href: "/compose", label: "Compose" },
+  { href: "/predictors", label: "Predictors" },
   { href: "/blog", label: "Blog" },
-  { href: "/articles", label: "Feed" },
-  { href: "/curators", label: "Curators" },
-  { href: "/verify", label: "Verify" },
-  { href: "/about", label: "About" },
-  { href: "/evalanche", label: "Evalanche", highlight: true },
 ];
 
 export default function Nav() {
@@ -21,11 +19,14 @@ export default function Nav() {
 
   return (
     <header className="topbar">
+      <a href="#main-content" className="skip-link">
+        Skip to Content
+      </a>
       <Link href="/" className="brand" style={{ textDecoration: "none" }} onClick={() => setMenuOpen(false)}>
         <div className="brand-mark" aria-hidden />
         <div className="brand-text">
-          <span className="brand-title">Eva Protocol</span>
-          <span className="brand-sub">Trust-weighted news on Avalanche</span>
+          <span className="brand-title">Eva Predicts</span>
+          <span className="brand-sub">reputation OS</span>
         </div>
       </Link>
 
