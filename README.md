@@ -70,6 +70,25 @@ Vercel is the canonical deployment target.
 - API: routed through `/api/*` and `/.well-known/*`
 - GitHub Pages is retired and should not be used for production builds
 
+### Verification-market contract deployment
+
+The production verification-market rollout is additive. Do not run `DeployFuji.s.sol` on mainnet
+unless you explicitly want a fresh trust graph. Use `contracts/script/DeployMainnetMarket.s.sol`
+to deploy `EvaVerificationMarket` and `EvaVerificationReputationAdapter` against the existing
+`EvaTrustGraph` proxy.
+
+Dry-run from the recorded deployer:
+
+```bash
+cd contracts
+forge script script/DeployMainnetMarket.s.sol:DeployMainnetMarket \
+  --rpc-url "$AVALANCHE_RPC" \
+  --sender 0x0fe61780bd5508b3C99e420662050e5560608cA4
+```
+
+Broadcast with the sovereign signing path, then update `protocol.config.json`,
+`contracts/deployments/mainnet.json`, and production env vars before flipping `market.enabled=true`.
+
 ## X verification channel
 
 Eva treats X as the distribution channel for the trust graph:

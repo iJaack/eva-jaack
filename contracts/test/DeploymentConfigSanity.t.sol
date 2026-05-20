@@ -12,6 +12,19 @@ contract DeploymentConfigSanityTest is Test {
         assertTrue(_contains(script, "computeCreateAddress"), "market/adapter address wiring should be explicit");
     }
 
+    function testMainnetMarketDeployScriptIsAdditiveOnly() external view {
+        string memory script = vm.readFile("script/DeployMainnetMarket.s.sol");
+
+        assertTrue(_contains(script, "Avalanche mainnet only"), "mainnet chain guard missing");
+        assertTrue(_contains(script, "EVA_DEPLOYER"), "sender override missing");
+        assertTrue(_contains(script, "DEFAULT_TRUST_GRAPH"), "existing trust graph constant missing");
+        assertTrue(_contains(script, "EVA_TRUST_GRAPH"), "trust graph env override missing");
+        assertTrue(_contains(script, "EvaVerificationMarket"), "market deployment missing");
+        assertTrue(_contains(script, "EvaVerificationReputationAdapter"), "adapter deployment missing");
+        assertTrue(_contains(script, "computeCreateAddress"), "market/adapter address wiring should be explicit");
+        assertFalse(_contains(script, "new EvaTrustGraph"), "mainnet market deploy must not deploy a new graph");
+    }
+
     function testMainnetDeploymentConfigHasRequiredTrustGraphAndRegistryAddresses() external view {
         string memory deployment = vm.readFile("deployments/mainnet.json");
 
