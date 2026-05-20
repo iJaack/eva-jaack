@@ -63,15 +63,15 @@
 - [ ] If yes, implement real request verification before re-enabling payment-required claims
 - [ ] Expand durable storage strategy for verification reports beyond local filesystem mode
 - [ ] Document the exact Vercel project configuration used in production
-- [ ] Add a contract regression test covering article ID sequencing and onboarding assumptions
+- [x] Add a contract regression test covering article ID sequencing and onboarding assumptions
 - [ ] Additive X-channel verification market
-  - [ ] shared config for X handles, market timing, resolver, treasury, and deployment placeholders
-  - [ ] `EvaVerificationMarket` contract with funding, staking, challenge, settlement, and reward claim flows
-  - [ ] trust-graph reputation adapter boundary
-  - [ ] claim-market backend APIs and persistence
+  - [x] shared config for X handles, market timing, resolver, treasury, and deployed addresses
+  - [x] `EvaVerificationMarket` contract with funding, staking, challenge, settlement, and reward claim flows
+  - [x] trust-graph reputation adapter boundary
+  - [x] claim-market backend APIs and persistence
   - [ ] X mention ingestion and publishing services
-  - [ ] claim pages and curator market participation UI
-  - [ ] rollout flags, smoke tests, and operational playbooks
+  - [x] claim pages and curator market participation UI
+  - [x] rollout flags, smoke tests, and operational playbooks
 
 ## Rules
 

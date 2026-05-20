@@ -36,7 +36,7 @@ Frontend, backend, and generated ABI output all consume the same canonical value
 
 - Avalanche C-Chain (`43114`)
 - `EvaTrustGraph`: `0xE84DdD5A03Fa4210c4217436afD2556B348A40a0`
-- `EvaVerificationMarket`: configured as an additive module and not yet deployed in production
+- `EvaVerificationMarket`: `0xfA6893410f19A2c2FC4dd7FA6DB2986de4D3bdad`
 - Eva oracle agent ID: `1599`
 - Site URL: `https://eva.jaack.me`
 
@@ -73,9 +73,9 @@ Vercel is the canonical deployment target.
 ### Verification-market contract deployment
 
 The production verification-market rollout is additive. Do not run `DeployFuji.s.sol` on mainnet
-unless you explicitly want a fresh trust graph. Use `contracts/script/DeployMainnetMarket.s.sol`
-to deploy `EvaVerificationMarket` and `EvaVerificationReputationAdapter` against the existing
-`EvaTrustGraph` proxy.
+unless you explicitly want a fresh trust graph. `EvaVerificationMarket` and
+`EvaVerificationReputationAdapter` were deployed against the existing `EvaTrustGraph` proxy from
+the Evalanche sovereign wallet on May 20, 2026.
 
 Dry-run from the recorded deployer:
 
@@ -86,8 +86,9 @@ forge script script/DeployMainnetMarket.s.sol:DeployMainnetMarket \
   --sender 0x0fe61780bd5508b3C99e420662050e5560608cA4
 ```
 
-Broadcast with the sovereign signing path, then update `protocol.config.json`,
-`contracts/deployments/mainnet.json`, and production env vars before flipping `market.enabled=true`.
+If a redeploy is needed, broadcast with the sovereign signing path, then update
+`protocol.config.json`, `contracts/deployments/mainnet.json`, and production env vars before
+shipping the updated runtime.
 
 ## X verification channel
 

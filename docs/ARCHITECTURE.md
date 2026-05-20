@@ -54,7 +54,7 @@ future scope.
 | Prediction theses | Offchain v1 product objects | They can be tracked, shared, countered, and resolved before graph promotion. |
 | Claim bundles | Offchain v1 evidence objects | They structure claims, deadlines, sources, conflicts, resolver context, dispute windows, and outcomes. |
 | X command surface | Configured as `@evapredicts` | Automation and posting require approval and operational access. |
-| Verification market | Placeholder only | `protocol.config.json` has zero addresses and `market.enabled=false`. |
+| Verification market | Live additive module | `EvaVerificationMarket` and `EvaVerificationReputationAdapter` are configured in `protocol.config.json` with `market.enabled=true`. |
 | Native trading/execution | Out of scope | Eva links out; it does not trade or custody user funds. |
 
 ## Canonical state
@@ -82,8 +82,8 @@ Future additive verification-market modules may become source of truth for:
 - challenge state
 - claim settlement outcomes
 
-Those modules are not production-live while their configured addresses are zero and
-`market.enabled=false`.
+Those modules are production-live while their configured addresses are non-zero and
+`market.enabled=true`.
 
 ERC-8004 registries remain part of the trust boundary for:
 

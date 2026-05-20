@@ -21,8 +21,8 @@
     "erc8004Reputation": "0x8004BAa17C55a88189AE136b182e5fdA19dE9b63",
     "erc8004Validation": "0x5c2B454E34C8E173909EB36FC07DE6143A24ab47",
     "evaTrustGraph": "0xE84DdD5A03Fa4210c4217436afD2556B348A40a0",
-    "evaVerificationMarket": "0x0000000000000000000000000000000000000000",
-    "evaVerificationReputationAdapter": "0x0000000000000000000000000000000000000000"
+    "evaVerificationMarket": "0xfA6893410f19A2c2FC4dd7FA6DB2986de4D3bdad",
+    "evaVerificationReputationAdapter": "0xbEF19ce1451b9a01eE47405E4cfbb31FbA52DF37"
   },
   "agents": {
     "eva": {
@@ -39,11 +39,11 @@
     }
   },
   "market": {
-    "enabled": false,
+    "enabled": true,
     "reviewWindowSeconds": 3600,
     "challengeWindowSeconds": 14400,
     "resolverAddress": "0x0fE61780BD5508b3C99E420662050E5560608cA4",
-    "treasuryAddress": "0x0000000000000000000000000000000000000000",
+    "treasuryAddress": "0x0fe61780bd5508b3C99e420662050e5560608cA4",
     "sourcePlatforms": ["x", "web", "manual"]
   },
   "verifyApi": {
