@@ -44,9 +44,6 @@ export default function EvalanchePage() {
       </nav>
 
       <header className="ev-hero">
-        <div className="ev-hero-bg" aria-hidden="true" />
-        <div className="ev-hero-grid" aria-hidden="true" />
-
         <div className="ev-hero-body">
           <div className="ev-hero-left">
             <div className="ev-logo-icon">E</div>
@@ -69,11 +66,8 @@ export default function EvalanchePage() {
             </div>
           </div>
 
-          <div className="ev-hero-code">
-            <div className="ev-code-bar">
-              <span className="ev-dot" /><span className="ev-dot" /><span className="ev-dot" />
-              <span className="ev-code-title">evalanche-v1.5.2.ts</span>
-            </div>
+          <figure className="ev-hero-code">
+            <figcaption className="ev-code-title">evalanche-v1.5.2.ts</figcaption>
             <pre className="ev-code-body"><code>{`const { agent } = await Evalanche.boot({ network: 'avalanche' });
 
 const quote = await agent.swap({
@@ -90,7 +84,7 @@ const markets = await agent.coinGecko().markets({
   order: 'market_cap_desc',
   per_page: 10,
 });`}</code></pre>
-          </div>
+          </figure>
         </div>
       </header>
 

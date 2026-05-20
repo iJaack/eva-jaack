@@ -1,0 +1,18 @@
+[
+  {
+    "date": "2026-05-20",
+    "macrostructure": "Index-First",
+    "theme": "Quiet",
+    "theme_axes": "light paper / system-native / cool accent",
+    "enrichment": "none",
+    "brief": "Essential minimal Eva Protocol frontend redesign across shared app shell and product surfaces"
+  },
+  {
+    "date": "2026-05-20",
+    "macrostructure": "Operator Console",
+    "theme": "custom",
+    "theme_axes": "cool paper / technical product desk / glacial cyan",
+    "enrichment": "none",
+    "brief": "Production-grade Eva Protocol frontend surface upgrade across prediction and evidence workflows"
+  }
+]

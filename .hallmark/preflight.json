@@ -1,0 +1,16 @@
+{
+  "scannedAt": "2026-05-20",
+  "framework": "Next.js app router",
+  "styling": "Tailwind 3 installed; product surface primarily uses frontend/app/globals.css",
+  "fontStack": "Space Grotesk + Manrope fallbacks in globals.css; Tailwind config declares display/body/mono stacks",
+  "palette": "Migrated to frontend/tokens.css OKLCH product tokens while preserving legacy variable aliases",
+  "motion": "Motion-cut: no framer-motion/gsap/motion dependency detected",
+  "spacing": "4px semantic token scale added in frontend/tokens.css",
+  "preserve": [
+    "Next.js app router",
+    "existing route tree",
+    "existing API client contracts",
+    "Eva logo assets",
+    "dark/light theme toggle behavior"
+  ]
+}

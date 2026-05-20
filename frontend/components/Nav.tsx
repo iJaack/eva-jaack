@@ -6,11 +6,11 @@ import { useState } from "react";
 import ThemeToggle from "./ThemeToggle";
 
 const navItems: readonly { href: string; label: string; exact?: boolean; highlight?: boolean }[] = [
-  { href: "/", label: "Home", exact: true },
   { href: "/markets", label: "Markets" },
   { href: "/compose", label: "Compose" },
   { href: "/predictors", label: "Predictors" },
   { href: "/verify", label: "Verify" },
+  { href: "/claims", label: "Claims" },
   { href: "/blog", label: "Blog" },
 ];
 
@@ -34,20 +34,6 @@ export default function Nav() {
           <span className="brand-sub">reputation OS</span>
         </div>
       </Link>
-
-      <div className="topbar-actions">
-        <ThemeToggle />
-        <button
-          className="nav-hamburger"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-          aria-expanded={menuOpen}
-        >
-          <span className={`hamburger-line ${menuOpen ? "open" : ""}`} />
-          <span className={`hamburger-line ${menuOpen ? "open" : ""}`} />
-          <span className={`hamburger-line ${menuOpen ? "open" : ""}`} />
-        </button>
-      </div>
 
       <nav className={`nav-links ${menuOpen ? "nav-open" : ""}`}>
         {navItems.map((item) => {
@@ -78,6 +64,23 @@ export default function Nav() {
           );
         })}
       </nav>
+
+      <div className="topbar-actions">
+        <ThemeToggle />
+        <Link href="/curators/register" className="nav-edge-cta" onClick={() => setMenuOpen(false)}>
+          Register
+        </Link>
+        <button
+          className="nav-hamburger"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+          aria-expanded={menuOpen}
+        >
+          <span className={`hamburger-line ${menuOpen ? "open" : ""}`} />
+          <span className={`hamburger-line ${menuOpen ? "open" : ""}`} />
+          <span className={`hamburger-line ${menuOpen ? "open" : ""}`} />
+        </button>
+      </div>
     </header>
   );
 }
