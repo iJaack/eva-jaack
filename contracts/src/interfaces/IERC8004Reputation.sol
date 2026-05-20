@@ -32,7 +32,15 @@ interface IERC8004Reputation {
     )
         external
         view
-        returns (address[] memory, uint64[] memory, int128[] memory, uint8[] memory, string[] memory, string[] memory, bool[] memory);
+        returns (
+            address[] memory,
+            uint64[] memory,
+            int128[] memory,
+            uint8[] memory,
+            string[] memory,
+            string[] memory,
+            bool[] memory
+        );
 
     function getClients(uint256 agentId) external view returns (address[] memory);
 

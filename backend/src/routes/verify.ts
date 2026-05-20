@@ -18,7 +18,12 @@ export function createVerifyRoutes(
   const verifyRoutes = new Hono();
 
   verifyRoutes.post('/', async (c) => {
-    const body = await c.req.json<{ url?: string; content?: string }>();
+    let body: { url?: string; content?: string };
+    try {
+      body = await c.req.json<{ url?: string; content?: string }>();
+    } catch {
+      return c.json({ error: 'Invalid JSON body' }, 400);
+    }
 
     if (!body.url) {
       return c.json({ error: 'Missing required field: url' }, 400);

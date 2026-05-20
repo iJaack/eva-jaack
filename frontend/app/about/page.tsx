@@ -10,25 +10,25 @@ const flowSteps = [
   {
     title: "Predictors post theses",
     description: "A thesis records the market, selected outcome, odds snapshot, rationale, and source context.",
-    tone: "138, 216, 192",
+    toneClass: "tone-mint",
     icon: "1",
   },
   {
     title: "Eva stores the record",
     description: "Markets, theses, counters, source links, and copy intent stay readable in the product surface.",
-    tone: "133, 203, 218",
+    toneClass: "tone-sky",
     icon: "2",
   },
   {
     title: "Evidence supports calls",
     description: "Source verification and claim pages remain useful when they make a prediction easier to inspect.",
-    tone: "156, 183, 235",
+    toneClass: "tone-periwinkle",
     icon: "3",
   },
   {
     title: "Trust compounds later",
     description: "Resolved outcomes can feed graph-backed reputation when a predictor links an Eva identity.",
-    tone: "243, 154, 142",
+    toneClass: "tone-coral",
     icon: "4",
   },
 ] as const;
@@ -60,17 +60,17 @@ const builtOn = [
   {
     title: "Avalanche C-Chain",
     description: "Fast finality and predictable fees for trust-graph staking and evidence-linked state changes.",
-    tone: "133, 203, 218",
+    toneClass: "tone-sky",
   },
   {
     title: "ERC-8004 registries",
     description: "Identity, validation, and reputation receipts remain legible to other agent-native tools and services.",
-    tone: "178, 149, 206",
+    toneClass: "tone-periwinkle",
   },
   {
     title: "Provider abstractions",
     description: "LLM (Anthropic/gateway), storage (Pinata/local), and signer (private-key/Evalanche) swap without touching the pipeline.",
-    tone: "198, 244, 89",
+    toneClass: "tone-lime",
   },
 ] as const;
 
@@ -102,7 +102,7 @@ export default function AboutPage() {
           <h1 className="hero-title">EvaTrustGraph now backs prediction reputation.</h1>
           <p className="hero-sub">
             Eva is a product surface for markets, theses, evidence, and predictor records. The trust primitive
-            underneath is durable identity, stake, and reputation for people who earn trust.
+            underneath is durable identity, stake, and reputation for people who earn trust. Market odds are forecasts; resolution status is tracked separately.
           </p>
           <div className="hero-actions">
             <Link href="/markets" className="btn btn-primary">
@@ -114,7 +114,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="protocol-stats grid-3" style={{ marginTop: "18px" }}>
+        <section className="protocol-stats grid-3">
           <div className="surface stat-card">
             <span className="stat-value">{articleCount ?? "—"}</span>
             <span className="stat-label">Source reports</span>
@@ -129,15 +129,14 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section style={{ marginTop: "40px" }}>
+        <section className="route-section">
           <p className="section-kicker">How it works</p>
           <h2 className="section-title">Four steps from market call to trust update</h2>
-          <div className="grid-2" style={{ marginTop: "16px" }}>
+          <div className="grid-2 section-grid">
             {flowSteps.map((step) => (
               <article
                 key={step.title}
-                className="surface step-card"
-                style={{ background: `linear-gradient(145deg, rgba(${step.tone}, 0.22), rgba(255, 255, 255, 0.88))` }}
+                className={`surface step-card ${step.toneClass}`}
               >
                 <h3>
                   <span className="icon-pill">{step.icon}</span>
@@ -149,10 +148,10 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section style={{ marginTop: "44px" }}>
+        <section className="route-section">
           <p className="section-kicker">Current product surface</p>
           <h2 className="section-title">What the product shows</h2>
-          <div className="grid-2" style={{ marginTop: "16px" }}>
+          <div className="grid-2 section-grid">
             {productSurface.map((item) => (
               <article key={item.primitive} className="surface built-card">
                 <h3>
@@ -164,15 +163,14 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section style={{ marginTop: "44px" }}>
+        <section className="route-section">
           <p className="section-kicker">Built on</p>
           <h2 className="section-title">Composable infrastructure, cleaner architecture</h2>
-          <div className="grid-3" style={{ marginTop: "16px" }}>
+          <div className="grid-3 section-grid">
             {builtOn.map((item) => (
               <article
                 key={item.title}
-                className="surface built-card"
-                style={{ background: `linear-gradient(145deg, rgba(${item.tone}, 0.18), rgba(255, 255, 255, 0.9))` }}
+                className={`surface built-card ${item.toneClass}`}
               >
                 <h3>{item.title}</h3>
                 <p>{item.description}</p>

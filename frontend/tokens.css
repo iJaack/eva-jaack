@@ -1,0 +1,136 @@
+/* Hallmark · macrostructure: Operator Console · tone: precise product desk · anchor hue: glacial-cyan */
+:root {
+  --font-display: "Space Grotesk", "Manrope", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-body: "Manrope", "Space Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --color-paper: oklch(98.8% 0.008 205);
+  --color-paper-2: oklch(96.4% 0.018 205);
+  --color-paper-3: oklch(92.5% 0.025 205);
+  --color-ink: oklch(17% 0.018 240);
+  --color-muted: color-mix(in oklch, var(--color-ink) 68%, transparent);
+  --color-subtle: color-mix(in oklch, var(--color-ink) 12%, transparent);
+  --color-surface: color-mix(in oklch, var(--color-paper) 92%, transparent);
+  --color-surface-strong: color-mix(in oklch, var(--color-paper) 96%, var(--color-ink) 4%);
+  --color-accent: oklch(63% 0.12 208);
+  --color-accent-strong: oklch(48% 0.11 212);
+  --color-accent-soft: color-mix(in oklch, var(--color-accent) 16%, transparent);
+  --color-mint: oklch(78% 0.085 166);
+  --color-lime: oklch(87% 0.16 124);
+  --color-coral: oklch(75% 0.12 31);
+  --color-sky: oklch(75% 0.095 212);
+  --color-periwinkle: oklch(74% 0.09 267);
+  --color-lavender: oklch(72% 0.09 308);
+  --color-success: oklch(55% 0.11 153);
+  --color-warning: oklch(63% 0.13 76);
+  --color-caution: oklch(59% 0.13 49);
+  --color-danger: oklch(53% 0.17 27);
+  --color-provider-polymarket: oklch(58% 0.18 257);
+  --color-provider-kalshi: oklch(59% 0.14 156);
+  --color-avalanche: oklch(59% 0.21 24);
+  --color-rule: color-mix(in oklch, var(--color-ink) 14%, transparent);
+  --color-focus: var(--color-accent-strong);
+
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 72px;
+
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 38px;
+  --text-display-s: 52px;
+  --text-display: 72px;
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+  --rule-hairline: 1px solid var(--color-rule);
+  --shadow-wide: 0 44px 110px color-mix(in oklch, var(--color-ink) 10%, transparent);
+  --shadow-float: 0 18px 48px color-mix(in oklch, var(--color-ink) 9%, transparent);
+  --shadow-soft: 0 10px 30px color-mix(in oklch, var(--color-ink) 7%, transparent);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 120ms;
+  --dur-mid: 180ms;
+  --dur-slow: 260ms;
+
+  --bg0: var(--color-paper);
+  --ink: var(--color-ink);
+  --muted: var(--color-muted);
+  --faint: var(--color-rule);
+  --card: var(--color-surface);
+  --card2: var(--color-surface-strong);
+  --p-mint: var(--color-mint);
+  --p-lime: var(--color-lime);
+  --p-coral: var(--color-coral);
+  --p-sky: var(--color-sky);
+  --p-peri: var(--color-periwinkle);
+  --p-lav: var(--color-lavender);
+  --radius: var(--radius-sm);
+  --pad: clamp(16px, 3.5vw, 72px);
+  --max: 1508px;
+  --mono: var(--font-mono);
+  --accent: var(--color-accent-strong);
+  --topbar-bg: color-mix(in oklch, var(--color-paper) 88%, transparent);
+  --nav-dropdown-bg: color-mix(in oklch, var(--color-paper) 96%, transparent);
+  --nav-dropdown-shadow: var(--shadow-soft);
+  --hero-kicker-bg: color-mix(in oklch, var(--color-paper) 82%, transparent);
+  --btn-ghost-bg: color-mix(in oklch, var(--color-paper) 82%, transparent);
+  --surface-muted-bg: color-mix(in oklch, var(--color-paper) 86%, transparent);
+  --diagram-bg: color-mix(in oklch, var(--color-paper) 76%, transparent);
+  --formula-bg: color-mix(in oklch, var(--color-ink) 4%, transparent);
+  --grid-line-h: color-mix(in oklch, var(--color-ink) 5%, transparent);
+  --grid-line-v: color-mix(in oklch, var(--color-ink) 4%, transparent);
+  --detail-link: var(--color-accent-strong);
+  --nav-active-bg: var(--color-accent-soft);
+  --nav-active-border: color-mix(in oklch, var(--color-accent) 48%, transparent);
+  --nav-active-color: var(--color-accent-strong);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-paper: oklch(16% 0.014 240);
+    --color-paper-2: oklch(20% 0.018 240);
+    --color-paper-3: oklch(25% 0.022 240);
+    --color-ink: oklch(93% 0.012 205);
+    --color-muted: color-mix(in oklch, var(--color-ink) 68%, transparent);
+    --color-subtle: color-mix(in oklch, var(--color-ink) 13%, transparent);
+    --color-surface: color-mix(in oklch, var(--color-paper-2) 88%, transparent);
+    --color-surface-strong: color-mix(in oklch, var(--color-ink) 8%, transparent);
+    --color-rule: color-mix(in oklch, var(--color-ink) 14%, transparent);
+    --color-accent: oklch(75% 0.095 212);
+    --color-accent-strong: oklch(78% 0.1 212);
+    --shadow-wide: 0 44px 110px color-mix(in oklch, black 34%, transparent);
+    --shadow-float: 0 18px 48px color-mix(in oklch, black 32%, transparent);
+    --shadow-soft: 0 10px 30px color-mix(in oklch, black 28%, transparent);
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-paper: oklch(16% 0.014 240);
+  --color-paper-2: oklch(20% 0.018 240);
+  --color-paper-3: oklch(25% 0.022 240);
+  --color-ink: oklch(93% 0.012 205);
+  --color-muted: color-mix(in oklch, var(--color-ink) 68%, transparent);
+  --color-subtle: color-mix(in oklch, var(--color-ink) 13%, transparent);
+  --color-surface: color-mix(in oklch, var(--color-paper-2) 88%, transparent);
+  --color-surface-strong: color-mix(in oklch, var(--color-ink) 8%, transparent);
+  --color-rule: color-mix(in oklch, var(--color-ink) 14%, transparent);
+  --color-accent: oklch(75% 0.095 212);
+  --color-accent-strong: oklch(78% 0.1 212);
+  --shadow-wide: 0 44px 110px color-mix(in oklch, black 34%, transparent);
+  --shadow-float: 0 18px 48px color-mix(in oklch, black 32%, transparent);
+  --shadow-soft: 0 10px 30px color-mix(in oklch, black 28%, transparent);
+}

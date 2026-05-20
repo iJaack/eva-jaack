@@ -9,7 +9,6 @@ import {
 import { privateKeyToAccount } from 'viem/accounts';
 import { avalanche } from 'viem/chains';
 import { config } from '../config.js';
-import { getEvalancheSigner, getSignerKey } from './signing.js';
 
 export interface WriteContractRequest {
   address: `0x${string}`;
@@ -60,6 +59,7 @@ class EvalancheSignerService implements SignerService {
   readonly provider = 'evalanche';
 
   async writeContract({ chain = avalanche, ...request }: WriteContractRequest): Promise<Hex> {
+    const { getEvalancheSigner, getSignerKey } = await import('./signing.js');
     const [{ address, secretsSource }, privateKey] = await Promise.all([
       getEvalancheSigner(),
       getSignerKey(),

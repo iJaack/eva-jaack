@@ -96,4 +96,100 @@ describe("prediction layer service", () => {
     expect(ignored.accepted).toBe(false);
     expect(ignored.command.status).toBe("ignored");
   });
+
+  it("filters provider markets that violate the conservative v1 risk policy", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
+    cleanupDirs.push(dir);
+    const service = new LocalPredictionLayerService(
+      join(dir, "index.json"),
+      async () => [],
+      async () => [
+        {
+          marketId: "polymarket-presidential-nomination",
+          provider: "polymarket",
+          externalId: "politics-1",
+          url: "https://polymarket.com/event/will-example-win-the-presidential-nomination",
+          title: "Will Example win the 2028 presidential nomination?",
+          category: "Politics",
+          status: "open",
+          volumeUsd: 10_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.12 },
+            { outcomeId: "no", label: "No", price: 0.88 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-super-bowl",
+          provider: "polymarket",
+          externalId: "sports-1",
+          url: "https://polymarket.com/event/will-example-win-the-game",
+          title: "Will Example win the game?",
+          category: "Sports",
+          status: "open",
+          volumeUsd: 9_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.45 },
+            { outcomeId: "no", label: "No", price: 0.55 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "kalshi-fed-hold",
+          provider: "kalshi",
+          externalId: "macro-1",
+          url: "https://kalshi.com/markets/fed-hold",
+          title: "Will the Fed hold rates at the next meeting?",
+          category: "Macro",
+          status: "open",
+          volumeUsd: 8_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.58 },
+            { outcomeId: "no", label: "No", price: 0.42 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-foreign-leader",
+          provider: "polymarket",
+          externalId: "unclassified-1",
+          url: "https://polymarket.com/event/will-example-be-the-leader-of-exampleland",
+          title: "Will Example be the leader of Exampleland by end of 2026?",
+          category: "Polymarket",
+          status: "open",
+          volumeUsd: 7_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.2 },
+            { outcomeId: "no", label: "No", price: 0.8 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ],
+    );
+
+    const markets = await service.listMarkets();
+    const summary = await service.getSummary();
+
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-presidential-nomination");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-super-bowl");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-foreign-leader");
+    expect(markets.markets.map((market) => market.marketId)).toContain("kalshi-fed-hold");
+    expect(summary.markets.map((market) => market.marketId)).not.toContain("polymarket-presidential-nomination");
+  });
 });

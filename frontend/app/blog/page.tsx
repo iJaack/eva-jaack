@@ -19,7 +19,7 @@ export default function BlogIndexPage() {
           </h1>
           <p className="hero-sub">
             Product notes, protocol updates, and plain-English writing on markets, theses, evidence, and
-            reputation design.
+            reputation design. Eva stays an evidence and reputation layer around external forecasts, not an exchange.
           </p>
         </section>
 

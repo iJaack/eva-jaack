@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import { getMarkets, type PredictionMarket } from "@/lib/api";
+import { marketUiStatus, statusClassName, statusLabel } from "@/lib/status";
 
 function formatUsd(value: number | null): string {
   if (value === null) return "—";
@@ -29,6 +30,7 @@ function providerLabel(provider: PredictionMarket["provider"]): string {
 
 export default function MarketsPage() {
   const [markets, setMarkets] = useState<PredictionMarket[]>([]);
+  const [providerFilter, setProviderFilter] = useState<"all" | PredictionMarket["provider"]>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,6 +41,11 @@ export default function MarketsPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const providers = Array.from(new Set(markets.map((market) => market.provider)));
+  const filteredMarkets = providerFilter === "all" ? markets : markets.filter((market) => market.provider === providerFilter);
+  const totalVolume = filteredMarkets.reduce((sum, market) => sum + (market.volumeUsd ?? 0), 0);
+  const unresolvedCount = filteredMarkets.filter((market) => market.status === "open" || market.status === "closed").length;
+
   return (
     <>
       <Nav />
@@ -46,7 +53,7 @@ export default function MarketsPage() {
         <section className="mobile-page-head">
           <p className="eyebrow">Markets</p>
           <h1>Live markets with Eva theses attached.</h1>
-          <p>External venues provide odds. Eva adds the public reasoning layer and predictor reputation.</p>
+          <p>External venues provide odds as forecasts. Eva adds the public reasoning layer, evidence state, and predictor reputation without implying odds equal truth.</p>
         </section>
 
         {loading ? (
@@ -59,43 +66,99 @@ export default function MarketsPage() {
             <p>{error}</p>
           </section>
         ) : (
-          <section className="market-stack">
-            {markets.map((market) => (
-              <Link
-                key={market.marketId}
-                href={`/markets/${market.marketId}`}
-                className={`prediction-card market-card-large ${providerClassName(market.provider)}`}
-              >
-                <div className="card-topline">
-                  <span>{market.category}</span>
-                  <span className="provider-badge">{providerLabel(market.provider)}</span>
+          <>
+            <section className="prediction-card route-panel">
+              <div className="section-heading-row prediction-heading">
+                <div>
+                  <p className="section-kicker">Forecast desk</p>
+                  <h2 className="section-title section-title-sm">Live market desk</h2>
                 </div>
-                <h2>{market.title}</h2>
-                <div className="market-outcomes">
-                  {market.outcomes.map((outcome) => (
-                    <div key={outcome.outcomeId}>
-                      <span>{outcome.label}</span>
-                      <strong>{formatOdds(outcome.price)}</strong>
+                <span className={statusClassName("forecast")}>Forecast</span>
+              </div>
+              <p className="market-boundary-note">
+                Showing {filteredMarkets.length} of {markets.length} markets. Odds are venue forecasts; final truth status lives in claim bundles and resolved thesis records.
+              </p>
+              <div className="desk-summary">
+                <div>
+                  <strong>{filteredMarkets.length}</strong>
+                  <span>visible markets</span>
+                </div>
+                <div>
+                  <strong>{formatUsd(totalVolume)}</strong>
+                  <span>visible volume</span>
+                </div>
+                <div>
+                  <strong>{unresolvedCount}</strong>
+                  <span>forecast / unresolved</span>
+                </div>
+              </div>
+              <div className="filter-bar" aria-label="Provider filters">
+                <button
+                  type="button"
+                  className={`filter-chip${providerFilter === "all" ? " filter-chip-active" : ""}`}
+                  onClick={() => setProviderFilter("all")}
+                >
+                  All
+                </button>
+                {providers.map((provider) => (
+                  <button
+                    key={provider}
+                    type="button"
+                    className={`filter-chip${providerFilter === provider ? " filter-chip-active" : ""}`}
+                    onClick={() => setProviderFilter(provider)}
+                  >
+                    {providerLabel(provider)}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className="market-stack">
+              {filteredMarkets.map((market) => {
+                const uiStatus = marketUiStatus(market);
+
+                return (
+                  <Link
+                    key={market.marketId}
+                    href={`/markets/${market.marketId}`}
+                    className={`prediction-card market-card-large ${providerClassName(market.provider)}`}
+                  >
+                    <div className="card-topline">
+                      <span>{market.category}</span>
+                      <span className="provider-badge">{providerLabel(market.provider)}</span>
                     </div>
-                  ))}
-                </div>
-                <div className="odds-row">
-                  <div>
-                    <span>Volume</span>
-                    <strong>{formatUsd(market.volumeUsd)}</strong>
-                  </div>
-                  <div>
-                    <span>Liquidity</span>
-                    <strong>{formatUsd(market.liquidityUsd)}</strong>
-                  </div>
-                  <div>
-                    <span>Status</span>
-                    <strong>{market.status}</strong>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </section>
+                    <h2>{market.title}</h2>
+                    <div className="status-row">
+                      <span className={statusClassName("forecast")}>Odds forecast</span>
+                      <span className={statusClassName(uiStatus)}>{statusLabel(uiStatus)}</span>
+                    </div>
+                    <div className="market-outcomes">
+                      {market.outcomes.map((outcome) => (
+                        <div key={outcome.outcomeId}>
+                          <span>{outcome.label}</span>
+                          <strong>{formatOdds(outcome.price)}</strong>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="odds-row">
+                      <div>
+                        <span>Volume</span>
+                        <strong>{formatUsd(market.volumeUsd)}</strong>
+                      </div>
+                      <div>
+                        <span>Liquidity</span>
+                        <strong>{formatUsd(market.liquidityUsd)}</strong>
+                      </div>
+                      <div>
+                        <span>Resolution</span>
+                        <strong>{statusLabel(uiStatus)}</strong>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </section>
+          </>
         )}
 
         <SiteFooter />

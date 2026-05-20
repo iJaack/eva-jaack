@@ -5,7 +5,7 @@ import type { Article } from "@/lib/api";
 import { ScoreBadge } from "./TrustScore";
 
 const STATUS_LABELS = ["Pending", "Verified", "Rejected"] as const;
-const STATUS_COLORS = ["#f5b731", "#34a853", "#e74c3c"] as const;
+const STATUS_COLORS = ["var(--color-warning)", "var(--color-success)", "var(--color-danger)"] as const;
 
 function formatDate(ts: number): string {
   if (!ts) return "—";
@@ -26,7 +26,7 @@ function extractDomain(uri: string): string {
 
 export default function ArticleCard({ article }: { article: Article }) {
   const statusLabel = STATUS_LABELS[article.status] ?? "Unknown";
-  const statusColor = STATUS_COLORS[article.status] ?? "#888";
+  const statusColor = STATUS_COLORS[article.status] ?? "var(--muted)";
 
   return (
     <Link href={`/article/${article.id}`} className="article-card surface">
@@ -35,9 +35,9 @@ export default function ArticleCard({ article }: { article: Article }) {
         <span
           className="status-badge"
           style={{
-            background: `${statusColor}18`,
+            background: `color-mix(in oklch, ${statusColor} 14%, transparent)`,
             color: statusColor,
-            borderColor: `${statusColor}40`,
+            borderColor: `color-mix(in oklch, ${statusColor} 40%, transparent)`,
           }}
         >
           {statusLabel}

@@ -5,6 +5,7 @@ export interface GenerateTextOptions {
   system: string;
   prompt: string;
   maxTokens?: number;
+  jsonMode?: boolean;
 }
 
 export interface LlmService {
@@ -59,7 +60,7 @@ class GatewayLlmService implements LlmService {
     private readonly apiKey?: string,
   ) {}
 
-  async generateText({ system, prompt, maxTokens = 1024 }: GenerateTextOptions): Promise<string> {
+  async generateText({ system, prompt, maxTokens = 1024, jsonMode = false }: GenerateTextOptions): Promise<string> {
     const res = await fetch(this.gatewayUrl, {
       method: 'POST',
       headers: {
@@ -73,6 +74,7 @@ class GatewayLlmService implements LlmService {
           { role: 'user', content: prompt },
         ],
         max_tokens: maxTokens,
+        ...(jsonMode ? { response_format: { type: 'json_object' } } : {}),
         // Fallback fields for non-OpenAI gateways
         system,
         prompt,
@@ -143,6 +145,6 @@ export function getLlmService(): LlmService {
 }
 
 export async function generateJson<T>(options: GenerateTextOptions): Promise<T> {
-  const raw = await getLlmService().generateText(options);
+  const raw = await getLlmService().generateText({ ...options, jsonMode: true });
   return JSON.parse(normalizeJsonResponse(raw)) as T;
 }

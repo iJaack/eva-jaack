@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Nav from "@/components/Nav";
+import SiteFooter from "@/components/SiteFooter";
 import { protocol } from "@/lib/protocol";
 
 type TocItem = {
@@ -54,32 +56,24 @@ function StackDiagram() {
 export default function WhitepaperPage() {
   return (
     <>
-      <header className="topbar">
-        <div className="brand">
-          <div className="brand-mark" aria-hidden />
-          <div className="brand-text">
-            <span className="brand-title">Eva Protocol Reference</span>
-            <span className="brand-sub">Prediction edition · April 2026</span>
-          </div>
-        </div>
-        <nav className="nav-links">
-          <Link href="/" className="nav-pill">
-            Back Home
-          </Link>
-          <a href="https://github.com/iJaack/eva-jaack" target="_blank" rel="noreferrer" className="nav-pill">
-            GitHub
-          </a>
-        </nav>
-      </header>
+      <Nav />
 
-      <main className="page-shell">
-        <section className="hero" style={{ paddingBottom: 8 }}>
+      <main id="main-content" className="page-shell">
+        <section className="hero whitepaper-hero">
           <span className="hero-kicker">Public whitepaper</span>
           <h1 className="hero-title">A trust graph for prediction reputation on Avalanche.</h1>
           <p className="hero-sub">
             Eva Protocol is a prediction reputation system. External markets provide odds; Eva records theses,
-            evidence, copy intent, and graph-backed predictor trust.
+            evidence, copy intent, and graph-backed predictor trust. Odds are forecasts; truth status is resolved separately.
           </p>
+          <div className="hero-actions">
+            <Link href="/markets" className="btn btn-primary">
+              Open market desk
+            </Link>
+            <a href="https://github.com/iJaack/eva-jaack" target="_blank" rel="noreferrer" className="btn btn-ghost">
+              GitHub
+            </a>
+          </div>
         </section>
 
         <div className="whitepaper-layout">
@@ -149,7 +143,7 @@ export default function WhitepaperPage() {
               <ol style={{ paddingLeft: 20, lineHeight: 1.9 }}>
                 <li>User publishes or is credited with a market thesis.</li>
                 <li>Eva stores the market, selected outcome, odds snapshot, rationale, and evidence links.</li>
-                <li>Other users can copy, counter, or inspect the claim trail.</li>
+                <li>Other users can preview copy intent, counter, or inspect the claim trail.</li>
                 <li>Unclaimed X profiles can accumulate offchain market records.</li>
                 <li>Registered identities can later receive reputation feedback after durable resolutions.</li>
                 <li>Verification reports remain available through `/api/verify` as evidence objects.</li>
@@ -260,6 +254,8 @@ export default function WhitepaperPage() {
             </section>
           </article>
         </div>
+
+        <SiteFooter />
       </main>
     </>
   );

@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "forge build",
-    "test": "forge test",
-    "fmt": "forge fmt"
+    "build": "${FOUNDRY_BIN:-$HOME/.foundry/bin/forge} build",
+    "test": "${FOUNDRY_BIN:-$HOME/.foundry/bin/forge} test",
+    "fmt": "${FOUNDRY_BIN:-$HOME/.foundry/bin/forge} fmt"
   }
 }

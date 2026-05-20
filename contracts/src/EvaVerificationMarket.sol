@@ -283,12 +283,12 @@ contract EvaVerificationMarket is
         emit VerdictStaked(claimId, msg.sender, verdict, amount, confidenceBand, rationaleHash, evidenceRoot);
     }
 
-    function openChallenge(
-        bytes32 claimId,
-        uint256 bondAmount,
-        bytes32 reasonHash,
-        bytes32 evidenceRoot
-    ) external whenNotPaused nonReentrant returns (uint256 challengeId) {
+    function openChallenge(bytes32 claimId, uint256 bondAmount, bytes32 reasonHash, bytes32 evidenceRoot)
+        external
+        whenNotPaused
+        nonReentrant
+        returns (uint256 challengeId)
+    {
         ClaimCore storage claim = _requireClaim(claimId);
         _requireRegisteredCurator(msg.sender);
         if (bondAmount < minChallengeBond) revert InvalidAmount();
@@ -328,8 +328,10 @@ contract EvaVerificationMarket is
         bytes32 claimId = challengeClaimId[challengeId];
         if (challenge.id == 0 || claimId == bytes32(0)) revert ChallengeNotFound();
         if (challenge.status != ChallengeStatus.Open) revert ChallengeNotOpen();
-        if (status != ChallengeStatus.Accepted && status != ChallengeStatus.Rejected && status != ChallengeStatus.Expired)
-        {
+        if (
+            status != ChallengeStatus.Accepted && status != ChallengeStatus.Rejected
+                && status != ChallengeStatus.Expired
+        ) {
             revert InvalidChallengeStatus();
         }
 
@@ -355,7 +357,8 @@ contract EvaVerificationMarket is
         }
         if (finalVerdict == Verdict.None || resolutionRoot == bytes32(0)) revert InvalidClaim();
 
-        claim.status = block.timestamp >= claim.challengeWindowEnd ? ClaimStatus.FinalResolved : ClaimStatus.SoftResolved;
+        claim.status =
+            block.timestamp >= claim.challengeWindowEnd ? ClaimStatus.FinalResolved : ClaimStatus.SoftResolved;
         claim.resolutionTime = uint64(block.timestamp);
 
         _claimResolution[claimId] = ClaimResolution({
@@ -368,7 +371,9 @@ contract EvaVerificationMarket is
 
         _notifyClaimResolved(claimId, finalVerdict);
 
-        emit ClaimResolved(claimId, finalVerdict, confidenceBand, resolutionRoot, overturnedByChallenge, uint64(block.timestamp));
+        emit ClaimResolved(
+            claimId, finalVerdict, confidenceBand, resolutionRoot, overturnedByChallenge, uint64(block.timestamp)
+        );
     }
 
     function finalizeClaim(bytes32 claimId) external onlyRole(RESOLVER_ROLE) {
@@ -412,13 +417,7 @@ contract EvaVerificationMarket is
 
         bool wasCorrect = position.verdict == _claimResolution[claimId].finalVerdict;
         _notifyCuratorSettled(
-            curator,
-            claimId,
-            wasCorrect,
-            position.amount,
-            reward,
-            slash,
-            uint8(_claims[claimId].claimType)
+            curator, claimId, wasCorrect, position.amount, reward, slash, uint8(_claims[claimId].claimType)
         );
     }
 
@@ -445,6 +444,7 @@ contract EvaVerificationMarket is
             protocolFeeBps_ > BPS_DENOMINATOR || softSlashBps_ > BPS_DENOMINATOR || reviewerPoolBps_ > BPS_DENOMINATOR
                 || challengeBonusPoolBps_ > BPS_DENOMINATOR
                 || reviewerPoolBps_ + challengeBonusPoolBps_ > BPS_DENOMINATOR
+                || protocolFeeBps_ + reviewerPoolBps_ + challengeBonusPoolBps_ > BPS_DENOMINATOR
         ) revert InvalidAmount();
 
         minStake = minStake_;
@@ -551,7 +551,11 @@ contract EvaVerificationMarket is
         emit ClaimFunded(claimId, msg.sender, amount, poolType);
     }
 
-    function _previewSettlement(bytes32 claimId, address curator) internal view returns (uint256 reward, uint256 slash) {
+    function _previewSettlement(bytes32 claimId, address curator)
+        internal
+        view
+        returns (uint256 reward, uint256 slash)
+    {
         ClaimResolution memory resolution = _claimResolution[claimId];
         StakePosition memory position = _positions[claimId][curator];
         if (resolution.finalVerdict == Verdict.None || position.amount == 0) {
@@ -683,7 +687,8 @@ contract EvaVerificationMarket is
         }
 
         address[] memory participants = _claimParticipants[claimId];
-        try reputationAdapter.onClaimResolved(claimId, uint8(finalVerdict), participants) {} catch (bytes memory err) {
+        try reputationAdapter.onClaimResolved(claimId, uint8(finalVerdict), participants) {}
+        catch (bytes memory err) {
             emit ReputationHookFailed(claimId, address(0), err);
         }
     }

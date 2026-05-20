@@ -70,6 +70,9 @@ export interface CuratorListResponse {
   chain: string;
   chainId: number;
   curators: CuratorDto[];
+  status?: "fresh" | "degraded";
+  source?: "trust-graph" | "timeout-fallback";
+  warning?: string;
 }
 
 export interface CuratorDetailResponse {
@@ -187,6 +190,28 @@ export interface ClaimTimelineEntryDto {
   note: string;
 }
 
+export interface ClaimBundleDto {
+  claim: string;
+  deadline: string;
+  resolutionSource: string | null;
+  evidence: string[];
+  authorIdentity: {
+    platform: ClaimSourcePlatform;
+    sourceRef: string;
+    handle: string | null;
+    agentAddress: string | null;
+  };
+  confidence: number | null;
+  conflictFlags: string[];
+  resolver: string | null;
+  disputeWindow: {
+    opensAt: string;
+    endsAt: string;
+  };
+  finalOutcome: ClaimVerdict | null;
+  status: MarketClaimStatus;
+}
+
 export interface ClaimMarketSummaryDto {
   claimId: string;
   title: string;
@@ -208,6 +233,7 @@ export interface ClaimMarketDetailResponse extends ClaimMarketSummaryDto {
   createdBy: string | null;
   context: string | null;
   evidenceLinks: string[];
+  bundle: ClaimBundleDto;
   packets: ClaimPacketsDto;
   challenges: ClaimChallengeDto[];
   resolution: ClaimResolutionDto;

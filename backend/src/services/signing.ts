@@ -20,7 +20,7 @@ export interface EvalancheSignerHandle {
     keystorePath: string;
     isNew: boolean;
   };
-  secretsSource: 'openclaw-secrets' | 'env' | 'keystore';
+  secretsSource: 'openclaw-secrets' | 'env' | 'keychain' | 'keystore';
 }
 
 let _bootPromise: Promise<BootedEvalanche> | null = null;

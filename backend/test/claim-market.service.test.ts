@@ -63,6 +63,22 @@ describe("claim market service", () => {
     expect(first.created).toBe(true);
     expect(second.created).toBe(false);
     expect(second.claim.claimId).toBe(first.claim.claimId);
+    expect(first.claim.bundle).toMatchObject({
+      claim: "Eva will open a public claim page for tagged X posts.",
+      resolutionSource: "machine-assessment",
+      evidence: ["https://eva.jaack.me/claims"],
+      authorIdentity: {
+        platform: "x",
+        handle: "@evaprotocol",
+        agentAddress: "0x1234000000000000000000000000000000000000",
+      },
+      confidence: 82,
+      resolver: expect.any(String),
+      finalOutcome: null,
+      status: "open",
+    });
+    expect(first.claim.bundle.deadline).toEqual(expect.any(String));
+    expect(first.claim.bundle.disputeWindow.endsAt).toEqual(expect.any(String));
     expect(first.claim.packets.metadata.uri).toMatch(/^memory:\/\//);
     expect(first.claim.machineAssessment?.verdict).toBe("verified");
 
@@ -74,6 +90,38 @@ describe("claim market service", () => {
       claims: Array<{ claimId: string }>;
     };
     expect(persisted.claims[0]?.claimId).toBe(first.claim.claimId);
+    expect(persisted.claims[0]?.bundle).toMatchObject({
+      claim: "Eva will open a public claim page for tagged X posts.",
+      confidence: 82,
+      status: "open",
+    });
+  });
+
+  it("serializes concurrent claim creation so durable records are not clobbered", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "eva-claims-"));
+    cleanupDirs.push(dir);
+
+    const service = new LocalClaimMarketService(join(dir, "index.json"), new MemoryStorageService());
+
+    await Promise.all([
+      service.createClaim({
+        sourcePlatform: "manual",
+        sourceRef: "manual-concurrent-1",
+        claimText: "Concurrent claim one is retained.",
+      }),
+      service.createClaim({
+        sourcePlatform: "manual",
+        sourceRef: "manual-concurrent-2",
+        claimText: "Concurrent claim two is retained.",
+      }),
+    ]);
+
+    const listed = await service.listClaims();
+    expect(listed.count).toBe(2);
+    expect(listed.claims.map((claim) => claim.claimText).sort()).toEqual([
+      "Concurrent claim one is retained.",
+      "Concurrent claim two is retained.",
+    ]);
   });
 
   it("builds stake, challenge, and settlement previews from stored claims", async () => {

@@ -32,10 +32,11 @@ export const config = {
   anthropicApiKey: env('ANTHROPIC_API_KEY'),
   braveApiKey: env('BRAVE_API_KEY'),
 
-  storageProvider: env('EVA_STORAGE_PROVIDER', 'auto') as 'auto' | 'pinata' | 'local',
+  storageProvider: env('EVA_STORAGE_PROVIDER', 'auto') as 'auto' | 'pinata' | 'vercel-blob' | 'local',
   pinataJwt: env('PINATA_JWT'),
   pinataEndpoint: env('PINATA_ENDPOINT', 'https://api.pinata.cloud/pinning/pinJSONToIPFS'),
   ipfsGatewayBase: env('IPFS_GATEWAY_BASE', 'https://gateway.pinata.cloud/ipfs'),
+  blobReadWriteToken: env('BLOB_READ_WRITE_TOKEN'),
   storageDir: env('EVA_STORAGE_DIR'),
 
   signerProvider: env('EVA_SIGNER_PROVIDER', 'auto') as 'auto' | 'private-key' | 'evalanche',

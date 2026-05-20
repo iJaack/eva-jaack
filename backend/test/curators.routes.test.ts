@@ -107,4 +107,31 @@ describe('curator routes', () => {
       error: 'Failed to fetch curators',
     });
   });
+
+  it('returns a degraded curator list instead of timing out while the trust graph warms', async () => {
+    const app = new Hono();
+    app.route('/api/curators', createCuratorRoutes({
+      listCurators: vi.fn().mockReturnValue(new Promise(() => undefined)),
+      listArticlesForCurator: vi.fn(),
+      getCuratorMarketActivity: vi.fn().mockResolvedValue({
+        claimsCreated: 0,
+        openClaims: 0,
+        resolvedClaims: 0,
+      }),
+      curatorListTimeoutMs: 5,
+      publicClient: { readContract: vi.fn() },
+    }));
+
+    const response = await fetchJson(app, '/api/curators');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      count: 0,
+      chain: 'avalanche',
+      chainId: 43114,
+      curators: [],
+      status: 'degraded',
+      source: 'timeout-fallback',
+    });
+  });
 });

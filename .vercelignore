@@ -1,7 +1,16 @@
 node_modules
 **/node_modules
 frontend/.next
+frontend/.next/**
 frontend/out
+frontend/test-results
+frontend/playwright-report
 contracts/out
 contracts/cache
+.code-review-graph
+.codex
+.data
+.hallmark
+.pnpm-store
+artifacts
 .git

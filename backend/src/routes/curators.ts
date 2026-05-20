@@ -97,10 +97,15 @@ const publicClient = createPublicClient({
   transport: http(config.avalancheRpc),
 });
 
+const routePublicClient: CuratorRouteDeps['publicClient'] = {
+  readContract: (args) => publicClient.readContract(args as never) as Promise<unknown>,
+};
+
 type CuratorRouteDeps = {
   listCurators: typeof listCurators;
   listArticlesForCurator: typeof listArticlesForCurator;
   getCuratorMarketActivity: (curatorAddress: string) => Promise<NonNullable<CuratorDetailResponse['marketActivity']>>;
+  curatorListTimeoutMs?: number;
   publicClient: {
     readContract: (args: {
       address: Address;
@@ -111,36 +116,86 @@ type CuratorRouteDeps = {
   };
 };
 
+type CuratorListResult =
+  | { status: 'fulfilled'; value: Awaited<ReturnType<typeof listCurators>> }
+  | { status: 'rejected'; reason: unknown }
+  | { status: 'timeout' };
+
+const DEFAULT_CURATOR_LIST_TIMEOUT_MS = 2_500;
+const CURATOR_LIST_TIMEOUT_WARNING =
+  'Curator graph is still warming. Returning an empty snapshot so the app stays available.';
+
+async function loadCuratorsWithTimeout(deps: CuratorRouteDeps): Promise<CuratorListResult> {
+  const timeoutMs = deps.curatorListTimeoutMs ?? DEFAULT_CURATOR_LIST_TIMEOUT_MS;
+  const operation = deps
+    .listCurators()
+    .then<CuratorListResult>((value) => ({ status: 'fulfilled', value }))
+    .catch<CuratorListResult>((reason) => ({ status: 'rejected', reason }));
+
+  const timeout = new Promise<CuratorListResult>((resolve) => {
+    setTimeout(() => resolve({ status: 'timeout' }), timeoutMs);
+  });
+
+  return Promise.race([operation, timeout]);
+}
+
 export function createCuratorRoutes(
   deps: CuratorRouteDeps = {
     listCurators,
     listArticlesForCurator,
     getCuratorMarketActivity: (curatorAddress) => getClaimMarketService().getCuratorMarketActivity(curatorAddress),
-    publicClient,
+    publicClient: routePublicClient,
   },
 ) {
   const curatorRoutes = new Hono();
 
   curatorRoutes.get('/', async (c) => {
-    try {
-      const curators = await deps.listCurators();
+    const result = await loadCuratorsWithTimeout(deps);
 
+    c.header('cache-control', 's-maxage=60, stale-while-revalidate=300');
+
+    if (result.status === 'fulfilled') {
+      const curators = result.value;
       return c.json<CuratorListResponse>({
         count: curators.length,
         chain: 'avalanche',
         chainId: 43114,
         curators,
+        status: 'fresh',
+        source: 'trust-graph',
       });
-    } catch (e) {
-      console.error(`[curators] list failed: ${e}`);
-      return c.json({ error: 'Failed to fetch curators', details: String(e) }, 500);
     }
+
+    if (result.status === 'timeout') {
+      console.warn(`[curators] list exceeded ${deps.curatorListTimeoutMs ?? DEFAULT_CURATOR_LIST_TIMEOUT_MS}ms`);
+      return c.json<CuratorListResponse>({
+        count: 0,
+        chain: 'avalanche',
+        chainId: 43114,
+        curators: [],
+        status: 'degraded',
+        source: 'timeout-fallback',
+        warning: CURATOR_LIST_TIMEOUT_WARNING,
+      });
+    }
+
+    console.error(`[curators] list failed: ${result.reason}`);
+    return c.json({ error: 'Failed to fetch curators', details: String(result.reason) }, 500);
   });
 
   curatorRoutes.get('/:id', async (c) => {
     try {
       const id = c.req.param('id');
-      const curators = await deps.listCurators();
+      const result = await loadCuratorsWithTimeout(deps);
+
+      if (result.status === 'timeout') {
+        return c.json({ error: 'Curator graph is warming', details: CURATOR_LIST_TIMEOUT_WARNING }, 503);
+      }
+      if (result.status === 'rejected') {
+        throw result.reason;
+      }
+
+      const curators = result.value;
 
       const curator = id.match(/^0x[0-9a-fA-F]{40}$/)
         ? curators.find((candidate) => candidate.address.toLowerCase() === id.toLowerCase())

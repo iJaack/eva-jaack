@@ -60,6 +60,28 @@ test("markets page color-codes Polymarket and Kalshi provider badges", async ({ 
 
   await expect(polymarketCard.getByText("Polymarket")).toBeVisible();
   await expect(kalshiCard.getByText("Kalshi")).toBeVisible();
-  await expect(polymarketCard.locator(".provider-badge")).toHaveCSS("color", "rgb(47, 125, 246)");
-  await expect(kalshiCard.locator(".provider-badge")).toHaveCSS("color", "rgb(22, 163, 106)");
+  await expect(polymarketCard.locator(".provider-badge")).toHaveCSS("border-radius", "999px");
+  await expect(kalshiCard.locator(".provider-badge")).toHaveCSS("border-radius", "999px");
+});
+
+test("markets page filters by provider without losing the market desk context", async ({ page }) => {
+  await page.route("**/api/markets", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(marketsPayload),
+    });
+  });
+
+  await page.goto("/markets");
+
+  await expect(page.getByRole("heading", { name: "Live market desk" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Will the Fed cut rates in June/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Will CPI come in above forecast/i })).toBeVisible();
+
+  await page.getByRole("button", { name: "Kalshi" }).click();
+
+  await expect(page.getByRole("link", { name: /Will CPI come in above forecast/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Will the Fed cut rates in June/i })).toHaveCount(0);
+  await expect(page.getByText("Showing 1 of 2 markets")).toBeVisible();
 });

@@ -91,27 +91,6 @@ function isSuccess(
   return Boolean(value && "ready" in value && value.ready);
 }
 
-function statusTone(type: "error" | "success" | "info") {
-  if (type === "error") {
-    return {
-      background: "rgba(243, 154, 142, 0.12)",
-      border: "rgba(243, 154, 142, 0.35)",
-    };
-  }
-
-  if (type === "success") {
-    return {
-      background: "rgba(138, 216, 192, 0.14)",
-      border: "rgba(138, 216, 192, 0.34)",
-    };
-  }
-
-  return {
-    background: "rgba(133, 203, 218, 0.12)",
-    border: "rgba(133, 203, 218, 0.3)",
-  };
-}
-
 function txStatusLabel(status: BroadcastTxStatus): string {
   switch (status) {
     case "sending":
@@ -568,6 +547,7 @@ export default function CuratorRegisterPage() {
             <p className="hero-sub">
               Bring an Avalanche wallet, an ERC-8004 agent ID you own, and enough $EVA to meet the self-stake.
               Eva preflights the transaction flow and shows you exactly what needs to happen next. Agents should use Evalanche as the preferred wallet and execution layer; human operators get the best experience with Core wallet from Ava Labs, and can broadcast the same prepared transactions here.
+              Registration affects reputation and evidence weighting, not exchange custody or trade execution.
             </p>
             <div className="hero-actions">
               <Link href="/evalanche" className="btn btn-primary">
@@ -596,6 +576,7 @@ export default function CuratorRegisterPage() {
               <li>You need enough $EVA balance to cover your chosen self-stake.</li>
               <li>If allowance is too low, approval must be broadcast before registration.</li>
               <li>No hidden custody: transaction payloads stay transparent and wallet-side.</li>
+              <li>Registration does not make Eva an exchange; it only anchors identity for reputation.</li>
             </ul>
           </aside>
         </section>
@@ -746,7 +727,7 @@ export default function CuratorRegisterPage() {
 
           <div className="register-results">
             {networkError ? (
-              <div className="surface status-panel" style={statusTone("error")}>
+              <div className="surface status-panel status-panel-error">
                 <p className="section-kicker" style={{ marginBottom: 8 }}>Network issue</p>
                 <h3 style={{ margin: 0 }}>Couldn&apos;t reach the registration API</h3>
                 <p style={{ marginTop: 10, color: "var(--muted)" }}>{networkError}</p>
@@ -763,7 +744,7 @@ export default function CuratorRegisterPage() {
               </div>
             ) : isSuccess(response) ? (
               <>
-                <div className="surface status-panel" style={statusTone("success")}>
+                <div className="surface status-panel status-panel-success">
                   <p className="section-kicker" style={{ marginBottom: 8 }}>Ready</p>
                   <h3 style={{ margin: 0 }}>Wallet and identity checks passed</h3>
                   <p style={{ marginTop: 10, color: "var(--muted)" }}>
@@ -802,7 +783,7 @@ export default function CuratorRegisterPage() {
                   </div>
                 </div>
 
-                <div className="surface status-panel" style={statusTone("info")}>
+                <div className="surface status-panel status-panel-info">
                   <p className="section-kicker" style={{ marginBottom: 8 }}>Broadcast</p>
                   <h3 style={{ margin: 0 }}>Send {response.transactions.length} transaction{response.transactions.length !== 1 ? "s" : ""} in order</h3>
                   <p style={{ marginTop: 10, color: "var(--muted)" }}>
@@ -926,7 +907,7 @@ export default function CuratorRegisterPage() {
                 </div>
               </>
             ) : (
-              <div className="surface status-panel" style={statusTone("error")}>
+              <div className="surface status-panel status-panel-error">
                 <p className="section-kicker" style={{ marginBottom: 8 }}>Not ready yet</p>
                 <h3 style={{ margin: 0 }}>{response.error}</h3>
 

@@ -44,7 +44,7 @@ export default function CuratorsPage() {
           <p className="hero-sub" style={{ fontSize: "clamp(16px, 1.8vw, 22px)" }}>
             {loading
               ? "Loading curators from Avalanche..."
-              : `${curators.length} graph-backed predictor ${curators.length !== 1 ? "identities" : "identity"} currently visible in Eva's trust graph.`}
+              : `${curators.length} graph-backed predictor ${curators.length !== 1 ? "identities" : "identity"} currently visible in Eva's trust graph. These identities weight evidence and reputation; they do not execute trades.`}
           </p>
           <div className="hero-actions">
             <Link href="/predictors" className="btn btn-primary">
@@ -84,6 +84,10 @@ export default function CuratorsPage() {
                 </div>
                 <div className="curator-card-info">
                   <h3 className="curator-card-address">{truncateAddress(curator.address)}</h3>
+                  <div className="status-row">
+                    <span className="status-chip status-chip-verified">Graph-backed</span>
+                    <span className="status-chip status-chip-unresolved">Evidence identity</span>
+                  </div>
                   <div className="curator-card-meta">
                     <span>Agent #{curator.curatorAgentId.toString()}</span>
                     <span>{curator.articleCount} verified sources</span>

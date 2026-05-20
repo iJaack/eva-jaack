@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import { getClaims, type MarketClaim } from "@/lib/api";
+import { claimUiStatus, statusClassName, statusLabel } from "@/lib/status";
 
 function formatTimestamp(value: string): string {
   return new Date(value).toLocaleDateString("en-US", {
@@ -43,10 +44,10 @@ export default function ClaimsPage() {
         <section className="hero hero-grid claims-hero">
           <div>
             <span className="hero-kicker">Evidence Queue</span>
-            <h1 className="hero-title">Claim packets that can support prediction theses.</h1>
+            <h1 className="hero-title">Claim bundles that can support prediction theses.</h1>
             <p className="hero-sub">
-              Claims stay inspectable here as supporting evidence. They preserve the audit trail behind market
-              theses, counters, and source checks.
+              Claim bundles stay inspectable here as supporting evidence. They preserve the audit trail behind market
+              theses, counters, and source checks without treating market odds as truth.
             </p>
             <div className="hero-actions">
               <Link href="/markets" className="btn btn-primary">
@@ -61,18 +62,19 @@ export default function ClaimsPage() {
           <aside className="surface hero-panel">
             <p className="hero-panel-kicker">Channel state</p>
             <ul className="hero-checklist">
-              <li>Claim pages are still live and durable.</li>
+              <li>Claim bundles are still live and durable.</li>
               <li>@evapredicts can turn explicit X commands into thesis or evidence pages.</li>
+              <li>Statuses use the evidence vocabulary: unresolved, verified, disputed, resolved, or void.</li>
               <li>{marketEnabled ? "Stake and challenge actions are live." : "Stake and challenge actions are staged until the market contract is deployed."}</li>
             </ul>
           </aside>
         </section>
 
         <section className="surface callout" style={{ marginTop: 28 }}>
-          <h3>Evidence attached to theses</h3>
+          <h3>Evidence bundles attached to theses</h3>
           <p>
-            Eva treats the trust graph as the canonical layer, while claim packets keep source context readable.
-            Claims are useful when they make a thesis easier to inspect, challenge, or score.
+            Eva treats the trust graph as the canonical layer, while claim bundles keep source context readable.
+            Bundles are useful when they make a thesis easier to inspect, challenge, or score.
           </p>
         </section>
 
@@ -107,10 +109,14 @@ export default function ClaimsPage() {
                 <Link key={claim.claimId} href={`/claims/${claim.claimId}`} className="surface claim-card">
                   <div className="claim-card-top">
                     <span className="blog-meta-pill">Claim</span>
-                    <span className="claim-card-status">{titleCase(claim.status)}</span>
+                    <span className={statusClassName(claimUiStatus(claim))}>{statusLabel(claimUiStatus(claim))}</span>
                   </div>
                   <h3>{claim.title}</h3>
                   <p>{claim.excerpt}</p>
+                  <div className="claim-bundle-row" aria-label="Claim bundle summary">
+                    <span className="status-chip status-chip-forecast">Evidence bundle</span>
+                    <span className="status-chip status-chip-unresolved">{claim.participantCount} participants</span>
+                  </div>
                   <div className="claim-card-meta">
                     <span>{claim.source.platform.toUpperCase()}</span>
                     <span>{formatTimestamp(claim.createdAt)}</span>

@@ -138,6 +138,23 @@ function titleCategory(title: string, fallback: string): string {
   return fallback;
 }
 
+function isAllowedV1Market(market: PredictionMarketDto): boolean {
+  const category = market.category.toLowerCase();
+  if ((market.provider === "polymarket" || market.provider === "kalshi") && category !== "crypto" && category !== "macro") {
+    return false;
+  }
+  if (category === "politics" || category === "sports") {
+    return false;
+  }
+
+  const title = market.title.toLowerCase();
+  return !/\b(election|president|senate|congress|nomination|trump|biden|nba|nfl|mlb|nhl|soccer|match|game|war|ceasefire|assassination|murder|killed|dies|death|criminal|investigation|arrest|indict|convict|hostage|shooting)\b/.test(title);
+}
+
+function applyV1MarketPolicy(markets: PredictionMarketDto[]): PredictionMarketDto[] {
+  return markets.filter(isAllowedV1Market);
+}
+
 function centsToProbability(value: unknown): number | null {
   const parsed = parseUsd(value);
   if (parsed === null) return null;
@@ -249,6 +266,7 @@ async function loadPolymarketMarkets(): Promise<PredictionMarketDto[]> {
   return rawMarkets
     .map((market, index) => normalizePolymarketMarket(market, index))
     .filter((market): market is PredictionMarketDto => market !== null)
+    .filter(isAllowedV1Market)
     .sort((left, right) => marketRank(right) - marketRank(left))
     .slice(0, providerMarketLimit);
 }
@@ -258,6 +276,7 @@ async function loadKalshiMarkets(): Promise<PredictionMarketDto[]> {
   return (response.markets ?? [])
     .map((market) => normalizeKalshiMarket(market))
     .filter((market): market is PredictionMarketDto => market !== null)
+    .filter(isAllowedV1Market)
     .sort((left, right) => marketRank(right) - marketRank(left))
     .slice(0, providerMarketLimit);
 }
@@ -271,16 +290,16 @@ async function loadProviderMarkets(): Promise<PredictionMarketDto[]> {
 }
 
 function mergeProviderMarkets(store: PredictionStore, providerMarkets: PredictionMarketDto[]): PredictionStore {
-  if (providerMarkets.length === 0) return store;
-  const providerMarketIds = new Set(providerMarkets.map((market) => market.marketId));
+  const allowedProviderMarkets = applyV1MarketPolicy(providerMarkets);
   const existingNonProviderMarkets = store.markets.filter((market) => {
+    if (!isAllowedV1Market(market)) return false;
     if (market.provider !== "polymarket" && market.provider !== "kalshi") return true;
-    return !providerMarketIds.has(market.marketId);
+    return !allowedProviderMarkets.some((providerMarket) => providerMarket.marketId === market.marketId);
   });
 
   return {
     ...store,
-    markets: [...existingNonProviderMarkets, ...providerMarkets],
+    markets: [...existingNonProviderMarkets, ...allowedProviderMarkets],
   };
 }
 
@@ -898,7 +917,7 @@ export class LocalPredictionLayerService {
       const raw = await readFile(this.indexPath, "utf8");
       const parsed = JSON.parse(raw) as Partial<PredictionStore>;
       const store = {
-        markets: Array.isArray(parsed.markets) ? parsed.markets : seedStore().markets,
+        markets: Array.isArray(parsed.markets) ? applyV1MarketPolicy(parsed.markets) : seedStore().markets,
         theses: Array.isArray(parsed.theses) ? parsed.theses : seedStore().theses,
         commands: Array.isArray(parsed.commands) ? parsed.commands : [],
       };

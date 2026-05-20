@@ -12,6 +12,7 @@ import {
   previewClaimStake,
   type MarketClaimDetail,
 } from "@/lib/api";
+import { claimUiStatus, statusClassName, statusLabel } from "@/lib/status";
 import type {
   ClaimChallengePreviewResponse,
   ClaimSettlementPreviewResponse,
@@ -31,6 +32,13 @@ function formatTimestamp(value: string | null): string {
 
 function titleCase(value: string): string {
   return value.replace(/_/g, " ").replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function packetSource(uri: string | null): string {
+  if (!uri) return "Not attached";
+  if (uri.startsWith("ipfs://")) return "IPFS packet";
+  if (uri.startsWith("memory://")) return "Local packet";
+  return "External packet";
 }
 
 export default function ClaimDetailClient() {
@@ -85,8 +93,8 @@ export default function ClaimDetailClient() {
     <>
       <Nav />
       <main className="page-shell">
-        <div style={{ marginTop: 24, marginBottom: 16 }}>
-          <Link href="/claims" className="btn btn-ghost" style={{ fontSize: 13, padding: "8px 16px" }}>
+        <div className="tight-back-row">
+          <Link href="/claims" className="btn btn-ghost btn-sm">
             ← Back to Claims
           </Link>
         </div>
@@ -96,16 +104,16 @@ export default function ClaimDetailClient() {
             <div className="loading-spinner" />
           </div>
         ) : error || !claim ? (
-          <div className="surface" style={{ padding: 28 }}>
-            <h2 style={{ marginTop: 0 }}>Claim unavailable</h2>
-            <p style={{ color: "var(--muted)" }}>{error ?? `Claim ${claimId} could not be loaded.`}</p>
+          <div className="surface surface-pad">
+            <h2 className="flush-title">Claim unavailable</h2>
+            <p className="muted-copy">{error ?? `Claim ${claimId} could not be loaded.`}</p>
           </div>
         ) : (
           <>
             <section className="surface claim-detail-header">
               <div className="claim-card-top">
                 <span className="blog-meta-pill">Claim</span>
-                <span className="claim-card-status">{titleCase(claim.status)}</span>
+                <span className={statusClassName(claimUiStatus(claim))}>{statusLabel(claimUiStatus(claim))}</span>
               </div>
               <h1 className="claim-detail-title">{claim.title}</h1>
               <p className="blog-post-dek">{claim.claimText}</p>
@@ -113,6 +121,50 @@ export default function ClaimDetailClient() {
                 <span>{claim.source.platform.toUpperCase()}</span>
                 <span>{formatTimestamp(claim.createdAt)}</span>
                 <span>{claim.marketEnabled ? "Market live" : "Market staged"}</span>
+              </div>
+            </section>
+
+            <section className="route-section">
+              <div className="section-heading-row prediction-heading">
+                <div>
+                  <p className="section-kicker">Structured bundle</p>
+                  <h2 className="section-title section-title-sm">Inspect the claim before using it as evidence</h2>
+                </div>
+                <span className="status-chip status-chip-unresolved">Odds separate from truth</span>
+              </div>
+              <div className="claim-bundle-grid">
+                <article className="claim-bundle-card">
+                  <h3>Claim and source</h3>
+                  <ul className="bundle-list">
+                    <li><span>Claim type</span><strong>{titleCase(claim.claimType)}</strong></li>
+                    <li><span>Author / agent identity</span><strong>{claim.source.authorHandle ?? claim.createdBy ?? "Unknown"}</strong></li>
+                    <li><span>Evidence links</span><strong>{claim.evidenceLinks.length}</strong></li>
+                  </ul>
+                </article>
+                <article className="claim-bundle-card">
+                  <h3>Resolution state</h3>
+                  <ul className="bundle-list">
+                    <li><span>Outcome</span><strong>{claim.resolution.verdict ? titleCase(claim.resolution.verdict) : (claim.leadingVerdict ? titleCase(claim.leadingVerdict) : "Unresolved")}</strong></li>
+                    <li><span>Confidence</span><strong>{claim.resolution.confidenceBand ?? claim.machineAssessment?.confidence ?? "Pending"}</strong></li>
+                    <li><span>Resolution source</span><strong>{packetSource(claim.packets.resolution.uri)}</strong></li>
+                  </ul>
+                </article>
+                <article className="claim-bundle-card">
+                  <h3>Deadlines and disputes</h3>
+                  <ul className="bundle-list">
+                    <li><span>Resolver deadline</span><strong>{stakePreview ? formatTimestamp(stakePreview.reviewDeadline) : "Preview required"}</strong></li>
+                    <li><span>Dispute window</span><strong>{challengePreview ? formatTimestamp(challengePreview.challengeWindowEnd) : "Preview required"}</strong></li>
+                    <li><span>Conflicts</span><strong>{claim.challenges.length}</strong></li>
+                  </ul>
+                </article>
+                <article className="claim-bundle-card">
+                  <h3>Packet integrity</h3>
+                  <ul className="bundle-list">
+                    <li><span>Metadata</span><strong>{packetSource(claim.packets.metadata.uri)}</strong></li>
+                    <li><span>Evidence packet</span><strong>{packetSource(claim.packets.evidence.uri)}</strong></li>
+                    <li><span>Machine packet</span><strong>{packetSource(claim.packets.machineAssessment.uri)}</strong></li>
+                  </ul>
+                </article>
               </div>
             </section>
 

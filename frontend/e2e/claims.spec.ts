@@ -146,7 +146,7 @@ test("claims index and claim detail render the X-channel surfaces", async ({ pag
 
   await page.goto("/claims");
 
-  await expect(page.getByRole("heading", { name: "Claim packets that can support prediction theses." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Claim bundles that can support prediction theses." })).toBeVisible();
   await expect(page.getByRole("link", { name: "Browse markets" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Make a thesis" })).toBeVisible();
   await expect(page.getByRole("link", { name: /Eva opens public claim pages/i })).toBeVisible();

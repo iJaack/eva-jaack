@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import { getMarketDetail, type PredictionMarketDetail } from "@/lib/api";
+import { marketUiStatus, statusClassName, statusLabel, thesisUiStatus } from "@/lib/status";
 
 function formatOdds(value: number): string {
   return `${Math.round(value * 100)}%`;
@@ -48,7 +49,11 @@ export default function MarketDetailClient() {
             <section className="mobile-page-head market-detail-head">
               <p className="eyebrow">{detail.market.category}</p>
               <h1>{detail.market.title}</h1>
-              <p>Odds stay external. Eva tracks theses, counters, evidence, and predictor records around the market.</p>
+              <p>Odds stay external and remain forecasts. Eva tracks theses, counters, evidence, and separate resolution status around the market.</p>
+              <div className="status-row">
+                <span className="status-chip status-chip-forecast">Odds forecast</span>
+                <span className={statusClassName(marketUiStatus(detail.market))}>{statusLabel(marketUiStatus(detail.market))}</span>
+              </div>
             </section>
 
             <section className="prediction-card">
@@ -87,7 +92,7 @@ export default function MarketDetailClient() {
                     <Link key={thesis.thesisId} href={`/thesis/${thesis.thesisId}`} className="prediction-card thesis-list-item">
                       <div className="card-topline">
                         <span>{thesis.authorHandle}</span>
-                        <span>{thesis.copiedCount} copied</span>
+                        <span className={statusClassName(thesisUiStatus(thesis))}>{statusLabel(thesisUiStatus(thesis))}</span>
                       </div>
                       <h2>{thesis.selectedOutcomeLabel} at {formatOdds(thesis.oddsAtPost)}</h2>
                       <p>{thesis.rationale}</p>

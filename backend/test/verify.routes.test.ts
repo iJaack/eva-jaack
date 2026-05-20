@@ -5,6 +5,20 @@ import { fetchJson } from './helpers.js';
 import { sampleArticle, sampleReport } from './fixtures.js';
 
 describe('verify routes', () => {
+  it('rejects invalid JSON bodies at the route boundary', async () => {
+    const app = new Hono();
+    app.route('/api/verify', createVerifyRoutes());
+
+    const response = await fetchJson(app, '/api/verify', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: '{',
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: 'Invalid JSON body' });
+  });
+
   it('rejects missing url', async () => {
     const app = new Hono();
     app.route('/api/verify', createVerifyRoutes());
@@ -41,6 +55,10 @@ describe('verify routes', () => {
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
       success: true,
+      payment: {
+        required: false,
+        reason: 'x402 is not enforced in production until request verification is implemented.',
+      },
       articleMatch: {
         articleId: sampleArticle.id,
         matchesExistingSubmission: true,

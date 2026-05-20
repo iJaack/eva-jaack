@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { put } from '@vercel/blob';
 import { config } from '../config.js';
 
 export interface StorageService {
@@ -110,6 +111,37 @@ class LocalStorageService implements StorageService {
   }
 }
 
+// ── Vercel Blob (durable object storage) ──────────────────────────────
+
+class VercelBlobStorageService implements StorageService {
+  readonly provider = 'vercel-blob';
+
+  constructor(private readonly token: string) {}
+
+  async uploadJSON(data: object, options?: { name?: string }): Promise<string> {
+    const name = options?.name ?? `eva-verification-${Date.now()}.json`;
+    const blob = await put(name, JSON.stringify(data, null, 2), {
+      access: 'public',
+      addRandomSuffix: true,
+      contentType: 'application/json',
+      token: this.token,
+    });
+
+    return blob.url;
+  }
+
+  async loadJSON<T>(uri: string): Promise<T | null> {
+    if (!uri) return null;
+
+    const res = await fetch(uri);
+    if (!res.ok) {
+      throw new Error(`Failed to load JSON from ${uri}: ${res.status}`);
+    }
+
+    return res.json() as Promise<T>;
+  }
+}
+
 // ── Unavailable fallback ─────────────────────────────────────────────
 
 class UnavailableStorageService implements StorageService {
@@ -117,7 +149,7 @@ class UnavailableStorageService implements StorageService {
 
   async uploadJSON(): Promise<string> {
     throw new Error(
-      'No storage provider configured. Set EVA_STORAGE_PROVIDER=pinata and provide PINATA_JWT, or use EVA_STORAGE_PROVIDER=local for development.',
+      'No storage provider configured. Set EVA_STORAGE_PROVIDER=pinata with PINATA_JWT, EVA_STORAGE_PROVIDER=vercel-blob with BLOB_READ_WRITE_TOKEN, or use EVA_STORAGE_PROVIDER=local for development.',
     );
   }
 
@@ -140,14 +172,19 @@ export function getStorageService(): StorageService {
     return cachedService;
   }
 
+  if ((provider === 'vercel-blob' || provider === 'auto') && config.blobReadWriteToken) {
+    cachedService = new VercelBlobStorageService(config.blobReadWriteToken);
+    return cachedService;
+  }
+
   if (provider === 'local') {
     cachedService = new LocalStorageService(config.storageDir || defaultStorageDir);
     return cachedService;
   }
 
-  // In auto mode without Pinata credentials, fall back to local filesystem storage
+  // In auto mode without remote credentials, fall back to local filesystem storage
   if (provider === 'auto') {
-    console.warn('[storage] No Pinata credentials found, falling back to local filesystem storage');
+    console.warn('[storage] No remote storage credentials found, falling back to local filesystem storage');
     cachedService = new LocalStorageService(config.storageDir || defaultStorageDir);
     return cachedService;
   }

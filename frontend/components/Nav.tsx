@@ -10,8 +10,13 @@ const navItems: readonly { href: string; label: string; exact?: boolean; highlig
   { href: "/markets", label: "Markets" },
   { href: "/compose", label: "Compose" },
   { href: "/predictors", label: "Predictors" },
+  { href: "/verify", label: "Verify" },
   { href: "/blog", label: "Blog" },
 ];
+
+const utilityItems = [
+  { href: "/curators/register", label: "Register" },
+] as const;
 
 export default function Nav() {
   const pathname = usePathname();
@@ -22,7 +27,7 @@ export default function Nav() {
       <a href="#main-content" className="skip-link">
         Skip to Content
       </a>
-      <Link href="/" className="brand" style={{ textDecoration: "none" }} onClick={() => setMenuOpen(false)}>
+      <Link href="/" className="brand" onClick={() => setMenuOpen(false)}>
         <div className="brand-mark" aria-hidden />
         <div className="brand-text">
           <span className="brand-title">Eva Predicts</span>
@@ -52,6 +57,20 @@ export default function Nav() {
               key={item.href}
               href={item.href}
               className={`nav-pill${active ? " nav-pill-active" : ""}${item.highlight ? " nav-pill-highlight" : ""}`}
+              onClick={() => setMenuOpen(false)}
+            >
+              {item.label}
+            </Link>
+          );
+        })}
+        <span className="nav-divider" aria-hidden />
+        {utilityItems.map((item) => {
+          const active = pathname.startsWith(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`nav-pill nav-pill-utility${active ? " nav-pill-active" : ""}`}
               onClick={() => setMenuOpen(false)}
             >
               {item.label}

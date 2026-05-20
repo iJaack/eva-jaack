@@ -10,7 +10,8 @@ test("primary navigation stays focused while footer exposes secondary infrastruc
   await expect(header.getByRole("link", { name: "Compose" })).toBeVisible();
   await expect(header.getByRole("link", { name: "Predictors" })).toBeVisible();
   await expect(header.getByRole("link", { name: "Blog" })).toBeVisible();
-  await expect(header.getByRole("link", { name: "Verify" })).toHaveCount(0);
+  await expect(header.getByRole("link", { name: "Verify" })).toBeVisible();
+  await expect(header.getByRole("link", { name: "Register" })).toBeVisible();
   await expect(header.getByRole("link", { name: "Claims" })).toHaveCount(0);
   await expect(header.getByRole("link", { name: "Sources" })).toHaveCount(0);
 

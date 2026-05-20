@@ -10,7 +10,12 @@ import {IEvaReputationAdapter} from "./interfaces/IEvaReputationAdapter.sol";
 import {IEvaTrustGraph} from "./interfaces/IEvaTrustGraph.sol";
 import {IERC8004Reputation} from "./interfaces/IERC8004Reputation.sol";
 
-contract EvaVerificationReputationAdapter is Initializable, UUPSUpgradeable, AccessControlUpgradeable, IEvaReputationAdapter {
+contract EvaVerificationReputationAdapter is
+    Initializable,
+    UUPSUpgradeable,
+    AccessControlUpgradeable,
+    IEvaReputationAdapter
+{
     bytes32 public constant MARKET_ROLE = keccak256("MARKET_ROLE");
 
     struct CuratorMarketStats {
@@ -47,8 +52,10 @@ contract EvaVerificationReputationAdapter is Initializable, UUPSUpgradeable, Acc
         address market_,
         string calldata feedbackEndpoint_
     ) external initializer {
-        if (trustGraph_ == address(0) || reputationRegistry_ == address(0) || admin_ == address(0) || market_ == address(0))
-        {
+        if (
+            trustGraph_ == address(0) || reputationRegistry_ == address(0) || admin_ == address(0)
+                || market_ == address(0)
+        ) {
             revert InvalidAddress();
         }
 

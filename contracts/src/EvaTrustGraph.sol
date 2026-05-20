@@ -111,6 +111,10 @@ contract EvaTrustGraph is
     /// @param curatorAgentId ERC-8004 identity agent id that must be owned by the caller.
     /// @param amount Self-stake amount in $EVA.
     function registerCurator(uint256 curatorAgentId, uint256 amount) external nonReentrant {
+        if (curatorAgentId == 0) {
+            revert InvalidAmount();
+        }
+
         uint256 requiredStake = _requiredSelfStake(INITIAL_TRUST_SCORE);
         if (amount < requiredStake) {
             revert StakeBelowMinimum();
@@ -145,6 +149,10 @@ contract EvaTrustGraph is
     /// @notice Admin-only bootstrap registration with zero stake (for protocol launch).
     /// @param curatorAgentId ERC-8004 identity agent id that must be owned by the caller.
     function bootstrapCurator(uint256 curatorAgentId) external onlyRole(DEFAULT_ADMIN_ROLE) nonReentrant {
+        if (curatorAgentId == 0) {
+            revert InvalidAmount();
+        }
+
         Curator storage curator = _curators[msg.sender];
         if (curator.registered) {
             revert AlreadyRegistered();
@@ -418,7 +426,8 @@ contract EvaTrustGraph is
             "https://eva.jaack.me/api/verify",
             evidenceURI,
             responseHash
-        ) {} catch {}
+        ) {}
+            catch {}
     }
 
     /// @notice Applies inactivity decay to a curator trust score.
@@ -503,7 +512,8 @@ contract EvaTrustGraph is
         if (decayEpochSeconds_ == 0) {
             revert InvalidAmount();
         }
-        if (minSelfStake_ == 0 && minBacking_ != 0) {  // allow both 0 for bootstrap
+        if (minSelfStake_ == 0 && minBacking_ != 0) {
+            // allow both 0 for bootstrap
             revert InvalidAmount();
         }
         if (minYieldMultiplierBps_ == 0 || maxYieldMultiplierBps_ < minYieldMultiplierBps_) {
@@ -652,7 +662,10 @@ contract EvaTrustGraph is
         emit YieldFunded(submitter, fee, yieldReserve);
     }
 
-    function updateSubmissionFees(uint256 submissionFee_, uint256 premiumSubmissionFee_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function updateSubmissionFees(uint256 submissionFee_, uint256 premiumSubmissionFee_)
+        external
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
         submissionFee = submissionFee_;
         premiumSubmissionFee = premiumSubmissionFee_;
     }

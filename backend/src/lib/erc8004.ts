@@ -106,6 +106,7 @@ export const publicClient = createPublicClient({
   chain: avalanche,
   transport: http(config.avalancheRpc),
 });
+const readContractLoose = publicClient.readContract as unknown as (args: unknown) => Promise<unknown>;
 
 export async function getSummary(
   agentId: bigint,
@@ -113,12 +114,12 @@ export async function getSummary(
   tag1: string,
   tag2: string,
 ): Promise<{ count: bigint; total: bigint; decimals: number }> {
-  const result = await publicClient.readContract({
+  const result = await readContractLoose({
     address: config.erc8004Reputation,
     abi: reputationReadAbi,
     functionName: 'getSummary',
     args: [agentId, clientAddresses, tag1, tag2],
-  });
+  }) as [bigint, bigint, number];
 
   return { count: result[0], total: result[1], decimals: result[2] };
 }
@@ -128,18 +129,18 @@ export async function readFeedback(
   clientAddress: `0x${string}`,
   feedbackIndex: bigint,
 ): Promise<{ value: bigint; valueDecimals: number; tag1: string; tag2: string; revoked: boolean }> {
-  const result = await publicClient.readContract({
+  const result = await readContractLoose({
     address: config.erc8004Reputation,
     abi: reputationReadAbi,
     functionName: 'readFeedback',
     args: [agentId, clientAddress, feedbackIndex],
-  });
+  }) as [bigint, number, string, string, boolean];
 
   return { value: result[0], valueDecimals: result[1], tag1: result[2], tag2: result[3], revoked: result[4] };
 }
 
 export async function getClients(agentId: bigint): Promise<`0x${string}`[]> {
-  return publicClient.readContract({
+  return readContractLoose({
     address: config.erc8004Reputation,
     abi: reputationReadAbi,
     functionName: 'getClients',
@@ -154,12 +155,12 @@ export async function readAllFeedback(
   tag2: string,
   includeRevoked: boolean,
 ) {
-  const result = await publicClient.readContract({
+  const result = await readContractLoose({
     address: config.erc8004Reputation,
     abi: reputationReadAbi,
     functionName: 'readAllFeedback',
     args: [agentId, clientAddresses, tag1, tag2, includeRevoked],
-  });
+  }) as [`0x${string}`[], bigint[], bigint[], number[], string[], string[], boolean[]];
 
   return {
     clients: result[0],

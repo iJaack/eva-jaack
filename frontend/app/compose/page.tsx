@@ -26,8 +26,23 @@ function ComposeInner() {
     getMarkets().then((response) => setMarkets(response.markets)).catch(() => setMarkets([]));
   }, []);
 
+  const selectedMarket = markets.find((market) => market.marketId === marketId) ?? null;
+  const marketContextReady = Boolean(marketId || marketTitle.trim() || marketUrl.trim());
+  const authorReady = Boolean(authorHandle.trim());
+  const outcomeReady = Boolean(selectedOutcomeLabel.trim());
+  const rationaleReady = Boolean(rationale.trim());
+  const evidenceCount = evidence
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean).length;
+  const canPublish = authorReady && marketContextReady && outcomeReady && rationaleReady && !submitting;
+
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!canPublish) {
+      setError("Add an author, market context, outcome, and rationale before publishing.");
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
@@ -59,7 +74,7 @@ function ComposeInner() {
         <section className="mobile-page-head">
           <p className="eyebrow">Compose</p>
           <h1>Publish a prediction thesis built for X.</h1>
-          <p>Start from a market URL, X post, or manual question. Eva stores the track record offchain first.</p>
+          <p>Start from a market URL, X post, or manual question. Eva stores a forecast record and keeps truth or resolution status separate until evidence resolves.</p>
           <div className="mobile-hero-actions">
             <Link href="/verify" className="mobile-action">
               Check source first
@@ -87,57 +102,90 @@ function ComposeInner() {
             </div>
           </section>
         ) : (
-          <form className="prediction-card compose-form" onSubmit={submit}>
-            <label className="field-group">
-              <span className="field-label">X handle</span>
-              <input className="field-input" value={authorHandle} onChange={(event) => setAuthorHandle(event.target.value)} placeholder="@evapredicts" required />
-            </label>
+          <section className="compose-layout">
+            <form className="prediction-card compose-form" onSubmit={submit}>
+              <label className="field-group">
+                <span className="field-label">X handle</span>
+                <input className="field-input" value={authorHandle} onChange={(event) => setAuthorHandle(event.target.value)} placeholder="@evapredicts" required />
+              </label>
 
-            <label className="field-group">
-              <span className="field-label">Existing market</span>
-              <select className="field-input" value={marketId} onChange={(event) => setMarketId(event.target.value)}>
-                <option value="">Create from URL/title</option>
-                {markets.map((market) => (
-                  <option key={market.marketId} value={market.marketId}>
-                    {market.title}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <label className="field-group">
+                <span className="field-label">Existing market</span>
+                <select className="field-input" value={marketId} onChange={(event) => setMarketId(event.target.value)}>
+                  <option value="">Create from URL/title</option>
+                  {markets.map((market) => (
+                    <option key={market.marketId} value={market.marketId}>
+                      {market.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-            {!marketId ? (
-              <>
-                <label className="field-group">
-                  <span className="field-label">Market title</span>
-                  <input className="field-input" value={marketTitle} onChange={(event) => setMarketTitle(event.target.value)} placeholder="Will crude oil trade above $95 before close?" />
-                </label>
-                <label className="field-group">
-                  <span className="field-label">Market or source URL</span>
-                  <input className="field-input" value={marketUrl} onChange={(event) => setMarketUrl(event.target.value)} placeholder="https://x.com/... or https://polymarket.com/..." />
-                </label>
-              </>
-            ) : null}
+              {!marketId ? (
+                <>
+                  <label className="field-group">
+                    <span className="field-label">Market title</span>
+                    <input className="field-input" value={marketTitle} onChange={(event) => setMarketTitle(event.target.value)} placeholder="Will crude oil trade above $95 before close?" />
+                  </label>
+                  <label className="field-group">
+                    <span className="field-label">Market or source URL</span>
+                    <input className="field-input" value={marketUrl} onChange={(event) => setMarketUrl(event.target.value)} placeholder="https://x.com/... or https://polymarket.com/..." />
+                  </label>
+                </>
+              ) : null}
 
-            <label className="field-group">
-              <span className="field-label">Outcome</span>
-              <input className="field-input" value={selectedOutcomeLabel} onChange={(event) => setSelectedOutcomeLabel(event.target.value)} placeholder="Yes" required />
-            </label>
+              <label className="field-group">
+                <span className="field-label">Outcome</span>
+                <input className="field-input" value={selectedOutcomeLabel} onChange={(event) => setSelectedOutcomeLabel(event.target.value)} placeholder="Yes" required />
+              </label>
 
-            <label className="field-group">
-              <span className="field-label">Rationale</span>
-              <textarea className="field-input compose-textarea" value={rationale} onChange={(event) => setRationale(event.target.value)} placeholder="Why is this outcome mispriced?" required />
-            </label>
+              <label className="field-group">
+                <span className="field-label">Rationale</span>
+                <textarea className="field-input compose-textarea" value={rationale} onChange={(event) => setRationale(event.target.value)} placeholder="Why is this outcome mispriced?" required />
+              </label>
 
-            <label className="field-group">
-              <span className="field-label">Evidence links</span>
-              <textarea className="field-input compose-textarea compose-textarea-small" value={evidence} onChange={(event) => setEvidence(event.target.value)} placeholder="One URL per line" />
-            </label>
+              <label className="field-group">
+                <span className="field-label">Evidence links</span>
+                <textarea className="field-input compose-textarea compose-textarea-small" value={evidence} onChange={(event) => setEvidence(event.target.value)} placeholder="One URL per line" />
+              </label>
 
-            {error ? <p className="claim-warning">{error}</p> : null}
-            <button className="mobile-action mobile-action-primary compose-submit" type="submit" disabled={submitting}>
-              {submitting ? "Publishing..." : "Publish thesis"}
-            </button>
-          </form>
+              {error ? <p className="claim-warning">{error}</p> : null}
+              <button className="mobile-action mobile-action-primary compose-submit" type="submit" disabled={!canPublish}>
+                {submitting ? "Publishing..." : "Publish thesis"}
+              </button>
+            </form>
+
+            <aside className="compose-sidecar">
+              <article className="prediction-card">
+                <div className="card-topline">
+                  <span>Forecast record</span>
+                  <span className={canPublish ? "status-chip status-chip-forecast" : "status-chip status-chip-unresolved"}>
+                    {canPublish ? "Ready to publish" : "Draft"}
+                  </span>
+                </div>
+                <h2>Thesis readiness</h2>
+                <p>
+                  Eva records the forecast and evidence bundle. It does not mark the outcome true until a resolver or evidence process reaches a separate status.
+                </p>
+                <ul className="readiness-list">
+                  <li><span>Author identity</span><strong>{authorReady ? authorHandle : "Needed"}</strong></li>
+                  <li><span>Market context</span><strong>{marketContextReady ? ((selectedMarket?.title ?? marketTitle) || "URL attached") : "Market context needed"}</strong></li>
+                  <li><span>Forecast outcome</span><strong>{outcomeReady ? selectedOutcomeLabel : "Needed"}</strong></li>
+                  <li><span>Evidence links</span><strong>{evidenceCount}</strong></li>
+                  <li><span>Resolution status</span><strong>Unresolved</strong></li>
+                </ul>
+              </article>
+
+              <article className="prediction-card">
+                <h2>Claim bundle fields</h2>
+                <p>When evidence is attached, the useful bundle is claim, source, author or agent identity, confidence, conflicts, deadline, resolver, dispute window, and outcome.</p>
+                <div className="status-row">
+                  <span className="status-chip status-chip-forecast">Forecast</span>
+                  <span className="status-chip status-chip-unresolved">Unresolved</span>
+                </div>
+              </article>
+            </aside>
+          </section>
         )}
 
         <SiteFooter />

@@ -5,13 +5,7 @@ import { FormEvent, useRef, useState } from "react";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import { verifyArticleUrl, type VerificationResult } from "@/lib/api";
-
-function claimTone(score: number): string {
-  if (score >= 75) return "#237a4b";
-  if (score >= 50) return "#9a6a00";
-  if (score >= 25) return "#b35a18";
-  return "#b42318";
-}
+import { scoreUiStatus, statusClassName, statusLabel } from "@/lib/status";
 
 export default function VerifyPage() {
   const [url, setUrl] = useState("");
@@ -54,7 +48,7 @@ export default function VerifyPage() {
           <h1>Check a source before it backs a thesis.</h1>
           <p>
             Paste a source URL and Eva will extract factual claims, score the evidence, and return a report
-            you can use when publishing or challenging a market thesis.
+            you can use when publishing or challenging a market thesis. This verifies evidence quality; it does not turn forecast odds into truth.
           </p>
           <div className="mobile-hero-actions">
             <Link href="/compose" className="mobile-action mobile-action-primary">
@@ -101,6 +95,10 @@ export default function VerifyPage() {
               {submitting ? "Checking…" : "Check Evidence"}
             </button>
           </form>
+          <p className="market-boundary-note">
+            x402 payment enforcement is disabled until a request can be bound to the exact URL, claim ID, chain,
+            amount, expiry, and replay guard. Until then this tool runs as an evidence-quality check.
+          </p>
         </section>
 
         {result ? (
@@ -108,15 +106,18 @@ export default function VerifyPage() {
             <article className="prediction-card verify-result-card">
               <div className="card-topline">
                 <span>Evidence Report</span>
-                <span>{result.verification.claimCount} claims</span>
+                <span className={statusClassName(scoreUiStatus(result.verification.overallScore))}>
+                  {statusLabel(scoreUiStatus(result.verification.overallScore))}
+                </span>
               </div>
               <h2>{result.verification.report.title || result.verification.report.url}</h2>
+              <p className="market-boundary-note">
+                Evidence score is separate from market outcome. Use it to support, dispute, or resolve a claim bundle.
+              </p>
               <div className="odds-row">
                 <div>
-                  <span>Score</span>
-                  <strong style={{ color: claimTone(result.verification.overallScore) }}>
-                    {result.verification.overallScore}
-                  </strong>
+                  <span>Evidence score</span>
+                  <strong>{result.verification.overallScore}</strong>
                 </div>
                 <div>
                   <span>Onchain</span>
@@ -143,12 +144,12 @@ export default function VerifyPage() {
 
             <div className="thesis-stack">
               {result.verification.report.claims.map((claim, index) => {
-                const tone = claimTone(claim.score);
+                const claimStatus = scoreUiStatus(claim.score);
                 return (
                   <article key={`${claim.claim.text}-${index}`} className="prediction-card verify-claim-card">
                     <div className="card-topline">
                       <span>Claim {index + 1}</span>
-                      <span style={{ color: tone }}>Score {claim.score}</span>
+                      <span className={statusClassName(claimStatus)}>{statusLabel(claimStatus)} · {claim.score}</span>
                     </div>
                     <h2>{claim.claim.text}</h2>
                     <p>{claim.explanation}</p>

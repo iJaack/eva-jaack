@@ -52,6 +52,7 @@ export default function PredictorDetailClient() {
                 {detail.predictor.profileState === "registered"
                   ? "This predictor is linked to an Eva trust graph identity."
                   : "This product record can be claimed later by connecting a wallet and Eva identity."}
+                {" "}Forecast records and truth or resolution status remain separate.
               </p>
             </section>
 
@@ -79,9 +80,9 @@ export default function PredictorDetailClient() {
                   <p>Canonical graph state from registered identity and reputation receipts.</p>
                 </div>
                 <div>
-                  <span>Market Record</span>
+                  <span>Resolution Record</span>
                   <strong>{detail.predictor.bestCategory ?? "Pending"}</strong>
-                  <p>Offchain thesis stats until markets resolve and can feed reputation.</p>
+                  <p>Offchain thesis stats stay separate from resolved outcomes until evidence can feed reputation.</p>
                 </div>
               </div>
               {detail.predictor.profileState === "unclaimed" ? (

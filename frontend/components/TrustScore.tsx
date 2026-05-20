@@ -1,10 +1,10 @@
 "use client";
 
 function scoreColor(score: number): string {
-  if (score >= 75) return "#34a853";
-  if (score >= 50) return "#f5b731";
-  if (score >= 25) return "#e8803a";
-  return "#e74c3c";
+  if (score >= 75) return "var(--color-success)";
+  if (score >= 50) return "var(--color-warning)";
+  if (score >= 25) return "var(--color-caution)";
+  return "var(--color-danger)";
 }
 
 export default function TrustScore({
@@ -42,7 +42,7 @@ export default function TrustScore({
           strokeDasharray={`${filled} ${circumference - filled}`}
           strokeDashoffset={circumference / 4}
           strokeLinecap="round"
-          style={{ transition: "stroke-dasharray 0.5s ease" }}
+          style={{ transition: "stroke-dasharray var(--dur-slow) var(--ease-out)" }}
         />
       </svg>
       <div className="trust-score-value" style={{ color }}>
@@ -65,9 +65,9 @@ export function ScoreBadge({
     <span
       className="score-badge"
       style={{
-        background: `${color}18`,
+        background: `color-mix(in oklch, ${color} 14%, transparent)`,
         color,
-        borderColor: `${color}40`,
+        borderColor: `color-mix(in oklch, ${color} 40%, transparent)`,
       }}
     >
       {label ? `${label}: ` : ""}

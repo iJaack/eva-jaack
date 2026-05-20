@@ -68,6 +68,22 @@ contract EvaTrustGraphTest is Test {
         graph.registerCurator(CURATOR_AGENT_ID, 250_000e18);
     }
 
+    function testRegisterCuratorRejectsZeroAgentIdEvenWhenOwned() external {
+        identity.setOwner(0, curator);
+
+        vm.prank(curator);
+        vm.expectRevert();
+        graph.registerCurator(0, 250_000e18);
+    }
+
+    function testBootstrapCuratorRejectsZeroAgentIdEvenWhenOwned() external {
+        identity.setOwner(0, admin);
+
+        vm.prank(admin);
+        vm.expectRevert();
+        graph.bootstrapCurator(0);
+    }
+
     function testBackAndUnbackCurator() external {
         vm.prank(curator);
         graph.registerCurator(CURATOR_AGENT_ID, 250_000e18);
@@ -113,6 +129,36 @@ contract EvaTrustGraphTest is Test {
         assertEq(uint8(article.status), uint8(IEvaTrustGraph.ArticleStatus.Verified));
         assertEq(validation.callCount(), 1);
         assertEq(reputation.callCount(), 1);
+    }
+
+    function testArticleIdsSequenceAcrossStandardAndPremiumSubmissions() external {
+        _registerCurator();
+
+        vm.prank(curator);
+        uint256 firstArticleId = graph.submitArticle(keccak256("sequenced-standard-1"), "ipfs://standard-1");
+
+        vm.prank(curator);
+        uint256 secondArticleId = graph.submitArticlePremium(keccak256("sequenced-premium"), "ipfs://premium");
+
+        vm.prank(curator);
+        uint256 thirdArticleId = graph.submitArticle(keccak256("sequenced-standard-2"), "ipfs://standard-2");
+
+        IEvaTrustGraph.ArticleSubmission memory firstArticle = graph.getArticle(firstArticleId);
+        IEvaTrustGraph.ArticleSubmission memory secondArticle = graph.getArticle(secondArticleId);
+        IEvaTrustGraph.ArticleSubmission memory thirdArticle = graph.getArticle(thirdArticleId);
+        IEvaTrustGraph.Curator memory curatorState = graph.getCurator(curator);
+
+        assertEq(firstArticleId, 1);
+        assertEq(secondArticleId, 2);
+        assertEq(thirdArticleId, 3);
+        assertEq(graph.nextArticleId(), thirdArticleId);
+        assertEq(curatorState.articleCount, 3);
+        assertFalse(firstArticle.premium);
+        assertTrue(secondArticle.premium);
+        assertFalse(thirdArticle.premium);
+        assertNotEq(firstArticle.requestHash, secondArticle.requestHash);
+        assertNotEq(secondArticle.requestHash, thirdArticle.requestHash);
+        assertEq(uint8(firstArticle.status), uint8(IEvaTrustGraph.ArticleStatus.Pending));
     }
 
     function testVerificationYieldDistributionLifecycle() external {
@@ -377,7 +423,8 @@ contract EvaTrustGraphTest is Test {
         graph.fundYield(2_000e18);
 
         vm.prank(curator);
-        uint256 articleId = graph.submitArticle(keccak256("delegator-post-deactivate"), "ipfs://delegator-post-deactivate");
+        uint256 articleId =
+            graph.submitArticle(keccak256("delegator-post-deactivate"), "ipfs://delegator-post-deactivate");
 
         vm.prank(oracle);
         graph.processVerification(

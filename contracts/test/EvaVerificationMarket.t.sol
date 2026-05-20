@@ -131,17 +131,14 @@ contract EvaVerificationMarketTest is Test {
         );
 
         vm.prank(curatorA);
-        uint256 challengeId = market.openChallenge(
-            claimId, 50e18, keccak256("challenge-rationale"), keccak256("challenge-evidence")
-        );
+        uint256 challengeId =
+            market.openChallenge(claimId, 50e18, keccak256("challenge-rationale"), keccak256("challenge-evidence"));
 
         vm.prank(resolver);
         market.resolveChallenge(challengeId, IEvaVerificationMarket.ChallengeStatus.Accepted);
 
         vm.prank(resolver);
-        market.resolveClaim(
-            claimId, IEvaVerificationMarket.Verdict.Verified, 91, keccak256("resolution-root"), true
-        );
+        market.resolveClaim(claimId, IEvaVerificationMarket.Verdict.Verified, 91, keccak256("resolution-root"), true);
 
         IEvaVerificationMarket.ClaimCore memory softResolvedClaim = market.getClaim(claimId);
         assertEq(uint8(softResolvedClaim.status), uint8(IEvaVerificationMarket.ClaimStatus.SoftResolved));
@@ -192,20 +189,13 @@ contract EvaVerificationMarketTest is Test {
 
         vm.prank(curatorA);
         market.stakeVerdict(
-            claimId,
-            IEvaVerificationMarket.Verdict.Verified,
-            100e18,
-            75,
-            keccak256("rationale"),
-            keccak256("evidence")
+            claimId, IEvaVerificationMarket.Verdict.Verified, 100e18, 75, keccak256("rationale"), keccak256("evidence")
         );
 
         adapter.setFailures(false, true);
 
         vm.prank(resolver);
-        market.resolveClaim(
-            claimId, IEvaVerificationMarket.Verdict.Verified, 80, keccak256("final-resolution"), false
-        );
+        market.resolveClaim(claimId, IEvaVerificationMarket.Verdict.Verified, 80, keccak256("final-resolution"), false);
 
         IEvaVerificationMarket.ClaimCore memory claim = market.getClaim(claimId);
         vm.warp(claim.challengeWindowEnd);
@@ -218,6 +208,49 @@ contract EvaVerificationMarketTest is Test {
         assertGt(market.claimableRewards(curatorA), 0);
     }
 
+    function testUpdateMarketParametersRejectsOverallocatedRewardPools() external {
+        vm.prank(admin);
+        vm.expectRevert(EvaVerificationMarket.InvalidAmount.selector);
+        market.updateMarketParameters(100e18, 50e18, 8_000, 3, 1_000, 2_000, 1_000);
+    }
+
+    function testSettlementSkipsReputationHooksWhenAdapterUnset() external {
+        bytes32 claimId = _createDefaultClaim();
+
+        vm.prank(admin);
+        market.setReputationAdapter(address(0));
+
+        vm.prank(curatorA);
+        market.fundClaimFee(claimId, 200e18);
+
+        vm.prank(curatorA);
+        market.stakeVerdict(
+            claimId,
+            IEvaVerificationMarket.Verdict.Verified,
+            100e18,
+            75,
+            keccak256("no-adapter-rationale"),
+            keccak256("no-adapter-evidence")
+        );
+
+        vm.prank(resolver);
+        market.resolveClaim(
+            claimId, IEvaVerificationMarket.Verdict.Verified, 80, keccak256("no-adapter-resolution"), false
+        );
+
+        IEvaVerificationMarket.ClaimCore memory claim = market.getClaim(claimId);
+        vm.warp(claim.challengeWindowEnd);
+        vm.prank(resolver);
+        market.finalizeClaim(claimId);
+
+        vm.prank(curatorA);
+        market.settleCurator(claimId, curatorA);
+
+        assertEq(adapter.lastResolvedClaimId(), bytes32(0));
+        assertEq(adapter.curatorSettledCallCount(), 0);
+        assertGt(market.claimableRewards(curatorA), 0);
+    }
+
     function _createDefaultClaim() internal returns (bytes32 claimId) {
         bytes32 sourceRefHash = keccak256("https://x.com/eva/status/1");
         bytes32 claimHash = keccak256("claim-hash");
@@ -225,9 +258,7 @@ contract EvaVerificationMarketTest is Test {
         uint64 reviewDeadline = uint64(block.timestamp + 1 days);
         uint64 challengeWindowEnd = uint64(block.timestamp + 3 days);
 
-        claimId = keccak256(
-            abi.encode(IEvaVerificationMarket.SourcePlatform.X, sourceRefHash, claimHash)
-        );
+        claimId = keccak256(abi.encode(IEvaVerificationMarket.SourcePlatform.X, sourceRefHash, claimHash));
 
         market.createClaim(
             IEvaVerificationMarket.SourcePlatform.X,

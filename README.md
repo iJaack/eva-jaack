@@ -17,9 +17,18 @@ records copy intent without custodying funds or placing trades.
 - `frontend/` — Next.js application for the mobile-first prediction feed, thesis composer, market pages, predictor profiles, verification flow, and curator onboarding
 - `backend/` — Hono API for markets, theses, predictors, X command ingestion, verification, article detail, curator detail, and trust summaries
 - `contracts/` — Foundry workspace containing `EvaTrustGraph.sol`
-- `contracts/` — Foundry workspace containing `EvaTrustGraph.sol` and additive verification-market modules
 - `docs/` — aligned product, architecture, design, and task documents
 - `protocol.config.json` — shared source of truth for site URL, chain metadata, contract addresses, and Eva oracle identity
+
+## Product docs
+
+- [Architecture](docs/ARCHITECTURE.md) — current system boundaries, live/future split, and request flows
+- [Product strategy](docs/PRODUCT_STRATEGY.md) — v1 strategy, claim-bundle schema, status taxonomy, risk policy, and x402 boundary
+- [Roadmap](docs/ROADMAP.md) — milestone plan with regression checks per milestone
+- [Business plan](docs/BUSINESS_PLAN.md) — product thesis, segments, scoreboards, risks, and operating plan
+- [Go-to-market](docs/GO_TO_MARKET.md) — positioning, channel plan, launch loops, and do-not-claim list
+- [Curator onboarding FAQ](docs/CURATOR_ONBOARDING_FAQ.md) — reference copy for registration and trust inspection
+- [CEO autonomy instructions](docs/autonomy/EVAPROTOCOL_CEO.md) — autonomous operating loop and cron/update guidance
 
 ## Shared source of truth
 

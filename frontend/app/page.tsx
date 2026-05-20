@@ -12,6 +12,7 @@ import {
   type Predictor,
   type Thesis,
 } from "@/lib/api";
+import { marketUiStatus, statusClassName, statusLabel, thesisUiStatus } from "@/lib/status";
 
 const compactUsdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -47,11 +48,13 @@ function MarketStrip({ markets }: { markets: PredictionMarket[] }) {
     <div className="mobile-strip" aria-label="Trending markets">
       {markets.map((market) => {
         const outcome = leadingOutcome(market);
+        const uiStatus = marketUiStatus(market);
 
         return (
           <Link key={market.marketId} href={`/markets/${market.marketId}`} className="market-chip">
             <span>{market.category}</span>
             <strong>{outcome ? `${outcome.label} ${formatOdds(outcome.price)}` : "No odds"}</strong>
+            <span className={statusClassName(uiStatus)}>{statusLabel(uiStatus)}</span>
           </Link>
         );
       })}
@@ -59,10 +62,25 @@ function MarketStrip({ markets }: { markets: PredictionMarket[] }) {
   );
 }
 
+const deskModules = [
+  {
+    title: "Forecast",
+    body: "External odds show market belief. Eva does not treat odds as truth.",
+  },
+  {
+    title: "Evidence layer",
+    body: "Theses carry source links, claim packets, and verification context.",
+  },
+  {
+    title: "Resolution",
+    body: "Truth status is separate: unresolved, verified, disputed, resolved, or void.",
+  },
+] as const;
+
 const productModules = [
   {
     title: "Markets",
-    body: "External odds and closing context for the questions Eva tracks.",
+    body: "External odds and close context for the questions Eva tracks as forecasts.",
   },
   {
     title: "Theses",
@@ -109,6 +127,10 @@ function ThesisCard({ thesis, market }: { thesis: Thesis; market: PredictionMark
         <h2>{market?.title ?? "Prediction thesis"}</h2>
         <p>{thesis.rationale}</p>
       </Link>
+      <div className="status-row" aria-label="Thesis status">
+        <span className={statusClassName("forecast")}>Forecast</span>
+        <span className={statusClassName(thesisUiStatus(thesis))}>{statusLabel(thesisUiStatus(thesis))}</span>
+      </div>
       <div className="odds-row">
         <div>
           <span>Outcome</span>
@@ -125,7 +147,7 @@ function ThesisCard({ thesis, market }: { thesis: Thesis; market: PredictionMark
       </div>
       <div className="sticky-action-row">
         <button className="mobile-action mobile-action-primary" type="button" onClick={previewCopy} disabled={copyPending}>
-          {copyPending ? "Preparing…" : "Copy Thesis"}
+          {copyPending ? "Preparing…" : "Preview Copy"}
         </button>
         <Link className="mobile-action" href={`/compose?counterTo=${thesis.thesisId}`}>
           Counter
@@ -178,6 +200,7 @@ export default function HomePage() {
           <h1>Track markets, publish theses, follow predictor reputation.</h1>
           <p>
             Eva connects external odds, thesis pages, evidence, and trust scores in one product surface.
+            Market odds are forecasts; resolution and evidence status are tracked separately.
           </p>
           <div className="mobile-hero-actions">
             <Link href="/compose" className="mobile-action mobile-action-primary">
@@ -186,6 +209,14 @@ export default function HomePage() {
             <Link href="/markets" className="mobile-action">
               Browse markets
             </Link>
+          </div>
+          <div className="product-desk-grid" aria-label="Eva product boundaries">
+            {deskModules.map((module) => (
+              <article key={module.title} className="workflow-card">
+                <h3>{module.title}</h3>
+                <p>{module.body}</p>
+              </article>
+            ))}
           </div>
         </section>
 
@@ -254,6 +285,7 @@ export default function HomePage() {
                       <div>
                         <span>{market.category}</span>
                         <strong>{market.title}</strong>
+                        <span className={statusClassName(marketUiStatus(market))}>{statusLabel(marketUiStatus(market))}</span>
                       </div>
                       <div>
                         <span>Vol</span>

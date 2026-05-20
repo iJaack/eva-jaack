@@ -7,6 +7,7 @@ import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import { getCopyPreview, getThesisDetail, type PredictionThesisDetail } from "@/lib/api";
 import { protocol } from "@/lib/protocol";
+import { statusClassName, statusLabel, thesisUiStatus } from "@/lib/status";
 
 function formatOdds(value: number): string {
   return `${Math.round(value * 100)}%`;
@@ -55,6 +56,10 @@ export default function ThesisDetailClient() {
             <section className="mobile-page-head thesis-hero">
               <p className="eyebrow">{detail.predictor.handle}</p>
               <h1>{detail.thesis.selectedOutcomeLabel} on {detail.market.title}</h1>
+              <div className="status-row">
+                <span className="status-chip status-chip-forecast">Odds forecast</span>
+                <span className={statusClassName(thesisUiStatus(detail.thesis))}>{statusLabel(thesisUiStatus(detail.thesis))}</span>
+              </div>
               <div className="odds-row odds-row-hero">
                 <div>
                   <span>Posted odds</span>
@@ -80,6 +85,9 @@ export default function ThesisDetailClient() {
               </div>
               <h2>Rationale</h2>
               <p>{detail.thesis.rationale}</p>
+              <p className="market-boundary-note">
+                This is a forecast thesis. Evidence links can support or dispute it, but truth status only changes through resolution.
+              </p>
               {detail.thesis.evidenceLinks.length > 0 ? (
                 <div className="evidence-list">
                   {detail.thesis.evidenceLinks.map((link) => (
@@ -105,9 +113,9 @@ export default function ThesisDetailClient() {
                   <p>Canonical graph-backed identity and trust.</p>
                 </div>
                 <div>
-                  <span>Market Record</span>
+                  <span>Resolution Record</span>
                   <strong>{detail.predictor.accuracy === null ? "Pending" : `${detail.predictor.accuracy}%`}</strong>
-                  <p>App-derived thesis stats until outcomes resolve.</p>
+                  <p>Forecast stats stay pending until outcomes resolve separately.</p>
                 </div>
               </div>
             </section>
@@ -131,7 +139,7 @@ export default function ThesisDetailClient() {
 
             <div className="mobile-bottom-actions">
               <button className="mobile-action mobile-action-primary" type="button" onClick={previewCopy}>
-                Copy thesis
+                Preview copy
               </button>
               <Link className="mobile-action" href={`/compose?counterTo=${detail.thesis.thesisId}&marketId=${detail.market.marketId}`}>
                 Counter

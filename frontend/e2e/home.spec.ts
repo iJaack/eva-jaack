@@ -154,7 +154,7 @@ test("copy thesis button shows pending state and announces the result", async ({
 
   await page.goto("/");
 
-  const copyButton = page.getByRole("button", { name: "Copy Thesis" });
+  const copyButton = page.getByRole("button", { name: "Preview Copy" });
   await copyButton.click();
 
   await expect(page.getByRole("button", { name: "Preparing…" })).toBeDisabled();

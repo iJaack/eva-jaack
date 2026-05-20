@@ -150,12 +150,9 @@ interface IEvaVerificationMarket {
         bytes32 evidenceRoot
     ) external;
 
-    function openChallenge(
-        bytes32 claimId,
-        uint256 bondAmount,
-        bytes32 reasonHash,
-        bytes32 evidenceRoot
-    ) external returns (uint256 challengeId);
+    function openChallenge(bytes32 claimId, uint256 bondAmount, bytes32 reasonHash, bytes32 evidenceRoot)
+        external
+        returns (uint256 challengeId);
 
     function resolveChallenge(uint256 challengeId, ChallengeStatus status) external;
 

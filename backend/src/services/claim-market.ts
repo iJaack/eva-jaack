@@ -6,6 +6,7 @@ import { config } from "../config.js";
 import { protocol } from "../protocol.js";
 import type {
   ClaimChallengePreviewResponse,
+  ClaimBundleDto,
   ClaimCreateResponse,
   ClaimFundingDto,
   ClaimListResponse,
@@ -65,7 +66,11 @@ export interface ClaimMarketService {
 }
 
 type ClaimStore = {
-  claims: ClaimMarketDetailResponse[];
+  claims: StoredClaim[];
+};
+
+type StoredClaim = Omit<ClaimMarketDetailResponse, "bundle"> & {
+  bundle?: ClaimBundleDto;
 };
 
 const defaultClaimIndexPath = resolve(
@@ -140,6 +145,75 @@ function openStatus(status: MarketClaimStatus): boolean {
   return status === "open" || status === "under_review" || status === "contested";
 }
 
+function zeroAddressToNull(value: string): string | null {
+  return /^0x0{40}$/i.test(value) ? null : value;
+}
+
+function conflictFlagsFor(claim: StoredClaim): string[] {
+  const flags: string[] = [];
+
+  if (claim.evidenceLinks.length === 0) {
+    flags.push("missing-evidence");
+  }
+
+  if (!claim.machineAssessment) {
+    flags.push("missing-machine-assessment");
+  } else {
+    if (claim.machineAssessment.confidence < 60) {
+      flags.push("low-confidence");
+    }
+    if (claim.machineAssessment.verdict === "mixed" || claim.machineAssessment.verdict === "misleading") {
+      flags.push("conflicting-signals");
+    }
+    if (
+      claim.machineAssessment.verdict === "unverifiable_yet" ||
+      claim.machineAssessment.verdict === "non_falsifiable"
+    ) {
+      flags.push("requires-human-resolution");
+    }
+  }
+
+  if (claim.challenges.some((challenge) => challenge.status === "open")) {
+    flags.push("open-dispute");
+  }
+
+  return flags;
+}
+
+function bundleFor(claim: StoredClaim): ClaimBundleDto {
+  const reviewDeadline = addSeconds(claim.createdAt, protocol.market.reviewWindowSeconds);
+  const disputeWindowEnd = addSeconds(
+    claim.createdAt,
+    protocol.market.reviewWindowSeconds + protocol.market.challengeWindowSeconds,
+  );
+
+  return {
+    claim: claim.claimText,
+    deadline: reviewDeadline,
+    resolutionSource: claim.resolution.resolutionRoot
+      ? "resolution-root"
+      : claim.machineAssessment
+        ? "machine-assessment"
+        : null,
+    evidence: claim.evidenceLinks,
+    authorIdentity: {
+      platform: claim.source.platform,
+      sourceRef: claim.source.ref,
+      handle: claim.source.authorHandle,
+      agentAddress: claim.createdBy,
+    },
+    confidence: claim.resolution.confidenceBand ?? claim.machineAssessment?.confidence ?? null,
+    conflictFlags: conflictFlagsFor(claim),
+    resolver: zeroAddressToNull(protocol.market.resolverAddress),
+    disputeWindow: {
+      opensAt: reviewDeadline,
+      endsAt: disputeWindowEnd,
+    },
+    finalOutcome: claim.resolution.verdict,
+    status: claim.status,
+  };
+}
+
 async function packetFor(storage: StorageService, data: object | null, name: string): Promise<ClaimPacketRefDto> {
   if (!data) return { ...emptyPacket };
 
@@ -154,6 +228,8 @@ async function packetFor(storage: StorageService, data: object | null, name: str
 }
 
 export class LocalClaimMarketService implements ClaimMarketService {
+  private mutationQueue: Promise<void> = Promise.resolve();
+
   constructor(
     private readonly indexPath = defaultClaimIndexPath,
     private readonly storage: StorageService = getStorageService(),
@@ -177,100 +253,102 @@ export class LocalClaimMarketService implements ClaimMarketService {
   async createClaim(input: ClaimCreateInput): Promise<ClaimCreateResponse> {
     this.validateCreateInput(input);
 
-    const store = await this.readStore();
-    const claimId = claimIdFor(input);
-    const existing = store.claims.find((claim) => claim.claimId === claimId);
-    if (existing) {
-      return {
-        created: false,
-        claim: this.withRuntimeFlags(existing),
-      };
-    }
+    return this.enqueueMutation(async () => {
+      const store = await this.readStore();
+      const claimId = claimIdFor(input);
+      const existing = store.claims.find((claim) => claim.claimId === claimId);
+      if (existing) {
+        return {
+          created: false,
+          claim: this.withRuntimeFlags(existing),
+        };
+      }
 
-    const createdAt = new Date().toISOString();
-    const machineAssessment: ClaimMachineAssessmentDto | null = input.machineAssessment
-      ? {
-          ...input.machineAssessment,
-          generatedAt: createdAt,
-        }
-      : null;
-    const metadataPacket = await packetFor(
-      this.storage,
-      {
+      const createdAt = new Date().toISOString();
+      const machineAssessment: ClaimMachineAssessmentDto | null = input.machineAssessment
+        ? {
+            ...input.machineAssessment,
+            generatedAt: createdAt,
+          }
+        : null;
+      const metadataPacket = await packetFor(
+        this.storage,
+        {
+          claimId,
+          sourcePlatform: input.sourcePlatform,
+          sourceRef: input.sourceRef,
+          claimText: input.claimText,
+          claimType: input.claimType ?? "factual",
+        },
+        `eva-claim-${claimId.slice(2, 12)}-metadata`,
+      );
+      const evidencePacket = await packetFor(
+        this.storage,
+        input.evidenceLinks?.length ? { evidenceLinks: input.evidenceLinks } : null,
+        `eva-claim-${claimId.slice(2, 12)}-evidence`,
+      );
+      const machinePacket = await packetFor(
+        this.storage,
+        machineAssessment,
+        `eva-claim-${claimId.slice(2, 12)}-machine`,
+      );
+
+      const claim = this.withRuntimeFlags({
         claimId,
-        sourcePlatform: input.sourcePlatform,
-        sourceRef: input.sourceRef,
+        title: titleFor(input),
+        excerpt: excerptFor(input.claimText),
         claimText: input.claimText,
         claimType: input.claimType ?? "factual",
-      },
-      `eva-claim-${claimId.slice(2, 12)}-metadata`,
-    );
-    const evidencePacket = await packetFor(
-      this.storage,
-      input.evidenceLinks?.length ? { evidenceLinks: input.evidenceLinks } : null,
-      `eva-claim-${claimId.slice(2, 12)}-evidence`,
-    );
-    const machinePacket = await packetFor(
-      this.storage,
-      machineAssessment,
-      `eva-claim-${claimId.slice(2, 12)}-machine`,
-    );
-
-    const claim: ClaimMarketDetailResponse = {
-      claimId,
-      title: titleFor(input),
-      excerpt: excerptFor(input.claimText),
-      claimText: input.claimText,
-      claimType: input.claimType ?? "factual",
-      status: "open",
-      createdAt,
-      updatedAt: createdAt,
-      source: {
-        platform: input.sourcePlatform,
-        ref: input.sourceRef,
-        url: input.sourceUrl ?? null,
-        authorHandle: input.authorHandle ?? null,
-        conversationId: input.conversationId ?? null,
-      },
-      machineAssessment,
-      funding: { ...zeroFunding },
-      participantCount: 0,
-      leadingVerdict: machineAssessment?.verdict ?? null,
-      marketEnabled: isMarketEnabled(),
-      createdBy: input.createdBy ?? null,
-      context: input.context ?? null,
-      evidenceLinks: input.evidenceLinks ?? [],
-      packets: {
-        metadata: metadataPacket,
-        evidence: evidencePacket,
-        machineAssessment: machinePacket,
-        resolution: { ...emptyPacket },
-      },
-      challenges: [],
-      resolution: {
-        verdict: null,
-        confidenceBand: null,
-        resolutionRoot: null,
-        overturnedByChallenge: false,
-        resolvedAt: null,
-        summary: null,
-      },
-      timeline: [
-        {
-          label: "Claim opened",
-          at: createdAt,
-          note: "A canonical claim page was created for the trust graph and market layer.",
+        status: "open",
+        createdAt,
+        updatedAt: createdAt,
+        source: {
+          platform: input.sourcePlatform,
+          ref: input.sourceRef,
+          url: input.sourceUrl ?? null,
+          authorHandle: input.authorHandle ?? null,
+          conversationId: input.conversationId ?? null,
         },
-      ],
-    };
+        machineAssessment,
+        funding: { ...zeroFunding },
+        participantCount: 0,
+        leadingVerdict: machineAssessment?.verdict ?? null,
+        marketEnabled: isMarketEnabled(),
+        createdBy: input.createdBy ?? null,
+        context: input.context ?? null,
+        evidenceLinks: input.evidenceLinks ?? [],
+        packets: {
+          metadata: metadataPacket,
+          evidence: evidencePacket,
+          machineAssessment: machinePacket,
+          resolution: { ...emptyPacket },
+        },
+        challenges: [],
+        resolution: {
+          verdict: null,
+          confidenceBand: null,
+          resolutionRoot: null,
+          overturnedByChallenge: false,
+          resolvedAt: null,
+          summary: null,
+        },
+        timeline: [
+          {
+            label: "Claim opened",
+            at: createdAt,
+            note: "A canonical claim page was created for the trust graph and market layer.",
+          },
+        ],
+      });
 
-    store.claims.push(claim);
-    await this.writeStore(store);
+      store.claims.push(claim);
+      await this.writeStore(store);
 
-    return {
-      created: true,
-      claim,
-    };
+      return {
+        created: true,
+        claim,
+      };
+    });
   }
 
   async getClaim(claimId: string): Promise<ClaimMarketDetailResponse | null> {
@@ -378,10 +456,11 @@ export class LocalClaimMarketService implements ClaimMarketService {
     }
   }
 
-  private withRuntimeFlags(claim: ClaimMarketDetailResponse): ClaimMarketDetailResponse {
+  private withRuntimeFlags(claim: StoredClaim): ClaimMarketDetailResponse {
     return {
       ...claim,
       marketEnabled: isMarketEnabled(),
+      bundle: bundleFor(claim),
     };
   }
 
@@ -400,6 +479,15 @@ export class LocalClaimMarketService implements ClaimMarketService {
   private async writeStore(store: ClaimStore): Promise<void> {
     await mkdir(dirname(this.indexPath), { recursive: true });
     await writeFile(this.indexPath, JSON.stringify(store, null, 2), "utf8");
+  }
+
+  private enqueueMutation<T>(operation: () => Promise<T>): Promise<T> {
+    const run = this.mutationQueue.then(operation, operation);
+    this.mutationQueue = run.then(
+      () => undefined,
+      () => undefined,
+    );
+    return run;
   }
 }
 

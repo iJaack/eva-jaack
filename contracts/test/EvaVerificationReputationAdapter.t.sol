@@ -48,7 +48,9 @@ contract EvaVerificationReputationAdapterTest is Test {
             EvaVerificationReputationAdapter.initialize,
             (address(graph), address(reputation), admin, marketAddress, "https://eva.jaack.me/api/claims")
         );
-        adapter = EvaVerificationReputationAdapter(address(new ERC1967Proxy(address(adapterImplementation), adapterInitData)));
+        adapter = EvaVerificationReputationAdapter(
+            address(new ERC1967Proxy(address(adapterImplementation), adapterInitData))
+        );
 
         eva.mint(curator, 500_000e18);
         vm.prank(curator);
@@ -90,5 +92,47 @@ contract EvaVerificationReputationAdapterTest is Test {
     function testOnlyMarketRoleCanRecordSettlement() external {
         vm.expectRevert();
         adapter.onCuratorSettled(curator, keccak256("claim-id"), true, 100e18, 10e18, 0, 1);
+    }
+
+    function testIncorrectSettlementUpdatesStatsAndNegativeReputationFeedback() external {
+        bytes32 claimId = keccak256("incorrect-claim-id");
+
+        vm.prank(marketAddress);
+        adapter.onCuratorSettled(curator, claimId, false, 150e18, 5e18, 20e18, 6);
+
+        (
+            uint256 claimsSettled,
+            uint256 correctClaims,
+            uint256 lifetimeStake,
+            uint256 lifetimeRewards,
+            uint256 lifetimeSlashed,
+            uint64 lastSettledAt
+        ) = adapter.curatorStats(curator);
+
+        assertEq(claimsSettled, 1);
+        assertEq(correctClaims, 0);
+        assertEq(lifetimeStake, 150e18);
+        assertEq(lifetimeRewards, 5e18);
+        assertEq(lifetimeSlashed, 20e18);
+        assertGt(lastSettledAt, 0);
+
+        assertEq(reputation.callCount(), 1);
+        assertEq(reputation.lastAgentId(), CURATOR_AGENT_ID);
+        assertEq(reputation.lastValue(), -int128(100));
+        assertEq(reputation.lastTag1(), "eva_verification_market");
+        assertEq(reputation.lastTag2(), "claim_type:6");
+    }
+
+    function testUnregisteredCuratorSettlementUpdatesStatsWithoutRegistryFeedback() external {
+        address unregisteredCurator = makeAddr("unregisteredCurator");
+
+        vm.prank(marketAddress);
+        adapter.onCuratorSettled(unregisteredCurator, keccak256("claim-id"), true, 100e18, 10e18, 0, 1);
+
+        (uint256 claimsSettled, uint256 correctClaims,,,,) = adapter.curatorStats(unregisteredCurator);
+
+        assertEq(claimsSettled, 1);
+        assertEq(correctClaims, 1);
+        assertEq(reputation.callCount(), 0);
     }
 }

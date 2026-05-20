@@ -12,7 +12,8 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@hono/node-server": "^1.19.11",
-    "evalanche": "^1.6.1",
+    "@vercel/blob": "^2.3.3",
+    "evalanche": "^1.9.7",
     "hono": "^4.12.8",
     "p-limit": "^7.3.0",
     "viem": "^2.23.2"

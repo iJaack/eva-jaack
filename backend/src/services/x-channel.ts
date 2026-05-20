@@ -120,7 +120,7 @@ export class XChannelService {
 
   async ingestMention(event: XMentionEvent): Promise<XMentionIngestResponse> {
     const normalized = normalizeXMention(event);
-    if (!normalized.accepted) {
+    if (normalized.accepted === false) {
       return {
         accepted: false,
         created: false,
