@@ -42,9 +42,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   return (
     <>
       <Nav />
-      <main className="page-shell">
-        <div style={{ marginTop: 24, marginBottom: 16 }}>
-          <Link href="/blog" className="btn btn-ghost" style={{ fontSize: 13, padding: "8px 16px" }}>
+      <main id="main-content" className="page-shell">
+        <div className="back-row">
+          <Link href="/blog" className="btn btn-ghost btn-sm">
             ← Back to Blog
           </Link>
         </div>

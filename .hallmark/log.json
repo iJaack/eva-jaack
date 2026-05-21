@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-05-21",
+    "macrostructure": "Route Workbench System",
+    "theme": "custom",
+    "theme_axes": "sticky context rail / right-side workbench / compact route commands / shared wide shell",
+    "enrichment": "none",
+    "brief": "Extended the workbench layout beyond home so all product routes share the same operational page structure"
+  },
+  {
+    "date": "2026-05-21",
     "macrostructure": "Workbench",
     "theme": "custom",
     "theme_axes": "wide probability desk / market queue / thesis inspector / context rail",

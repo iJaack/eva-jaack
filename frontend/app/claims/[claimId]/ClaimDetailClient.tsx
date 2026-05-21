@@ -92,7 +92,7 @@ export default function ClaimDetailClient() {
   return (
     <>
       <Nav />
-      <main className="page-shell">
+      <main id="main-content" className="page-shell">
         <div className="tight-back-row">
           <Link href="/claims" className="btn btn-ghost btn-sm">
             ← Back to Claims

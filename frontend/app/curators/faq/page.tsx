@@ -160,7 +160,7 @@ export default function CuratorFAQPage() {
   return (
     <>
       <Nav />
-      <main className="page-shell">
+      <main id="main-content" className="page-shell">
         <section className="hero">
           <span className="hero-kicker">Curator onboarding</span>
           <h1 className="hero-title section-title-sm">

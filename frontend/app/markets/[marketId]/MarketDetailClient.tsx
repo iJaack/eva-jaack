@@ -30,7 +30,7 @@ export default function MarketDetailClient() {
   return (
     <>
       <Nav />
-      <main className="mobile-shell">
+      <main id="main-content" className="mobile-shell">
         <div className="back-row">
           <Link href="/markets" className="section-link">Back to markets</Link>
         </div>

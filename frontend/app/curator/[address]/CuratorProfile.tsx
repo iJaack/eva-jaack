@@ -44,9 +44,9 @@ export default function CuratorProfile() {
   return (
     <>
       <Nav />
-      <main className="page-shell">
-        <div style={{ marginTop: 24, marginBottom: 16 }}>
-          <Link href="/curators" className="btn btn-ghost" style={{ fontSize: 13, padding: "8px 16px" }}>
+      <main id="main-content" className="page-shell">
+        <div className="back-row">
+          <Link href="/curators" className="btn btn-ghost btn-sm">
             ← Back to Graph Identities
           </Link>
         </div>
@@ -56,9 +56,9 @@ export default function CuratorProfile() {
             <div className="loading-spinner" />
           </div>
         ) : error || !curator || !curator.registered ? (
-          <div className="surface" style={{ padding: 32, textAlign: "center" }}>
+          <div className="surface surface-pad centered-note">
             <h2>Graph identity not found</h2>
-            <p style={{ color: "var(--muted)" }}>{error ?? `Address ${address} is not a registered Eva identity.`}</p>
+            <p className="muted-copy">{error ?? `Address ${address} is not a registered Eva identity.`}</p>
           </div>
         ) : (
           <>

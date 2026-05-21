@@ -49,7 +49,7 @@ export default function MarketsPage() {
   return (
     <>
       <Nav />
-      <main className="mobile-shell">
+      <main id="main-content" className="mobile-shell">
         <section className="mobile-page-head">
           <p className="eyebrow">Markets</p>
           <h1>Live markets with Eva theses attached.</h1>

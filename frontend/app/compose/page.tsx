@@ -70,7 +70,7 @@ function ComposeInner() {
   return (
     <>
       <Nav />
-      <main className="mobile-shell">
+      <main id="main-content" className="mobile-shell">
         <section className="mobile-page-head">
           <p className="eyebrow">Compose</p>
           <h1>Publish a prediction thesis built for X.</h1>
@@ -200,7 +200,7 @@ export default function ComposePage() {
       fallback={
         <>
           <Nav />
-          <main className="mobile-shell">
+          <main id="main-content" className="mobile-shell">
             <div className="loading-state">
               <div className="loading-spinner" />
             </div>

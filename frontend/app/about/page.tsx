@@ -96,7 +96,7 @@ export default function AboutPage() {
     <>
       <Nav />
 
-      <main className="page-shell">
+      <main id="main-content" className="page-shell">
         <section className="hero">
           <span className="hero-kicker">Protocol Notes</span>
           <h1 className="hero-title">EvaTrustGraph now backs prediction reputation.</h1>

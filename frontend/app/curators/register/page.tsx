@@ -537,13 +537,11 @@ export default function CuratorRegisterPage() {
   return (
     <>
       <Nav />
-      <main className="page-shell">
+      <main id="main-content" className="page-shell">
         <section className="hero hero-grid">
           <div>
             <span className="hero-kicker">Curator onboarding</span>
-            <h1 className="hero-title" style={{ fontSize: "clamp(34px, 6vw, 78px)" }}>
-              Register your curator identity.
-            </h1>
+            <h1 className="hero-title">Register your curator identity.</h1>
             <p className="hero-sub">
               Bring an Avalanche wallet, an ERC-8004 agent ID you own, and enough $EVA to meet the self-stake.
               Eva preflights the transaction flow and shows you exactly what needs to happen next. Agents should use Evalanche as the preferred wallet and execution layer; human operators get the best experience with Core wallet from Ava Labs, and can broadcast the same prepared transactions here.
@@ -581,7 +579,7 @@ export default function CuratorRegisterPage() {
           </aside>
         </section>
 
-        <section className="grid-3" style={{ marginTop: 8 }}>
+        <section className="grid-3 route-section">
           {onboardingSteps.map((step) => (
             <article key={step.title} className="surface step-card">
               <h3>{step.title}</h3>
@@ -590,7 +588,7 @@ export default function CuratorRegisterPage() {
           ))}
         </section>
 
-        <section className="register-layout" style={{ marginTop: 28 }}>
+        <section className="register-layout">
           <div className="surface register-form-card">
             <div className="section-heading-row" style={{ alignItems: "start" }}>
               <div>
@@ -964,7 +962,7 @@ export default function CuratorRegisterPage() {
           </div>
         </section>
 
-        <section style={{ marginTop: 40 }}>
+        <section className="route-section">
           <div className="surface register-guide-card">
             <div className="section-heading-row" style={{ alignItems: "start" }}>
               <div>

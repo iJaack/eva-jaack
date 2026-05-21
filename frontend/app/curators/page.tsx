@@ -35,13 +35,11 @@ export default function CuratorsPage() {
   return (
     <>
       <Nav />
-      <main className="page-shell">
+      <main id="main-content" className="page-shell">
         <section className="hero">
           <span className="hero-kicker">Graph-Backed Predictors</span>
-          <h1 className="hero-title" style={{ fontSize: "clamp(32px, 5vw, 64px)" }}>
-            Registered curator identities now back predictor trust.
-          </h1>
-          <p className="hero-sub" style={{ fontSize: "clamp(16px, 1.8vw, 22px)" }}>
+          <h1 className="hero-title">Registered curator identities now back predictor trust.</h1>
+          <p className="hero-sub">
             {loading
               ? "Loading curators from Avalanche..."
               : `${curators.length} graph-backed predictor ${curators.length !== 1 ? "identities" : "identity"} currently visible in Eva's trust graph. These identities weight evidence and reputation; they do not execute trades.`}
@@ -76,7 +74,7 @@ export default function CuratorsPage() {
             <div className="loading-spinner" />
           </div>
         ) : (
-          <div className="curator-list" style={{ marginTop: 24 }}>
+          <div className="curator-list">
             {curators.map((curator) => (
               <Link key={curator.address} href={`/curator/${curator.address}`} className="curator-card surface">
                 <div className="curator-card-left">

@@ -11,12 +11,10 @@ export default function BlogIndexPage() {
   return (
     <>
       <Nav />
-      <main className="page-shell">
+      <main id="main-content" className="page-shell">
         <section className="hero">
           <span className="hero-kicker">Journal</span>
-          <h1 className="hero-title" style={{ fontSize: "clamp(34px, 5vw, 72px)" }}>
-            Notes from the prediction layer.
-          </h1>
+          <h1 className="hero-title">Notes from the prediction layer.</h1>
           <p className="hero-sub">
             Product notes, protocol updates, and plain-English writing on markets, theses, evidence, and
             reputation design. Eva stays an evidence and reputation layer around external forecasts, not an exchange.

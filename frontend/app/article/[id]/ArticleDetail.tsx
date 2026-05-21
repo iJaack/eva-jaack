@@ -73,9 +73,9 @@ export default function ArticleDetail() {
   return (
     <>
       <Nav />
-      <main className="page-shell">
-        <div style={{ marginTop: 24, marginBottom: 16 }}>
-          <Link href="/articles" className="btn btn-ghost" style={{ fontSize: 13, padding: "8px 16px" }}>
+      <main id="main-content" className="page-shell">
+        <div className="back-row">
+          <Link href="/articles" className="btn btn-ghost btn-sm">
             ← Back to Articles
           </Link>
         </div>
@@ -85,9 +85,9 @@ export default function ArticleDetail() {
             <div className="loading-spinner" />
           </div>
         ) : error || invalidId || !article ? (
-          <div className="surface" style={{ padding: 32, textAlign: "center" }}>
+          <div className="surface surface-pad centered-note">
             <h2>Article not found</h2>
-            <p style={{ color: "var(--muted)" }}>
+            <p className="muted-copy">
               {error ?? (invalidId ? "Invalid article ID." : `Article #${id} does not exist.`)}
             </p>
           </div>

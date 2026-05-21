@@ -37,7 +37,7 @@ export default function ThesisDetailClient() {
   return (
     <>
       <Nav />
-      <main className="mobile-shell thesis-detail-shell">
+      <main id="main-content" className="mobile-shell thesis-detail-shell">
         <div className="back-row">
           <Link href="/markets" className="section-link">Back to markets</Link>
         </div>

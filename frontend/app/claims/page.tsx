@@ -40,7 +40,7 @@ export default function ClaimsPage() {
   return (
     <>
       <Nav />
-      <main className="page-shell">
+      <main id="main-content" className="page-shell">
         <section className="hero hero-grid claims-hero">
           <div>
             <span className="hero-kicker">Evidence Queue</span>
@@ -70,7 +70,7 @@ export default function ClaimsPage() {
           </aside>
         </section>
 
-        <section className="surface callout" style={{ marginTop: 28 }}>
+        <section className="surface callout">
           <h3>Evidence bundles attached to theses</h3>
           <p>
             Eva treats the trust graph as the canonical layer, while claim bundles keep source context readable.
@@ -78,7 +78,7 @@ export default function ClaimsPage() {
           </p>
         </section>
 
-        <section style={{ marginTop: 40 }}>
+        <section className="route-section">
           <div className="section-heading-row">
             <div>
               <p className="section-kicker">Claim pages</p>
@@ -91,9 +91,9 @@ export default function ClaimsPage() {
               <div className="loading-spinner" />
             </div>
           ) : error ? (
-            <div className="surface" style={{ padding: 24 }}>
-              <h3 style={{ marginTop: 0 }}>Claims unavailable</h3>
-              <p style={{ color: "var(--muted)" }}>{error}</p>
+            <div className="surface surface-pad">
+              <h3 className="flush-title">Claims unavailable</h3>
+              <p className="muted-copy">{error}</p>
             </div>
           ) : claims.length === 0 ? (
             <div className="surface claims-empty">

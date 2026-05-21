@@ -90,6 +90,18 @@ button {
   align-items: start;
 }
 
+.page-shell:not(.prediction-home),
+.mobile-shell:not(.prediction-home) {
+  display: grid;
+  align-items: start;
+  gap: var(--space-xl);
+}
+
+.page-shell:not(.prediction-home) > *,
+.mobile-shell:not(.prediction-home) > * {
+  min-width: 0;
+}
+
 .skip-link {
   position: absolute;
   inset-block-start: calc(var(--space-sm) + env(safe-area-inset-top));
@@ -322,6 +334,40 @@ button {
   box-shadow: var(--shadow-card);
 }
 
+.page-shell:not(.prediction-home) > .hero,
+.mobile-shell:not(.prediction-home) > .mobile-page-head,
+.page-shell:not(.prediction-home) > .claim-detail-header {
+  margin-top: 0;
+  padding: clamp(24px, 3vw, 40px);
+  border: var(--rule-hairline);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(140deg, color-mix(in oklch, var(--color-accent) 7%, transparent), transparent 46%),
+    var(--card);
+  box-shadow: var(--shadow-soft);
+}
+
+.page-shell:not(.prediction-home) > .hero,
+.mobile-shell:not(.prediction-home) > .mobile-page-head {
+  display: grid;
+  align-content: start;
+  gap: var(--space-md);
+}
+
+.hero > *,
+.mobile-hero > *,
+.mobile-page-head > *,
+.claim-detail-header > * {
+  min-width: 0;
+}
+
+.hero-actions .btn,
+.mobile-hero-actions .mobile-action {
+  min-width: 0;
+  text-align: center;
+  white-space: normal;
+}
+
 .home-command {
   gap: var(--space-md);
   margin-top: var(--space-sm);
@@ -344,6 +390,11 @@ button {
 }
 
 .mobile-page-head {
+  border-bottom: var(--rule-hairline);
+}
+
+.page-shell:not(.prediction-home) > .mobile-page-head,
+.mobile-shell:not(.prediction-home) > .mobile-page-head {
   border-bottom: var(--rule-hairline);
 }
 
@@ -578,6 +629,17 @@ button {
   padding: var(--space-lg);
 }
 
+.surface-pad {
+  padding: var(--space-lg);
+}
+
+.route-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+}
+
 .surface-muted,
 .wallet-panel,
 .diagram,
@@ -709,6 +771,7 @@ button {
 .protocol-stats {
   display: grid;
   gap: var(--space-md);
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .stats-grid-home,
@@ -1086,6 +1149,23 @@ button {
   font: inherit;
 }
 
+.formula,
+.code-block {
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.formula code,
+.code-block code,
+.toc-card code,
+.detail-value,
+.detail-hash,
+.summary-mono {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .field-input:focus,
 .claim-input-group input:focus,
 .compose-textarea:focus {
@@ -1317,7 +1397,7 @@ button {
 .claims-grid,
 .market-stack,
 .predictor-list-large {
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .claim-detail-title {
@@ -1403,6 +1483,43 @@ button {
 .blog-home-section,
 .blog-index-section {
   margin-top: var(--space-xl);
+}
+
+.page-shell:not(.prediction-home) > .back-row,
+.page-shell:not(.prediction-home) > .tight-back-row,
+.mobile-shell:not(.prediction-home) > .back-row,
+.mobile-shell:not(.prediction-home) > .tight-back-row,
+.page-shell:not(.prediction-home) > .route-section,
+.mobile-shell:not(.prediction-home) > .route-section,
+.page-shell:not(.prediction-home) > .prediction-section,
+.mobile-shell:not(.prediction-home) > .prediction-section,
+.page-shell:not(.prediction-home) > .blog-index-section,
+.mobile-shell:not(.prediction-home) > .blog-index-section,
+.page-shell:not(.prediction-home) > .centered-note,
+.mobile-shell:not(.prediction-home) > .centered-note,
+.page-shell:not(.prediction-home) > .callout,
+.mobile-shell:not(.prediction-home) > .callout,
+.page-shell:not(.prediction-home) > .market-stack,
+.mobile-shell:not(.prediction-home) > .market-stack,
+.page-shell:not(.prediction-home) > .claims-grid,
+.mobile-shell:not(.prediction-home) > .claims-grid,
+.page-shell:not(.prediction-home) > .protocol-stats,
+.mobile-shell:not(.prediction-home) > .protocol-stats,
+.page-shell:not(.prediction-home) > .register-layout,
+.mobile-shell:not(.prediction-home) > .register-layout,
+.page-shell:not(.prediction-home) > .compose-layout,
+.mobile-shell:not(.prediction-home) > .compose-layout,
+.page-shell:not(.prediction-home) > .whitepaper-layout,
+.mobile-shell:not(.prediction-home) > .whitepaper-layout,
+.page-shell:not(.prediction-home) > .faq-stack,
+.mobile-shell:not(.prediction-home) > .faq-stack,
+.page-shell:not(.prediction-home) > .curator-list,
+.mobile-shell:not(.prediction-home) > .curator-list,
+.page-shell:not(.prediction-home) > .article-detail,
+.mobile-shell:not(.prediction-home) > .article-detail,
+.page-shell:not(.prediction-home) > .blog-post-shell,
+.mobile-shell:not(.prediction-home) > .blog-post-shell {
+  margin-top: 0;
 }
 
 .site-footer,
@@ -1531,6 +1648,12 @@ button {
     gap: var(--space-md);
   }
 
+  .claims-grid,
+  .market-stack,
+  .predictor-list-large {
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  }
+
   .product-module {
     padding: var(--space-md);
     border: var(--rule-hairline);
@@ -1588,6 +1711,86 @@ button {
 }
 
 @media (min-width: 72rem) {
+  .page-shell:not(.prediction-home),
+  .mobile-shell:not(.prediction-home) {
+    grid-template-columns: minmax(280px, 0.38fr) minmax(0, 1fr);
+    gap: var(--space-lg) var(--space-xl);
+  }
+
+  .page-shell:not(.prediction-home) > .hero,
+  .mobile-shell:not(.prediction-home) > .mobile-page-head,
+  .page-shell:not(.prediction-home) > .claim-detail-header {
+    position: sticky;
+    top: calc(76px + var(--space-lg));
+    grid-column: 1;
+    align-self: start;
+    max-height: calc(100dvh - 104px);
+    overflow: auto;
+  }
+
+  .page-shell:not(.prediction-home) > :not(.hero):not(.mobile-page-head):not(.claim-detail-header):not(.site-footer):not(.footer):not(.back-row):not(.tight-back-row),
+  .mobile-shell:not(.prediction-home) > :not(.hero):not(.mobile-page-head):not(.claim-detail-header):not(.site-footer):not(.footer):not(.back-row):not(.tight-back-row) {
+    grid-column: 2;
+  }
+
+  .page-shell:not(.prediction-home) > .back-row,
+  .page-shell:not(.prediction-home) > .tight-back-row,
+  .mobile-shell:not(.prediction-home) > .back-row,
+  .mobile-shell:not(.prediction-home) > .tight-back-row,
+  .page-shell:not(.prediction-home) > .site-footer,
+  .page-shell:not(.prediction-home) > .footer,
+  .mobile-shell:not(.prediction-home) > .site-footer,
+  .mobile-shell:not(.prediction-home) > .footer,
+  .page-shell:not(.prediction-home) > .article-detail,
+  .page-shell:not(.prediction-home) > .blog-post-shell,
+  .page-shell:not(.prediction-home) > .claim-detail-grid,
+  .page-shell:not(.prediction-home) > .curator-profile,
+  .mobile-shell:not(.prediction-home) > .article-detail,
+  .mobile-shell:not(.prediction-home) > .blog-post-shell,
+  .mobile-shell:not(.prediction-home) > .claim-detail-grid,
+  .mobile-shell:not(.prediction-home) > .curator-profile {
+    grid-column: 1 / -1;
+  }
+
+  .page-shell:not(.prediction-home) > .hero.hero-grid,
+  .mobile-shell:not(.prediction-home) > .mobile-page-head.hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-shell:not(.prediction-home) > .hero .hero-panel,
+  .mobile-shell:not(.prediction-home) > .mobile-page-head .hero-panel {
+    padding: var(--space-md);
+  }
+
+  .page-shell:not(.prediction-home) > .hero .hero-actions,
+  .mobile-shell:not(.prediction-home) > .mobile-page-head .mobile-hero-actions {
+    display: grid;
+    align-items: stretch;
+  }
+
+  .page-shell:not(.prediction-home) > .hero .btn,
+  .mobile-shell:not(.prediction-home) > .mobile-page-head .mobile-action {
+    width: 100%;
+  }
+
+  .page-shell:not(.prediction-home) > .hero .hero-title,
+  .mobile-shell:not(.prediction-home) > .mobile-page-head h1,
+  .page-shell:not(.prediction-home) > .claim-detail-header .claim-detail-title {
+    max-width: 100%;
+    font-size: clamp(2rem, 2.35vw, 2.65rem);
+    line-height: 1.08;
+  }
+
+  .page-shell:not(.prediction-home) > .hero .hero-sub,
+  .mobile-shell:not(.prediction-home) > .mobile-page-head p,
+  .page-shell:not(.prediction-home) > .claim-detail-header .blog-post-dek {
+    font-size: var(--text-base);
+  }
+
+  .whitepaper-layout {
+    grid-template-columns: minmax(220px, 0.36fr) minmax(0, 1fr);
+  }
+
   .home-workbench {
     grid-template-columns: minmax(300px, 0.74fr) minmax(520px, 1.28fr);
     grid-template-areas:
@@ -1623,6 +1826,12 @@ button {
 }
 
 @media (min-width: 96rem) {
+  .page-shell:not(.prediction-home),
+  .mobile-shell:not(.prediction-home) {
+    grid-template-columns: minmax(320px, 0.3fr) minmax(0, 1fr);
+    column-gap: var(--space-2xl);
+  }
+
   .home-workbench {
     grid-template-columns: minmax(320px, 0.78fr) minmax(560px, 1.36fr) minmax(300px, 0.66fr);
     grid-template-areas:

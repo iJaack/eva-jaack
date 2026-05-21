@@ -23,13 +23,11 @@ export default function ArticlesPage() {
   return (
     <>
       <Nav />
-      <main className="page-shell">
-        <section className="hero" style={{ paddingBottom: 0 }}>
+      <main id="main-content" className="page-shell">
+        <section className="hero">
           <span className="hero-kicker">Verified Sources Archive</span>
-          <h1 className="hero-title" style={{ fontSize: "clamp(28px, 5vw, 56px)" }}>
-            Source reports that can support market theses.
-          </h1>
-          <p className="hero-sub" style={{ fontSize: "clamp(16px, 1.8vw, 22px)" }}>
+          <h1 className="hero-title">Source reports that can support market theses.</h1>
+          <p className="hero-sub">
             {loading
               ? "Loading source reports from Avalanche…"
               : `${count} source reports registered on-chain`}
@@ -41,7 +39,7 @@ export default function ArticlesPage() {
             <div className="loading-spinner" />
           </div>
         ) : (
-          <div className="grid-2" style={{ marginTop: 24 }}>
+          <div className="grid-2 route-section">
             {articles.map((a) => (
               <ArticleCard key={a.id} article={a} />
             ))}

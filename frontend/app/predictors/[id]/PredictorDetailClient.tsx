@@ -29,7 +29,7 @@ export default function PredictorDetailClient() {
   return (
     <>
       <Nav />
-      <main className="mobile-shell">
+      <main id="main-content" className="mobile-shell">
         <div className="back-row">
           <Link href="/predictors" className="section-link">Back to predictors</Link>
         </div>

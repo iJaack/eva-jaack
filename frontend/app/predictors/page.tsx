@@ -27,7 +27,7 @@ export default function PredictorsPage() {
   return (
     <>
       <Nav />
-      <main className="mobile-shell">
+      <main id="main-content" className="mobile-shell">
         <section className="mobile-page-head">
           <p className="eyebrow">Predictors</p>
           <h1>Trust graph identity plus market record.</h1>
