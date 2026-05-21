@@ -1573,7 +1573,7 @@ button {
 
 @media (min-width: 90rem) {
   :root {
-    --max: 1240px;
+    --max: 2480px;
   }
 }
 

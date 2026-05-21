@@ -86,7 +86,7 @@
   --p-lav: var(--color-resolution);
   --radius: var(--radius-md);
   --pad: clamp(18px, 4vw, 48px);
-  --max: 1120px;
+  --max: 2240px;
   --mono: var(--font-mono);
   --accent: var(--color-accent);
   --topbar-bg: color-mix(in oklch, var(--color-paper) 94%, transparent);
