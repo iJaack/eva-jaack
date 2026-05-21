@@ -1,4 +1,4 @@
-/* Hallmark · macrostructure: Ecosystem Index · tone: probability desk · theme: custom market ledger · enrichment: none · nav: N7 product tabs plus utility · footer: Ft4 compact index · pre-emit critique: P5 H5 E4 S5 R4 V5 */
+/* Hallmark · macrostructure: Workbench · tone: probability desk · theme: custom market ledger · enrichment: none · nav: N7 product tabs plus utility · footer: Ft4 compact index · pre-emit critique: P5 H5 E5 S5 R4 V5 */
 @import "../tokens.css";
 
 * {
@@ -82,6 +82,12 @@ button {
 .prediction-home {
   display: grid;
   gap: var(--space-xl);
+}
+
+.home-workbench {
+  display: grid;
+  gap: var(--space-lg);
+  align-items: start;
 }
 
 .skip-link {
@@ -314,6 +320,27 @@ button {
     linear-gradient(120deg, color-mix(in oklch, var(--color-accent) 8%, transparent), transparent 42%),
     var(--card);
   box-shadow: var(--shadow-card);
+}
+
+.home-command {
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+  padding: clamp(22px, 2.8vw, 36px);
+}
+
+.home-command h1 {
+  max-width: 22ch;
+  font-size: clamp(2rem, 3.7vw, 3.45rem);
+}
+
+.home-command > p {
+  max-width: 64ch;
+  margin: 0;
+  font-size: clamp(0.98rem, 1.1vw, 1.08rem);
+}
+
+.home-command .mobile-hero-actions {
+  margin-top: var(--space-xs);
 }
 
 .mobile-page-head {
@@ -609,6 +636,34 @@ button {
 .prediction-section,
 .product-system {
   min-width: 0;
+}
+
+.workbench-tape,
+.workbench-feature,
+.workbench-markets,
+.workbench-rail,
+.workbench-predictors,
+.workbench-system {
+  min-width: 0;
+}
+
+.home-workbench > .prediction-section,
+.home-workbench > .lead-thesis,
+.workbench-rail > .prediction-section {
+  margin-top: 0;
+}
+
+.workbench-rail {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.workbench-metrics {
+  margin: 0;
+}
+
+.workbench-tape .mobile-strip {
+  margin: 0;
 }
 
 .grid-2,
@@ -1506,6 +1561,11 @@ button {
     grid-template-columns: 1fr;
   }
 
+  .home-command {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+  }
+
   .hero-grid {
     grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
     align-items: start;
@@ -1524,6 +1584,69 @@ button {
   .compose-layout {
     grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.65fr);
     align-items: start;
+  }
+}
+
+@media (min-width: 72rem) {
+  .home-workbench {
+    grid-template-columns: minmax(300px, 0.74fr) minmax(520px, 1.28fr);
+    grid-template-areas:
+      "tape tape"
+      "markets feature"
+      "rail rail";
+  }
+
+  .workbench-tape {
+    grid-area: tape;
+  }
+
+  .workbench-markets {
+    grid-area: markets;
+  }
+
+  .workbench-feature {
+    grid-area: feature;
+  }
+
+  .workbench-rail {
+    grid-area: rail;
+    grid-template-columns: minmax(220px, 0.7fr) minmax(320px, 1fr) minmax(320px, 1fr);
+  }
+
+  .workbench-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .workbench-system .product-module-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 96rem) {
+  .home-workbench {
+    grid-template-columns: minmax(320px, 0.78fr) minmax(560px, 1.36fr) minmax(300px, 0.66fr);
+    grid-template-areas:
+      "tape tape tape"
+      "markets feature rail";
+  }
+
+  .workbench-feature,
+  .workbench-rail {
+    position: sticky;
+    top: calc(76px + var(--space-lg));
+  }
+
+  .workbench-rail {
+    grid-template-columns: 1fr;
+    align-content: start;
+  }
+
+  .workbench-markets .market-list-mobile {
+    gap: var(--space-sm);
+  }
+
+  .workbench-feature .thesis-card {
+    min-height: 420px;
   }
 }
 
@@ -1645,6 +1768,12 @@ button {
 
   .mobile-hero-actions .mobile-action {
     flex: 1 1 100%;
+  }
+
+  .home-command .mobile-hero-actions .mobile-action {
+    flex: 1 1 calc(50% - var(--space-xs));
+    min-width: 0;
+    padding-inline: var(--space-xs);
   }
 }
 

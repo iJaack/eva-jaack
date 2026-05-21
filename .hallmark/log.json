@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-05-21",
+    "macrostructure": "Workbench",
+    "theme": "custom",
+    "theme_axes": "wide probability desk / market queue / thesis inspector / context rail",
+    "enrichment": "none",
+    "brief": "Reimagined homepage layout from sequential landing page into three-zone prediction workbench"
+  },
+  {
+    "date": "2026-05-21",
     "macrostructure": "Ecosystem Index",
     "theme": "custom",
     "theme_axes": "warm market paper / probability blue / evidence green / resolution purple",

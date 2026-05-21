@@ -99,7 +99,7 @@ const summaryPayload = {
   ],
 };
 
-test("homepage leads with product-first prediction OS copy and live modules", async ({ page }) => {
+test("homepage leads with the prediction workbench layout", async ({ page }) => {
   await page.route("**/api/prediction-summary", async (route) => {
     await route.fulfill({
       status: 200,
@@ -110,15 +110,17 @@ test("homepage leads with product-first prediction OS copy and live modules", as
 
   await page.goto("/");
 
-  await expect(page.getByText("Prediction OS")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Track markets, publish theses, follow predictor reputation." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "A reputation desk for published forecasts." })).toBeVisible();
+  await expect(page.getByText("Eva turns market odds into inspectable records")).toBeVisible();
+  await expect(page.getByText("Market tape")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Scan what moved first" })).toBeVisible();
   await expect(page.getByText("active predictors")).toBeVisible();
   await expect(page.getByText("copied theses")).toBeVisible();
   await expect(page.getByText("Featured thesis")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Most copied thesis" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Inspect the live argument" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Where the network is focused" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Trust graph plus market record" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "One workflow for market reasoning" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Reputation context" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Reasoning layers" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Markets", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Theses", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Evidence", exact: true })).toBeVisible();

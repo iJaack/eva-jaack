@@ -62,21 +62,6 @@ function MarketStrip({ markets }: { markets: PredictionMarket[] }) {
   );
 }
 
-const deskModules = [
-  {
-    title: "01 Forecast",
-    body: "Odds show market belief and timing. They are never treated as final truth.",
-  },
-  {
-    title: "02 Thesis",
-    body: "Each position stores author, outcome, rationale, odds snapshot, and source links.",
-  },
-  {
-    title: "03 Resolution",
-    body: "Claim status stays separate: unresolved, verified, disputed, resolved, or void.",
-  },
-] as const;
-
 const productModules = [
   {
     title: "Markets",
@@ -195,12 +180,12 @@ export default function HomePage() {
     <>
       <Nav />
       <main id="main-content" className="mobile-shell prediction-home">
-        <section className="mobile-hero">
+        <section className="mobile-hero home-command">
           <p className="eyebrow">Featured · Markets · Predictors · Evidence</p>
-          <h1>A reputation desk for people who publish forecasts.</h1>
+          <h1>A reputation desk for published forecasts.</h1>
           <p>
-            Eva turns market odds into inspectable records: a thesis, evidence links, reputation context,
-            and a separate resolution state when the claim can be checked.
+            Eva turns market odds into inspectable records: thesis, evidence, reputation context,
+            and resolution state.
           </p>
           <div className="mobile-hero-actions">
             <Link href="/compose" className="mobile-action mobile-action-primary">
@@ -209,14 +194,6 @@ export default function HomePage() {
             <Link href="/markets" className="mobile-action">
               Browse markets
             </Link>
-          </div>
-          <div className="product-desk-grid" aria-label="Eva product boundaries">
-            {deskModules.map((module) => (
-              <article key={module.title} className="workflow-card">
-                <h3>{module.title}</h3>
-                <p>{module.body}</p>
-              </article>
-            ))}
           </div>
         </section>
 
@@ -230,45 +207,21 @@ export default function HomePage() {
             <p>{error ?? "Eva could not load prediction activity."}</p>
           </section>
         ) : (
-          <>
-            <section className="mobile-metrics">
-              <div>
-                <strong>{summary.stats.weeklyActivePredictors}</strong>
-                <span>active predictors</span>
-              </div>
-              <div>
-                <strong>{summary.stats.openThesisCount}</strong>
-                <span>open theses</span>
-              </div>
-              <div>
-                <strong>{summary.stats.copiedThesisEvents}</strong>
-                <span>copied theses</span>
-              </div>
-            </section>
-
-            <MarketStrip markets={markets} />
-
-            <section className="lead-thesis">
+          <section className="home-workbench" aria-label="Eva prediction workbench">
+            <section className="prediction-section workbench-tape">
               <div className="section-heading-row prediction-heading">
                 <div>
-                  <p className="section-kicker">Featured thesis</p>
-                  <h2 className="section-title section-title-sm">Most copied thesis</h2>
+                  <p className="section-kicker">Market tape</p>
+                  <h2 className="section-title section-title-sm">Scan what moved first</h2>
                 </div>
-                <Link href="/markets" className="section-link">
-                  See all
+                <Link href="/compose" className="section-link">
+                  New thesis
                 </Link>
               </div>
-              {leadThesis ? (
-                <ThesisCard thesis={leadThesis} market={leadMarket} />
-              ) : (
-                <article className="prediction-card empty-state-card">
-                  <h2>No Featured Thesis</h2>
-                  <p>Publish a thesis to create the first featured market record.</p>
-                </article>
-              )}
+              <MarketStrip markets={markets} />
             </section>
 
-            <section className="prediction-section">
+            <section className="prediction-section workbench-markets">
               <div className="section-heading-row prediction-heading">
                 <div>
                   <p className="section-kicker">Markets</p>
@@ -302,47 +255,84 @@ export default function HomePage() {
               )}
             </section>
 
-            <section className="prediction-section">
+            <section className="lead-thesis workbench-feature">
               <div className="section-heading-row prediction-heading">
                 <div>
-                  <p className="section-kicker">Predictors</p>
-                  <h2 className="section-title section-title-sm">Trust graph plus market record</h2>
+                  <p className="section-kicker">Featured thesis</p>
+                  <h2 className="section-title section-title-sm">Inspect the live argument</h2>
                 </div>
-                <Link href="/predictors" className="section-link">
-                  Rankings
+                <Link href="/markets" className="section-link">
+                  See all
                 </Link>
               </div>
-              {predictors.length > 0 ? (
-                <div className="predictor-list">
-                  {predictors.map((predictor) => (
-                    <PredictorRow key={predictor.predictorId} predictor={predictor} />
-                  ))}
-                </div>
+              {leadThesis ? (
+                <ThesisCard thesis={leadThesis} market={leadMarket} />
               ) : (
                 <article className="prediction-card empty-state-card">
-                  <h2>No Predictors Yet</h2>
-                  <p>Published theses will create predictor records.</p>
+                  <h2>No Featured Thesis</h2>
+                  <p>Publish a thesis to create the first featured market record.</p>
                 </article>
               )}
             </section>
 
-            <section className="prediction-section product-system">
-              <div className="section-heading-row prediction-heading">
+            <aside className="workbench-rail" aria-label="Network context">
+              <section className="mobile-metrics workbench-metrics" aria-label="Network metrics">
                 <div>
-                  <p className="section-kicker">Product system</p>
-                  <h2 className="section-title section-title-sm">One workflow for market reasoning</h2>
+                  <strong>{summary.stats.weeklyActivePredictors}</strong>
+                  <span>active predictors</span>
                 </div>
-              </div>
-              <div className="product-module-grid">
-                {productModules.map((module) => (
-                  <article key={module.title} className="product-module">
-                    <h3>{module.title}</h3>
-                    <p>{module.body}</p>
+                <div>
+                  <strong>{summary.stats.openThesisCount}</strong>
+                  <span>open theses</span>
+                </div>
+                <div>
+                  <strong>{summary.stats.copiedThesisEvents}</strong>
+                  <span>copied theses</span>
+                </div>
+              </section>
+
+              <section className="prediction-section workbench-predictors">
+                <div className="section-heading-row prediction-heading">
+                  <div>
+                    <p className="section-kicker">Predictors</p>
+                    <h2 className="section-title section-title-sm">Reputation context</h2>
+                  </div>
+                  <Link href="/predictors" className="section-link">
+                    Rankings
+                  </Link>
+                </div>
+                {predictors.length > 0 ? (
+                  <div className="predictor-list">
+                    {predictors.map((predictor) => (
+                      <PredictorRow key={predictor.predictorId} predictor={predictor} />
+                    ))}
+                  </div>
+                ) : (
+                  <article className="prediction-card empty-state-card">
+                    <h2>No Predictors Yet</h2>
+                    <p>Published theses will create predictor records.</p>
                   </article>
-                ))}
-              </div>
-            </section>
-          </>
+                )}
+              </section>
+
+              <section className="prediction-section product-system workbench-system">
+                <div className="section-heading-row prediction-heading">
+                  <div>
+                    <p className="section-kicker">Product system</p>
+                    <h2 className="section-title section-title-sm">Reasoning layers</h2>
+                  </div>
+                </div>
+                <div className="product-module-grid">
+                  {productModules.map((module) => (
+                    <article key={module.title} className="product-module">
+                      <h3>{module.title}</h3>
+                      <p>{module.body}</p>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            </aside>
+          </section>
         )}
 
         <SiteFooter />
