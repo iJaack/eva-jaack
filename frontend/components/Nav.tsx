@@ -8,8 +8,8 @@ import ThemeToggle from "./ThemeToggle";
 const navItems: readonly { href: string; label: string; exact?: boolean; highlight?: boolean }[] = [
   { href: "/markets", label: "Markets" },
   { href: "/compose", label: "Compose" },
+  { href: "/verify", label: "Evidence" },
   { href: "/predictors", label: "Predictors" },
-  { href: "/verify", label: "Verify" },
   { href: "/claims", label: "Claims" },
   { href: "/blog", label: "Blog" },
 ];
@@ -30,8 +30,8 @@ export default function Nav() {
       <Link href="/" className="brand" onClick={() => setMenuOpen(false)}>
         <div className="brand-mark" aria-hidden />
         <div className="brand-text">
-          <span className="brand-title">Eva Predicts</span>
-          <span className="brand-sub">reputation OS</span>
+          <span className="brand-title">Eva Protocol</span>
+          <span className="brand-sub">prediction desk</span>
         </div>
       </Link>
 
@@ -67,8 +67,8 @@ export default function Nav() {
 
       <div className="topbar-actions">
         <ThemeToggle />
-        <Link href="/curators/register" className="nav-edge-cta" onClick={() => setMenuOpen(false)}>
-          Register
+        <Link href="/compose" className="nav-edge-cta" onClick={() => setMenuOpen(false)}>
+          New thesis
         </Link>
         <button
           className="nav-hamburger"

@@ -64,35 +64,35 @@ function MarketStrip({ markets }: { markets: PredictionMarket[] }) {
 
 const deskModules = [
   {
-    title: "Forecast",
-    body: "External odds show market belief. Eva does not treat odds as truth.",
+    title: "01 Forecast",
+    body: "Odds show market belief and timing. They are never treated as final truth.",
   },
   {
-    title: "Evidence layer",
-    body: "Theses carry source links, claim packets, and verification context.",
+    title: "02 Thesis",
+    body: "Each position stores author, outcome, rationale, odds snapshot, and source links.",
   },
   {
-    title: "Resolution",
-    body: "Truth status is separate: unresolved, verified, disputed, resolved, or void.",
+    title: "03 Resolution",
+    body: "Claim status stays separate: unresolved, verified, disputed, resolved, or void.",
   },
 ] as const;
 
 const productModules = [
   {
     title: "Markets",
-    body: "External odds and close context for the questions Eva tracks as forecasts.",
+    body: "A probability-first feed for questions that deserve a public reasoning trail.",
   },
   {
     title: "Theses",
-    body: "Public reasoning tied to an outcome, timestamp, and odds snapshot.",
+    body: "Structured posts built for X, market references, and counter-theses.",
   },
   {
     title: "Evidence",
-    body: "Source links and claim checks that make a prediction inspectable.",
+    body: "Source checks and claim packets that make reasoning inspectable.",
   },
   {
     title: "Predictors",
-    body: "Trust score, market record, and graph-backed identity in one profile.",
+    body: "Graph-backed identity, trust score, market record, and open status.",
   },
 ] as const;
 
@@ -196,11 +196,11 @@ export default function HomePage() {
       <Nav />
       <main id="main-content" className="mobile-shell prediction-home">
         <section className="mobile-hero">
-          <p className="eyebrow">Prediction OS</p>
-          <h1>Track markets, publish theses, follow predictor reputation.</h1>
+          <p className="eyebrow">Featured · Markets · Predictors · Evidence</p>
+          <h1>A reputation desk for people who publish forecasts.</h1>
           <p>
-            Eva connects external odds, thesis pages, evidence, and trust scores in one product surface.
-            Market odds are forecasts; resolution and evidence status are tracked separately.
+            Eva turns market odds into inspectable records: a thesis, evidence links, reputation context,
+            and a separate resolution state when the claim can be checked.
           </p>
           <div className="mobile-hero-actions">
             <Link href="/compose" className="mobile-action mobile-action-primary">
