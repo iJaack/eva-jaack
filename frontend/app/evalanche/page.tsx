@@ -35,6 +35,9 @@ export default function EvalanchePage() {
   return (
     <div className="ev-root">
       <nav className="ev-nav">
+        <a href="#main-content" className="skip-link">
+          Skip to Content
+        </a>
         <Link href="/" className="ev-nav-home">← eva.jaack.me</Link>
         <div className="ev-nav-links">
           <a href="https://github.com/iJaack/evalanche" target="_blank" rel="noreferrer" className="ev-nav-link">GitHub</a>
@@ -43,8 +46,8 @@ export default function EvalanchePage() {
         </div>
       </nav>
 
-      <header className="ev-hero">
-        <div className="ev-hero-body">
+      <main id="main-content" className="ev-shell">
+        <header className="ev-hero">
           <div className="ev-hero-left">
             <div className="ev-logo-icon">E</div>
             <h1 className="ev-wordmark">
@@ -65,10 +68,13 @@ export default function EvalanchePage() {
               <Link href="/about" className="ev-btn-ghost">Back to Eva →</Link>
             </div>
           </div>
+        </header>
 
-          <figure className="ev-hero-code">
-            <figcaption className="ev-code-title">evalanche-v1.5.2.ts</figcaption>
-            <pre className="ev-code-body"><code>{`const { agent } = await Evalanche.boot({ network: 'avalanche' });
+        <section className="ev-section ev-code-section">
+          <div className="ev-container">
+            <figure className="ev-hero-code">
+              <figcaption className="ev-code-title">evalanche-v1.5.2.ts</figcaption>
+              <pre className="ev-code-body"><code>{`const { agent } = await Evalanche.boot({ network: 'avalanche' });
 
 const quote = await agent.swap({
   fromChainId: 43114,
@@ -84,45 +90,46 @@ const markets = await agent.coinGecko().markets({
   order: 'market_cap_desc',
   per_page: 10,
 });`}</code></pre>
-          </figure>
-        </div>
-      </header>
-
-      <section className="ev-section">
-        <div className="ev-container">
-          <h2 className="ev-section-title">What Evalanche is now</h2>
-          <div className="ev-features">
-            {features.map((feature) => (
-              <div key={feature.title} className="ev-feature-card">
-                <span className="ev-feature-badge">{feature.badge}</span>
-                <h3 className="ev-feature-title">{feature.title}</h3>
-                <p className="ev-feature-body">{feature.body}</p>
-              </div>
-            ))}
+            </figure>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="ev-section" id="install">
-        <div className="ev-container">
-          <h2 className="ev-section-title">Why v1.5.2 matters</h2>
-          <div className="ev-steps">
-            {[
-              ["01", "Safer custom RPC handling", "Custom RPC overrides now map to the correct chain IDs across supported EVM aliases instead of defaulting everything to Avalanche/Fuji."],
-              ["02", "Polymarket MCP paths cleaned up", "Search, order book lookup, and positions now call real methods. Unsupported buy/approve/redeem paths fail honestly."],
-              ["03", "Sharper market workflow surface", "CoinGecko, Polymarket, dYdX references, README, ClawHub skill, and the public page are now aligned around the same product surface."],
-            ].map(([step, label, text]) => (
-              <div key={step} className="ev-step">
-                <div className="ev-step-meta">
-                  <span className="ev-step-num">{step}</span>
-                  <span className="ev-step-label">{label}</span>
+        <section className="ev-section">
+          <div className="ev-container">
+            <h2 className="ev-section-title">What Evalanche is now</h2>
+            <div className="ev-features">
+              {features.map((feature) => (
+                <div key={feature.title} className="ev-feature-card">
+                  <span className="ev-feature-badge">{feature.badge}</span>
+                  <h3 className="ev-feature-title">{feature.title}</h3>
+                  <p className="ev-feature-body">{feature.body}</p>
                 </div>
-                <pre className="ev-step-code"><code>{text}</code></pre>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        <section className="ev-section" id="install">
+          <div className="ev-container">
+            <h2 className="ev-section-title">Why v1.5.2 matters</h2>
+            <div className="ev-steps">
+              {[
+                ["01", "Safer custom RPC handling", "Custom RPC overrides now map to the correct chain IDs across supported EVM aliases instead of defaulting everything to Avalanche/Fuji."],
+                ["02", "Polymarket MCP paths cleaned up", "Search, order book lookup, and positions now call real methods. Unsupported buy/approve/redeem paths fail honestly."],
+                ["03", "Sharper market workflow surface", "CoinGecko, Polymarket, dYdX references, README, ClawHub skill, and the public page are now aligned around the same product surface."],
+              ].map(([step, label, text]) => (
+                <div key={step} className="ev-step">
+                  <div className="ev-step-meta">
+                    <span className="ev-step-num">{step}</span>
+                    <span className="ev-step-label">{label}</span>
+                  </div>
+                  <pre className="ev-step-code"><code>{text}</code></pre>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
 
       <footer className="ev-footer">
         <p>built for <a href="https://eva.jaack.me">Eva Protocol</a> and broader agent infrastructure work · open source · Avalanche-first roots, multi-EVM scope</p>
