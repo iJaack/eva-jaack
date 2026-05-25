@@ -7,18 +7,22 @@ on:
   workflow_dispatch:
   deployment_status:
 
+concurrency:
+  group: validate-monorepo-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     if: github.event_name != 'deployment_status'
     runs-on: ubuntu-latest
+    env:
+      CI: true
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - uses: actions/setup-node@v4
         with:
@@ -55,18 +59,50 @@ jobs:
       - name: Frontend E2E
         run: pnpm --filter frontend test:e2e
 
+      - name: Frontend responsive route audit
+        env:
+          NEXT_PUBLIC_API_BASE: http://127.0.0.1:3001/api
+          AUDIT_API_BASE: http://127.0.0.1:3001/api
+          EVA_STORAGE_PROVIDER: local
+          EVA_STORAGE_DIR: ${{ runner.temp }}/eva-storage
+        run: |
+          pnpm --filter backend dev > "$RUNNER_TEMP/backend.log" 2>&1 &
+          backend_pid=$!
+          NEXT_PUBLIC_API_BASE="$NEXT_PUBLIC_API_BASE" pnpm --filter frontend exec next dev --webpack --hostname 127.0.0.1 --port 4281 > "$RUNNER_TEMP/frontend.log" 2>&1 &
+          frontend_pid=$!
+          cleanup() {
+            kill "$backend_pid" "$frontend_pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          curl --fail --retry 30 --retry-delay 2 --retry-all-errors http://127.0.0.1:3001/health
+          curl --fail --retry 30 --retry-delay 2 --retry-all-errors http://127.0.0.1:4281/
+          node frontend/scripts/responsive-live-audit.mjs http://127.0.0.1:4281 "$RUNNER_TEMP/responsive-live-audit"
+
+      - name: Upload frontend diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-diagnostics
+          path: |
+            ${{ runner.temp }}/backend.log
+            ${{ runner.temp }}/frontend.log
+            ${{ runner.temp }}/responsive-live-audit
+            frontend/test-results
+            frontend/playwright-report
+          if-no-files-found: ignore
+
       - name: Contract tests
         run: cd contracts && forge test
 
   deployment-smoke:
     if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
+    env:
+      CI: true
     steps:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - uses: actions/setup-node@v4
         with:

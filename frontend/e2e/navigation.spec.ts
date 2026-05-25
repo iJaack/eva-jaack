@@ -4,7 +4,16 @@ test("primary navigation stays focused while footer exposes secondary infrastruc
   await page.goto("/");
 
   const header = page.locator("header.topbar");
-  await expect(header.getByText("prediction desk")).toBeVisible();
+  const isMobile = (page.viewportSize()?.width ?? 0) < 640;
+
+  await expect(header.getByText("Eva Protocol")).toBeVisible();
+  if (isMobile) {
+    await expect(header.getByText("prediction desk")).toBeHidden();
+    await header.getByRole("button", { name: "Toggle menu" }).click();
+  } else {
+    await expect(header.getByText("prediction desk")).toBeVisible();
+  }
+
   await expect(header.getByRole("link", { name: "Markets" })).toBeVisible();
   await expect(header.getByRole("link", { name: "Compose" })).toBeVisible();
   await expect(header.getByRole("link", { name: "Evidence" })).toBeVisible();
@@ -14,7 +23,11 @@ test("primary navigation stays focused while footer exposes secondary infrastruc
   await expect(header.getByRole("link", { name: "Sources" })).toHaveCount(0);
 
   const loop = page.locator(".participation-dock");
-  await expect(loop.getByText("Pick · call · verify · resolve · rank")).toBeVisible();
+  if (isMobile) {
+    await expect(loop.getByText("Pick · call · verify · resolve · rank")).toBeHidden();
+  } else {
+    await expect(loop.getByText("Pick · call · verify · resolve · rank")).toBeVisible();
+  }
   await expect(loop.getByRole("link", { name: /1 Pick/ })).toBeVisible();
   await expect(loop.getByRole("link", { name: "Start loop" })).toBeVisible();
 
