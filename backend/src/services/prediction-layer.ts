@@ -66,6 +66,12 @@ type RegisteredIdentity = {
 };
 
 type LiveMarketLoader = () => Promise<PredictionMarketDto[]>;
+type PolymarketSearchResponse = {
+  events?: Array<Record<string, unknown> & { markets?: Record<string, unknown>[] }>;
+};
+type KalshiMarketListResponse = {
+  markets?: Record<string, unknown>[];
+};
 
 const defaultPredictionIndexPath = resolve(
   dirname(fileURLToPath(import.meta.url)),
@@ -76,7 +82,10 @@ const liveMarketCacheTtlMs = 60_000;
 const providerMarketLimit = 25;
 const polymarketMarketsUrl =
   "https://gamma-api.polymarket.com/markets?closed=false&active=true&limit=100&order=volumeNum&ascending=false";
-const kalshiMarketsUrl = "https://api.elections.kalshi.com/trade-api/v2/markets?status=open&mve_filter=exclude&limit=1000";
+const polymarketSearchTerms = ["bitcoin", "ethereum", "solana", "fed", "inflation", "gdp", "recession"];
+const kalshiTradeApiBaseUrl = "https://external-api.kalshi.com/trade-api/v2";
+const kalshiMarketsUrl = `${kalshiTradeApiBaseUrl}/markets?status=open&mve_filter=exclude&limit=1000`;
+const kalshiSeriesTickers = ["KXCPI", "KXFED", "KXBTC", "KXETH"];
 const xPostPattern = /https?:\/\/(?:www\.)?(?:x|twitter)\.com\/[^\s/]+\/status\/\d+/i;
 const marketUrlPattern = /https?:\/\/[^\s]+/i;
 const optOutPattern = /\b(stop|unsubscribe|do not reply|don't reply|dont reply|leave me alone)\b/i;
@@ -261,9 +270,23 @@ function marketRank(market: PredictionMarketDto): number {
   return (market.volumeUsd ?? 0) + (market.liquidityUsd ?? 0);
 }
 
+function dedupeRawMarkets(markets: Record<string, unknown>[]): Record<string, unknown>[] {
+  const byId = new Map<string, Record<string, unknown>>();
+  for (const market of markets) {
+    const id = String(market.id ?? market.conditionId ?? market.ticker ?? market.slug ?? "").trim();
+    if (id && !byId.has(id)) byId.set(id, market);
+  }
+  return [...byId.values()];
+}
+
 async function loadPolymarketMarkets(): Promise<PredictionMarketDto[]> {
   const rawMarkets = await fetchJsonWithTimeout<Record<string, unknown>[]>(polymarketMarketsUrl);
-  return rawMarkets
+  const searchedMarkets = await Promise.allSettled(polymarketSearchTerms.map(loadPolymarketSearchMarkets));
+
+  return dedupeRawMarkets([
+    ...rawMarkets,
+    ...searchedMarkets.flatMap((result) => (result.status === "fulfilled" ? result.value : [])),
+  ])
     .map((market, index) => normalizePolymarketMarket(market, index))
     .filter((market): market is PredictionMarketDto => market !== null)
     .filter(isAllowedV1Market)
@@ -271,9 +294,27 @@ async function loadPolymarketMarkets(): Promise<PredictionMarketDto[]> {
     .slice(0, providerMarketLimit);
 }
 
+async function loadPolymarketSearchMarkets(term: string): Promise<Record<string, unknown>[]> {
+  const response = await fetchJsonWithTimeout<PolymarketSearchResponse>(
+    `https://gamma-api.polymarket.com/public-search?q=${encodeURIComponent(term)}&limit=10`,
+  );
+
+  return (response.events ?? [])
+    .flatMap((event) => event.markets ?? [])
+    .filter((market) => market.active !== false && market.closed !== true);
+}
+
 async function loadKalshiMarkets(): Promise<PredictionMarketDto[]> {
-  const response = await fetchJsonWithTimeout<{ markets?: Record<string, unknown>[] }>(kalshiMarketsUrl);
-  return (response.markets ?? [])
+  const responses = await Promise.allSettled([
+    fetchJsonWithTimeout<KalshiMarketListResponse>(kalshiMarketsUrl),
+    ...kalshiSeriesTickers.map((ticker) =>
+      fetchJsonWithTimeout<KalshiMarketListResponse>(
+        `${kalshiTradeApiBaseUrl}/markets?status=open&series_ticker=${encodeURIComponent(ticker)}&limit=100`,
+      ),
+    ),
+  ]);
+
+  return dedupeRawMarkets(responses.flatMap((result) => (result.status === "fulfilled" ? result.value.markets ?? [] : [])))
     .map((market) => normalizeKalshiMarket(market))
     .filter((market): market is PredictionMarketDto => market !== null)
     .filter(isAllowedV1Market)

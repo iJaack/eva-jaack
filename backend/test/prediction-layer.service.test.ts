@@ -1,7 +1,7 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { LocalPredictionLayerService } from "../src/services/prediction-layer.js";
 import { sampleCurator } from "./fixtures.js";
 
@@ -10,6 +10,7 @@ const cleanupDirs: string[] = [];
 describe("prediction layer service", () => {
   afterEach(async () => {
     await Promise.all(cleanupDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
+    vi.unstubAllGlobals();
   });
 
   it("creates offchain theses and aggregates unclaimed predictor profiles", async () => {
@@ -191,5 +192,106 @@ describe("prediction layer service", () => {
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-foreign-leader");
     expect(markets.markets.map((market) => market.marketId)).toContain("kalshi-fed-hold");
     expect(summary.markets.map((market) => market.marketId)).not.toContain("polymarket-presidential-nomination");
+  });
+
+  it("discovers real provider markets from targeted Polymarket search and Kalshi series feeds", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
+    cleanupDirs.push(dir);
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: string | URL | Request) => {
+        const url = String(input);
+        if (url.includes("gamma-api.polymarket.com/markets")) {
+          return new Response(
+            JSON.stringify([
+              {
+                id: "politics-1",
+                question: "Will Example win the 2028 presidential nomination?",
+                slug: "will-example-win-the-presidential-nomination",
+                category: "Politics",
+                outcomes: JSON.stringify(["Yes", "No"]),
+                outcomePrices: JSON.stringify(["0.12", "0.88"]),
+                volumeNum: "10000000",
+                liquidityNum: "1000000",
+                active: true,
+                closed: false,
+                createdAt: "2026-05-01T00:00:00.000Z",
+                updatedAt: "2026-05-24T00:00:00.000Z",
+              },
+            ]),
+            { status: 200 },
+          );
+        }
+        if (url.includes("gamma-api.polymarket.com/public-search") && url.includes("bitcoin")) {
+          return new Response(
+            JSON.stringify({
+              events: [
+                {
+                  title: "When will Bitcoin hit $150k?",
+                  markets: [
+                    {
+                      id: "573652",
+                      question: "Will Bitcoin hit $150k by September 30?",
+                      slug: "will-bitcoin-hit-150k-by-september-30",
+                      outcomes: JSON.stringify(["Yes", "No"]),
+                      outcomePrices: JSON.stringify(["0.27", "0.73"]),
+                      volumeNum: "778900.33",
+                      liquidityNum: "49842.41",
+                      active: true,
+                      closed: false,
+                      endDate: "2026-09-30T23:59:59.000Z",
+                      createdAt: "2026-05-01T00:00:00.000Z",
+                      updatedAt: "2026-05-24T00:00:00.000Z",
+                    },
+                  ],
+                },
+              ],
+            }),
+            { status: 200 },
+          );
+        }
+        if (url.includes("external-api.kalshi.com/trade-api/v2/markets") && url.includes("series_ticker=KXCPI")) {
+          return new Response(
+            JSON.stringify({
+              markets: [
+                {
+                  ticker: "KXCPI-26MAY-T0.8",
+                  title: "CPI inflation in May?",
+                  yes_bid_dollars: "0.1200",
+                  yes_ask_dollars: "0.1600",
+                  volume_dollars: "1000.00",
+                  liquidity_dollars: "250.00",
+                  close_time: "2026-06-10T12:25:00Z",
+                  created_time: "2026-04-10T19:00:45.996047Z",
+                  updated_time: "2026-05-24T00:00:00.000Z",
+                },
+              ],
+            }),
+            { status: 200 },
+          );
+        }
+        return new Response(JSON.stringify({ markets: [] }), { status: 200 });
+      }),
+    );
+
+    const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => []);
+
+    const markets = await service.listMarkets();
+
+    expect(markets.markets).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          marketId: "polymarket-will-bitcoin-hit-150k-by-september-30",
+          provider: "polymarket",
+          title: "Will Bitcoin hit $150k by September 30?",
+        }),
+        expect.objectContaining({
+          marketId: "kalshi-kxcpi-26may-t0-8",
+          provider: "kalshi",
+          title: "CPI inflation in May?",
+        }),
+      ]),
+    );
   });
 });
