@@ -7,6 +7,8 @@ import SiteFooter from "@/components/SiteFooter";
 import { verifyArticleUrl, type VerificationResult } from "@/lib/api";
 import { scoreUiStatus, statusClassName, statusLabel } from "@/lib/status";
 
+const evidencePlaybook = ["Paste source", "Extract claims", "Score evidence", "Attach to thesis"] as const;
+
 export default function VerifyPage() {
   const [url, setUrl] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -45,7 +47,7 @@ export default function VerifyPage() {
       <main id="main-content" className="mobile-shell verify-tool-shell">
         <section className="mobile-page-head">
           <p className="eyebrow">Evidence Tool</p>
-          <h1>Check a source before it backs a thesis.</h1>
+          <h1>Clear evidence before it counts.</h1>
           <p>
             Paste a source URL and Eva will extract factual claims, score the evidence, and return a report
             you can use when publishing or challenging a market thesis. This verifies evidence quality; it does not turn forecast odds into truth.
@@ -99,6 +101,14 @@ export default function VerifyPage() {
             x402 payment enforcement is disabled until a request can be bound to the exact URL, claim ID, chain,
             amount, expiry, and replay guard. Until then this tool runs as an evidence-quality check.
           </p>
+          <div className="quest-line quest-line-compact" aria-label="Evidence check steps">
+            {evidencePlaybook.map((step, index) => (
+              <span key={step} className="quest-line-step">
+                <strong>{index + 1}</strong>
+                {step}
+              </span>
+            ))}
+          </div>
         </section>
 
         {result ? (

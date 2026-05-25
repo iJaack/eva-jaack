@@ -36,6 +36,7 @@ function ComposeInner() {
     .map((line) => line.trim())
     .filter(Boolean).length;
   const canPublish = authorReady && marketContextReady && outcomeReady && rationaleReady && !submitting;
+  const readinessCompleted = [authorReady, marketContextReady, outcomeReady, rationaleReady].filter(Boolean).length;
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -73,8 +74,8 @@ function ComposeInner() {
       <main id="main-content" className="mobile-shell">
         <section className="mobile-page-head">
           <p className="eyebrow">Compose</p>
-          <h1>Publish a prediction thesis built for X.</h1>
-          <p>Start from a market URL, X post, or manual question. Eva stores a forecast record and keeps truth or resolution status separate until evidence resolves.</p>
+          <h1>Make the call in four fields.</h1>
+          <p>Start from a market URL, X post, or manual question. Eva keeps the forecast record separate from truth until evidence resolves it.</p>
           <div className="mobile-hero-actions">
             <Link href="/verify" className="mobile-action">
               Check source first
@@ -164,6 +165,15 @@ function ComposeInner() {
                   </span>
                 </div>
                 <h2>Thesis readiness</h2>
+                <div className="mission-progress" aria-label={`Thesis readiness ${readinessCompleted} of 4`}>
+                  <div className="mission-progress-head">
+                    <span>Mission progress</span>
+                    <strong>{readinessCompleted}/4</strong>
+                  </div>
+                  <div className="mission-meter">
+                    <span className={`mission-meter-fill mission-meter-fill-${readinessCompleted}`} />
+                  </div>
+                </div>
                 <p>
                   Eva records the forecast and evidence bundle. It does not mark the outcome true until a resolver or evidence process reaches a separate status.
                 </p>

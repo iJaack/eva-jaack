@@ -81,6 +81,76 @@ const productModules = [
   },
 ] as const;
 
+const participationQuests = [
+  {
+    step: "01",
+    title: "Pick a market",
+    body: "Scan live odds, volume, and category before you make a public call.",
+    href: "/markets",
+    cta: "Open markets",
+  },
+  {
+    step: "02",
+    title: "Publish or counter",
+    body: "Turn a view into a thesis that others can copy, challenge, or resolve.",
+    href: "/compose",
+    cta: "Make call",
+  },
+  {
+    step: "03",
+    title: "Verify the source",
+    body: "Attach evidence quality before the claim starts moving reputation.",
+    href: "/verify",
+    cta: "Check source",
+  },
+  {
+    step: "04",
+    title: "Watch rank move",
+    body: "Resolved outcomes update predictor history instead of hiding in a feed.",
+    href: "/predictors",
+    cta: "View rank",
+  },
+] as const;
+
+function QuestBoard({ stats }: { stats: PredictionSummary["stats"] }) {
+  return (
+    <section className="prediction-section quest-board workbench-quests" aria-label="Participation missions">
+      <div className="quest-board-copy">
+        <p className="section-kicker">Start here</p>
+        <h2 className="section-title section-title-sm">One loop, four actions</h2>
+        <p>
+          Eva should feel like a fast truth game: choose a question, publish a call, back it with evidence,
+          and let the record update reputation.
+        </p>
+      </div>
+      <div className="quest-grid">
+        {participationQuests.map((quest) => (
+          <Link key={quest.step} href={quest.href} className="quest-card">
+            <span className="quest-step">{quest.step}</span>
+            <h3>{quest.title}</h3>
+            <p>{quest.body}</p>
+            <span className="quest-card-cta">{quest.cta}</span>
+          </Link>
+        ))}
+      </div>
+      <div className="quest-scoreboard" aria-label="Current network activity">
+        <div>
+          <strong>{stats.weeklyActivePredictors}</strong>
+          <span>players this week</span>
+        </div>
+        <div>
+          <strong>{stats.openThesisCount}</strong>
+          <span>open calls</span>
+        </div>
+        <div>
+          <strong>{stats.copiedThesisEvents}</strong>
+          <span>copy intents</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ThesisCard({ thesis, market }: { thesis: Thesis; market: PredictionMarket | null }) {
   const [copyState, setCopyState] = useState<string | null>(null);
   const [copyPending, setCopyPending] = useState(false);
@@ -181,11 +251,10 @@ export default function HomePage() {
       <Nav />
       <main id="main-content" className="mobile-shell prediction-home">
         <section className="mobile-hero home-command">
-          <p className="eyebrow">Featured · Markets · Predictors · Evidence</p>
-          <h1>A reputation desk for published forecasts.</h1>
+          <p className="eyebrow">Markets · calls · evidence · reputation</p>
+          <h1>Play the truth loop.</h1>
           <p>
-            Eva turns market odds into inspectable records: thesis, evidence, reputation context,
-            and resolution state.
+            Pick a market, publish a call, attach evidence, and let resolved outcomes move reputation.
           </p>
           <div className="mobile-hero-actions">
             <Link href="/compose" className="mobile-action mobile-action-primary">
@@ -208,6 +277,8 @@ export default function HomePage() {
           </section>
         ) : (
           <section className="home-workbench" aria-label="Eva prediction workbench">
+            <QuestBoard stats={summary.stats} />
+
             <section className="prediction-section workbench-tape">
               <div className="section-heading-row prediction-heading">
                 <div>

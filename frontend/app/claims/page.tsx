@@ -19,6 +19,8 @@ function titleCase(value: string): string {
   return value.replace(/_/g, " ").replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
+const claimLoop = ["Verify", "Stake", "Challenge", "Resolve"] as const;
+
 export default function ClaimsPage() {
   const [claims, setClaims] = useState<MarketClaim[]>([]);
   const [marketEnabled, setMarketEnabled] = useState(false);
@@ -76,6 +78,14 @@ export default function ClaimsPage() {
             Eva treats the trust graph as the canonical layer, while claim bundles keep source context readable.
             Bundles are useful when they make a thesis easier to inspect, challenge, or score.
           </p>
+          <div className="quest-line quest-line-compact" aria-label="Claim resolution steps">
+            {claimLoop.map((step, index) => (
+              <span key={step} className="quest-line-step">
+                <strong>{index + 1}</strong>
+                {step}
+              </span>
+            ))}
+          </div>
         </section>
 
         <section className="route-section">

@@ -6,6 +6,8 @@ import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import { getPredictors, type Predictor } from "@/lib/api";
 
+const rankingLoop = ["Find signal", "Open record", "Compare accuracy", "Copy or counter"] as const;
+
 export default function PredictorsPage() {
   const [predictors, setPredictors] = useState<Predictor[]>([]);
   const [profileFilter, setProfileFilter] = useState<"all" | Predictor["profileState"]>("all");
@@ -30,8 +32,8 @@ export default function PredictorsPage() {
       <main id="main-content" className="mobile-shell">
         <section className="mobile-page-head">
           <p className="eyebrow">Predictors</p>
-          <h1>Trust graph identity plus market record.</h1>
-          <p>Registered predictors inherit Eva trust. Unclaimed X profiles can build forecast records before connecting a wallet, while truth status remains tied to resolution evidence.</p>
+          <h1>Follow the record, not the noise.</h1>
+          <p>Registered predictors inherit Eva trust. Every open call, copy, and resolved outcome becomes a public score trail.</p>
         </section>
 
         {loading ? (
@@ -56,6 +58,14 @@ export default function PredictorsPage() {
               <p className="market-boundary-note">
                 Trust score is identity reputation. Forecast accuracy is only promoted when outcomes resolve through evidence or resolver windows.
               </p>
+              <div className="quest-line quest-line-compact" aria-label="Predictor participation loop">
+                {rankingLoop.map((step, index) => (
+                  <span key={step} className="quest-line-step">
+                    <strong>{index + 1}</strong>
+                    {step}
+                  </span>
+                ))}
+              </div>
               <div className="filter-bar" aria-label="Predictor filters">
                 <button
                   type="button"

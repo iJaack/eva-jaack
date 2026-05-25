@@ -28,6 +28,13 @@ function providerLabel(provider: PredictionMarket["provider"]): string {
   return "External";
 }
 
+const marketPlaybook = [
+  "Pick a question",
+  "Choose your side",
+  "Publish the reason",
+  "Track resolution",
+] as const;
+
 export default function MarketsPage() {
   const [markets, setMarkets] = useState<PredictionMarket[]>([]);
   const [providerFilter, setProviderFilter] = useState<"all" | PredictionMarket["provider"]>("all");
@@ -52,8 +59,8 @@ export default function MarketsPage() {
       <main id="main-content" className="mobile-shell">
         <section className="mobile-page-head">
           <p className="eyebrow">Markets</p>
-          <h1>Live markets with Eva theses attached.</h1>
-          <p>External venues provide odds as forecasts. Eva adds the public reasoning layer, evidence state, and predictor reputation without implying odds equal truth.</p>
+          <h1>Choose the next call.</h1>
+          <p>Every market is a starting tile: inspect the odds, publish your reason, then let evidence and resolution decide reputation.</p>
         </section>
 
         {loading ? (
@@ -91,6 +98,14 @@ export default function MarketsPage() {
                   <strong>{unresolvedCount}</strong>
                   <span>forecast / unresolved</span>
                 </div>
+              </div>
+              <div className="quest-line" aria-label="Market participation steps">
+                {marketPlaybook.map((step, index) => (
+                  <span key={step} className="quest-line-step">
+                    <strong>{index + 1}</strong>
+                    {step}
+                  </span>
+                ))}
               </div>
               <div className="filter-bar" aria-label="Provider filters">
                 <button

@@ -10,7 +10,7 @@ const links = [
 export default function SiteFooter() {
   return (
     <footer className="footer site-footer">
-      <span>Eva Protocol · market reasoning, evidence, reputation.</span>
+      <span>Eva Protocol · pick markets, publish calls, verify evidence, earn reputation.</span>
       <div className="footer-links">
         {links.map((link) => (
           <Link key={link.href} href={link.href}>

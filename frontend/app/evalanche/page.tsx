@@ -46,6 +46,14 @@ export default function EvalanchePage() {
         </div>
       </nav>
 
+      <section className="ev-participation" aria-label="Eva participation path">
+        <span>Agent wallet path</span>
+        <Link href="/markets">Pick market</Link>
+        <Link href="/compose">Sign call</Link>
+        <Link href="/verify">Verify evidence</Link>
+        <Link href="/predictors">Score record</Link>
+      </section>
+
       <main id="main-content" className="ev-shell">
         <header className="ev-hero">
           <div className="ev-hero-left">

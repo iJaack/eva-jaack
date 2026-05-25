@@ -110,8 +110,12 @@ test("homepage leads with the prediction workbench layout", async ({ page }) => 
 
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "A reputation desk for published forecasts." })).toBeVisible();
-  await expect(page.getByText("Eva turns market odds into inspectable records")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Play the truth loop." })).toBeVisible();
+  await expect(page.getByText("Pick a market, publish a call, attach evidence")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "One loop, four actions" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /01 Pick a market/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /02 Publish or counter/i })).toBeVisible();
+  await expect(page.getByText("players this week")).toBeVisible();
   await expect(page.getByText("Market tape")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Scan what moved first" })).toBeVisible();
   await expect(page.getByText("active predictors")).toBeVisible();

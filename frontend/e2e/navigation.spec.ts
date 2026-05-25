@@ -13,8 +13,13 @@ test("primary navigation stays focused while footer exposes secondary infrastruc
   await expect(header.getByRole("link", { name: "Register" })).toBeVisible();
   await expect(header.getByRole("link", { name: "Sources" })).toHaveCount(0);
 
+  const loop = page.locator(".participation-dock");
+  await expect(loop.getByText("Pick · call · verify · resolve · rank")).toBeVisible();
+  await expect(loop.getByRole("link", { name: /1 Pick/ })).toBeVisible();
+  await expect(loop.getByRole("link", { name: "Start loop" })).toBeVisible();
+
   const footer = page.locator("footer.site-footer");
-  await expect(footer.getByText("market reasoning, evidence, reputation")).toBeVisible();
+  await expect(footer.getByText("pick markets, publish calls, verify evidence, earn reputation")).toBeVisible();
   await expect(footer.getByRole("link", { name: "Verify" })).toBeVisible();
   await expect(footer.getByRole("link", { name: "Claims" })).toBeVisible();
   await expect(footer.getByRole("link", { name: "Reference" })).toBeVisible();
