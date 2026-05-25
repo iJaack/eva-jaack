@@ -139,4 +139,6 @@ jobs:
         env:
           SMOKE_BASE_URL: ${{ steps.smoke-url.outputs.base_url }}
           SMOKE_CURATORS_MAX_MS: '5000'
+          SMOKE_ALLOW_PROTECTED_SKIP: 'true'
+          SMOKE_VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: pnpm smoke:deploy

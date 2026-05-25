@@ -11,6 +11,12 @@ const marketId = (process.env.SMOKE_MARKET_ID ?? "crude-oil-95-window").trim();
 const predictorId = (process.env.SMOKE_PREDICTOR_ID ?? "nairlof").trim();
 const requestTimeoutMs = Number(process.env.SMOKE_TIMEOUT_MS ?? "15000");
 const curatorsMaxMs = Number(process.env.SMOKE_CURATORS_MAX_MS ?? "5000");
+const vercelBypassSecret = (
+  process.env.SMOKE_VERCEL_BYPASS_SECRET ??
+  process.env.VERCEL_AUTOMATION_BYPASS_SECRET ??
+  ""
+).trim();
+const allowProtectedSkip = process.env.SMOKE_ALLOW_PROTECTED_SKIP === "true";
 
 if (!baseUrl) {
   console.error("Missing SMOKE_BASE_URL or CLI base URL argument.");
@@ -85,6 +91,45 @@ if (verifyUrl) {
 }
 
 let failures = 0;
+let successes = 0;
+const failedChecks = [];
+
+const sharedHeaders = vercelBypassSecret
+  ? {
+      "x-vercel-protection-bypass": vercelBypassSecret,
+      "x-vercel-set-bypass-cookie": "true",
+    }
+  : {};
+
+function isVercelProtectedResponse(response) {
+  const setCookie = response.headers.get("set-cookie") ?? "";
+  const server = response.headers.get("server") ?? "";
+  return (
+    (response.status === 401 || response.status === 403) &&
+    server.toLowerCase().includes("vercel") &&
+    setCookie.includes("_vercel_sso_nonce")
+  );
+}
+
+if (!vercelBypassSecret && allowProtectedSkip) {
+  try {
+    const response = await fetch(`${baseUrl}/`, {
+      method: "GET",
+      headers: sharedHeaders,
+      signal: AbortSignal.timeout(requestTimeoutMs),
+    });
+
+    if (isVercelProtectedResponse(response)) {
+      console.warn(
+        "SKIP deployment smoke: Vercel Deployment Protection blocked the deployment URL. " +
+          "Configure the GitHub secret VERCEL_AUTOMATION_BYPASS_SECRET to run deployed-url smoke checks."
+      );
+      process.exit(0);
+    }
+  } catch {
+    // Let the full smoke suite below report the real network/application error.
+  }
+}
 
 for (const check of checks) {
   const url = `${baseUrl}${check.path}`;
@@ -94,12 +139,13 @@ for (const check of checks) {
   try {
     response = await fetch(url, {
       method: check.method,
-      headers: check.headers,
+      headers: { ...sharedHeaders, ...check.headers },
       body: check.body,
       signal: AbortSignal.timeout(requestTimeoutMs),
     });
   } catch (error) {
     failures += 1;
+    failedChecks.push({ name: check.name, protectedByVercel: false });
     console.error(`FAIL ${check.name}: request error for ${url} :: ${String(error)}`);
     continue;
   }
@@ -108,16 +154,22 @@ for (const check of checks) {
 
   if (!response.ok) {
     failures += 1;
+    failedChecks.push({
+      name: check.name,
+      protectedByVercel: isVercelProtectedResponse(response),
+    });
     console.error(`FAIL ${check.name}: ${response.status} ${url} (${elapsedMs}ms)`);
     continue;
   }
 
   if (check.maxMs && elapsedMs > check.maxMs) {
     failures += 1;
+    failedChecks.push({ name: check.name, protectedByVercel: false });
     console.error(`FAIL ${check.name}: exceeded latency budget ${elapsedMs}ms > ${check.maxMs}ms for ${url}`);
     continue;
   }
 
+  successes += 1;
   console.log(`PASS ${check.name}: ${response.status} ${url} (${elapsedMs}ms)`);
 }
 
@@ -142,5 +194,23 @@ if (!thesisId) {
 }
 
 if (failures > 0) {
+  const onlyVercelProtectionFailures =
+    successes === 0 && failedChecks.length > 0 && failedChecks.every((check) => check.protectedByVercel);
+
+  if (onlyVercelProtectionFailures && !vercelBypassSecret && allowProtectedSkip) {
+    console.warn(
+      "SKIP deployment smoke: Vercel Deployment Protection blocked every smoke request. " +
+        "Configure the GitHub secret VERCEL_AUTOMATION_BYPASS_SECRET to run deployed-url smoke checks."
+    );
+    process.exit(0);
+  }
+
+  if (onlyVercelProtectionFailures && vercelBypassSecret) {
+    console.error(
+      "Vercel Deployment Protection still blocked every smoke request even with a bypass secret. " +
+        "Verify the GitHub secret VERCEL_AUTOMATION_BYPASS_SECRET matches the active project bypass secret."
+    );
+  }
+
   process.exit(1);
 }
