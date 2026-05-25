@@ -2363,7 +2363,8 @@ button {
   }
 
   .home-command .mobile-hero-actions .mobile-action {
-    flex: 1 1 calc(50% - var(--space-xs));
+    flex: 1 1 100%;
+    width: 100%;
     min-width: 0;
     padding-inline: var(--space-xs);
   }
@@ -2390,5 +2391,793 @@ button {
   .predictor-row:hover,
   .nav-pill:hover {
     transform: none;
+  }
+}
+
+/* Hallmark · visual reset: command-console · pre-emit critique: P5 H5 E5 S5 R5 V5 */
+body {
+  background:
+    linear-gradient(to right, var(--grid-line-v) 1px, transparent 1px) 0 0 / 96px 100%,
+    linear-gradient(to bottom, var(--grid-line-h) 1px, transparent 1px) 0 0 / 100% 96px,
+    var(--bg0);
+}
+
+.site-backdrop {
+  background:
+    linear-gradient(to right, var(--grid-line-v) 1px, transparent 1px) 0 0 / 96px 100%,
+    linear-gradient(to bottom, var(--grid-line-h) 1px, transparent 1px) 0 0 / 100% 96px,
+    var(--bg0);
+  opacity: 0.58;
+}
+
+.topbar {
+  border-bottom-color: var(--color-rule-strong);
+  background: var(--topbar-bg);
+  box-shadow: none;
+}
+
+.brand-mark,
+.nav-hamburger,
+.theme-toggle,
+.nav-edge-cta,
+.nav-links,
+.loop-step,
+.participation-cta,
+.btn,
+.mobile-action,
+.filter-chip,
+.provider-badge,
+.status-badge,
+.score-badge,
+.tag-pill,
+.status-chip,
+.claim-inline-badge,
+.tx-state-chip,
+.blog-meta-pill {
+  border-radius: var(--radius-sm);
+}
+
+.brand-title,
+.brand-sub,
+.nav-pill,
+.nav-edge-cta,
+.participation-kicker,
+.loop-step,
+.participation-cta,
+.section-kicker,
+.eyebrow,
+.hero-kicker,
+.hero-panel-kicker,
+.field-label,
+.stat-label,
+.card-topline,
+.quest-step,
+.quest-card-cta,
+.quest-line-step,
+.market-label,
+.handle-link {
+  letter-spacing: 0;
+}
+
+.nav-links {
+  border-color: var(--color-rule-strong);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklch, var(--color-paper-2) 92%, transparent);
+}
+
+.nav-pill {
+  border-radius: var(--radius-sm);
+}
+
+.nav-pill-active,
+.nav-pill-highlight,
+.nav-pill-utility {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.participation-dock {
+  border-bottom-color: color-mix(in oklch, var(--color-accent) 48%, var(--color-rule));
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.participation-kicker,
+.participation-dock-copy strong {
+  color: currentColor;
+}
+
+.loop-step {
+  border-color: color-mix(in oklch, var(--color-accent-ink) 24%, transparent);
+  background: color-mix(in oklch, var(--color-accent-ink) 10%, transparent);
+  color: currentColor;
+}
+
+.loop-step span {
+  background: color-mix(in oklch, var(--color-accent-ink) 18%, transparent);
+  color: currentColor;
+}
+
+.loop-step-active,
+.participation-cta {
+  border-color: var(--color-accent-ink);
+  background: var(--color-accent-ink);
+  color: var(--color-accent);
+}
+
+.page-shell,
+.mobile-shell,
+.participation-dock-inner {
+  width: min(100%, var(--max));
+}
+
+.mobile-hero,
+.page-shell:not(.prediction-home) > .hero,
+.mobile-shell:not(.prediction-home) > .mobile-page-head,
+.page-shell:not(.prediction-home) > .claim-detail-header {
+  border-color: var(--color-rule-strong);
+  border-left: var(--rule-hairline);
+  background: color-mix(in oklch, var(--card) 92%, var(--color-accent-soft));
+  box-shadow: none;
+}
+
+.home-command {
+  min-height: clamp(340px, 45vw, 580px);
+  align-content: end;
+  border-color: var(--color-accent);
+  background:
+    linear-gradient(180deg, color-mix(in oklch, var(--color-paper-2) 88%, transparent), var(--color-paper)),
+    var(--color-paper);
+  color: var(--ink);
+}
+
+.home-command h1 {
+  max-width: 12ch;
+  font-size: clamp(3.1rem, 8vw, 8.6rem);
+  line-height: 0.92;
+}
+
+.home-command > p {
+  max-width: 48ch;
+  color: var(--color-ink-2);
+  font-size: clamp(1.06rem, 1.4vw, 1.35rem);
+}
+
+.home-command .eyebrow {
+  color: var(--color-accent);
+}
+
+.home-command .mobile-action-primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.home-command .mobile-action:not(.mobile-action-primary) {
+  border-color: var(--color-rule-strong);
+  background: var(--card);
+  color: var(--ink);
+}
+
+.page-shell:not(.prediction-home) > .hero,
+.mobile-shell:not(.prediction-home) > .mobile-page-head,
+.page-shell:not(.prediction-home) > .claim-detail-header {
+  border-left: 4px solid var(--color-accent);
+}
+
+.hero-title,
+.mobile-page-head h1,
+.claim-detail-title,
+.blog-post-title {
+  font-size: clamp(2.35rem, 4.6vw, 5.4rem);
+  line-height: 0.98;
+}
+
+.surface,
+.prediction-card,
+.workflow-card,
+.principle-card,
+.route-panel,
+.article-card,
+.claim-card,
+.claim-panel,
+.claim-detail-header,
+.claim-bundle-card,
+.wallet-panel,
+.tx-card,
+.toc-card,
+.paper-section,
+.diagram-cell,
+.register-form-card,
+.register-summary-card,
+.register-contracts-card,
+.register-placeholder,
+.register-guide-card,
+.status-panel,
+.blog-feature-card,
+.blog-post-header,
+.blog-post-body,
+.quest-card,
+.market-chip,
+.market-row,
+.predictor-row,
+.odds-row > div,
+.market-outcomes > div,
+.record-layers > div,
+.desk-summary > div,
+.mobile-metrics > div,
+.quest-scoreboard > div {
+  border-color: var(--color-rule-strong);
+  background: var(--card);
+  box-shadow: none;
+}
+
+.route-panel,
+.prediction-card,
+.surface,
+.blog-feature-card,
+.blog-post-header,
+.blog-post-body,
+.paper-section {
+  position: relative;
+}
+
+.route-panel::before,
+.prediction-card::before,
+.blog-feature-card::before,
+.paper-section::before {
+  background: var(--color-accent);
+}
+
+.quest-board {
+  padding: var(--space-xl);
+  border: var(--rule-hairline);
+  border-color: var(--color-rule-strong);
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklch, var(--color-paper-2) 86%, transparent);
+}
+
+.quest-card {
+  border-top: 4px solid var(--color-accent);
+}
+
+.quest-card:nth-child(2) {
+  border-top-color: var(--color-warning);
+}
+
+.quest-card:nth-child(3) {
+  border-top-color: var(--color-evidence);
+}
+
+.quest-card:nth-child(4) {
+  border-top-color: var(--color-resolution);
+}
+
+.quest-scoreboard > div,
+.desk-summary > div,
+.mobile-metrics > div,
+.odds-row > div,
+.market-outcomes > div,
+.record-layers > div {
+  background: var(--color-paper-3);
+}
+
+.quest-scoreboard strong,
+.desk-summary strong,
+.mobile-metrics strong,
+.predictor-card-score strong,
+.stat-value {
+  color: var(--color-accent);
+}
+
+.market-card-large {
+  border-left: 4px solid var(--provider-accent);
+}
+
+.market-card-large::before {
+  content: none;
+}
+
+.provider-badge {
+  background: color-mix(in oklch, var(--provider-accent) 16%, var(--card));
+}
+
+.btn-primary,
+.mobile-action-primary,
+.compose-submit,
+.filter-chip-active,
+.status-chip-forecast {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.btn-ghost,
+.mobile-action:not(.mobile-action-primary),
+.filter-chip,
+.status-chip,
+.provider-badge,
+.blog-meta-pill {
+  background: var(--color-paper-2);
+}
+
+.field-input,
+.claim-input-group input,
+.compose-textarea,
+.code-block,
+.formula {
+  border-color: var(--color-rule-strong);
+  background: var(--color-paper);
+}
+
+.field-input:focus,
+.claim-input-group input:focus,
+.compose-textarea:focus {
+  background: var(--color-paper-2);
+}
+
+.mission-meter {
+  background: var(--color-paper-3);
+}
+
+.mission-meter-fill {
+  background: var(--color-accent);
+}
+
+.ev-root {
+  background: var(--bg0);
+}
+
+@media (min-width: 72rem) {
+  .page-shell:not(.prediction-home),
+  .mobile-shell:not(.prediction-home) {
+    grid-template-columns: minmax(360px, 0.24fr) minmax(0, 1fr);
+  }
+
+  .home-workbench {
+    grid-template-columns: minmax(420px, 0.9fr) minmax(520px, 1.4fr) minmax(320px, 0.7fr);
+    grid-template-areas:
+      "quests tape tape"
+      "quests markets feature"
+      "rail rail rail";
+  }
+
+  .workbench-quests {
+    position: sticky;
+    top: calc(112px + var(--space-lg));
+  }
+
+  .quest-board {
+    min-height: calc(100dvh - 150px);
+    align-content: start;
+  }
+
+  .quest-grid,
+  .quest-scoreboard {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 96rem) {
+  .home-workbench {
+    grid-template-columns: minmax(440px, 0.72fr) minmax(560px, 1.22fr) minmax(380px, 0.76fr);
+    grid-template-areas:
+      "quests tape rail"
+      "quests markets feature";
+  }
+
+  .workbench-rail {
+    grid-template-columns: 1fr;
+  }
+
+  .quest-board {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 58rem) {
+  .nav-links {
+    border-radius: var(--radius-md);
+  }
+}
+
+@media (max-width: 39.999rem) {
+  .home-command {
+    min-height: 360px;
+  }
+
+  .home-command h1 {
+    font-size: clamp(3rem, 14vw, 4.15rem);
+  }
+
+  .quest-board {
+    padding: var(--space-lg);
+  }
+}
+
+/* Hallmark · layout reset: terminal workbench · pre-emit critique: P5 H5 E5 S5 R5 V5 */
+.topbar {
+  min-height: 72px;
+}
+
+.brand {
+  min-height: 44px;
+  padding-inline-end: var(--space-md);
+  border-inline-end: var(--rule-hairline);
+  border-color: var(--color-rule-strong);
+}
+
+.brand-mark {
+  background-color: var(--color-accent);
+}
+
+.brand-title,
+.brand-sub,
+.nav-pill,
+.nav-edge-cta,
+.participation-cta,
+.loop-step,
+.btn,
+.mobile-action,
+.filter-chip {
+  text-transform: none;
+}
+
+.participation-dock {
+  position: sticky;
+  top: 72px;
+  z-index: 180;
+}
+
+.page-shell,
+.mobile-shell {
+  padding-top: clamp(var(--space-lg), 3vw, var(--space-2xl));
+}
+
+.prediction-home {
+  gap: clamp(var(--space-xl), 4vw, var(--space-3xl));
+}
+
+.home-command {
+  position: relative;
+  overflow: clip;
+  isolation: isolate;
+  padding: clamp(44px, 6vw, 88px);
+  border-radius: var(--radius-sm);
+}
+
+.home-command::after {
+  content: "EVA\A TRUTH\A LOOP";
+  position: absolute;
+  inset-block: var(--space-xl);
+  inset-inline-end: var(--space-xl);
+  z-index: -1;
+  display: grid;
+  place-items: end;
+  color: color-mix(in oklch, var(--color-accent) 14%, transparent);
+  font-family: var(--font-display);
+  font-size: clamp(4.5rem, 12vw, 14rem);
+  font-weight: 900;
+  line-height: 0.78;
+  white-space: pre;
+  text-align: right;
+}
+
+.home-workbench {
+  gap: var(--space-xl);
+}
+
+.page-shell:not(.prediction-home),
+.mobile-shell:not(.prediction-home) {
+  gap: var(--space-lg) var(--space-2xl);
+}
+
+.page-shell:not(.prediction-home) > .hero,
+.mobile-shell:not(.prediction-home) > .mobile-page-head,
+.page-shell:not(.prediction-home) > .claim-detail-header {
+  border-left: var(--rule-hairline);
+  border-top: 6px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, color-mix(in oklch, var(--color-accent) 14%, transparent), transparent 34%),
+    var(--color-paper);
+}
+
+.page-shell:not(.prediction-home) > .hero::before,
+.mobile-shell:not(.prediction-home) > .mobile-page-head::before,
+.page-shell:not(.prediction-home) > .claim-detail-header::before {
+  content: "";
+  display: block;
+  width: 52px;
+  height: 6px;
+  margin-bottom: var(--space-xl);
+  background: var(--color-accent);
+}
+
+.hero-kicker,
+.section-kicker,
+.eyebrow,
+.hero-panel-kicker {
+  color: var(--color-accent);
+}
+
+.section-heading-row {
+  align-items: start;
+  padding: var(--space-sm);
+  border: var(--rule-hairline);
+  border-left: 4px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-paper-2);
+}
+
+.section-title-sm,
+.prediction-card h2,
+.claim-panel h2,
+.route-panel h3,
+.workflow-card h3,
+.product-module h3,
+.claim-bundle-card h3,
+.paper-section h2,
+.blog-post-section h2 {
+  font-size: clamp(1.05rem, 1.15vw, 1.38rem);
+}
+
+.surface,
+.prediction-card,
+.workflow-card,
+.principle-card,
+.route-panel,
+.article-card,
+.claim-card,
+.claim-panel,
+.claim-detail-header,
+.claim-bundle-card,
+.wallet-panel,
+.tx-card,
+.toc-card,
+.paper-section,
+.diagram-cell,
+.register-form-card,
+.register-summary-card,
+.register-contracts-card,
+.register-placeholder,
+.register-guide-card,
+.status-panel,
+.blog-feature-card,
+.blog-post-header,
+.blog-post-body,
+.quest-card,
+.market-chip,
+.market-row,
+.predictor-row,
+.summary-item,
+.stat-card,
+.home-stat-card,
+.mobile-metrics > div,
+.odds-row > div,
+.market-outcomes > div,
+.record-layers > div,
+.desk-summary > div,
+.quest-scoreboard > div {
+  border-radius: var(--radius-sm);
+}
+
+.route-panel,
+.prediction-card,
+.surface,
+.paper-section,
+.blog-feature-card,
+.blog-post-header,
+.blog-post-body {
+  overflow: clip;
+}
+
+.market-chip,
+.market-row,
+.predictor-row,
+.claim-card,
+.article-card,
+.curator-card,
+.quest-card,
+.prediction-card {
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--color-accent) 5%, transparent), transparent 28%),
+    var(--card);
+}
+
+.market-chip strong,
+.market-row strong,
+.predictor-row strong,
+.odds-row strong,
+.market-outcomes strong,
+.summary-value {
+  font-family: var(--font-mono);
+}
+
+.market-outcomes > div,
+.odds-row > div,
+.record-layers > div,
+.desk-summary > div,
+.mobile-metrics > div,
+.quest-scoreboard > div,
+.summary-item {
+  border-left: 3px solid var(--color-accent);
+}
+
+.market-card-large {
+  border-left-width: 6px;
+}
+
+.predictor-card-score strong,
+.stat-value,
+.quest-scoreboard strong,
+.desk-summary strong,
+.mobile-metrics strong,
+.odds-row strong,
+.market-outcomes strong {
+  font-weight: 900;
+}
+
+.footer,
+.site-footer {
+  border-color: var(--color-rule-strong);
+}
+
+@media (min-width: 72rem) {
+  .page-shell:not(.prediction-home),
+  .mobile-shell:not(.prediction-home) {
+    grid-template-columns: minmax(420px, 0.28fr) minmax(0, 1fr);
+  }
+
+  .page-shell:not(.prediction-home) > .hero,
+  .mobile-shell:not(.prediction-home) > .mobile-page-head,
+  .page-shell:not(.prediction-home) > .claim-detail-header {
+    min-height: calc(100dvh - 156px);
+    padding: clamp(28px, 2.4vw, 48px);
+  }
+
+  .page-shell:not(.prediction-home) > .hero,
+  .mobile-shell:not(.prediction-home) > .mobile-page-head {
+    grid-row: 1 / span 16;
+  }
+
+  .page-shell:not(.prediction-home) > .hero .hero-actions,
+  .mobile-shell:not(.prediction-home) > .mobile-page-head .mobile-hero-actions {
+    margin-top: auto;
+  }
+
+  .home-command {
+    min-height: min(720px, calc(100dvh - 172px));
+  }
+
+  .home-workbench {
+    grid-template-columns: minmax(420px, 0.78fr) minmax(680px, 1.38fr) minmax(380px, 0.74fr);
+    grid-template-areas:
+      "quests tape rail"
+      "quests markets feature";
+  }
+
+  .workbench-tape {
+    position: sticky;
+    top: 126px;
+    z-index: 20;
+  }
+
+  .workbench-feature,
+  .workbench-rail {
+    position: static;
+    top: auto;
+  }
+
+  .quest-board {
+    min-height: calc(100dvh - 172px);
+  }
+
+  .market-stack,
+  .predictor-list-large,
+  .claims-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .market-card-large {
+    grid-template-columns: minmax(0, 1.18fr) minmax(240px, 0.42fr) minmax(300px, 0.5fr);
+    grid-template-areas:
+      "marketTop marketOutcomes marketOdds"
+      "marketTitle marketOutcomes marketOdds"
+      "marketStatus marketOutcomes marketOdds";
+    align-items: stretch;
+    gap: var(--space-md) var(--space-lg);
+  }
+
+  .market-card-large .card-topline {
+    grid-area: marketTop;
+  }
+
+  .market-card-large > h2 {
+    grid-area: marketTitle;
+    align-self: center;
+    margin: 0;
+    font-size: clamp(1.35rem, 1.8vw, 2rem);
+  }
+
+  .market-card-large .status-row {
+    grid-area: marketStatus;
+  }
+
+  .market-card-large .market-outcomes {
+    grid-area: marketOutcomes;
+    align-content: stretch;
+  }
+
+  .market-card-large .odds-row {
+    grid-area: marketOdds;
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 0;
+  }
+
+  .predictor-card {
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) minmax(140px, 0.28fr) minmax(360px, 1fr);
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  .predictor-card .odds-row {
+    margin-top: 0;
+  }
+
+  .claim-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.48fr);
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  .whitepaper-layout,
+  .compose-layout,
+  .register-layout,
+  .claim-detail-grid,
+  .article-detail,
+  .blog-post-shell {
+    gap: var(--space-xl);
+  }
+}
+
+@media (min-width: 112rem) {
+  .page-shell:not(.prediction-home),
+  .mobile-shell:not(.prediction-home) {
+    grid-template-columns: minmax(500px, 0.26fr) minmax(0, 1fr);
+  }
+
+  .market-card-large {
+    grid-template-columns: minmax(0, 1.28fr) minmax(300px, 0.42fr) minmax(360px, 0.5fr);
+  }
+}
+
+@media (max-width: 58rem) {
+  .participation-dock {
+    top: 64px;
+  }
+
+  .brand {
+    border-inline-end: 0;
+    padding-inline-end: 0;
+  }
+}
+
+@media (max-width: 39.999rem) {
+  .home-command {
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+  .home-command::after {
+    inset-block: auto var(--space-lg);
+    inset-inline-end: var(--space-lg);
+    font-size: clamp(3.6rem, 18vw, 5.8rem);
+  }
+
+  .section-heading-row {
+    padding: var(--space-sm);
   }
 }

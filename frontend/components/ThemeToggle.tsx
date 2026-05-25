@@ -4,21 +4,14 @@ import { useEffect, useSyncExternalStore } from "react";
 
 type Theme = "light" | "dark";
 
-function getSystemTheme(): Theme {
-  if (typeof window === "undefined") return "light";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
-
 function getInitialTheme(): Theme {
-  if (typeof window === "undefined") return "light";
+  if (typeof window === "undefined") return "dark";
   const stored = localStorage.getItem("theme") as Theme | null;
-  return stored ?? getSystemTheme();
+  return stored ?? "dark";
 }
 
 export default function ThemeToggle() {
-  const theme = useSyncExternalStore(subscribeToTheme, getInitialTheme, () => "light");
+  const theme = useSyncExternalStore(subscribeToTheme, getInitialTheme, () => "dark");
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);

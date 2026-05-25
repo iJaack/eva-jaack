@@ -60,8 +60,8 @@ test("markets page color-codes Polymarket and Kalshi provider badges", async ({ 
 
   await expect(polymarketCard.getByText("Polymarket")).toBeVisible();
   await expect(kalshiCard.getByText("Kalshi")).toBeVisible();
-  await expect(polymarketCard.locator(".provider-badge")).toHaveCSS("border-radius", "999px");
-  await expect(kalshiCard.locator(".provider-badge")).toHaveCSS("border-radius", "999px");
+  await expect(polymarketCard.locator(".provider-badge")).toHaveCSS("border-radius", "4px");
+  await expect(kalshiCard.locator(".provider-badge")).toHaveCSS("border-radius", "4px");
 });
 
 test("markets page filters by provider without losing the market desk context", async ({ page }) => {
