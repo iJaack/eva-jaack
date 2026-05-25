@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CI: true
+      NEXT_TELEMETRY_DISABLED: 1
     steps:
       - uses: actions/checkout@v4
         with:
@@ -74,8 +75,8 @@ jobs:
             kill "$backend_pid" "$frontend_pid" 2>/dev/null || true
           }
           trap cleanup EXIT
-          curl --fail --retry 30 --retry-delay 2 --retry-all-errors http://127.0.0.1:3001/health
-          curl --fail --retry 30 --retry-delay 2 --retry-all-errors http://127.0.0.1:4281/
+          curl --fail --retry 30 --retry-delay 2 --retry-all-errors http://127.0.0.1:3001/health > /dev/null
+          curl --fail --retry 30 --retry-delay 2 --retry-all-errors http://127.0.0.1:4281/ > /dev/null
           node frontend/scripts/responsive-live-audit.mjs http://127.0.0.1:4281 "$RUNNER_TEMP/responsive-live-audit"
 
       - name: Upload frontend diagnostics
@@ -91,6 +92,11 @@ jobs:
             frontend/playwright-report
           if-no-files-found: ignore
 
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
       - name: Contract tests
         run: cd contracts && forge test
 
@@ -99,6 +105,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CI: true
+      NEXT_TELEMETRY_DISABLED: 1
     steps:
       - uses: actions/checkout@v4
 
