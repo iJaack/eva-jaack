@@ -2847,19 +2847,25 @@ body {
   border-radius: var(--radius-sm);
 }
 
+.home-command > * {
+  position: relative;
+  z-index: 1;
+}
+
 .home-command::after {
   content: "EVA\A TRUTH\A LOOP";
   position: absolute;
   inset-block: var(--space-xl);
   inset-inline-end: var(--space-xl);
-  z-index: -1;
+  z-index: 0;
   display: grid;
   place-items: end;
-  color: color-mix(in oklch, var(--color-accent) 14%, transparent);
+  color: color-mix(in oklch, var(--color-accent) 78%, var(--color-ink));
   font-family: var(--font-display);
   font-size: clamp(4.5rem, 12vw, 14rem);
   font-weight: 900;
   line-height: 0.78;
+  opacity: 0.38;
   white-space: pre;
   text-align: right;
 }
@@ -3172,9 +3178,14 @@ body {
   }
 
   .home-command::after {
-    inset-block: auto var(--space-lg);
-    inset-inline-end: var(--space-lg);
-    font-size: clamp(3.6rem, 18vw, 5.8rem);
+    position: relative;
+    inset: auto;
+    margin-top: var(--space-sm);
+    place-items: start;
+    color: color-mix(in oklch, var(--color-accent) 88%, var(--color-ink));
+    font-size: clamp(2.75rem, 15vw, 4.9rem);
+    opacity: 0.68;
+    text-align: left;
   }
 
   .section-heading-row {
