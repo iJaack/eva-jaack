@@ -3061,6 +3061,11 @@ body {
     grid-row: 1 / span 16;
   }
 
+  .mobile-shell:not(.prediction-home) > .market-detail-head {
+    grid-row: auto;
+    min-height: auto;
+  }
+
   .page-shell:not(.prediction-home) > .hero .hero-actions,
   .mobile-shell:not(.prediction-home) > .mobile-page-head .mobile-hero-actions {
     margin-top: auto;

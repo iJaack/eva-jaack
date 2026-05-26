@@ -44,6 +44,42 @@ const marketsPayload = {
   ],
 };
 
+const marketDetailPayload = {
+  market: marketsPayload.markets[0],
+  theses: [
+    {
+      thesisId: "thesis-fed-cut",
+      marketId: "polymarket-fed-cut",
+      authorHandle: "@macrodesk",
+      authorWallet: null,
+      authorAgentId: null,
+      selectedOutcomeId: "yes",
+      selectedOutcomeLabel: "Yes",
+      oddsAtPost: 0.41,
+      currentOdds: 0.43,
+      conviction: 64,
+      rationale: "Inflation data leaves room for one policy move.",
+      evidenceLinks: ["https://example.com/source"],
+      sourceUrl: "https://example.com/source",
+      sourcePostUrl: null,
+      counterToThesisId: null,
+      copiedCount: 3,
+      challengedCount: 0,
+      status: "open",
+      resolution: {
+        correct: null,
+        resolvedOutcomeId: null,
+        resolvedAt: null,
+        oddsEdge: null,
+        reputationImpact: "pending",
+        summary: null,
+      },
+      createdAt: "2026-04-22T00:00:00.000Z",
+      updatedAt: "2026-04-22T00:00:00.000Z",
+    },
+  ],
+};
+
 test("markets page color-codes Polymarket and Kalshi provider badges", async ({ page }) => {
   await page.route("**/api/markets", async (route) => {
     await route.fulfill({
@@ -84,4 +120,27 @@ test("markets page filters by provider without losing the market desk context", 
   await expect(page.getByRole("link", { name: /Will CPI come in above forecast/i })).toBeVisible();
   await expect(page.getByRole("link", { name: /Will the Fed cut rates in June/i })).toHaveCount(0);
   await expect(page.getByText("Showing 1 of 2 markets")).toBeVisible();
+});
+
+test("market detail content starts beside the hero on desktop", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.route("**/api/markets/polymarket-fed-cut", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(marketDetailPayload),
+    });
+  });
+
+  await page.goto("/markets/polymarket-fed-cut");
+
+  const hero = page.locator(".market-detail-head");
+  const outcomes = page.locator(".market-outcomes");
+  await expect(hero).toBeVisible();
+  await expect(outcomes).toBeVisible();
+  await expect.poll(async () => {
+    const heroBox = await hero.boundingBox();
+    const outcomesBox = await outcomes.boundingBox();
+    return Boolean(heroBox && outcomesBox && outcomesBox.x > heroBox.x + heroBox.width && outcomesBox.y < 360);
+  }).toBe(true);
 });
