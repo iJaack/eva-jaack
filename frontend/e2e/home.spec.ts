@@ -211,9 +211,15 @@ test("desktop homepage keeps shared product sections in the main grid", async ({
   const productSystem = page.locator(".product-system");
   const footer = page.locator("footer.site-footer");
   const marketStrip = page.locator(".mobile-strip");
+  const counterLink = page.getByRole("link", { name: "Counter", exact: true });
 
   await expect(productSystem).toBeVisible();
   await expect(footer).toBeVisible();
+  await counterLink.scrollIntoViewIfNeeded();
+  await expect(counterLink).toBeInViewport();
+  await counterLink.click();
+  await expect(page).toHaveURL(/\/compose\?counterTo=thesis-fed-hold$/);
+  await page.goBack();
   await expect.poll(async () => {
     const productBox = await productSystem.boundingBox();
     const footerBox = await footer.boundingBox();
@@ -222,4 +228,30 @@ test("desktop homepage keeps shared product sections in the main grid", async ({
   await expect.poll(async () => {
     return marketStrip.evaluate((element) => element.scrollWidth <= element.clientWidth + 1);
   }).toBe(true);
+  await expect.poll(async () => {
+    return page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1);
+  }).toBe(true);
+});
+
+test("desktop homepage keeps thesis actions inside the page width at 1280px", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 1000 });
+  await page.route("**/api/prediction-summary", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(summaryPayload),
+    });
+  });
+
+  await page.goto("/");
+
+  const counterLink = page.getByRole("link", { name: "Counter", exact: true });
+  await counterLink.scrollIntoViewIfNeeded();
+  await expect(counterLink).toBeInViewport();
+  await expect.poll(async () => {
+    return page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1);
+  }).toBe(true);
+
+  await counterLink.click();
+  await expect(page).toHaveURL(/\/compose\?counterTo=thesis-fed-hold$/);
 });

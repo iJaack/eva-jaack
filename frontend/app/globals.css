@@ -3071,7 +3071,7 @@ body {
   }
 
   .home-workbench {
-    grid-template-columns: minmax(420px, 0.78fr) minmax(680px, 1.38fr) minmax(380px, 0.74fr);
+    grid-template-columns: minmax(260px, 0.78fr) minmax(0, 1.38fr) minmax(260px, 0.74fr);
     grid-template-areas:
       "quests tape rail"
       "quests markets feature";
