@@ -2702,6 +2702,19 @@ body {
   background: var(--color-paper-2);
 }
 
+.filter-chip.filter-chip-active,
+.status-chip.status-chip-forecast {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.market-card-large .provider-badge {
+  background: color-mix(in oklch, var(--provider-accent) 24%, var(--color-paper-2));
+  border-color: color-mix(in oklch, var(--provider-accent) 72%, var(--color-rule));
+  color: var(--ink);
+}
+
 .field-input,
 .claim-input-group input,
 .compose-textarea,
