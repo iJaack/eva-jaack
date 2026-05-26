@@ -6,8 +6,8 @@ const verifyUrl = (process.env.SMOKE_VERIFY_URL ?? "").trim();
 const articleId = (process.env.SMOKE_ARTICLE_ID ?? "").trim();
 const curatorAddress = (process.env.SMOKE_CURATOR_ADDRESS ?? "").trim();
 const claimId = (process.env.SMOKE_CLAIM_ID ?? "").trim();
-const thesisId = (process.env.SMOKE_THESIS_ID ?? "").trim();
-const marketId = (process.env.SMOKE_MARKET_ID ?? "crude-oil-95-window").trim();
+const thesisId = (process.env.SMOKE_THESIS_ID ?? "thesis-fed-hold-macro").trim();
+const marketId = (process.env.SMOKE_MARKET_ID ?? "fed-hold-next-meeting").trim();
 const predictorId = (process.env.SMOKE_PREDICTOR_ID ?? "nairlof").trim();
 const requestTimeoutMs = Number(process.env.SMOKE_TIMEOUT_MS ?? "15000");
 const curatorsMaxMs = Number(process.env.SMOKE_CURATORS_MAX_MS ?? "5000");
@@ -31,6 +31,7 @@ const checks = [
   { name: "predictors page", method: "GET", path: "/predictors" },
   { name: "prediction summary API", method: "GET", path: `${protocol.app.apiBasePath}/prediction-summary` },
   { name: "markets API", method: "GET", path: `${protocol.app.apiBasePath}/markets` },
+  { name: "market detail page", method: "GET", path: `/markets/${marketId}` },
   { name: "market detail API", method: "GET", path: `${protocol.app.apiBasePath}/markets/${marketId}` },
   { name: "predictors API", method: "GET", path: `${protocol.app.apiBasePath}/predictors` },
   { name: "predictor detail API", method: "GET", path: `${protocol.app.apiBasePath}/predictors/${predictorId}` },

@@ -31,11 +31,39 @@
       "dest": "/api/index.ts?route=health"
     },
     {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "src": "/article/([^/]+)",
+      "dest": "/frontend/article/[id]?nxtPid=$1"
+    },
+    {
+      "src": "/claims/x",
+      "dest": "/frontend/claims/x"
+    },
+    {
+      "src": "/claims/([^/]+)",
+      "dest": "/frontend/claims/[claimId]?nxtPclaimId=$1"
+    },
+    {
+      "src": "/curator/([^/]+)",
+      "dest": "/frontend/curator/[address]?nxtPaddress=$1"
+    },
+    {
+      "src": "/markets/([^/]+)",
+      "dest": "/frontend/markets/[marketId]?nxtPmarketId=$1"
+    },
+    {
+      "src": "/predictors/([^/]+)",
+      "dest": "/frontend/predictors/[id]?nxtPid=$1"
+    },
+    {
+      "src": "/thesis/([^/]+)",
+      "dest": "/frontend/thesis/[thesisId]?nxtPthesisId=$1"
     },
     {
       "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
     }
   ]
 }
