@@ -13,7 +13,8 @@
     "typecheck": "pnpm --filter frontend typecheck",
     "test:backend": "pnpm --filter backend test",
     "test:e2e": "pnpm --filter frontend test:e2e",
-    "smoke:deploy": "node scripts/smoke-deployment.mjs"
+    "smoke:deploy": "node scripts/smoke-deployment.mjs",
+    "finalize:thesis-protocol": "node scripts/finalize-thesis-protocol-deploy.mjs"
   },
   "dependencies": {
     "hono": "^4.12.8"
