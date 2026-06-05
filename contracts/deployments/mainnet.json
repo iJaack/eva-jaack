@@ -3,6 +3,7 @@
   "chainId": 43114,
   "deployedAt": "2026-03-04T16:22:00Z",
   "verificationMarketDeployedAt": "2026-05-20T08:28:00Z",
+  "thesisProtocolDeployedAt": "2026-06-05T20:02:16Z",
   "deployer": "0x0fE61780BD5508b3C99E420662050E5560608cA4",
   "contracts": {
     "EvaTrustGraph": {
@@ -29,6 +30,14 @@
       "implementationTxHash": "0x6642c006923bbdf7159bd9006adc6358ff8fee895090db6ab0dd8f340557c651",
       "proxyTxHash": "0xa3dc512be94deebb4464ae2566646c2a815700cdda79943b8fc2a4257166b63f",
       "deployedBlock": 85904672,
+      "verified": false
+    },
+    "EvaThesisProtocol": {
+      "proxy": "0x5eDBd1eea3228662326e60634E53AB8975D6641c",
+      "implementation": "0x3acc6Fd96d67425Cb746F23b0e395eB82Bff171f",
+      "implementationTxHash": "0x4e0fa1bf82a97d50cbc613db522b705a267b3d74bb9c3cf0f1105db0dfa7959c",
+      "proxyTxHash": "0x038868cf5190e49cdb548cbe52b0d10fd9868f9e9aed9a6f583979877c283949",
+      "deployedBlock": 87265823,
       "verified": false
     }
   },

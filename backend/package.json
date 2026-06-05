@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "mcp": "tsx src/mcp.ts",
+    "deploy:thesis-protocol:evalanche": "tsx scripts/deploy-thesis-protocol-evalanche.ts",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
