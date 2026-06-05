@@ -14,7 +14,8 @@
     "test:backend": "pnpm --filter backend test",
     "test:e2e": "pnpm --filter frontend test:e2e",
     "smoke:deploy": "node scripts/smoke-deployment.mjs",
-    "finalize:thesis-protocol": "node scripts/finalize-thesis-protocol-deploy.mjs"
+    "finalize:thesis-protocol": "node scripts/finalize-thesis-protocol-deploy.mjs",
+    "publish:spacex-thesis": "node scripts/publish-spacex-thesis.mjs"
   },
   "dependencies": {
     "hono": "^4.12.8"
