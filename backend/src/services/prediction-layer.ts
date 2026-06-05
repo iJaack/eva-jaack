@@ -460,71 +460,187 @@ function mergeSeedMarkets(markets: PredictionMarketDto[]): PredictionMarketDto[]
   return [...byId.values()];
 }
 
+function mergeSeedTheses(theses: ThesisDto[]): ThesisDto[] {
+  const byId = new Map(seedStore().theses.map((thesis) => [thesis.thesisId, thesis]));
+  for (const thesis of theses) byId.set(thesis.thesisId, thesis);
+  return [...byId.values()];
+}
+
 function seedStore(): PredictionStore {
   const seededAt = isoDaysAgo(1);
+  const markets: PredictionMarketDto[] = [
+    {
+      marketId: "spacex-ipo-before-2027",
+      provider: "manual",
+      externalId: "spacex-ipo-2027",
+      url: "https://polymarket.com/",
+      title: "Will SpaceX IPO before the end of 2027?",
+      category: "Private Markets",
+      status: "open",
+      volumeUsd: 12500000,
+      liquidityUsd: 1100000,
+      closeTime: isoFromNow(580),
+      outcomes: [
+        { outcomeId: "yes", label: "Yes", price: 0.24 },
+        { outcomeId: "no", label: "No", price: 0.76 },
+      ],
+      linkedClaimIds: [],
+      createdAt: seededAt,
+      updatedAt: seededAt,
+    },
+    {
+      marketId: "fed-hold-next-meeting",
+      provider: "external",
+      externalId: "fed-hold",
+      url: "https://kalshi.com/",
+      title: "Will the Fed hold rates at the next meeting?",
+      category: "Macro",
+      status: "open",
+      volumeUsd: 115500000,
+      liquidityUsd: 5200000,
+      closeTime: isoFromNow(56),
+      outcomes: [
+        { outcomeId: "hold", label: "Hold", price: 0.58 },
+        { outcomeId: "cut", label: "Cut", price: 0.29 },
+        { outcomeId: "hike", label: "Hike", price: 0.13 },
+      ],
+      linkedClaimIds: [],
+      createdAt: seededAt,
+      updatedAt: seededAt,
+    },
+    {
+      marketId: "btc-110k-window",
+      provider: "external",
+      externalId: "btc-110k",
+      url: "https://polymarket.com/",
+      title: "Will Bitcoin trade above $110k before this market closes?",
+      category: "Crypto",
+      status: "open",
+      volumeUsd: 52600000,
+      liquidityUsd: 3900000,
+      closeTime: isoFromNow(69),
+      outcomes: [
+        { outcomeId: "yes", label: "Yes", price: 0.37 },
+        { outcomeId: "no", label: "No", price: 0.63 },
+      ],
+      linkedClaimIds: [],
+      createdAt: seededAt,
+      updatedAt: seededAt,
+    },
+  ];
+
   return {
-    markets: [
+    markets,
+    theses: [seedSpaceXThesis(markets)],
+    commands: [],
+  };
+}
+
+function seedSpaceXThesis(markets: PredictionMarketDto[]): ThesisDto {
+  const createdAt = "2026-06-05T20:10:00.000Z";
+  const title = "SpaceX IPO liquidity rotation thesis";
+  const body =
+    "SpaceX IPO anticipation is absorbing speculative liquidity now; after the IPO path becomes explicit, risk markets can reprice as attention and liquidity rotate.";
+  const author: ThesisAuthorDto = {
+    dynamicUserId: "evalanche:spacex-ipo-liquidity",
+    xHandle: "@spacethesis",
+    xProfileId: "spaceX-ipo-liquidity",
+    walletAddress: "0x0fE61780BD5508b3C99E420662050E5560608cA4",
+    walletSource: "embedded",
+  };
+  const thesisId = `thesis-${stableHash({ title: title.toLowerCase(), author: author.xHandle.toLowerCase(), body })}`;
+  const signals: ThesisSignalDto[] = [
+    buildPredictionSignal(
+      markets,
       {
         marketId: "spacex-ipo-before-2027",
+        marketTitle: "Will SpaceX IPO before the end of 2027?",
+        marketUrl: "https://polymarket.com/",
         provider: "manual",
-        externalId: "spacex-ipo-2027",
-        url: "https://polymarket.com/",
-        title: "Will SpaceX IPO before the end of 2027?",
-        category: "Private Markets",
+        selectedOutcomeId: "yes",
+        selectedOutcomeLabel: "Yes",
+        oddsAtAdd: 0.24,
+        currentOdds: 0.24,
+        weight: 60,
+        role: "core",
+        rationale: "Primary market signal for IPO timing; if timing probability rises, liquidity rotation becomes more actionable.",
         status: "open",
-        volumeUsd: 12500000,
-        liquidityUsd: 1100000,
-        closeTime: isoFromNow(580),
-        outcomes: [
-          { outcomeId: "yes", label: "Yes", price: 0.24 },
-          { outcomeId: "no", label: "No", price: 0.76 },
-        ],
-        linkedClaimIds: [],
-        createdAt: seededAt,
-        updatedAt: seededAt,
       },
+      createdAt,
+    ),
+    buildPredictionSignal(
+      markets,
       {
-        marketId: "fed-hold-next-meeting",
-        provider: "external",
-        externalId: "fed-hold",
-        url: "https://kalshi.com/",
-        title: "Will the Fed hold rates at the next meeting?",
-        category: "Macro",
+        marketTitle: "Private-market liquidity tightness before a major SpaceX listing",
+        marketUrl: "https://eva.jaack.me/",
+        provider: "manual",
+        selectedOutcomeLabel: "Liquidity remains constrained before IPO clarity",
+        oddsAtAdd: 0.55,
+        currentOdds: 0.55,
+        weight: 20,
+        role: "second_order",
+        rationale: "Second-order signal: capital waits for liquidity and allocation clarity before rotating into adjacent risk markets.",
         status: "open",
-        volumeUsd: 115500000,
-        liquidityUsd: 5200000,
-        closeTime: isoFromNow(56),
-        outcomes: [
-          { outcomeId: "hold", label: "Hold", price: 0.58 },
-          { outcomeId: "cut", label: "Cut", price: 0.29 },
-          { outcomeId: "hike", label: "Hike", price: 0.13 },
-        ],
-        linkedClaimIds: [],
-        createdAt: seededAt,
-        updatedAt: seededAt,
       },
+      createdAt,
+    ),
+    buildFactSignal(
       {
-        marketId: "btc-110k-window",
-        provider: "external",
-        externalId: "btc-110k",
-        url: "https://polymarket.com/",
-        title: "Will Bitcoin trade above $110k before this market closes?",
-        category: "Crypto",
-        status: "open",
-        volumeUsd: 52600000,
-        liquidityUsd: 3900000,
-        closeTime: isoFromNow(69),
-        outcomes: [
-          { outcomeId: "yes", label: "Yes", price: 0.37 },
-          { outcomeId: "no", label: "No", price: 0.63 },
-        ],
-        linkedClaimIds: [],
-        createdAt: seededAt,
-        updatedAt: seededAt,
+        claimText: "SpaceX has used private tender offers and secondary liquidity before pursuing a public listing.",
+        sourceUrl: "https://www.spacex.com/",
+        verifierVerdict: "unverifiable_yet",
+        verifierScore: 50,
+        weight: 10,
+        role: "lateral",
+        rationale: "Tender and secondary-market facts inform whether IPO anticipation can absorb liquidity before a listing path is explicit.",
+      },
+      createdAt,
+    ),
+    buildFactSignal(
+      {
+        claimText: "The thesis should be revised when IPO timing markets, private-market liquidity facts, or adjacent risk-market signals materially change.",
+        sourceUrl: "https://eva.jaack.me/",
+        verifierVerdict: "non_falsifiable",
+        verifierScore: 50,
+        weight: 10,
+        role: "third_order",
+        rationale: "This is the operating rule for the living post: market changes should produce visible thesis history.",
+      },
+      createdAt,
+    ),
+  ];
+  const revision = revisionFor(1, body, "Initial SpaceX liquidity thesis published.", signals, null, createdAt);
+  return {
+    thesisId,
+    title,
+    slug: `${slugify(title)}-${thesisId.slice(-6)}`,
+    author,
+    body,
+    currentRevision: revision,
+    revisions: [revision],
+    signals,
+    currentScore: revision.scoreAfter,
+    evidenceLinks: ["https://eva.jaack.me/markets"],
+    sourceUrl: "https://polymarket.com/",
+    sourcePostUrl: null,
+    counterToThesisId: null,
+    copiedCount: 0,
+    challengedCount: 0,
+    status: "active",
+    resolution: { ...emptyResolution },
+    timeline: [
+      {
+        timelineId: `tl-${stableHash({ thesisId, createdAt, action: "created" })}`,
+        action: "created",
+        at: createdAt,
+        note: "Thesis published with initial signal basket.",
+        scoreBefore: null,
+        scoreAfter: revision.scoreAfter,
       },
     ],
-    theses: [],
-    commands: [],
+    anchor: emptyAnchor(),
+    createdAt,
+    updatedAt: createdAt,
   };
 }
 
@@ -1025,7 +1141,7 @@ export class LocalPredictionLayerService {
       const parsed = JSON.parse(raw) as Partial<PredictionStore>;
       const store = {
         markets: Array.isArray(parsed.markets) ? applyV1MarketPolicy(mergeSeedMarkets(parsed.markets)) : seedStore().markets,
-        theses: Array.isArray(parsed.theses) ? parsed.theses : [],
+        theses: Array.isArray(parsed.theses) ? mergeSeedTheses(parsed.theses) : seedStore().theses,
         commands: Array.isArray(parsed.commands) ? parsed.commands : [],
       };
       return mergeProviderMarkets(store, await this.loadLiveMarkets());
