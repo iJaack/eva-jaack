@@ -7,6 +7,7 @@
     "dev": "tsx src/index.ts",
     "mcp": "tsx src/mcp.ts",
     "deploy:thesis-protocol:evalanche": "tsx scripts/deploy-thesis-protocol-evalanche.ts",
+    "anchor:thesis:evalanche": "tsx scripts/broadcast-thesis-anchor-evalanche.ts",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"

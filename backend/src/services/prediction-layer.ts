@@ -246,6 +246,16 @@ function emptyAnchor(): ThesisAnchorDto {
   };
 }
 
+function confirmedAnchor(txHash: `0x${string}`, confirmedAt: string): ThesisAnchorDto {
+  return {
+    status: "confirmed",
+    txHash,
+    contractAddress: config.evaThesisProtocol,
+    preparedAt: confirmedAt,
+    confirmedAt,
+  };
+}
+
 function normalizeHandle(handle: string): string {
   const trimmed = handle.trim();
   if (!trimmed) throw new Error("Connected X identity and wallet are required");
@@ -541,6 +551,8 @@ function seedSpaceXThesis(markets: PredictionMarketDto[]): ThesisDto {
   const title = "SpaceX IPO liquidity rotation thesis";
   const body =
     "SpaceX IPO anticipation is absorbing speculative liquidity now; after the IPO path becomes explicit, risk markets can reprice as attention and liquidity rotate.";
+  const anchoredAt = "2026-06-05T20:30:25.000Z";
+  const thesisAnchor = confirmedAnchor("0xe02eae437e8dbbc9c2842c0ac087c7a51a76d164c3d484f058042aaa45c7f3bb", "2026-06-05T20:28:50.000Z");
   const author: ThesisAuthorDto = {
     dynamicUserId: "evalanche:spacex-ipo-liquidity",
     xHandle: "@spacethesis",
@@ -609,7 +621,11 @@ function seedSpaceXThesis(markets: PredictionMarketDto[]): ThesisDto {
       createdAt,
     ),
   ];
-  const revision = revisionFor(1, body, "Initial SpaceX liquidity thesis published.", signals, null, createdAt);
+  const revision = { ...revisionFor(1, body, "Initial SpaceX liquidity thesis published.", signals, null, createdAt), anchor: thesisAnchor };
+  signals[0] = { ...signals[0], anchor: confirmedAnchor("0xa0941cdfa04ba2090bef61ca290872e8dd380402fb0d616034751b2d961d73bd", "2026-06-05T20:28:53.000Z") };
+  signals[1] = { ...signals[1], anchor: confirmedAnchor("0x475041c32d4f117f9d6ca5af76be42d5fe8adc8e4afed2bf895c4ba3e96e2414", "2026-06-05T20:28:55.000Z") };
+  signals[2] = { ...signals[2], anchor: confirmedAnchor("0xee81e2573c828de318ef1b85dcac35c1b313753feb3793ca5daf7277961827eb", "2026-06-05T20:30:22.000Z") };
+  signals[3] = { ...signals[3], anchor: confirmedAnchor("0x4a3e564bc769b7ecf2f0818054fe6e7b1f3aca0420b09a8036d12c322966db20", anchoredAt) };
   return {
     thesisId,
     title,
@@ -635,12 +651,20 @@ function seedSpaceXThesis(markets: PredictionMarketDto[]): ThesisDto {
         at: createdAt,
         note: "Thesis published with initial signal basket.",
         scoreBefore: null,
-        scoreAfter: revision.scoreAfter,
-      },
-    ],
-    anchor: emptyAnchor(),
+          scoreAfter: revision.scoreAfter,
+        },
+        {
+          timelineId: `tl-${stableHash({ thesisId, anchoredAt, action: "anchored" })}`,
+          action: "anchored",
+          at: anchoredAt,
+          note: "Thesis and four signals anchored to EvaThesisProtocol on Avalanche.",
+          scoreBefore: revision.scoreAfter,
+          scoreAfter: revision.scoreAfter,
+        },
+      ],
+    anchor: thesisAnchor,
     createdAt,
-    updatedAt: createdAt,
+    updatedAt: anchoredAt,
   };
 }
 
