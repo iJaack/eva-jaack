@@ -20,7 +20,7 @@ const defaultIdentity: ThesisIdentity = {
   dynamicUserId: "local-dynamic-preview",
   xHandle: "@spacethesis",
   xProfileId: "local-x-preview",
-  walletAddress: "0x0fE61780BD5508b3C99E420662050E5560608cA4",
+  walletAddress: "0x0fe61780bd5508b3C99e420662050e5560608cA4",
   walletSource: "embedded" as const,
 };
 

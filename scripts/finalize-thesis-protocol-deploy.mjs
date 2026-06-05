@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const configPath = path.join(repoRoot, "protocol.config.json");
 const rpcUrl = process.env.AVALANCHE_RPC_URL ?? "https://api.avax.network/ext/bc/C/rpc";
-const expectedOperator = "0x0fE61780BD5508b3C99E420662050E5560608cA4";
+const expectedOperator = "0x0fe61780bd5508b3C99e420662050e5560608cA4";
 const defaultAdminRole = "0x" + "0".repeat(64);
 const operatorRole = "0x97667070c54ef182b0f5858b034beac1b6f3089aa2d3188bb1e8929f4fa9b929";
 const hasRoleSelector = "0x91d14854";

@@ -12,7 +12,7 @@ Use this when an agent needs to work with Eva Protocol safely.
 - Use the local MCP server first: `pnpm --filter backend mcp`.
 - Treat remote MCP write tools as unavailable unless the agent has scoped credentials.
 - Confirm wallet identity before preparing or broadcasting protocol transactions.
-- Use `0x0fE61780BD5508b3C99E420662050E5560608cA4` only when the operator explicitly approved that signer for the task.
+- Use `0x0fe61780bd5508b3C99e420662050e5560608cA4` only when the operator explicitly approved that signer for the task.
 
 ## Safety Rules
 

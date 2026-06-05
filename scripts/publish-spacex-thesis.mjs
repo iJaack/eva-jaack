@@ -1,5 +1,5 @@
 const defaultApiBase = process.env.EVA_API_BASE ?? "https://api.eva.jaack.me/api";
-const defaultWallet = "0x0fE61780BD5508b3C99E420662050E5560608cA4";
+const defaultWallet = "0x0fe61780bd5508b3C99e420662050e5560608cA4";
 const title = "SpaceX IPO liquidity rotation thesis";
 const body =
   "SpaceX IPO anticipation is absorbing speculative liquidity now; after the IPO path becomes explicit, risk markets can reprice as attention and liquidity rotate.";
