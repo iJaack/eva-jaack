@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
+import EvaProviders from "@/components/EvaProviders";
 import { protocol } from "@/lib/protocol";
 
 const title = `${protocol.app.name} — Prediction reputation OS`;
@@ -52,7 +53,7 @@ export default function RootLayout({
         <div className="site-backdrop" aria-hidden>
           <div className="backdrop-grid" />
         </div>
-        {children}
+        <EvaProviders>{children}</EvaProviders>
       </body>
     </html>
   );

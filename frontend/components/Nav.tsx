@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import DynamicAuthControl from "./DynamicAuthControl";
 import ThemeToggle from "./ThemeToggle";
 
 const navItems: readonly { href: string; label: string; exact?: boolean; highlight?: boolean }[] = [
@@ -111,6 +112,7 @@ export default function Nav() {
         </nav>
 
         <div className="topbar-actions">
+          <DynamicAuthControl />
           <ThemeToggle />
           <Link href="/compose" className="nav-edge-cta" onClick={() => setMenuOpen(false)}>
             New thesis

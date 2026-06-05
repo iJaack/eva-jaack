@@ -46,20 +46,16 @@ Use these statuses in product copy and docs:
 
 Market odds are a price signal. They are not a truth status.
 
-## V1 risk policy
+## V1 market-loading policy
 
-Avoid these categories in v1:
+The market desk should load open provider markets broadly so predictors can find the market they
+want to discuss. For now, exclude sports markets from the loaded provider feed.
 
-- elections
-- sports betting
-- war
-- assassination
-- criminal investigations
-- personal tragedies
-- easily manipulable events
+Founder-approved examples and public launch posts should still prefer clear resolution sources,
+limited harm surfaces, and events where evidence quality matters more than spectacle.
 
-The first examples should use clear resolution sources, limited harm surfaces, and events where
-evidence quality matters more than spectacle.
+Do not imply Eva endorses a market just because it appears in the desk. Loaded markets are external
+forecast contexts, not truth claims.
 
 ## x402 boundary
 

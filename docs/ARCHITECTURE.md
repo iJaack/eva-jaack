@@ -199,8 +199,8 @@ status. Market odds are not a truth score.
 - `/api/verify` must describe payment honestly. If x402 is not enforced, the response must say so.
 - Trust reads must query the same tags the backend writes.
 - The verification market is additive. No new market module may replace curator identity or long-lived trust state in `EvaTrustGraph`.
-- V1 risk policy excludes elections, sports betting, war, assassination, criminal investigations,
-  personal tragedies, and easily manipulable events.
+- Provider market loading is broad, but sports markets are excluded for now. Appearance in the
+  market desk is external context, not Eva endorsement or truth status.
 - x402 may be used only for paid verification/API access after strict resource-bound request
   verification exists.
 

@@ -11,7 +11,7 @@ already publish prediction-market takes, claim bundles, and evidence trails in p
 
 ## Product
 
-Eva combines five primitives:
+Eva combines six primitives:
 
 - Markets: external venues and questions that anchor a prediction.
 - Theses: a user's outcome call, odds snapshot, rationale, and evidence.
@@ -93,8 +93,9 @@ Readiness scoreboard:
 
 - Messaging risk: overclaiming native market or x402 behavior before it is live.
 - Infrastructure risk: local or serverless storage is not durable enough for public report links.
-- Category risk: v1 should avoid elections, sports betting, war, assassination, criminal
-  investigations, personal tragedies, and easily manipulable events.
+- Category risk: loading provider markets broadly can expose sensitive topics. Sports markets stay
+  excluded for now, and public examples should still use clear resolution sources and limited harm
+  surfaces.
 - Activation risk: curator onboarding may fail if wallet, agent ID, stake, allowance, or gas states
   are unclear.
 - Distribution risk: content can be drafted autonomously, but public posting still requires

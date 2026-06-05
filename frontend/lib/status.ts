@@ -35,10 +35,16 @@ export function marketUiStatus(market: Pick<PredictionMarket, "status">): EvaUiS
   return "forecast";
 }
 
-export function thesisUiStatus(thesis: Pick<Thesis, "status" | "resolution">): EvaUiStatus {
+type ThesisStatusInput = Pick<Thesis, "status"> & {
+  resolution?: {
+    reputationImpact?: string | null;
+  } | null;
+};
+
+export function thesisUiStatus(thesis: ThesisStatusInput): EvaUiStatus {
   if (thesis.status === "resolved") return "resolved";
   if (thesis.status === "withdrawn" || thesis.status === "invalid") return "void";
-  if (thesis.resolution.reputationImpact === "negative") return "disputed";
+  if (thesis.resolution?.reputationImpact === "negative") return "disputed";
   return "unresolved";
 }
 

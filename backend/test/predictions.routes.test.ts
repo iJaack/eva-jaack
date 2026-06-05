@@ -8,6 +8,7 @@ import { LocalPredictionLayerService } from "../src/services/prediction-layer.js
 import { fetchJson } from "./helpers.js";
 
 const cleanupDirs: string[] = [];
+const walletAddress = "0x1111111111111111111111111111111111111111";
 
 afterEach(async () => {
   await Promise.all(cleanupDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
@@ -22,12 +23,22 @@ async function makeApp() {
   return app;
 }
 
+function identityPayload() {
+  return {
+    dynamicUserId: "dyn-route-1",
+    xHandle: "@routealpha",
+    xProfileId: "x-route-1",
+    walletAddress,
+    walletSource: "embedded",
+  };
+}
+
 describe("prediction routes", () => {
   it("serves summary, market detail, and predictor rankings", async () => {
     const app = await makeApp();
 
     const summary = await fetchJson(app, "/api/prediction-summary");
-    const market = await fetchJson(app, "/api/markets/crude-oil-95-window");
+    const market = await fetchJson(app, "/api/markets/spacex-ipo-before-2027");
     const predictors = await fetchJson(app, "/api/predictors");
 
     expect(summary.status).toBe(200);
@@ -39,7 +50,7 @@ describe("prediction routes", () => {
     });
     expect(market.status).toBe(200);
     expect(market.body).toMatchObject({
-      market: { marketId: "crude-oil-95-window" },
+      market: { marketId: "spacex-ipo-before-2027" },
     });
     expect(predictors.status).toBe(200);
     expect(predictors.body).toMatchObject({
@@ -47,65 +58,86 @@ describe("prediction routes", () => {
     });
   });
 
-  it("creates a thesis and returns copy previews", async () => {
+  it("creates and revises a multi-signal thesis", async () => {
     const app = await makeApp();
     const created = await fetchJson(app, "/api/theses", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        authorHandle: "@routealpha",
-        marketId: "crude-oil-95-window",
-        selectedOutcomeId: "yes",
-        rationale: "Route tests should prove the thesis API is live.",
+        ...identityPayload(),
+        title: "SpaceX IPO liquidity rotation thesis",
+        body: "SpaceX IPO anticipation is absorbing speculative liquidity now.",
+        predictionSignals: [
+          {
+            marketId: "spacex-ipo-before-2027",
+            selectedOutcomeLabel: "Yes",
+            oddsAtAdd: 0.24,
+            currentOdds: 0.36,
+            weight: 60,
+            role: "core",
+          },
+        ],
+        factSignals: [
+          {
+            claimText: "SpaceX has explored tender offers before a public listing.",
+            verifierVerdict: "likely_true",
+            verifierScore: 82,
+            reportUri: "ipfs://route-fact",
+            weight: 40,
+            role: "second_order",
+          },
+        ],
       }),
     });
 
     expect(created.status).toBe(201);
-    const thesisId = (created.body as { thesis: { thesisId: string } }).thesis.thesisId;
+    const thesisId = (created.body as { thesis: { thesisId: string; currentScore: number } }).thesis.thesisId;
+    expect((created.body as { thesis: { currentScore: number } }).thesis.currentScore).toBe(70);
 
     const detail = await fetchJson(app, `/api/theses/${thesisId}`);
-    const copy = await fetchJson(app, "/api/copy-preview", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ thesisId }),
+    expect(detail.status).toBe(200);
+    expect(detail.body).toMatchObject({
+      thesis: {
+        title: "SpaceX IPO liquidity rotation thesis",
+        signals: expect.arrayContaining([expect.objectContaining({ kind: "prediction_market" })]),
+      },
     });
 
-    expect(detail.status).toBe(200);
-    expect(copy.status).toBe(200);
-    expect(copy.body).toMatchObject({
-      thesisId,
-      execution: "external-link-only",
+    const signalId = (created.body as { thesis: { signals: Array<{ signalId: string }> } }).thesis.signals[0]!.signalId;
+    const revised = await fetchJson(app, `/api/theses/${thesisId}/revisions`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...identityPayload(),
+        body: "SpaceX IPO timing odds strengthened, so the thesis confidence improved.",
+        note: "IPO timing signal moved.",
+        signalUpdates: [{ signalId, currentOdds: 0.45 }],
+      }),
+    });
+
+    expect(revised.status).toBe(200);
+    expect(revised.body).toMatchObject({
+      thesis: {
+        currentRevision: { version: 2 },
+        timeline: expect.arrayContaining([expect.objectContaining({ action: "revised", scoreBefore: 70 })]),
+      },
     });
   });
 
-  it("accepts explicit @evapredicts commands without keyword scanning", async () => {
+  it("rejects thesis writes without connected X and wallet identity", async () => {
     const app = await makeApp();
-    const accepted = await fetchJson(app, "/api/x/ingest", {
+    const response = await fetchJson(app, "/api/theses", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        mentionId: "route-mention-1",
-        authorHandle: "@routealpha",
-        text: "@evapredicts track this market call",
-        tweetUrl: "https://x.com/routealpha/status/1",
-      }),
-    });
-    const ignored = await fetchJson(app, "/api/x/ingest", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        mentionId: "route-mention-2",
-        authorHandle: "@routealpha",
-        text: "@evapredicts hello",
+        title: "No identity",
+        body: "This should not publish.",
       }),
     });
 
-    expect(accepted.status).toBe(202);
-    expect(accepted.body).toMatchObject({ accepted: true });
-    expect(ignored.status).toBe(200);
-    expect(ignored.body).toMatchObject({
-      accepted: false,
-      command: { status: "ignored" },
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      error: "Connected X identity and wallet are required",
     });
   });
 });

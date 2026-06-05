@@ -182,6 +182,12 @@ button {
   gap: var(--space-xs);
 }
 
+.dynamic-auth-control {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
 .nav-hamburger,
 .theme-toggle,
 .nav-edge-cta {

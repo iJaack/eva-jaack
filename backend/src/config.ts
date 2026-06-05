@@ -20,6 +20,7 @@ export const config = {
     'EVA_VERIFICATION_REPUTATION_ADAPTER',
     protocol.contracts.evaVerificationReputationAdapter,
   ) as `0x${string}`,
+  evaThesisProtocol: env('EVA_THESIS_PROTOCOL', protocol.contracts.evaThesisProtocol) as `0x${string}`,
 
   evaAgentId: env('EVA_AGENT_ID', protocol.agents.eva.id),
   evaSovereignWallet: env('EVA_SOVEREIGN_WALLET', protocol.agents.eva.wallet) as `0x${string}`,

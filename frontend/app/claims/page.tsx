@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
-import { getClaims, type MarketClaim } from "@/lib/api";
+import { getClaims, type MarketActionability, type MarketClaim } from "@/lib/api";
 import { claimUiStatus, statusClassName, statusLabel } from "@/lib/status";
 
 function formatTimestamp(value: string): string {
@@ -20,10 +20,19 @@ function titleCase(value: string): string {
 }
 
 const claimLoop = ["Verify", "Stake", "Challenge", "Resolve"] as const;
+const stagedActionability: MarketActionability = {
+  status: "disabled",
+  label: "Market staged",
+  description: "Stake and challenge actions are staged until the verification market is enabled.",
+  marketAddress: null,
+  adapterAddress: null,
+  transactionPreparation: false,
+  onchainReadback: false,
+};
 
 export default function ClaimsPage() {
   const [claims, setClaims] = useState<MarketClaim[]>([]);
-  const [marketEnabled, setMarketEnabled] = useState(false);
+  const [marketActionability, setMarketActionability] = useState<MarketActionability>(stagedActionability);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,7 +40,7 @@ export default function ClaimsPage() {
     getClaims()
       .then((response) => {
         setClaims(response.claims);
-        setMarketEnabled(response.marketEnabled);
+        setMarketActionability(response.marketActionability ?? stagedActionability);
       })
       .catch((reason) => {
         setError(reason instanceof Error ? reason.message : "Failed to load claims.");
@@ -67,7 +76,9 @@ export default function ClaimsPage() {
               <li>Claim bundles are still live and durable.</li>
               <li>@evapredicts can turn explicit X commands into thesis or evidence pages.</li>
               <li>Statuses use the evidence vocabulary: unresolved, verified, disputed, resolved, or void.</li>
-              <li>{marketEnabled ? "Stake and challenge actions are live." : "Stake and challenge actions are staged until the market contract is deployed."}</li>
+              <li>
+                <strong>{marketActionability.label}.</strong> {marketActionability.description}
+              </li>
             </ul>
           </aside>
         </section>

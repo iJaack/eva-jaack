@@ -4,6 +4,7 @@ import type {
   ArticleListResponse,
   ClaimChallengePreviewResponse,
   ClaimCreateResponse,
+  ClaimMarketActionabilityDto,
   ClaimListResponse,
   ClaimMarketDetailResponse,
   ClaimMarketSummaryDto,
@@ -35,6 +36,7 @@ export type CuratorDetail = CuratorDetailResponse;
 export type VerificationResult = VerifyResponse;
 export type MarketClaim = ClaimMarketSummaryDto;
 export type MarketClaimDetail = ClaimMarketDetailResponse;
+export type MarketActionability = ClaimMarketActionabilityDto;
 export type PredictionMarket = PredictionMarketDto;
 export type Thesis = ThesisDto;
 export type Predictor = PredictorDto;
@@ -97,18 +99,38 @@ export async function getThesisDetail(thesisId: string): Promise<ThesisDetailRes
 }
 
 export async function createThesis(input: {
-  authorHandle: string;
-  authorWallet?: string;
-  authorAgentId?: string;
-  marketId?: string;
-  marketTitle?: string;
-  marketUrl?: string;
-  category?: string;
-  selectedOutcomeId?: string;
-  selectedOutcomeLabel?: string;
-  oddsAtPost?: number;
-  conviction?: number;
-  rationale: string;
+  dynamicUserId: string;
+  xHandle: string;
+  xProfileId?: string;
+  walletAddress: string;
+  walletSource: "external" | "embedded";
+  title: string;
+  body: string;
+  predictionSignals?: Array<{
+    marketId?: string;
+    marketTitle?: string;
+    marketUrl?: string;
+    provider?: string;
+    selectedOutcomeId?: string;
+    selectedOutcomeLabel: string;
+    oddsAtAdd?: number;
+    currentOdds?: number;
+    weight?: number;
+    role?: string;
+    rationale?: string;
+    status?: string;
+  }>;
+  factSignals?: Array<{
+    claimText: string;
+    sourceUrl?: string;
+    verifierVerdict?: string;
+    verifierScore?: number;
+    reportUri?: string;
+    reportHash?: string;
+    weight?: number;
+    role?: string;
+    rationale?: string;
+  }>;
   evidenceLinks?: string[];
   sourceUrl?: string;
   sourcePostUrl?: string;
@@ -138,6 +160,20 @@ export async function getCopyPreview(thesisId: string): Promise<CopyThesisPrevie
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ thesisId }),
+  });
+}
+
+export async function prepareThesisAnchor(thesisId: string): Promise<{
+  thesisId: string;
+  anchorStatus: string;
+  transactions: Array<{ to: string; data: string; description: string }>;
+}> {
+  return fetchJson(`${getApiBase()}/theses/${thesisId}/protocol/prepare-anchor`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
   });
 }
 

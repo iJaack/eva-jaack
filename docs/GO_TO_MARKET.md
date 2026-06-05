@@ -30,7 +30,7 @@ Secondary:
 
 - Researchers who want reusable claim bundles
 - Curators who want a public reliability record
-- Communities that debate markets, collectibles, elections, protocol launches, and macro events
+- Communities that debate markets, collectibles, protocol launches, public product releases, and macro events
 
 ## Messaging pillars
 
@@ -103,20 +103,14 @@ Use these labels consistently:
 
 Copy must never imply that market odds are the same thing as truth status.
 
-## V1 risk policy
+## V1 market-loading policy
 
-V1 should avoid:
+The market desk can load open provider markets broadly so users can find the market they want to
+discuss. For now, provider loading excludes sports markets.
 
-- Elections
-- Sports betting
-- War
-- Assassination
-- Criminal investigations
-- Personal tragedies
-- Easily manipulable events
-
-Use markets where the resolution source is clear, the harm surface is limited, and the product can
-teach evidence/reputation mechanics without becoming an incentive layer for bad behavior.
+Public examples, founder-approved X posts, and partner material should still prefer markets where
+the resolution source is clear, the harm surface is limited, and the product can teach
+evidence/reputation mechanics without becoming an incentive layer for bad behavior.
 
 ## Channel plan
 
@@ -158,5 +152,7 @@ Until analytics access is confirmed, report these as unknown instead of estimati
 - Do not claim x402 is enforced while `verifyApi.paymentRequired=false`.
 - Do not describe x402 as in-scope before strict resource-bound verification exists.
 - Do not claim verification-market modules are deployed while configured addresses are zero.
+- Do not describe claim stake, challenge, or settlement actions as live until the product can prepare,
+  sign, broadcast, confirm, and read back those actions.
 - Do not claim user, revenue, volume, or retention numbers without live evidence.
 - Do not claim public posts or outreach are autonomous without approval.

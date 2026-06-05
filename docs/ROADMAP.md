@@ -83,8 +83,8 @@ Regression and unit checks:
 - Frontend E2E for mobile market feed, thesis compose, market detail, predictor profiles, and copy
   or counter flows.
 - Content review confirming no copy implies Eva executes trades or guarantees outcomes.
-- Risk-policy review confirming v1 excludes elections, sports betting, war, assassination, criminal
-  investigations, personal tragedies, and easily manipulable events.
+- Market-loading review confirming provider markets load broadly, sports markets stay excluded for
+  now, and public examples do not imply Eva endorsement or truth status.
 
 Milestone 3 is not complete until a user can understand a thesis page, its evidence, and what Eva
 does not do.

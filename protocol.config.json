@@ -22,7 +22,8 @@
     "erc8004Validation": "0x5c2B454E34C8E173909EB36FC07DE6143A24ab47",
     "evaTrustGraph": "0xE84DdD5A03Fa4210c4217436afD2556B348A40a0",
     "evaVerificationMarket": "0xfA6893410f19A2c2FC4dd7FA6DB2986de4D3bdad",
-    "evaVerificationReputationAdapter": "0xbEF19ce1451b9a01eE47405E4cfbb31FbA52DF37"
+    "evaVerificationReputationAdapter": "0xbEF19ce1451b9a01eE47405E4cfbb31FbA52DF37",
+    "evaThesisProtocol": "0x0000000000000000000000000000000000000000"
   },
   "agents": {
     "eva": {

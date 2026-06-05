@@ -30,6 +30,7 @@ export type ProtocolConfig = {
     evaTrustGraph: `0x${string}`;
     evaVerificationMarket: `0x${string}`;
     evaVerificationReputationAdapter: `0x${string}`;
+    evaThesisProtocol: `0x${string}`;
   };
   agents: {
     eva: {

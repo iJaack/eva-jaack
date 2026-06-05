@@ -2,6 +2,17 @@ import { expect, test } from "@playwright/test";
 
 const claimId = "0xclaim123";
 
+const marketActionability = {
+  status: "offchain-preview",
+  label: "Preview only",
+  description:
+    "Verification market contracts are configured, but claim actions remain preview-only until backend transaction preparation and onchain readback are enabled.",
+  marketAddress: "0xfA6893410f19A2c2FC4dd7FA6DB2986de4D3bdad",
+  adapterAddress: "0xbEF19ce1451b9a01eE47405E4cfbb31FbA52DF37",
+  transactionPreparation: false,
+  onchainReadback: false,
+};
+
 const claimPayload = {
   claimId,
   title: "Eva opens public claim pages for tagged X posts",
@@ -36,7 +47,8 @@ const claimPayload = {
   },
   participantCount: 0,
   leadingVerdict: "verified",
-  marketEnabled: false,
+  marketEnabled: true,
+  marketActionability,
   createdBy: "0x1111111111111111111111111111111111111111",
   context: "Originated from X mention 123",
   evidenceLinks: ["https://x.com/eva/status/123"],
@@ -73,7 +85,8 @@ test("claims index and claim detail render the X-channel surfaces", async ({ pag
         count: 1,
         chain: "avalanche",
         chainId: 43114,
-        marketEnabled: false,
+        marketEnabled: true,
+        marketActionability,
         claims: [claimPayload],
       }),
     });
@@ -93,7 +106,8 @@ test("claims index and claim detail render the X-channel surfaces", async ({ pag
       contentType: "application/json",
       body: JSON.stringify({
         claimId,
-        marketEnabled: false,
+        marketEnabled: true,
+        marketActionability,
         settlementReady: false,
         finalVerdict: null,
         totalStake: "0",
@@ -113,8 +127,9 @@ test("claims index and claim detail render the X-channel surfaces", async ({ pag
       contentType: "application/json",
       body: JSON.stringify({
         claimId,
-        marketEnabled: false,
+        marketEnabled: true,
         source: "offchain-preview",
+        marketActionability,
         requiresRegisteredCurator: true,
         amount: "100000000000000000000",
         verdict: "verified",
@@ -122,7 +137,7 @@ test("claims index and claim detail render the X-channel surfaces", async ({ pag
         minimumStake: "100000000000000000000",
         reviewDeadline: "2026-03-27T13:00:00.000Z",
         challengeWindowEnd: "2026-03-27T17:00:00.000Z",
-        warnings: ["The onchain market is not deployed yet, so this is a preflight preview only."],
+        warnings: ["Claim actions are preview-only until transaction preparation and onchain readback are enabled."],
       }),
     });
   });
@@ -133,13 +148,14 @@ test("claims index and claim detail render the X-channel surfaces", async ({ pag
       contentType: "application/json",
       body: JSON.stringify({
         claimId,
-        marketEnabled: false,
+        marketEnabled: true,
         source: "offchain-preview",
+        marketActionability,
         requiresRegisteredCurator: true,
         bondAmount: "50000000000000000000",
         minimumChallengeBond: "50000000000000000000",
         challengeWindowEnd: "2026-03-27T17:00:00.000Z",
-        warnings: ["Challenge actions are staged until the market contract is deployed."],
+        warnings: ["Challenge actions are preview-only until transaction preparation and onchain readback are enabled."],
       }),
     });
   });
@@ -150,16 +166,19 @@ test("claims index and claim detail render the X-channel surfaces", async ({ pag
   await expect(page.getByRole("link", { name: "Browse markets" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Make a thesis" })).toBeVisible();
   await expect(page.getByRole("link", { name: /Eva opens public claim pages/i })).toBeVisible();
+  await expect(page.getByText("Preview only")).toBeVisible();
+  await expect(page.getByText(/claim actions remain preview-only/i)).toBeVisible();
 
   await page.goto(`/claims/${claimId}`);
 
   await expect(page.getByRole("heading", { name: /Eva opens public claim pages/i })).toBeVisible();
+  await expect(page.getByText("Preview only")).toBeVisible();
   await expect(page.getByText("Machine assessment")).toBeVisible();
   await expect(page.getByText("Stake preview")).toBeVisible();
 
   await page.getByRole("button", { name: "Preview verified stake" }).click();
-  await expect(page.getByText("The onchain market is not deployed yet")).toBeVisible();
+  await expect(page.getByText("Claim actions are preview-only until transaction preparation and onchain readback are enabled.")).toBeVisible();
 
   await page.getByRole("button", { name: "Preview challenge" }).click();
-  await expect(page.getByText("Challenge actions are staged until the market contract is deployed.")).toBeVisible();
+  await expect(page.getByText("Challenge actions are preview-only until transaction preparation and onchain readback are enabled.")).toBeVisible();
 });

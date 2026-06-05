@@ -132,7 +132,7 @@ const BLOG_POSTS: BlogPost[] = [
       {
         title: "What remains future scope",
         paragraphs: [
-          "Native verification-market contracts, x402 payment enforcement, and trade execution are not production claims today unless current config and deployment truth say otherwise.",
+          "Verification-market contracts can be deployed without making every claim action executable. Until Eva can prepare, sign, broadcast, confirm, and read back claim actions, stake and challenge flows should be described as preview-only.",
           "The near-term job is to make the prediction, evidence, and curator loops honest, measurable, and useful before adding heavier protocol mechanics.",
         ],
       },
@@ -173,7 +173,7 @@ const BLOG_POSTS: BlogPost[] = [
       {
         title: "The risk boundary",
         paragraphs: [
-          "V1 should avoid categories where incentives or harm surfaces can overwhelm the product: elections, sports betting, war, assassination, criminal investigations, personal tragedies, and easily manipulable events.",
+          "The market desk can load provider markets broadly, with sports excluded for now. Public examples should still use clear resolution sources and limited harm surfaces.",
           "The right launch wedge is narrower: clear resolution sources, limited harm, and examples where better evidence and reputation make the market argument easier to inspect.",
         ],
       },

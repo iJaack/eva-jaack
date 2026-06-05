@@ -19,6 +19,11 @@ const contracts = [
     exportName: "evaVerificationMarketAbi",
     filename: "evaVerificationMarketAbi.ts",
   },
+  {
+    artifactPath: path.join(repoRoot, "contracts", "out", "EvaThesisProtocol.sol", "EvaThesisProtocol.json"),
+    exportName: "evaThesisProtocolAbi",
+    filename: "evaThesisProtocolAbi.ts",
+  },
 ];
 
 for (const contract of contracts) {

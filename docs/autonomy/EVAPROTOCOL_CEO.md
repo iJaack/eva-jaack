@@ -133,8 +133,8 @@ When data is missing, write `unknown` and name the source needed to know it.
   conflicts, resolver, dispute window, and outcome.
 - Copy must separate market odds from truth status.
 - Supported statuses are `forecast`, `unresolved`, `verified`, `disputed`, `resolved`, and `void`.
-- V1 should avoid elections, sports betting, war, assassination, criminal investigations, personal
-  tragedies, and easily manipulable events.
+- Provider market loading is broad, but sports markets are excluded for now. Public examples should
+  still use clear resolution sources and limited harm surfaces.
 - x402 is only for paid verification/API access after strict resource-bound verification exists.
 
 ## Scoreboard

@@ -153,4 +153,39 @@ describe("claim market service", () => {
       participantCount: 0,
     });
   });
+
+  it("reports market actionability separately from deployed market configuration", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "eva-claims-"));
+    cleanupDirs.push(dir);
+
+    const service = new LocalClaimMarketService(join(dir, "index.json"), new MemoryStorageService());
+    const created = await service.createClaim({
+      sourcePlatform: "manual",
+      sourceRef: "manual-actionability-1",
+      claimText: "Configured market addresses do not make claim actions executable by themselves.",
+    });
+
+    const listed = await service.listClaims();
+    const loaded = await service.getClaim(created.claim.claimId);
+    const stakePreview = await service.getStakePreview(created.claim.claimId, {
+      amount: "100000000000000000000",
+      verdict: "verified",
+    });
+
+    expect((listed as any).marketActionability).toMatchObject({
+      status: "offchain-preview",
+      transactionPreparation: false,
+      onchainReadback: false,
+    });
+    expect((listed.claims[0] as any).marketActionability).toMatchObject({
+      status: "offchain-preview",
+    });
+    expect((loaded as any)?.marketActionability).toMatchObject({
+      status: "offchain-preview",
+    });
+    expect((stakePreview as any)?.marketActionability).toMatchObject({
+      status: "offchain-preview",
+    });
+    expect(stakePreview?.source).toBe("offchain-preview");
+  });
 });

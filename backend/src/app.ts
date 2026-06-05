@@ -23,6 +23,12 @@ function agentManifest() {
     services: [{ type: 'agentWallet', id: `eip155:43114:${config.evaSovereignWallet}` }],
     signers: [{ agentWallet: `eip155:43114:${config.evaSovereignWallet}` }],
     feedbackAggregator: `${protocol.app.siteUrl}${protocol.app.apiBasePath}/reputation/feedback`,
+    thesisProtocol: {
+      contract: `eip155:43114:${config.evaThesisProtocol}`,
+      mcp: `${protocol.app.siteUrl}${protocol.app.apiBasePath}/mcp`,
+      localMcp: 'eva-mcp stdio',
+      writePolicy: 'X identity plus wallet required; transaction broadcasts require explicit approval.',
+    },
   };
 }
 

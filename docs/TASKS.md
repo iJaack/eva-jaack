@@ -14,8 +14,10 @@
 - [x] Generate frontend and backend ABI output from the Solidity artifact
 - [x] Replace `next lint` with a Next 16 compatible ESLint command
 - [x] Add prediction-layer APIs for markets, theses, predictors, X command ingestion, and copy previews
+- [x] Load provider prediction markets broadly while excluding sports markets for now
 - [x] Redesign the homepage around a mobile-first prediction feed
 - [x] Add mobile market, thesis, compose, and predictor profile surfaces
+- [x] Separate verification-market deployment truth from executable claim actionability
 
 ## Now
 
@@ -69,9 +71,11 @@
   - [x] `EvaVerificationMarket` contract with funding, staking, challenge, settlement, and reward claim flows
   - [x] trust-graph reputation adapter boundary
   - [x] claim-market backend APIs and persistence
+  - [x] claim actionability status for preview-only vs executable states
   - [ ] X mention ingestion and publishing services
   - [x] claim pages and curator market participation UI
   - [x] rollout flags, smoke tests, and operational playbooks
+  - [ ] onchain claim/stake/challenge transaction preparation and readback
 
 ## Rules
 

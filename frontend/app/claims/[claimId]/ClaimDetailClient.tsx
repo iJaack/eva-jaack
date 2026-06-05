@@ -10,6 +10,7 @@ import {
   getClaimSettlementPreview,
   previewClaimChallenge,
   previewClaimStake,
+  type MarketActionability,
   type MarketClaimDetail,
 } from "@/lib/api";
 import { claimUiStatus, statusClassName, statusLabel } from "@/lib/status";
@@ -40,6 +41,16 @@ function packetSource(uri: string | null): string {
   if (uri.startsWith("memory://")) return "Local packet";
   return "External packet";
 }
+
+const stagedActionability: MarketActionability = {
+  status: "disabled",
+  label: "Market staged",
+  description: "Stake and challenge actions are staged until the verification market is enabled.",
+  marketAddress: null,
+  adapterAddress: null,
+  transactionPreparation: false,
+  onchainReadback: false,
+};
 
 export default function ClaimDetailClient() {
   const params = useParams();
@@ -110,6 +121,11 @@ export default function ClaimDetailClient() {
           </div>
         ) : (
           <>
+            {(() => {
+              const actionability = claim.marketActionability ?? stagedActionability;
+
+              return (
+                <>
             <section className="surface claim-detail-header">
               <div className="claim-card-top">
                 <span className="blog-meta-pill">Claim</span>
@@ -120,8 +136,9 @@ export default function ClaimDetailClient() {
               <div className="claim-card-meta">
                 <span>{claim.source.platform.toUpperCase()}</span>
                 <span>{formatTimestamp(claim.createdAt)}</span>
-                <span>{claim.marketEnabled ? "Market live" : "Market staged"}</span>
+                <span>{actionability.label}</span>
               </div>
+              <p className="claim-muted">{actionability.description}</p>
             </section>
 
             <section className="route-section">
@@ -255,6 +272,10 @@ export default function ClaimDetailClient() {
                   {stakePreview ? (
                     <div className="claim-preview-output">
                       <div className="claim-key-value">
+                        <span>Actionability</span>
+                        <strong>{stakePreview.marketActionability.label}</strong>
+                      </div>
+                      <div className="claim-key-value">
                         <span>Minimum stake</span>
                         <strong>{stakePreview.minimumStake}</strong>
                       </div>
@@ -281,6 +302,10 @@ export default function ClaimDetailClient() {
                   {challengePreview ? (
                     <div className="claim-preview-output">
                       <div className="claim-key-value">
+                        <span>Actionability</span>
+                        <strong>{challengePreview.marketActionability.label}</strong>
+                      </div>
+                      <div className="claim-key-value">
                         <span>Minimum bond</span>
                         <strong>{challengePreview.minimumChallengeBond}</strong>
                       </div>
@@ -296,6 +321,9 @@ export default function ClaimDetailClient() {
                 </article>
               </aside>
             </section>
+                </>
+              );
+            })()}
           </>
         )}
 

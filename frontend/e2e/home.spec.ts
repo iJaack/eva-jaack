@@ -50,31 +50,62 @@ const summaryPayload = {
   theses: [
     {
       thesisId: "thesis-fed-hold",
-      marketId: "fed-hold",
-      authorHandle: "@macrodesk",
-      authorWallet: null,
-      authorAgentId: null,
-      selectedOutcomeId: "hold",
-      selectedOutcomeLabel: "Hold",
-      oddsAtPost: 0.44,
-      currentOdds: 0.58,
-      conviction: 68,
-      rationale: "Inflation prints are not soft enough for a cut.",
+      slug: "fed-hold-liquidity-thesis",
+      title: "Fed hold liquidity thesis",
+      body: "Inflation prints are not soft enough for a cut, so liquidity remains tight.",
+      author: {
+        dynamicUserId: "dyn-macrodesk",
+        xHandle: "@macrodesk",
+        xProfileId: null,
+        walletAddress: "0x1111111111111111111111111111111111111111",
+        walletSource: "external",
+      },
+      currentRevision: {
+        revisionId: "rev-fed-hold-1",
+        version: 1,
+        body: "Inflation prints are not soft enough for a cut, so liquidity remains tight.",
+        note: "Initial thesis.",
+        signalSnapshot: [],
+        scoreBefore: null,
+        scoreAfter: 68,
+        createdAt: "2026-04-22T00:00:00.000Z",
+        anchor: { status: "unanchored", txHash: null, contractAddress: null, preparedAt: null, confirmedAt: null },
+      },
+      revisions: [],
+      signals: [
+        {
+          signalId: "sig-fed-hold",
+          kind: "prediction_market",
+          role: "core",
+          title: "Will the Fed hold rates at the next meeting?",
+          rationale: "Primary macro signal.",
+          weight: 100,
+          signalScore: 68,
+          addedAt: "2026-04-22T00:00:00.000Z",
+          updatedAt: "2026-04-22T00:00:00.000Z",
+          anchor: { status: "unanchored", txHash: null, contractAddress: null, preparedAt: null, confirmedAt: null },
+          marketId: "fed-hold",
+          provider: "external",
+          externalId: "fed-hold",
+          marketUrl: "https://example.com/market/fed-hold",
+          selectedOutcomeId: "hold",
+          selectedOutcomeLabel: "Hold",
+          resolvedOutcomeLabel: null,
+          oddsAtAdd: 0.44,
+          currentOdds: 0.58,
+          status: "open",
+        },
+      ],
+      currentScore: 68,
+      timeline: [],
       evidenceLinks: ["https://example.com/source"],
       sourceUrl: "https://example.com/source",
       sourcePostUrl: null,
       counterToThesisId: null,
       copiedCount: 7,
       challengedCount: 1,
-      status: "open",
-      resolution: {
-        correct: null,
-        resolvedOutcomeId: null,
-        resolvedAt: null,
-        oddsEdge: null,
-        reputationImpact: "pending",
-        summary: null,
-      },
+      status: "active",
+      anchor: { status: "unanchored", txHash: null, contractAddress: null, preparedAt: null, confirmedAt: null },
       createdAt: "2026-04-22T00:00:00.000Z",
       updatedAt: "2026-04-22T00:00:00.000Z",
     },
@@ -110,12 +141,12 @@ test("homepage leads with the prediction workbench layout", async ({ page }) => 
 
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "Play the truth loop." })).toBeVisible();
-  await expect(page.getByText("Pick a market, publish a call, attach evidence")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Publish evolving market theses." })).toBeVisible();
+  await expect(page.getByText("Combine prediction markets, closed outcomes, and verified facts")).toBeVisible();
   await expect(page.getByRole("heading", { name: "One loop, four actions" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /01 Pick a market/i })).toBeVisible();
-  await expect(page.getByRole("link", { name: /02 Publish or counter/i })).toBeVisible();
-  await expect(page.getByText("players this week")).toBeVisible();
+  await expect(page.getByRole("link", { name: /01 Write the thesis/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /02 Attach markets/i })).toBeVisible();
+  await expect(page.getByText("authors")).toBeVisible();
   await expect(page.getByText("Market tape")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Scan what moved first" })).toBeVisible();
   await expect(page.getByText("active predictors")).toBeVisible();
@@ -125,9 +156,9 @@ test("homepage leads with the prediction workbench layout", async ({ page }) => 
   await expect(page.getByRole("heading", { name: "Where the network is focused" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Reputation context" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Reasoning layers" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Markets", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Theses", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Evidence", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Thesis posts", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Signals", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "History", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Predictors", exact: true })).toBeVisible();
 });
 
@@ -211,7 +242,7 @@ test("desktop homepage keeps shared product sections in the main grid", async ({
   const productSystem = page.locator(".product-system");
   const footer = page.locator("footer.site-footer");
   const marketStrip = page.locator(".mobile-strip");
-  const counterLink = page.getByRole("link", { name: "Counter", exact: true });
+  const counterLink = page.getByRole("link", { name: "Build from this", exact: true });
 
   await expect(productSystem).toBeVisible();
   await expect(footer).toBeVisible();
@@ -245,7 +276,7 @@ test("desktop homepage keeps thesis actions inside the page width at 1280px", as
 
   await page.goto("/");
 
-  const counterLink = page.getByRole("link", { name: "Counter", exact: true });
+  const counterLink = page.getByRole("link", { name: "Build from this", exact: true });
   await counterLink.scrollIntoViewIfNeeded();
   await expect(counterLink).toBeInViewport();
   await expect.poll(async () => {

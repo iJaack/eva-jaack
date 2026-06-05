@@ -5,12 +5,20 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
-import { getCopyPreview, getThesisDetail, type PredictionThesisDetail } from "@/lib/api";
+import { getCopyPreview, getThesisDetail, prepareThesisAnchor, type PredictionThesisDetail, type Thesis } from "@/lib/api";
 import { protocol } from "@/lib/protocol";
-import { statusClassName, statusLabel, thesisUiStatus } from "@/lib/status";
+import { scoreUiStatus, statusClassName, statusLabel, thesisUiStatus } from "@/lib/status";
 
 function formatOdds(value: number): string {
   return `${Math.round(value * 100)}%`;
+}
+
+function predictionSignals(thesis: Thesis) {
+  return thesis.signals.filter((signal) => signal.kind === "prediction_market");
+}
+
+function factSignals(thesis: Thesis) {
+  return thesis.signals.filter((signal) => signal.kind === "fact");
 }
 
 export default function ThesisDetailClient() {
@@ -18,6 +26,7 @@ export default function ThesisDetailClient() {
   const thesisId = params.thesisId as string;
   const [detail, setDetail] = useState<PredictionThesisDetail | null>(null);
   const [copyState, setCopyState] = useState<string | null>(null);
+  const [anchorState, setAnchorState] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,6 +41,15 @@ export default function ThesisDetailClient() {
   const previewCopy = async () => {
     const preview = await getCopyPreview(thesisId);
     setCopyState(preview.warning);
+  };
+
+  const previewAnchor = async () => {
+    try {
+      const prepared = await prepareThesisAnchor(thesisId);
+      setAnchorState(`${prepared.transactions.length} unsigned protocol transactions prepared. Broadcast still requires approval.`);
+    } catch (reason) {
+      setAnchorState(reason instanceof Error ? reason.message : "Unable to prepare protocol transactions.");
+    }
   };
 
   return (
@@ -54,20 +72,22 @@ export default function ThesisDetailClient() {
         ) : (
           <>
             <section className="mobile-page-head thesis-hero">
-              <p className="eyebrow">{detail.predictor.handle}</p>
-              <h1>{detail.thesis.selectedOutcomeLabel} on {detail.market.title}</h1>
+              <p className="eyebrow">{detail.thesis.author.xHandle}</p>
+              <h1>{detail.thesis.title}</h1>
+              <p>{detail.thesis.body}</p>
               <div className="status-row">
-                <span className="status-chip status-chip-forecast">Odds forecast</span>
+                <span className={statusClassName(scoreUiStatus(detail.thesis.currentScore))}>Score {detail.thesis.currentScore}</span>
                 <span className={statusClassName(thesisUiStatus(detail.thesis))}>{statusLabel(thesisUiStatus(detail.thesis))}</span>
+                <span className="status-chip status-chip-forecast">Anchor {detail.thesis.anchor.status}</span>
               </div>
               <div className="odds-row odds-row-hero">
                 <div>
-                  <span>Posted odds</span>
-                  <strong>{formatOdds(detail.thesis.oddsAtPost)}</strong>
+                  <span>Signals</span>
+                  <strong>{detail.thesis.signals.length}</strong>
                 </div>
                 <div>
-                  <span>Current odds</span>
-                  <strong>{formatOdds(detail.thesis.currentOdds)}</strong>
+                  <span>Revision</span>
+                  <strong>v{detail.thesis.currentRevision.version}</strong>
                 </div>
                 <div>
                   <span>Trust</span>
@@ -81,72 +101,93 @@ export default function ThesisDetailClient() {
                 <Link href={`/predictors/${detail.predictor.predictorId}`} className="handle-link">
                   {detail.predictor.handle}
                 </Link>
-                <span>{detail.predictor.profileState === "registered" ? "Graph-backed" : "Unclaimed"}</span>
+                <span>{detail.predictor.profileState === "registered" ? "Graph-backed" : "Wallet-linked"}</span>
               </div>
-              <h2>Rationale</h2>
-              <p>{detail.thesis.rationale}</p>
-              <p className="market-boundary-note">
-                This is a forecast thesis. Evidence links can support or dispute it, but truth status only changes through resolution.
-              </p>
-              {detail.thesis.evidenceLinks.length > 0 ? (
-                <div className="evidence-list">
-                  {detail.thesis.evidenceLinks.map((link) => (
-                    <a key={link} href={link} target="_blank" rel="noreferrer">
-                      {link}
-                    </a>
-                  ))}
-                </div>
-              ) : null}
-              <div className="sticky-action-row">
-                <Link className="mobile-action" href="/verify">
-                  Check another source
-                </Link>
+              <h2>Market signals</h2>
+              <div className="thesis-stack">
+                {predictionSignals(detail.thesis).map((signal) => (
+                  <article key={signal.signalId} className="prediction-card thesis-list-item">
+                    <div className="card-topline">
+                      <span>{signal.role.replace(/_/g, " ")}</span>
+                      <span>{signal.status}</span>
+                    </div>
+                    <h3>{signal.title}</h3>
+                    <p>{signal.rationale ?? "No signal note yet."}</p>
+                    <div className="odds-row">
+                      <div>
+                        <span>Outcome</span>
+                        <strong>{signal.selectedOutcomeLabel}</strong>
+                      </div>
+                      <div>
+                        <span>Added</span>
+                        <strong>{formatOdds(signal.oddsAtAdd)}</strong>
+                      </div>
+                      <div>
+                        <span>Now</span>
+                        <strong>{formatOdds(signal.currentOdds)}</strong>
+                      </div>
+                    </div>
+                  </article>
+                ))}
               </div>
             </section>
 
             <section className="prediction-card">
-              <h2>Market record layers</h2>
-              <div className="record-layers">
-                <div>
-                  <span>Eva Trust Score</span>
-                  <strong>{detail.predictor.trustScore}</strong>
-                  <p>Canonical graph-backed identity and trust.</p>
-                </div>
-                <div>
-                  <span>Resolution Record</span>
-                  <strong>{detail.predictor.accuracy === null ? "Pending" : `${detail.predictor.accuracy}%`}</strong>
-                  <p>Forecast stats stay pending until outcomes resolve separately.</p>
-                </div>
+              <h2>Fact signals</h2>
+              <div className="thesis-stack">
+                {factSignals(detail.thesis).length === 0 ? (
+                  <p className="empty-copy">No factual signals attached yet.</p>
+                ) : (
+                  factSignals(detail.thesis).map((signal) => (
+                    <article key={signal.signalId} className="prediction-card thesis-list-item">
+                      <div className="card-topline">
+                        <span>{signal.verifierVerdict.replace(/_/g, " ")}</span>
+                        <span>Score {signal.verifierScore}</span>
+                      </div>
+                      <h3>{signal.claimText}</h3>
+                      {signal.sourceUrl ? (
+                        <a href={signal.sourceUrl} target="_blank" rel="noreferrer">
+                          {signal.sourceUrl}
+                        </a>
+                      ) : null}
+                    </article>
+                  ))
+                )}
               </div>
             </section>
 
-            {detail.counters.length > 0 ? (
-              <section className="prediction-section">
-                <p className="section-kicker">Counters</p>
-                <div className="thesis-stack">
-                  {detail.counters.map((counter) => (
-                    <Link key={counter.thesisId} href={`/thesis/${counter.thesisId}`} className="prediction-card thesis-list-item">
-                      <div className="card-topline">
-                        <span>{counter.authorHandle}</span>
-                        <span>{counter.selectedOutcomeLabel}</span>
-                      </div>
-                      <p>{counter.rationale}</p>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            ) : null}
+            <section className="prediction-card">
+              <h2>Revision history</h2>
+              <div className="thesis-stack">
+                {detail.thesis.timeline.map((entry) => (
+                  <article key={entry.timelineId} className="thesis-list-item">
+                    <div className="card-topline">
+                      <span>{entry.action.replace(/_/g, " ")}</span>
+                      <span>{new Date(entry.at).toLocaleDateString()}</span>
+                    </div>
+                    <p>{entry.note}</p>
+                    <div className="status-row">
+                      <span className="status-chip status-chip-forecast">Before {entry.scoreBefore ?? "new"}</span>
+                      <span className="status-chip status-chip-unresolved">After {entry.scoreAfter}</span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
 
             <div className="mobile-bottom-actions">
               <button className="mobile-action mobile-action-primary" type="button" onClick={previewCopy}>
                 Preview copy
               </button>
-              <Link className="mobile-action" href={`/compose?counterTo=${detail.thesis.thesisId}&marketId=${detail.market.marketId}`}>
-                Counter
+              <Link className="mobile-action" href={`/compose?counterTo=${detail.thesis.thesisId}`}>
+                Build from this
               </Link>
+              <button className="mobile-action" type="button" onClick={previewAnchor}>
+                Prepare anchor
+              </button>
               <a
                 className="mobile-action"
-                href={`https://x.com/intent/post?text=${encodeURIComponent(`Tracking this prediction on Eva: ${detail.market.title}`)}&url=${encodeURIComponent(`${protocol.app.siteUrl}/thesis/${detail.thesis.thesisId}`)}`}
+                href={`https://x.com/intent/post?text=${encodeURIComponent(`Tracking this evolving thesis on Eva: ${detail.thesis.title}`)}&url=${encodeURIComponent(`${protocol.app.siteUrl}/thesis/${detail.thesis.thesisId}`)}`}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -154,9 +195,9 @@ export default function ThesisDetailClient() {
               </a>
             </div>
             {copyState ? <p className="inline-note">{copyState}</p> : null}
+            {anchorState ? <p className="inline-note">{anchorState}</p> : null}
           </>
         )}
-
         <SiteFooter />
       </main>
     </>

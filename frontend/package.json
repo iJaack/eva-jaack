@@ -11,6 +11,8 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@dynamic-labs/ethereum": "^4.88.1",
+    "@dynamic-labs/sdk-react-core": "^4.88.1",
     "next": "16.1.7",
     "react": "19.0.0",
     "react-dom": "19.0.0",

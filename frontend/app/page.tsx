@@ -40,7 +40,10 @@ function leadingOutcome(market: PredictionMarket): { label: string; price: numbe
 }
 
 function thesisMarket(thesis: Thesis, markets: PredictionMarket[]): PredictionMarket | null {
-  return markets.find((market) => market.marketId === thesis.marketId) ?? null;
+  const firstMarketSignal = thesis.signals.find((signal) => signal.kind === "prediction_market" && signal.marketId);
+  return firstMarketSignal && firstMarketSignal.kind === "prediction_market"
+    ? markets.find((market) => market.marketId === firstMarketSignal.marketId) ?? null
+    : null;
 }
 
 function MarketStrip({ markets }: { markets: PredictionMarket[] }) {
@@ -64,51 +67,51 @@ function MarketStrip({ markets }: { markets: PredictionMarket[] }) {
 
 const productModules = [
   {
-    title: "Markets",
-    body: "A probability-first feed for questions that deserve a public reasoning trail.",
+    title: "Thesis posts",
+    body: "Interactive essays that combine prediction markets, facts, and revision history.",
   },
   {
-    title: "Theses",
-    body: "Structured posts built for X, market references, and counter-theses.",
+    title: "Signals",
+    body: "Live markets, closed predictions, lateral facts, and second-order evidence in one basket.",
   },
   {
-    title: "Evidence",
-    body: "Source checks and claim packets that make reasoning inspectable.",
+    title: "History",
+    body: "Every update keeps the prior score, signal snapshot, and reasoning trail visible.",
   },
   {
     title: "Predictors",
-    body: "Graph-backed identity, trust score, market record, and open status.",
+    body: "X identity plus wallet-backed records that can later anchor to protocol state.",
   },
 ] as const;
 
 const participationQuests = [
   {
     step: "01",
-    title: "Pick a market",
-    body: "Scan live odds, volume, and category before you make a public call.",
-    href: "/markets",
-    cta: "Open markets",
+    title: "Write the thesis",
+    body: "Start with a bigger market idea, not a single isolated call.",
+    href: "/compose",
+    cta: "Compose",
   },
   {
     step: "02",
-    title: "Publish or counter",
-    body: "Turn a view into a thesis that others can copy, challenge, or resolve.",
-    href: "/compose",
-    cta: "Make call",
+    title: "Attach markets",
+    body: "Add live or closed prediction markets as first, second, or third-order signals.",
+    href: "/markets",
+    cta: "Browse signals",
   },
   {
     step: "03",
-    title: "Verify the source",
-    body: "Attach evidence quality before the claim starts moving reputation.",
+    title: "Verify facts",
+    body: "Attach factual signals so the essay has more than market odds.",
     href: "/verify",
     cta: "Check source",
   },
   {
     step: "04",
-    title: "Watch rank move",
-    body: "Resolved outcomes update predictor history instead of hiding in a feed.",
+    title: "Revise over time",
+    body: "Let score, signals, and history show how the thesis evolves.",
     href: "/predictors",
-    cta: "View rank",
+    cta: "View records",
   },
 ] as const;
 
@@ -136,15 +139,15 @@ function QuestBoard({ stats }: { stats: PredictionSummary["stats"] }) {
       <div className="quest-scoreboard" aria-label="Current network activity">
         <div>
           <strong>{stats.weeklyActivePredictors}</strong>
-          <span>players this week</span>
+          <span>authors</span>
         </div>
         <div>
           <strong>{stats.openThesisCount}</strong>
-          <span>open calls</span>
+          <span>open theses</span>
         </div>
         <div>
           <strong>{stats.copiedThesisEvents}</strong>
-          <span>copy intents</span>
+          <span>shares/copies</span>
         </div>
       </div>
     </section>
@@ -172,15 +175,15 @@ function ThesisCard({ thesis, market }: { thesis: Thesis; market: PredictionMark
   return (
     <article className="prediction-card thesis-card">
       <div className="card-topline">
-        <Link href={`/predictors/${thesis.authorHandle.replace(/^@/, "")}`} className="handle-link">
-          {thesis.authorHandle}
+        <Link href={`/predictors/${thesis.author.xHandle.replace(/^@/, "")}`} className="handle-link">
+          {thesis.author.xHandle}
         </Link>
         <span>{thesis.copiedCount} copied</span>
       </div>
       <Link href={`/thesis/${thesis.thesisId}`} className="thesis-card-main">
         <span className="market-label">{market?.category ?? "Market"}</span>
-        <h2>{market?.title ?? "Prediction thesis"}</h2>
-        <p>{thesis.rationale}</p>
+        <h2>{thesis.title}</h2>
+        <p>{thesis.body}</p>
       </Link>
       <div className="status-row" aria-label="Thesis status">
         <span className={statusClassName("forecast")}>Forecast</span>
@@ -188,16 +191,16 @@ function ThesisCard({ thesis, market }: { thesis: Thesis; market: PredictionMark
       </div>
       <div className="odds-row">
         <div>
-          <span>Outcome</span>
-          <strong>{thesis.selectedOutcomeLabel}</strong>
+          <span>Signals</span>
+          <strong>{thesis.signals.length}</strong>
         </div>
         <div>
-          <span>Posted</span>
-          <strong>{formatOdds(thesis.oddsAtPost)}</strong>
+          <span>Score</span>
+          <strong>{thesis.currentScore}</strong>
         </div>
         <div>
-          <span>Now</span>
-          <strong>{formatOdds(thesis.currentOdds)}</strong>
+          <span>Revision</span>
+          <strong>v{thesis.currentRevision.version}</strong>
         </div>
       </div>
       <div className="sticky-action-row">
@@ -205,7 +208,7 @@ function ThesisCard({ thesis, market }: { thesis: Thesis; market: PredictionMark
           {copyPending ? "Preparing…" : "Preview Copy"}
         </button>
         <Link className="mobile-action" href={`/compose?counterTo=${thesis.thesisId}`}>
-          Counter
+          Build from this
         </Link>
       </div>
       {copyState ? <p className="inline-note" role="status" aria-live="polite">{copyState}</p> : null}
@@ -251,10 +254,10 @@ export default function HomePage() {
       <Nav />
       <main id="main-content" className="mobile-shell prediction-home">
         <section className="mobile-hero home-command">
-          <p className="eyebrow">Markets · calls · evidence · reputation</p>
-          <h1>Play the truth loop.</h1>
+          <p className="eyebrow">Thesis posts · signals · evidence · history</p>
+          <h1>Publish evolving market theses.</h1>
           <p>
-            Pick a market, publish a call, attach evidence, and let resolved outcomes move reputation.
+            Combine prediction markets, closed outcomes, and verified facts into one interactive post that evolves over time.
           </p>
           <div className="mobile-hero-actions">
             <Link href="/compose" className="mobile-action mobile-action-primary">

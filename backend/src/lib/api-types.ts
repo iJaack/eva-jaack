@@ -117,6 +117,12 @@ export interface VerifyResponse {
 
 export type ClaimSourcePlatform = "x" | "farcaster" | "web" | "manual";
 export type MarketClaimStatus = "open" | "under_review" | "contested" | "soft_resolved" | "final_resolved" | "cancelled" | "archived";
+export type ClaimMarketActionabilityStatus =
+  | "disabled"
+  | "offchain-preview"
+  | "prepared-transaction"
+  | "onchain-readback"
+  | "fully-executable";
 export type ClaimVerdict =
   | "verified"
   | "likely_true"
@@ -151,6 +157,16 @@ export interface ClaimFundingDto {
   slashedPool: string;
   protocolFeeAccrued: string;
   totalStaked: string;
+}
+
+export interface ClaimMarketActionabilityDto {
+  status: ClaimMarketActionabilityStatus;
+  label: string;
+  description: string;
+  marketAddress: string | null;
+  adapterAddress: string | null;
+  transactionPreparation: boolean;
+  onchainReadback: boolean;
 }
 
 export interface ClaimPacketRefDto {
@@ -227,6 +243,7 @@ export interface ClaimMarketSummaryDto {
   participantCount: number;
   leadingVerdict: ClaimVerdict | null;
   marketEnabled: boolean;
+  marketActionability: ClaimMarketActionabilityDto;
 }
 
 export interface ClaimMarketDetailResponse extends ClaimMarketSummaryDto {
@@ -245,6 +262,7 @@ export interface ClaimListResponse {
   chain: string;
   chainId: number;
   marketEnabled: boolean;
+  marketActionability: ClaimMarketActionabilityDto;
   claims: ClaimMarketSummaryDto[];
 }
 
@@ -257,6 +275,7 @@ export interface ClaimStakePreviewResponse {
   claimId: string;
   marketEnabled: boolean;
   source: "offchain-preview" | "onchain";
+  marketActionability: ClaimMarketActionabilityDto;
   requiresRegisteredCurator: boolean;
   amount: string;
   verdict: ClaimVerdict;
@@ -271,6 +290,7 @@ export interface ClaimChallengePreviewResponse {
   claimId: string;
   marketEnabled: boolean;
   source: "offchain-preview" | "onchain";
+  marketActionability: ClaimMarketActionabilityDto;
   requiresRegisteredCurator: boolean;
   bondAmount: string;
   minimumChallengeBond: string;
@@ -281,6 +301,7 @@ export interface ClaimChallengePreviewResponse {
 export interface ClaimSettlementPreviewResponse {
   claimId: string;
   marketEnabled: boolean;
+  marketActionability: ClaimMarketActionabilityDto;
   settlementReady: boolean;
   finalVerdict: ClaimVerdict | null;
   totalStake: string;
@@ -303,9 +324,13 @@ export interface XMentionIngestResponse {
 
 export type PredictionMarketProvider = "polymarket" | "kalshi" | "manual" | "external";
 export type PredictionMarketStatus = "open" | "closed" | "resolved" | "cancelled";
-export type ThesisStatus = "open" | "resolved" | "withdrawn" | "invalid";
+export type ThesisStatus = "draft" | "active" | "resolved" | "withdrawn" | "invalid";
 export type XCommandType = "track" | "verify" | "thesis" | "counter" | "copy" | "unknown";
 export type XCommandStatus = "accepted" | "ignored" | "moderation_required" | "responded" | "failed";
+export type ThesisSignalKind = "prediction_market" | "fact";
+export type ThesisSignalRole = "core" | "lateral" | "second_order" | "third_order" | "hedge" | "contradiction";
+export type ThesisAnchorStatus = "unanchored" | "prepared" | "submitted" | "confirmed" | "failed";
+export type ThesisWalletSource = "external" | "embedded";
 
 export interface PredictionMarketOutcomeDto {
   outcomeId: string;
@@ -339,18 +364,92 @@ export interface ThesisResolutionDto {
   summary: string | null;
 }
 
+export interface ThesisAuthorDto {
+  dynamicUserId: string;
+  xHandle: string;
+  xProfileId: string | null;
+  walletAddress: `0x${string}`;
+  walletSource: ThesisWalletSource;
+}
+
+export interface ThesisAnchorDto {
+  status: ThesisAnchorStatus;
+  txHash: string | null;
+  contractAddress: string | null;
+  preparedAt: string | null;
+  confirmedAt: string | null;
+}
+
+export interface ThesisBaseSignalDto {
+  signalId: string;
+  kind: ThesisSignalKind;
+  role: ThesisSignalRole;
+  title: string;
+  rationale: string | null;
+  weight: number;
+  signalScore: number;
+  addedAt: string;
+  updatedAt: string;
+  anchor: ThesisAnchorDto;
+}
+
+export interface ThesisPredictionSignalDto extends ThesisBaseSignalDto {
+  kind: "prediction_market";
+  marketId: string | null;
+  provider: PredictionMarketProvider;
+  externalId: string | null;
+  marketUrl: string | null;
+  selectedOutcomeId: string | null;
+  selectedOutcomeLabel: string;
+  resolvedOutcomeLabel: string | null;
+  oddsAtAdd: number;
+  currentOdds: number;
+  status: PredictionMarketStatus;
+}
+
+export interface ThesisFactSignalDto extends ThesisBaseSignalDto {
+  kind: "fact";
+  claimText: string;
+  sourceUrl: string | null;
+  verifierVerdict: ClaimVerdict;
+  verifierScore: number;
+  reportUri: string | null;
+  reportHash: string | null;
+}
+
+export type ThesisSignalDto = ThesisPredictionSignalDto | ThesisFactSignalDto;
+
+export interface ThesisRevisionDto {
+  revisionId: string;
+  version: number;
+  body: string;
+  note: string | null;
+  signalSnapshot: ThesisSignalDto[];
+  scoreBefore: number | null;
+  scoreAfter: number;
+  createdAt: string;
+  anchor: ThesisAnchorDto;
+}
+
+export interface ThesisTimelineEntryDto {
+  timelineId: string;
+  action: "created" | "revised" | "signal_added" | "signal_updated" | "anchored" | "resolved";
+  at: string;
+  note: string | null;
+  scoreBefore: number | null;
+  scoreAfter: number;
+}
+
 export interface ThesisDto {
   thesisId: string;
-  marketId: string;
-  authorHandle: string;
-  authorWallet: `0x${string}` | null;
-  authorAgentId: string | null;
-  selectedOutcomeId: string;
-  selectedOutcomeLabel: string;
-  oddsAtPost: number;
-  currentOdds: number;
-  conviction: number;
-  rationale: string;
+  title: string;
+  slug: string;
+  author: ThesisAuthorDto;
+  body: string;
+  currentRevision: ThesisRevisionDto;
+  revisions: ThesisRevisionDto[];
+  signals: ThesisSignalDto[];
+  currentScore: number;
   evidenceLinks: string[];
   sourceUrl: string | null;
   sourcePostUrl: string | null;
@@ -359,6 +458,8 @@ export interface ThesisDto {
   challengedCount: number;
   status: ThesisStatus;
   resolution: ThesisResolutionDto;
+  timeline: ThesisTimelineEntryDto[];
+  anchor: ThesisAnchorDto;
   createdAt: string;
   updatedAt: string;
 }
@@ -402,7 +503,7 @@ export interface ThesisListResponse {
 
 export interface ThesisDetailResponse {
   thesis: ThesisDto;
-  market: PredictionMarketDto;
+  markets: PredictionMarketDto[];
   predictor: PredictorDto;
   counters: ThesisDto[];
 }
@@ -410,7 +511,7 @@ export interface ThesisDetailResponse {
 export interface ThesisCreateResponse {
   created: boolean;
   thesis: ThesisDto;
-  market: PredictionMarketDto;
+  markets: PredictionMarketDto[];
 }
 
 export interface PredictorListResponse {
@@ -432,9 +533,9 @@ export interface PredictionNetworkSummaryResponse {
 
 export interface CopyThesisPreviewResponse {
   thesisId: string;
-  marketId: string;
-  selectedOutcomeId: string;
-  selectedOutcomeLabel: string;
+  marketId: string | null;
+  selectedOutcomeId: string | null;
+  selectedOutcomeLabel: string | null;
   originalOdds: number;
   currentOdds: number;
   venueUrl: string | null;
@@ -458,5 +559,5 @@ export interface XCommandIngestResponse {
   accepted: boolean;
   command: XCommandDto;
   thesis: ThesisDto | null;
-  market: PredictionMarketDto | null;
+  markets: PredictionMarketDto[];
 }

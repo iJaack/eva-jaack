@@ -7,10 +7,6 @@ import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import { getPredictorDetail, type PredictionPredictorDetail } from "@/lib/api";
 
-function formatOdds(value: number): string {
-  return `${Math.round(value * 100)}%`;
-}
-
 export default function PredictorDetailClient() {
   const params = useParams();
   const id = params.id as string;
@@ -98,11 +94,15 @@ export default function PredictorDetailClient() {
                 {detail.theses.map((thesis) => (
                   <Link key={thesis.thesisId} href={`/thesis/${thesis.thesisId}`} className="prediction-card thesis-list-item">
                     <div className="card-topline">
-                      <span>{thesis.selectedOutcomeLabel}</span>
+                      <span>Score {thesis.currentScore}</span>
                       <span>{thesis.copiedCount} copied</span>
                     </div>
-                    <h2>{formatOdds(thesis.oddsAtPost)} at post</h2>
-                    <p>{thesis.rationale}</p>
+                    <h2>{thesis.title}</h2>
+                    <p>{thesis.body}</p>
+                    <div className="status-row">
+                      <span className="status-chip status-chip-forecast">{thesis.signals.length} signals</span>
+                      <span className="status-chip status-chip-unresolved">v{thesis.currentRevision.version}</span>
+                    </div>
                   </Link>
                 ))}
               </div>

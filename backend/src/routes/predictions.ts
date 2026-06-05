@@ -18,10 +18,14 @@ import {
   type ThesisCreateInput,
   type XCommandIngestInput,
 } from "../services/prediction-layer.js";
+import { prepareThesisAnchorTransactions } from "../services/thesis-protocol.js";
 
 type PredictionRouteDeps = {
   predictions: LocalPredictionLayerService;
 };
+
+type PredictionSignalInputItem = NonNullable<ThesisCreateInput["predictionSignals"]>[number];
+type FactSignalInputItem = NonNullable<ThesisCreateInput["factSignals"]>[number];
 
 function normalizeString(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
@@ -39,6 +43,11 @@ function normalizeNumber(value: unknown): number | null {
 function normalizeStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.filter((entry): entry is string => typeof entry === "string" && entry.trim().length > 0);
+}
+
+function normalizeObjectArray(value: unknown): Record<string, unknown>[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === "object" && !Array.isArray(entry));
 }
 
 async function readJsonBody(c: Context): Promise<Record<string, unknown> | null> {
@@ -84,25 +93,49 @@ export function createPredictionRoutes(
     const body = await readJsonBody(c);
     if (!body) return c.json({ error: "Invalid JSON body" }, 400);
 
-    const authorHandle = normalizeString(body.authorHandle);
-    const rationale = normalizeString(body.rationale);
-    if (!authorHandle || !rationale) {
-      return c.json({ error: "Missing required fields: authorHandle, rationale" }, 400);
+    const title = normalizeString(body.title);
+    const thesisBody = normalizeString(body.body);
+    if (!title || !thesisBody) {
+      return c.json({ error: "Missing required fields: title, body" }, 400);
     }
 
     const input: ThesisCreateInput = {
-      authorHandle,
-      authorWallet: normalizeString(body.authorWallet),
-      authorAgentId: normalizeString(body.authorAgentId),
-      marketId: normalizeString(body.marketId),
-      marketTitle: normalizeString(body.marketTitle),
-      marketUrl: normalizeString(body.marketUrl),
-      category: normalizeString(body.category),
-      selectedOutcomeId: normalizeString(body.selectedOutcomeId),
-      selectedOutcomeLabel: normalizeString(body.selectedOutcomeLabel),
-      oddsAtPost: normalizeNumber(body.oddsAtPost),
-      conviction: normalizeNumber(body.conviction),
-      rationale,
+      identity: {
+        dynamicUserId: normalizeString(body.dynamicUserId) ?? normalizeString(body.identity && typeof body.identity === "object" ? (body.identity as Record<string, unknown>).dynamicUserId : null) ?? "",
+        xHandle: normalizeString(body.xHandle) ?? normalizeString(body.identity && typeof body.identity === "object" ? (body.identity as Record<string, unknown>).xHandle : null) ?? "",
+        xProfileId: normalizeString(body.xProfileId) ?? normalizeString(body.identity && typeof body.identity === "object" ? (body.identity as Record<string, unknown>).xProfileId : null),
+        walletAddress: normalizeString(body.walletAddress) ?? normalizeString(body.identity && typeof body.identity === "object" ? (body.identity as Record<string, unknown>).walletAddress : null),
+        walletSource: (normalizeString(body.walletSource) ?? normalizeString(body.identity && typeof body.identity === "object" ? (body.identity as Record<string, unknown>).walletSource : null)) as "external" | "embedded" | null,
+      },
+      title,
+      body: thesisBody,
+      predictionSignals: normalizeObjectArray(body.predictionSignals).map((signal) => ({
+        marketId: normalizeString(signal.marketId),
+        provider: normalizeString(signal.provider) as PredictionSignalInputItem["provider"],
+        externalId: normalizeString(signal.externalId),
+        marketTitle: normalizeString(signal.marketTitle),
+        marketUrl: normalizeString(signal.marketUrl),
+        selectedOutcomeId: normalizeString(signal.selectedOutcomeId),
+        selectedOutcomeLabel: normalizeString(signal.selectedOutcomeLabel) ?? "Yes",
+        resolvedOutcomeLabel: normalizeString(signal.resolvedOutcomeLabel),
+        oddsAtAdd: normalizeNumber(signal.oddsAtAdd),
+        currentOdds: normalizeNumber(signal.currentOdds),
+        weight: normalizeNumber(signal.weight),
+        role: normalizeString(signal.role) as PredictionSignalInputItem["role"],
+        rationale: normalizeString(signal.rationale),
+        status: normalizeString(signal.status) as PredictionSignalInputItem["status"],
+      })),
+      factSignals: normalizeObjectArray(body.factSignals).map((signal) => ({
+        claimText: normalizeString(signal.claimText) ?? "",
+        sourceUrl: normalizeString(signal.sourceUrl),
+        verifierVerdict: normalizeString(signal.verifierVerdict) as FactSignalInputItem["verifierVerdict"],
+        verifierScore: normalizeNumber(signal.verifierScore),
+        reportUri: normalizeString(signal.reportUri),
+        reportHash: normalizeString(signal.reportHash),
+        weight: normalizeNumber(signal.weight),
+        role: normalizeString(signal.role) as FactSignalInputItem["role"],
+        rationale: normalizeString(signal.rationale),
+      })),
       evidenceLinks: normalizeStringArray(body.evidenceLinks),
       sourceUrl: normalizeString(body.sourceUrl),
       sourcePostUrl: normalizeString(body.sourcePostUrl),
@@ -121,6 +154,51 @@ export function createPredictionRoutes(
     const response = await deps.predictions.getThesis(c.req.param("thesisId"));
     if (!response) return c.json({ error: "Thesis not found" }, 404);
     return c.json<ThesisDetailResponse>(response);
+  });
+
+  routes.post("/theses/:thesisId/revisions", async (c) => {
+    const body = await readJsonBody(c);
+    if (!body) return c.json({ error: "Invalid JSON body" }, 400);
+
+    try {
+      const response = await deps.predictions.recordRevision(c.req.param("thesisId"), {
+        identity: {
+          dynamicUserId: normalizeString(body.dynamicUserId) ?? "",
+          xHandle: normalizeString(body.xHandle) ?? "",
+          xProfileId: normalizeString(body.xProfileId),
+          walletAddress: normalizeString(body.walletAddress),
+          walletSource: normalizeString(body.walletSource) as "external" | "embedded" | null,
+        },
+        body: normalizeString(body.body),
+        note: normalizeString(body.note),
+        signalUpdates: normalizeObjectArray(body.signalUpdates).map((update) => ({
+          signalId: normalizeString(update.signalId) ?? "",
+          currentOdds: normalizeNumber(update.currentOdds),
+          weight: normalizeNumber(update.weight),
+          status: normalizeString(update.status) as PredictionSignalInputItem["status"],
+          resolvedOutcomeLabel: normalizeString(update.resolvedOutcomeLabel),
+        })),
+      });
+      if (!response) return c.json({ error: "Thesis not found" }, 404);
+      return c.json<ThesisDetailResponse>(response);
+    } catch (error) {
+      return c.json({ error: error instanceof Error ? error.message : "Failed to revise thesis" }, 400);
+    }
+  });
+
+  routes.post("/theses/:thesisId/protocol/prepare-anchor", async (c) => {
+    const detail = await deps.predictions.getThesis(c.req.param("thesisId"));
+    if (!detail) return c.json({ error: "Thesis not found" }, 404);
+
+    try {
+      return c.json({
+        thesisId: detail.thesis.thesisId,
+        anchorStatus: detail.thesis.anchor.status,
+        transactions: prepareThesisAnchorTransactions(detail.thesis),
+      });
+    } catch (error) {
+      return c.json({ error: error instanceof Error ? error.message : "Failed to prepare anchor transactions" }, 400);
+    }
   });
 
   routes.get("/predictors", async (c) => {

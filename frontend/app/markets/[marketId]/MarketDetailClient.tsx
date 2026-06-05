@@ -91,11 +91,25 @@ export default function MarketDetailClient() {
                   detail.theses.map((thesis) => (
                     <Link key={thesis.thesisId} href={`/thesis/${thesis.thesisId}`} className="prediction-card thesis-list-item">
                       <div className="card-topline">
-                        <span>{thesis.authorHandle}</span>
+                        <span>{thesis.author.xHandle}</span>
                         <span className={statusClassName(thesisUiStatus(thesis))}>{statusLabel(thesisUiStatus(thesis))}</span>
                       </div>
-                      <h2>{thesis.selectedOutcomeLabel} at {formatOdds(thesis.oddsAtPost)}</h2>
-                      <p>{thesis.rationale}</p>
+                      <h2>{thesis.title}</h2>
+                      <p>{thesis.body}</p>
+                      <div className="odds-row">
+                        <div>
+                          <span>Score</span>
+                          <strong>{thesis.currentScore}</strong>
+                        </div>
+                        <div>
+                          <span>Signals</span>
+                          <strong>{thesis.signals.length}</strong>
+                        </div>
+                        <div>
+                          <span>Revision</span>
+                          <strong>v{thesis.currentRevision.version}</strong>
+                        </div>
+                      </div>
                     </Link>
                   ))
                 )}

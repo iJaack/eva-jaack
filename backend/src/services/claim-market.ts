@@ -10,6 +10,7 @@ import type {
   ClaimCreateResponse,
   ClaimFundingDto,
   ClaimListResponse,
+  ClaimMarketActionabilityDto,
   ClaimMachineAssessmentDto,
   ClaimMarketDetailResponse,
   ClaimPacketRefDto,
@@ -69,7 +70,7 @@ type ClaimStore = {
   claims: StoredClaim[];
 };
 
-type StoredClaim = Omit<ClaimMarketDetailResponse, "bundle"> & {
+type StoredClaim = Omit<ClaimMarketDetailResponse, "bundle" | "marketActionability"> & {
   bundle?: ClaimBundleDto;
 };
 
@@ -96,6 +97,31 @@ const minimumChallengeBond = "50000000000000000000";
 
 function isMarketEnabled(): boolean {
   return protocol.market.enabled && config.evaVerificationMarket !== "0x0000000000000000000000000000000000000000";
+}
+
+function marketActionability(): ClaimMarketActionabilityDto {
+  if (!isMarketEnabled()) {
+    return {
+      status: "disabled",
+      label: "Market staged",
+      description: "The verification market is disabled or missing a configured contract address.",
+      marketAddress: null,
+      adapterAddress: null,
+      transactionPreparation: false,
+      onchainReadback: false,
+    };
+  }
+
+  return {
+    status: "offchain-preview",
+    label: "Preview only",
+    description:
+      "Verification market contracts are configured, but claim actions remain preview-only until backend transaction preparation and onchain readback are enabled.",
+    marketAddress: config.evaVerificationMarket,
+    adapterAddress: config.evaVerificationReputationAdapter,
+    transactionPreparation: false,
+    onchainReadback: false,
+  };
 }
 
 function stableHash(data: unknown): string {
@@ -246,6 +272,7 @@ export class LocalClaimMarketService implements ClaimMarketService {
       chain: protocol.chain.name.toLowerCase().includes("avalanche") ? "avalanche" : protocol.chain.name,
       chainId: protocol.chain.id,
       marketEnabled: isMarketEnabled(),
+      marketActionability: marketActionability(),
       claims,
     };
   }
@@ -374,6 +401,7 @@ export class LocalClaimMarketService implements ClaimMarketService {
       claimId,
       marketEnabled: isMarketEnabled(),
       source: "offchain-preview",
+      marketActionability: marketActionability(),
       requiresRegisteredCurator: true,
       amount,
       verdict: input.verdict,
@@ -405,6 +433,7 @@ export class LocalClaimMarketService implements ClaimMarketService {
       claimId,
       marketEnabled: isMarketEnabled(),
       source: "offchain-preview",
+      marketActionability: marketActionability(),
       requiresRegisteredCurator: true,
       bondAmount,
       minimumChallengeBond,
@@ -420,6 +449,7 @@ export class LocalClaimMarketService implements ClaimMarketService {
     return {
       claimId,
       marketEnabled: isMarketEnabled(),
+      marketActionability: marketActionability(),
       settlementReady: claim.status === "soft_resolved" || claim.status === "final_resolved",
       finalVerdict: claim.resolution.verdict,
       totalStake: claim.funding.totalStaked,
@@ -460,6 +490,7 @@ export class LocalClaimMarketService implements ClaimMarketService {
     return {
       ...claim,
       marketEnabled: isMarketEnabled(),
+      marketActionability: marketActionability(),
       bundle: bundleFor(claim),
     };
   }

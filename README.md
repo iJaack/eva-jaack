@@ -23,6 +23,7 @@ records copy intent without custodying funds or placing trades.
 ## Product docs
 
 - [Architecture](docs/ARCHITECTURE.md) — current system boundaries, live/future split, and request flows
+- [Launch truth](docs/LAUNCH_TRUTH.md) — runtime actionability matrix and launch gates
 - [Product strategy](docs/PRODUCT_STRATEGY.md) — v1 strategy, claim-bundle schema, status taxonomy, risk policy, and x402 boundary
 - [Roadmap](docs/ROADMAP.md) — milestone plan with regression checks per milestone
 - [Business plan](docs/BUSINESS_PLAN.md) — product thesis, segments, scoreboards, risks, and operating plan

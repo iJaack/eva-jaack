@@ -165,8 +165,8 @@ Add under `How You Think`:
 - Copy must separate market odds from truth status.
 - Use claim statuses consistently: `forecast`, `unresolved`, `verified`, `disputed`, `resolved`,
   `void`.
-- V1 risk policy excludes elections, sports betting, war, assassination, criminal investigations,
-  personal tragedies, and easily manipulable events.
+- Provider market loading is broad, but sports markets are excluded for now. Public examples should
+  still use clear resolution sources and limited harm surfaces.
 - x402 is only for paid verification/API access after strict resource-bound verification exists.
 ```
 
@@ -199,8 +199,10 @@ Replace phase section with:
 ## Phase
 - Prediction reputation and curator onboarding pivot in progress.
 - EvaTrustGraph is deployed on Avalanche.
-- Native Eva trade execution, x402 enforcement, and verification-market contracts are not live
-  unless confirmed by current config and deployment truth.
+- Verification-market contracts are configured in current deployment truth, but claim stake,
+  challenge, and settlement actions remain preview-only until Eva can prepare, sign, broadcast,
+  confirm, and read back those actions.
+- Native Eva trade execution and x402 enforcement are not live.
 ```
 
 ## Proposed `OKR.md` targeted edits
