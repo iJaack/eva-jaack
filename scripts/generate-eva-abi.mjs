@@ -4,22 +4,6 @@ import path from "node:path";
 const repoRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const contracts = [
   {
-    artifactPath: path.join(repoRoot, "contracts", "out", "EvaTrustGraph.sol", "EvaTrustGraph.json"),
-    exportName: "evaTrustGraphAbi",
-    filename: "evaTrustGraphAbi.ts",
-  },
-  {
-    artifactPath: path.join(
-      repoRoot,
-      "contracts",
-      "out",
-      "EvaVerificationMarket.sol",
-      "EvaVerificationMarket.json",
-    ),
-    exportName: "evaVerificationMarketAbi",
-    filename: "evaVerificationMarketAbi.ts",
-  },
-  {
     artifactPath: path.join(repoRoot, "contracts", "out", "EvaThesisProtocol.sol", "EvaThesisProtocol.json"),
     exportName: "evaThesisProtocolAbi",
     filename: "evaThesisProtocolAbi.ts",

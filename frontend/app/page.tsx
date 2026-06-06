@@ -101,15 +101,15 @@ const participationQuests = [
   },
   {
     step: "03",
-    title: "Verify facts",
-    body: "Attach factual signals so the essay has more than market odds.",
-    href: "/verify",
-    cta: "Check source",
+    title: "Track the post",
+    body: "Let market odds, facts, and revision history update the public object.",
+    href: "/thesis/thesis-0fdef25794b38b6e8eed7524",
+    cta: "Open thesis",
   },
   {
     step: "04",
-    title: "Revise over time",
-    body: "Let score, signals, and history show how the thesis evolves.",
+    title: "Build the record",
+    body: "Connect X and wallet identity so authorship can persist across posts.",
     href: "/predictors",
     cta: "View records",
   },
@@ -122,8 +122,8 @@ function QuestBoard({ stats }: { stats: PredictionSummary["stats"] }) {
         <p className="section-kicker">Start here</p>
         <h2 className="section-title section-title-sm">One loop, four actions</h2>
         <p>
-          Eva should feel like a fast truth game: choose a question, publish a call, back it with evidence,
-          and let the record update reputation.
+          Eva should feel like an interactive market blog: choose a thesis, attach signals, publish it,
+          and let the visible history change as markets and facts move.
         </p>
       </div>
       <div className="quest-grid">
@@ -221,7 +221,7 @@ function PredictorRow({ predictor }: { predictor: Predictor }) {
     <Link href={`/predictors/${predictor.predictorId}`} className="predictor-row">
       <div>
         <strong>{predictor.handle}</strong>
-        <span>{predictor.profileState === "registered" ? "Graph-backed" : "Unclaimed X profile"}</span>
+        <span>{predictor.profileState === "registered" ? "Wallet-linked" : "Record-only X profile"}</span>
       </div>
       <div className="predictor-score">
         <strong>{predictor.trustScore}</strong>

@@ -8,16 +8,12 @@
 
 Eva Protocol backend signs on-chain writes through the local **Evalanche SDK boot flow**, not a remote signing bridge.
 
-Primary path:
-- `EVA_SIGNER_PROVIDER=evalanche`
+Active path:
 - `Evalanche.boot({ network: 'avalanche', identity: { agentId: '1599' } })`
-- credential resolution handled by Evalanche itself:
+- credential resolution is handled by Evalanche itself:
   1. OpenClaw secrets
   2. env vars (`AGENT_PRIVATE_KEY` / `AGENT_MNEMONIC`)
   3. encrypted local keystore (`~/.evalanche/keys/agent.json`)
-
-Fallback path:
-- `EVA_SIGNER_PROVIDER=private-key` with `EVA_PRIVATE_KEY`
 
 ## Why
 
@@ -26,50 +22,33 @@ We want agent-native key custody without forcing Eva Protocol to persist raw sig
 Evalanche gives us:
 - encrypted-at-rest keystore management
 - deterministic wallet reuse across boots
-- compatibility with ERC-8004 identity-based operation
+- compatibility with agent-native Avalanche operations
 - a clean migration path away from direct backend secret management
 
 ## Architecture
 
 ```text
-routes/reputation.ts or services/blockchain.ts
-  -> services/signer.ts
-      -> EvalancheSignerService
-          -> services/signing.ts
-              -> Evalanche.boot({ network: 'avalanche', identity: { agentId: '1599' } })
-                  -> OpenClaw secrets | env | ~/.evalanche/keys/agent.json
-                      -> decrypted in-process wallet
-                          -> viem wallet client writes contract
+routes/predictions.ts or services/thesis-protocol.ts
+  -> services/signing.ts
+      -> Evalanche.boot({ network: 'avalanche', identity: { agentId: '1599' } })
+          -> OpenClaw secrets | env | ~/.evalanche/keys/agent.json
+              -> decrypted in-process wallet
+                  -> viem wallet client writes contract
 ```
 
 ## What changed
 
 - Added local `evalanche` dependency to backend
 - `src/services/signing.ts` now boots Evalanche, caches the boot result, and exposes the signer key from the decrypted in-process wallet
-- `src/services/signer.ts` now uses a local `EvalancheSignerService` instead of an HTTP bridge stub
-- `src/routes/trust.ts` now reads `getCurator()` from `EvaTrustGraph` and combines it with ERC-8004 reputation summaries
-- `EVALANCHE_SIGNER_URL` is no longer part of the active signing path
+- `src/services/thesis-protocol.ts` prepares and submits thesis-protocol writes through the active signer path
+- Remote signer bridge URLs are no longer part of the active signing path
 
 ## Operational behavior
 
-### Auto mode
-
-If `EVA_SIGNER_PROVIDER=auto`:
-- use `EVA_PRIVATE_KEY` when explicitly provided
-- otherwise boot Evalanche locally
-
-### Explicit Evalanche mode
-
-If `EVA_SIGNER_PROVIDER=evalanche`:
 - boot Evalanche on Avalanche
 - reuse the same keystore-backed wallet across runs
 - sign and broadcast via viem using the decrypted wallet key in-process
-
-### Explicit private-key mode
-
-If `EVA_SIGNER_PROVIDER=private-key`:
-- use `EVA_PRIVATE_KEY`
-- bypass Evalanche entirely
+- confirm the deployer wallet before broadcast transactions
 
 ## Trust model
 

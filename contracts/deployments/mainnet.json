@@ -1,37 +1,9 @@
 {
   "network": "avalanche-mainnet",
   "chainId": 43114,
-  "deployedAt": "2026-03-04T16:22:00Z",
-  "verificationMarketDeployedAt": "2026-05-20T08:28:00Z",
   "thesisProtocolDeployedAt": "2026-06-05T20:02:16Z",
   "deployer": "0x0fe61780bd5508b3C99e420662050e5560608cA4",
   "contracts": {
-    "EvaTrustGraph": {
-      "proxy": "0xE84DdD5A03Fa4210c4217436afD2556B348A40a0",
-      "implementation": "0x30F1A422447C7765a59A832bDc3f2e68EED1b89C",
-      "implementationHistory": [
-        "0x862E93e689628b6960C7Cd5244475Fa58F12A944",
-        "0xb4354A33a9a4134C0954d6F1a6f3Ec9E2E2D3590",
-        "0x30F1A422447C7765a59A832bDc3f2e68EED1b89C"
-      ],
-      "verified": true
-    },
-    "EvaVerificationMarket": {
-      "proxy": "0xfA6893410f19A2c2FC4dd7FA6DB2986de4D3bdad",
-      "implementation": "0xb493fDcA28F3E462a5C4305d35976fEBb1C4724E",
-      "implementationTxHash": "0x390d280dcc1316f1245144f2c0a1a2a47df60615802572c6efea969db61037da",
-      "proxyTxHash": "0x9e2746ffe709ff1c56ff9cce19fce8e75e57025aaf31a1d3e04808c22b498bf0",
-      "deployedBlock": 85904677,
-      "verified": false
-    },
-    "EvaVerificationReputationAdapter": {
-      "proxy": "0xbEF19ce1451b9a01eE47405E4cfbb31FbA52DF37",
-      "implementation": "0xF9b26E870408c67f769F7b5BDa4409CDd54F2743",
-      "implementationTxHash": "0x6642c006923bbdf7159bd9006adc6358ff8fee895090db6ab0dd8f340557c651",
-      "proxyTxHash": "0xa3dc512be94deebb4464ae2566646c2a815700cdda79943b8fc2a4257166b63f",
-      "deployedBlock": 85904672,
-      "verified": false
-    },
     "EvaThesisProtocol": {
       "proxy": "0x5eDBd1eea3228662326e60634E53AB8975D6641c",
       "implementation": "0x3acc6Fd96d67425Cb746F23b0e395eB82Bff171f",
@@ -43,13 +15,6 @@
   },
   "roles": {
     "admin": "0x0fe61780bd5508b3C99e420662050e5560608cA4",
-    "oracle": "0x0fe61780bd5508b3C99e420662050e5560608cA4",
-    "treasury": "0x0fe61780bd5508b3C99e420662050e5560608cA4"
-  },
-  "externalContracts": {
-    "evaToken": "0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672",
-    "identityRegistry": "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
-    "reputationRegistry": "0x8004BAa17C55a88189AE136b182e5fdA19dE9b63",
-    "validationRegistry": "0x5c2B454E34C8E173909EB36FC07DE6143A24ab47"
+    "operator": "0x0fe61780bd5508b3C99e420662050e5560608cA4"
   }
 }

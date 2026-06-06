@@ -17,7 +17,7 @@ const predictorsPayload = {
       avgOddsEdge: null,
       copiedTheses: 7,
       bestCategory: "Macro",
-      badges: ["Unclaimed"],
+      badges: ["Record-only"],
     },
     {
       predictorId: "eva-agent",
@@ -33,12 +33,12 @@ const predictorsPayload = {
       avgOddsEdge: 12,
       copiedTheses: 21,
       bestCategory: "Crypto",
-      badges: ["Graph-backed"],
+      badges: ["Wallet-linked"],
     },
   ],
 };
 
-test("predictors page filters graph-backed and unclaimed records", async ({ page }) => {
+test("predictors page filters wallet-linked and record-only records", async ({ page }) => {
   await page.route("**/api/predictors", async (route) => {
     await route.fulfill({
       status: 200,
@@ -53,11 +53,11 @@ test("predictors page filters graph-backed and unclaimed records", async ({ page
   await expect(page.getByRole("link", { name: /@macrodesk/i })).toBeVisible();
   await expect(page.getByRole("link", { name: /@eva_agent/i })).toBeVisible();
 
-  await page.getByRole("button", { name: "Graph-backed" }).click();
+  await page.getByRole("button", { name: "Wallet-linked" }).click();
   await expect(page.getByRole("link", { name: /@eva_agent/i })).toBeVisible();
   await expect(page.getByRole("link", { name: /@macrodesk/i })).toHaveCount(0);
 
-  await page.getByRole("button", { name: "Unclaimed" }).click();
+  await page.getByRole("button", { name: "Record-only" }).click();
   await expect(page.getByRole("link", { name: /@macrodesk/i })).toBeVisible();
   await expect(page.getByRole("link", { name: /@eva_agent/i })).toHaveCount(0);
 });

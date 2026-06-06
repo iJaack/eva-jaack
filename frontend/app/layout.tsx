@@ -4,9 +4,9 @@ import "./globals.css";
 import EvaProviders from "@/components/EvaProviders";
 import { protocol } from "@/lib/protocol";
 
-const title = `${protocol.app.name} — Prediction reputation OS`;
+const title = `${protocol.app.name} — Evolving market theses`;
 const description =
-  "Eva connects markets, thesis pages, evidence, and graph-backed predictor reputation in one product surface.";
+  "Eva turns prediction markets, facts, and second-order signals into evolving thesis posts with visible history.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(protocol.app.siteUrl),

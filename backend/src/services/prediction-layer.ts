@@ -6,7 +6,6 @@ import { config } from "../config.js";
 import type {
   ClaimVerdict,
   CopyThesisPreviewResponse,
-  CuratorDto,
   MarketDetailResponse,
   MarketListResponse,
   PredictionMarketDto,
@@ -14,6 +13,7 @@ import type {
   PredictionNetworkSummaryResponse,
   PredictionMarketProvider,
   PredictionMarketStatus,
+  PredictorIdentityDto,
   PredictorDetailResponse,
   PredictorDto,
   PredictorListResponse,
@@ -32,7 +32,6 @@ import type {
   XCommandIngestResponse,
   XCommandType,
 } from "../lib/api-types.js";
-import { listCurators } from "./trust-graph.js";
 
 export interface ThesisIdentityInput {
   dynamicUserId: string;
@@ -471,8 +470,8 @@ function mergeSeedMarkets(markets: PredictionMarketDto[]): PredictionMarketDto[]
 }
 
 function mergeSeedTheses(theses: ThesisDto[]): ThesisDto[] {
-  const byId = new Map(seedStore().theses.map((thesis) => [thesis.thesisId, thesis]));
-  for (const thesis of theses) byId.set(thesis.thesisId, thesis);
+  const byId = new Map(theses.map((thesis) => [thesis.thesisId, thesis]));
+  for (const thesis of seedStore().theses) byId.set(thesis.thesisId, thesis);
   return [...byId.values()];
 }
 
@@ -678,7 +677,6 @@ function isMarketLive(market: PredictionMarketDto, now = Date.now()): boolean {
 function commandTypeFor(text: string): XCommandType {
   const value = text.toLowerCase();
   if (value.includes("track")) return "track";
-  if (value.includes("verify")) return "verify";
   if (value.includes("counter")) return "counter";
   if (value.includes("copy")) return "copy";
   if (value.includes("thesis")) return "thesis";
@@ -832,7 +830,7 @@ export class LocalPredictionLayerService {
     private readonly indexPath = config.storageDir
       ? resolve(config.storageDir, "predictions.json")
       : defaultPredictionIndexPath,
-    private readonly registeredIdentityLoader: () => Promise<CuratorDto[]> = listCurators,
+    private readonly registeredIdentityLoader: () => Promise<PredictorIdentityDto[]> = async () => [],
     private readonly liveMarketLoader: LiveMarketLoader = loadProviderMarkets,
   ) {}
 
@@ -1023,7 +1021,7 @@ export class LocalPredictionLayerService {
       const copiedTheses = theses.reduce((sum, thesis) => sum + thesis.copiedCount, 0);
       const accuracy = accuracyFor(theses);
       const badges = [
-        identity ? "Graph-backed" : "Unclaimed",
+        identity ? "Wallet-linked" : "Record-only",
         copiedTheses >= 10 ? "Copied" : null,
         theses.some((thesis) => thesis.signals.some((signal) => signal.kind === "fact")) ? "Evidence-backed" : null,
       ].filter((badge): badge is string => Boolean(badge));
@@ -1133,18 +1131,18 @@ export class LocalPredictionLayerService {
 
   private async loadRegisteredIdentities(): Promise<RegisteredIdentity[]> {
     try {
-      const curators = await Promise.race([
+      const identities = await Promise.race([
         this.registeredIdentityLoader(),
-        new Promise<CuratorDto[]>((resolve) => {
+        new Promise<PredictorIdentityDto[]>((resolve) => {
           setTimeout(() => resolve([]), identityLoadTimeoutMs);
         }),
       ]);
-      return curators
-        .filter((curator) => curator.registered)
-        .map((curator) => ({
-          wallet: curator.address,
-          agentId: curator.curatorAgentId,
-          trustScore: curator.trustScore,
+      return identities
+        .filter((identity) => identity.registered)
+        .map((identity) => ({
+          wallet: identity.address,
+          agentId: identity.agentId,
+          trustScore: identity.trustScore,
         }));
     } catch {
       return [];

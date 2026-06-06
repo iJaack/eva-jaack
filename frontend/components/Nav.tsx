@@ -9,41 +9,22 @@ import ThemeToggle from "./ThemeToggle";
 const navItems: readonly { href: string; label: string; exact?: boolean; highlight?: boolean }[] = [
   { href: "/markets", label: "Markets" },
   { href: "/compose", label: "Compose" },
-  { href: "/verify", label: "Evidence" },
   { href: "/predictors", label: "Predictors" },
-  { href: "/claims", label: "Claims" },
-  { href: "/blog", label: "Blog" },
 ];
 
-const utilityItems = [
-  { href: "/curators/register", label: "Register" },
-] as const;
-
 const loopItems = [
-  { href: "/markets", label: "Pick" },
-  { href: "/compose", label: "Call" },
-  { href: "/verify", label: "Verify" },
-  { href: "/claims", label: "Resolve" },
-  { href: "/predictors", label: "Rank" },
+  { href: "/markets", label: "Find" },
+  { href: "/compose", label: "Write" },
+  { href: "/thesis/thesis-0fdef25794b38b6e8eed7524", label: "Track" },
+  { href: "/predictors", label: "Record" },
 ] as const;
 
 function activeLoopHref(pathname: string): string | null {
   if (pathname === "/") return "/markets";
   if (pathname.startsWith("/markets")) return "/markets";
-  if (pathname.startsWith("/compose") || pathname.startsWith("/thesis")) return "/compose";
-  if (
-    pathname.startsWith("/verify") ||
-    pathname.startsWith("/article") ||
-    pathname.startsWith("/articles") ||
-    pathname.startsWith("/blog") ||
-    pathname.startsWith("/about") ||
-    pathname.startsWith("/whitepaper") ||
-    pathname.startsWith("/claims/x")
-  ) {
-    return "/verify";
-  }
-  if (pathname.startsWith("/claims")) return "/claims";
-  if (pathname.startsWith("/predictors") || pathname.startsWith("/curator") || pathname.startsWith("/curators")) {
+  if (pathname.startsWith("/compose")) return "/compose";
+  if (pathname.startsWith("/thesis")) return "/thesis/thesis-0fdef25794b38b6e8eed7524";
+  if (pathname.startsWith("/predictors")) {
     return "/predictors";
   }
   return null;
@@ -51,14 +32,10 @@ function activeLoopHref(pathname: string): string | null {
 
 function routeCta(pathname: string): { href: string; label: string } {
   if (pathname.startsWith("/markets")) return { href: "/compose", label: "Make call" };
-  if (pathname.startsWith("/compose")) return { href: "/verify", label: "Check evidence" };
+  if (pathname.startsWith("/compose")) return { href: "/markets", label: "Add signals" };
   if (pathname.startsWith("/thesis")) return { href: "/compose", label: "Counter" };
-  if (pathname.startsWith("/blog") || pathname.startsWith("/about") || pathname.startsWith("/whitepaper")) return { href: "/markets", label: "Apply it" };
-  if (pathname.startsWith("/claims/x")) return { href: "/verify", label: "Check source" };
-  if (pathname.startsWith("/verify") || pathname.startsWith("/article")) return { href: "/claims", label: "Attach claim" };
-  if (pathname.startsWith("/claims")) return { href: "/predictors", label: "See rank" };
-  if (pathname.startsWith("/predictors") || pathname.startsWith("/curator")) return { href: "/markets", label: "Find market" };
-  return { href: "/markets", label: "Start loop" };
+  if (pathname.startsWith("/predictors")) return { href: "/markets", label: "Find market" };
+  return { href: "/markets", label: "Start thesis" };
 }
 
 export default function Nav() {
@@ -95,20 +72,6 @@ export default function Nav() {
               </Link>
             );
           })}
-          <span className="nav-divider" aria-hidden />
-          {utilityItems.map((item) => {
-            const active = pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`nav-pill nav-pill-utility${active ? " nav-pill-active" : ""}`}
-                onClick={() => setMenuOpen(false)}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
         </nav>
 
         <div className="topbar-actions">
@@ -132,8 +95,8 @@ export default function Nav() {
       <section className="participation-dock" aria-label="Participation loop">
         <div className="participation-dock-inner">
           <div className="participation-dock-copy">
-            <span className="participation-kicker">Participation loop</span>
-            <strong>Pick · call · verify · resolve · rank</strong>
+            <span className="participation-kicker">Thesis loop</span>
+            <strong>Find signals · write thesis · track history · build record</strong>
           </div>
           <nav className="participation-loop" aria-label="Eva participation stages">
             {loopItems.map((item, index) => {

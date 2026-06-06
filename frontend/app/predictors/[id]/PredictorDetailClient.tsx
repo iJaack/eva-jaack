@@ -42,12 +42,12 @@ export default function PredictorDetailClient() {
         ) : (
           <>
             <section className="mobile-page-head predictor-detail-head">
-              <p className="eyebrow">{detail.predictor.profileState === "registered" ? "Graph-backed" : "Unclaimed predictor profile"}</p>
+              <p className="eyebrow">{detail.predictor.profileState === "registered" ? "Wallet-linked" : "Record-only predictor profile"}</p>
               <h1>{detail.predictor.handle}</h1>
               <p>
                 {detail.predictor.profileState === "registered"
-                  ? "This predictor is linked to an Eva trust graph identity."
-                  : "This product record can be claimed later by connecting a wallet and Eva identity."}
+                  ? "This predictor is linked to an X identity and wallet."
+                  : "This product record can be linked later by connecting X and a wallet."}
                 {" "}Forecast records and truth or resolution status remain separate.
               </p>
             </section>
@@ -55,7 +55,7 @@ export default function PredictorDetailClient() {
             <section className="mobile-metrics">
               <div>
                 <strong>{detail.predictor.trustScore}</strong>
-                <span>trust</span>
+                <span>score</span>
               </div>
               <div>
                 <strong>{detail.predictor.accuracy === null ? "—" : `${detail.predictor.accuracy}%`}</strong>
@@ -68,12 +68,12 @@ export default function PredictorDetailClient() {
             </section>
 
             <section className="prediction-card">
-              <h2>Two-layer reputation</h2>
+              <h2>Predictor record</h2>
               <div className="record-layers">
                 <div>
-                  <span>Eva Trust Score</span>
+                  <span>Eva score</span>
                   <strong>{detail.predictor.trustScore}</strong>
-                  <p>Canonical graph state from registered identity and reputation receipts.</p>
+                  <p>App record from wallet-linked identity, thesis history, and resolved outcomes.</p>
                 </div>
                 <div>
                   <span>Resolution Record</span>
@@ -81,11 +81,6 @@ export default function PredictorDetailClient() {
                   <p>Offchain thesis stats stay separate from resolved outcomes until evidence can feed reputation.</p>
                 </div>
               </div>
-              {detail.predictor.profileState === "unclaimed" ? (
-                <Link className="mobile-action mobile-action-primary claim-profile-action" href="/curators/register">
-                  Claim with Eva identity
-                </Link>
-              ) : null}
             </section>
 
             <section className="prediction-section">

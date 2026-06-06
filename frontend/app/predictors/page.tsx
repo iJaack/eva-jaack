@@ -33,7 +33,7 @@ export default function PredictorsPage() {
         <section className="mobile-page-head">
           <p className="eyebrow">Predictors</p>
           <h1>Follow the record, not the noise.</h1>
-          <p>Registered predictors inherit Eva trust. Every open call, copy, and resolved outcome becomes a public score trail.</p>
+          <p>Wallet-linked predictors build an Eva score. Every open call, copy, and resolved outcome becomes a public record.</p>
         </section>
 
         {loading ? (
@@ -79,14 +79,14 @@ export default function PredictorsPage() {
                   className={`filter-chip${profileFilter === "registered" ? " filter-chip-active" : ""}`}
                   onClick={() => setProfileFilter("registered")}
                 >
-                  Graph-backed
+                  Wallet-linked
                 </button>
                 <button
                   type="button"
                   className={`filter-chip${profileFilter === "unclaimed" ? " filter-chip-active" : ""}`}
                   onClick={() => setProfileFilter("unclaimed")}
                 >
-                  Unclaimed
+                  Record-only
                 </button>
               </div>
             </section>
@@ -97,12 +97,12 @@ export default function PredictorsPage() {
                   <div className="card-topline">
                     <span>{predictor.handle}</span>
                     <span className={predictor.profileState === "registered" ? "status-chip status-chip-verified" : "status-chip status-chip-unresolved"}>
-                      {predictor.profileState === "registered" ? "Graph-backed" : "Unclaimed"}
+                      {predictor.profileState === "registered" ? "Wallet-linked" : "Record-only"}
                     </span>
                   </div>
                   <div className="predictor-card-score">
                     <strong>{predictor.trustScore}</strong>
-                    <span>Eva Trust Score</span>
+                    <span>Eva score</span>
                   </div>
                   <div className="odds-row">
                     <div>

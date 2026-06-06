@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { LocalPredictionLayerService } from "../src/services/prediction-layer.js";
-import { sampleCurator } from "./fixtures.js";
+import { samplePredictorIdentity } from "./fixtures.js";
 
 const cleanupDirs: string[] = [];
 
@@ -12,7 +12,7 @@ function auth() {
     dynamicUserId: "dyn-user-1",
     xHandle: "@spacethesis",
     xProfileId: "x-42",
-    walletAddress: sampleCurator.address,
+    walletAddress: samplePredictorIdentity.address,
     walletSource: "external" as const,
   };
 }
@@ -26,7 +26,7 @@ describe("prediction layer service", () => {
   it("creates a multi-signal evolving thesis with weighted market and fact scores", async () => {
     const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
     cleanupDirs.push(dir);
-    const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => [sampleCurator], async () => []);
+    const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => [samplePredictorIdentity], async () => []);
 
     const created = await service.createThesis({
       identity: auth(),
@@ -63,7 +63,7 @@ describe("prediction layer service", () => {
     expect(created.created).toBe(true);
     expect(created.thesis.title).toBe("SpaceX IPO liquidity rotation thesis");
     expect(created.thesis.author.xHandle).toBe("@spacethesis");
-    expect(created.thesis.author.walletAddress).toBe(sampleCurator.address);
+    expect(created.thesis.author.walletAddress).toBe(samplePredictorIdentity.address);
     expect(created.thesis.signals).toHaveLength(2);
     expect(created.thesis.currentScore).toBe(70);
     expect(created.thesis.timeline[0]).toMatchObject({
@@ -75,8 +75,8 @@ describe("prediction layer service", () => {
     expect(detail?.thesis.currentRevision.body).toContain("risk markets reprice");
     expect(detail?.predictor).toMatchObject({
       registered: true,
-      wallet: sampleCurator.address,
-      trustScore: sampleCurator.trustScore,
+      wallet: samplePredictorIdentity.address,
+      trustScore: samplePredictorIdentity.trustScore,
     });
   });
 

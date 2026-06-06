@@ -101,7 +101,7 @@ export default function ThesisDetailClient() {
                 <Link href={`/predictors/${detail.predictor.predictorId}`} className="handle-link">
                   {detail.predictor.handle}
                 </Link>
-                <span>{detail.predictor.profileState === "registered" ? "Graph-backed" : "Wallet-linked"}</span>
+                <span>{detail.predictor.profileState === "registered" ? "Wallet-linked" : "Record-only"}</span>
               </div>
               <h2>Market signals</h2>
               <div className="thesis-stack">

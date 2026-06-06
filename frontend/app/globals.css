@@ -446,8 +446,7 @@ button {
 }
 
 .page-shell:not(.prediction-home) > .hero,
-.mobile-shell:not(.prediction-home) > .mobile-page-head,
-.page-shell:not(.prediction-home) > .claim-detail-header {
+.mobile-shell:not(.prediction-home) > .mobile-page-head {
   margin-top: 0;
   padding: clamp(24px, 3vw, 40px);
   border: var(--rule-hairline);
@@ -468,8 +467,7 @@ button {
 
 .hero > *,
 .mobile-hero > *,
-.mobile-page-head > *,
-.claim-detail-header > * {
+.mobile-page-head > * {
   min-width: 0;
 }
 
@@ -517,9 +515,7 @@ button {
 
 .hero-title,
 .mobile-hero h1,
-.mobile-page-head h1,
-.claim-detail-title,
-.blog-post-title {
+.mobile-page-head h1 {
   max-width: 18ch;
   margin: 0;
   font-family: var(--font-display);
@@ -538,10 +534,7 @@ button {
 
 .hero-sub,
 .mobile-hero > p,
-.mobile-page-head p,
-.blog-home-intro,
-.blog-feature-excerpt,
-.blog-post-dek {
+.mobile-page-head p {
   max-width: 62ch;
   margin: var(--space-md) 0 0;
   color: var(--muted);
@@ -552,8 +545,7 @@ button {
 .hero-kicker,
 .section-kicker,
 .eyebrow,
-.hero-panel-kicker,
-.claim-card-status {
+.hero-panel-kicker {
   margin: 0 0 var(--space-xs);
   color: var(--muted);
   font-family: var(--font-mono);
@@ -570,14 +562,7 @@ button {
 .wallet-panel-actions,
 .tx-card-actions,
 .filter-bar,
-.status-row,
-.claim-bundle-row,
-.claim-card-top,
-.claim-card-meta,
-.claim-badge-row,
-.article-card-meta,
-.article-card-dates,
-.blog-meta-row {
+.status-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -644,13 +629,10 @@ button {
 .section-title,
 .section-title-sm,
 .prediction-card h2,
-.claim-panel h2,
 .route-panel h3,
 .workflow-card h3,
 .product-module h3,
-.claim-bundle-card h3,
-.paper-section h2,
-.blog-post-section h2 {
+.paper-section h2 {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 800;
@@ -665,22 +647,17 @@ button {
 
 .section-title-sm,
 .prediction-card h2,
-.claim-panel h2,
 .route-panel h3,
 .workflow-card h3,
 .product-module h3,
-.claim-bundle-card h3,
-.paper-section h2,
-.blog-post-section h2 {
+.paper-section h2 {
   font-size: var(--text-lg);
 }
 
 .section-link,
 .text-link,
 .detail-link,
-.evidence-list a,
-.claim-link-list a,
-.blog-feature-cta {
+.evidence-list a {
   color: var(--detail-link);
   font-weight: 800;
   text-decoration: underline;
@@ -693,11 +670,6 @@ button {
 .workflow-card,
 .principle-card,
 .route-panel,
-.article-card,
-.claim-card,
-.claim-panel,
-.claim-detail-header,
-.claim-bundle-card,
 .wallet-panel,
 .tx-card,
 .toc-card,
@@ -708,10 +680,7 @@ button {
 .register-contracts-card,
 .register-placeholder,
 .register-guide-card,
-.status-panel,
-.blog-feature-card,
-.blog-post-header,
-.blog-post-body {
+.status-panel {
   border: var(--rule-hairline);
   border-radius: var(--radius-md);
   background: var(--card);
@@ -720,14 +689,6 @@ button {
 
 .surface,
 .prediction-card,
-.article-card,
-.claim-card,
-.claim-panel,
-.claim-detail-header,
-.claim-bundle-card,
-.blog-feature-card,
-.blog-post-header,
-.blog-post-body,
 .paper-section,
 .toc-card,
 .wallet-panel,
@@ -757,7 +718,6 @@ button {
 .diagram,
 .formula,
 .code-block,
-.claim-bundle-card,
 .desk-summary > div,
 .mobile-metrics > div,
 .odds-row > div,
@@ -781,15 +741,12 @@ button {
 .principle-card p,
 .route-panel p,
 .product-module p,
-.claim-panel p,
-.claim-muted,
-.claim-warning,
+.form-warning,
 .field-help,
 .empty-copy,
 .muted-copy,
 .paper-section p,
-.paper-section ul,
-.blog-post-section p {
+.paper-section ul {
   margin: var(--space-xs) 0 0;
   color: var(--muted);
   line-height: 1.58;
@@ -837,7 +794,14 @@ button {
 }
 
 .workbench-tape .mobile-strip {
+  width: 100%;
+  max-width: 100%;
   margin: 0;
+  overflow-x: auto;
+}
+
+.workbench-tape {
+  overflow: hidden;
 }
 
 .workbench-quests {
@@ -1045,14 +1009,8 @@ button {
 
 .grid-2,
 .grid-3,
-.whitepaper-layout,
 .paper-stack,
 .diagram-grid,
-.claims-grid,
-.claim-detail-grid,
-.claim-detail-main,
-.claim-detail-side,
-.claim-bundle-grid,
 .register-layout,
 .register-summary-grid,
 .wallet-panel-grid,
@@ -1071,14 +1029,9 @@ button {
 .product-desk-grid,
 .product-module-grid,
 .desk-summary,
-.claim-preview-output,
 .evidence-list,
-.claim-link-list,
 .faq-stack,
 .section-grid,
-.article-detail,
-.article-detail-score,
-.curator-list,
 .register-form,
 .compose-form,
 .readiness-list,
@@ -1114,8 +1067,7 @@ button {
 .desk-summary strong,
 .record-layers strong,
 .predictor-card-score strong,
-.profile-stat-value,
-.trust-score-value {
+.profile-stat-value {
   display: block;
   color: var(--ink);
   font-family: var(--font-display);
@@ -1131,7 +1083,6 @@ button {
 .desk-summary span,
 .record-layers span,
 .profile-stat-label,
-.trust-score-label,
 .market-chip span,
 .market-row span,
 .odds-row span,
@@ -1240,9 +1191,7 @@ button {
 .tag-pill,
 .status-chip,
 .filter-chip,
-.claim-inline-badge,
-.tx-state-chip,
-.blog-meta-pill {
+.tx-state-chip {
   min-height: 30px;
   display: inline-flex;
   align-items: center;
@@ -1355,10 +1304,7 @@ button {
 }
 
 .card-topline,
-.article-card-header,
-.article-detail-header,
-.tx-card-header,
-.curator-profile-header {
+.tx-card-header {
   display: flex;
   justify-content: space-between;
   gap: var(--space-md);
@@ -1448,7 +1394,6 @@ button {
 }
 
 .field-input,
-.claim-input-group input,
 .compose-textarea,
 .code-block,
 .formula {
@@ -1482,7 +1427,6 @@ button {
 }
 
 .field-input:focus,
-.claim-input-group input:focus,
 .compose-textarea:focus {
   border-color: var(--color-accent);
   background: var(--color-paper);
@@ -1493,8 +1437,7 @@ button {
   align-content: start;
 }
 
-.field-input::placeholder,
-.claim-input-group input::placeholder {
+.field-input::placeholder {
   color: var(--color-subtle);
 }
 
@@ -1507,8 +1450,7 @@ button {
   min-height: 84px;
 }
 
-.compose-submit,
-.claim-profile-action {
+.compose-submit {
   width: 100%;
 }
 
@@ -1517,10 +1459,8 @@ button {
 }
 
 .detail-row,
-.claim-key-value,
 .readiness-list li,
-.bundle-list li,
-.claim-timeline-item {
+.bundle-list li {
   display: grid;
   grid-template-columns: minmax(120px, 0.32fr) minmax(0, 1fr);
   gap: var(--space-md);
@@ -1542,8 +1482,7 @@ button {
 }
 
 .readiness-list strong,
-.bundle-list strong,
-.claim-key-value strong {
+.bundle-list strong {
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -1569,64 +1508,11 @@ button {
   }
 }
 
-.article-card,
-.curator-card {
-  display: grid;
-  gap: var(--space-sm);
-}
-
-.article-domain,
-.curator-card-address {
-  font-weight: 800;
-}
-
-.trust-score {
-  position: relative;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.trust-score svg {
-  display: block;
-}
-
-.trust-score-value {
-  position: absolute;
-  inset-block-start: 50%;
-  inset-inline-start: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.trust-score-label {
-  margin-top: var(--space-2xs);
-}
-
-.curator-card {
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  padding: var(--space-lg);
-  border: var(--rule-hairline);
-  border-radius: var(--radius-md);
-  background: var(--card);
-}
-
-.curator-card-meta,
-.curator-profile-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-md);
-  color: var(--muted);
-  font-size: var(--text-sm);
-}
-
 .hero-panel,
 .step-card,
 .built-card,
 .info-card,
-.roadmap-card,
-.claim-card,
-.claim-panel {
+.roadmap-card {
   padding: var(--space-lg);
 }
 
@@ -1677,56 +1563,21 @@ button {
   font-size: var(--text-sm);
 }
 
-.paper-stack,
-.blog-post-shell {
+.paper-stack {
   gap: var(--space-lg);
 }
 
 .paper-section + .paper-section,
-.blog-post-section + .blog-post-section,
 .faq-item + .faq-item {
   border-top: var(--rule-hairline);
 }
 
-.blog-feature-card,
-.blog-post-header,
-.blog-post-body {
-  position: relative;
-  overflow: clip;
-}
-
-.blog-feature-accent,
-.blog-post-glow {
-  display: none;
-}
-
-.blog-feature-title {
-  margin: var(--space-sm) 0 0;
-  font-size: var(--text-2xl);
-}
-
-.blog-post-section {
-  padding-block: var(--space-lg);
-}
-
-.claims-grid,
 .market-stack,
 .predictor-list-large {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.claim-detail-title {
-  max-width: 17ch;
-  font-size: var(--text-3xl);
-}
-
-.claim-input-group {
-  display: grid;
-  gap: var(--space-xs);
-  margin-top: var(--space-md);
-}
-
-.claim-warning,
+.form-warning,
 .wallet-note-error {
   color: var(--color-danger);
 }
@@ -1794,9 +1645,7 @@ button {
 .prediction-section,
 .lead-thesis,
 .publish-success,
-.centered-note,
-.blog-home-section,
-.blog-index-section {
+.centered-note {
   margin-top: var(--space-xl);
 }
 
@@ -1808,32 +1657,20 @@ button {
 .mobile-shell:not(.prediction-home) > .route-section,
 .page-shell:not(.prediction-home) > .prediction-section,
 .mobile-shell:not(.prediction-home) > .prediction-section,
-.page-shell:not(.prediction-home) > .blog-index-section,
-.mobile-shell:not(.prediction-home) > .blog-index-section,
 .page-shell:not(.prediction-home) > .centered-note,
 .mobile-shell:not(.prediction-home) > .centered-note,
 .page-shell:not(.prediction-home) > .callout,
 .mobile-shell:not(.prediction-home) > .callout,
 .page-shell:not(.prediction-home) > .market-stack,
 .mobile-shell:not(.prediction-home) > .market-stack,
-.page-shell:not(.prediction-home) > .claims-grid,
-.mobile-shell:not(.prediction-home) > .claims-grid,
 .page-shell:not(.prediction-home) > .protocol-stats,
 .mobile-shell:not(.prediction-home) > .protocol-stats,
 .page-shell:not(.prediction-home) > .register-layout,
 .mobile-shell:not(.prediction-home) > .register-layout,
 .page-shell:not(.prediction-home) > .compose-layout,
 .mobile-shell:not(.prediction-home) > .compose-layout,
-.page-shell:not(.prediction-home) > .whitepaper-layout,
-.mobile-shell:not(.prediction-home) > .whitepaper-layout,
 .page-shell:not(.prediction-home) > .faq-stack,
-.mobile-shell:not(.prediction-home) > .faq-stack,
-.page-shell:not(.prediction-home) > .curator-list,
-.mobile-shell:not(.prediction-home) > .curator-list,
-.page-shell:not(.prediction-home) > .article-detail,
-.mobile-shell:not(.prediction-home) > .article-detail,
-.page-shell:not(.prediction-home) > .blog-post-shell,
-.mobile-shell:not(.prediction-home) > .blog-post-shell {
+.mobile-shell:not(.prediction-home) > .faq-stack {
   margin-top: 0;
 }
 
@@ -1881,7 +1718,6 @@ button {
   margin-top: 0;
 }
 
-.whitepaper-hero,
 .thesis-hero,
 .market-detail-head,
 .predictor-detail-head {
@@ -1898,31 +1734,28 @@ button {
 
 @media (hover: hover) and (pointer: fine) {
   .nav-hamburger:hover,
-  .theme-toggle:hover,
-  .nav-edge-cta:hover,
-  .nav-pill:hover,
-  .loop-step:hover,
-  .participation-cta:hover,
-  .btn:hover,
-  .mobile-action:hover,
-  .filter-chip:hover,
-  .quest-card:hover,
-  .market-chip:hover,
-  .market-row:hover,
-  .predictor-row:hover,
-  .thesis-card-main:hover,
-  .article-card:hover,
-  .claim-card:hover,
-  .curator-card:hover {
+.theme-toggle:hover,
+.nav-edge-cta:hover,
+.nav-pill:hover,
+.loop-step:hover,
+.participation-cta:hover,
+.btn:hover,
+.mobile-action:hover,
+.filter-chip:hover,
+.quest-card:hover,
+.market-chip:hover,
+.market-row:hover,
+.predictor-row:hover,
+.thesis-card-main:hover {
     transform: translateY(-1px);
     border-color: var(--color-rule-strong);
     background: var(--row-hover-bg);
   }
 
   .btn-primary:hover,
-  .mobile-action-primary:hover,
-  .compose-submit:hover,
-  .participation-cta:hover {
+.mobile-action-primary:hover,
+.compose-submit:hover,
+.participation-cta:hover {
     background: var(--color-accent-strong);
     color: var(--color-accent-ink);
   }
@@ -1942,26 +1775,24 @@ button {
 
 @media (min-width: 40rem) {
   .hero-title,
-  .mobile-hero h1,
-  .mobile-page-head h1 {
+.mobile-hero h1,
+.mobile-page-head h1 {
     font-size: clamp(2.45rem, 4.9vw, 4.4rem);
   }
 
   .grid-2,
-  .claim-detail-grid,
-  .compose-layout,
-  .register-layout {
+.compose-layout,
+.register-layout {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .grid-3,
-  .product-desk-grid,
-  .desk-summary,
-  .register-summary-grid,
-  .wallet-panel-grid,
-  .broadcast-panel-grid,
-  .record-layers,
-  .claim-bundle-grid {
+.product-desk-grid,
+.desk-summary,
+.register-summary-grid,
+.wallet-panel-grid,
+.broadcast-panel-grid,
+.record-layers {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
@@ -1974,9 +1805,8 @@ button {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .claims-grid,
   .market-stack,
-  .predictor-list-large {
+.predictor-list-large {
     grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
   }
 
@@ -1998,9 +1828,9 @@ button {
   }
 
   .mobile-hero > .eyebrow,
-  .mobile-hero > h1,
-  .mobile-hero > p,
-  .mobile-hero > .mobile-hero-actions {
+.mobile-hero > h1,
+.mobile-hero > p,
+.mobile-hero > .mobile-hero-actions {
     grid-column: 1;
   }
 
@@ -2017,11 +1847,6 @@ button {
 
   .hero-grid {
     grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-    align-items: start;
-  }
-
-  .whitepaper-layout {
-    grid-template-columns: 260px minmax(0, 1fr);
     align-items: start;
   }
 
@@ -2047,14 +1872,13 @@ button {
 
 @media (min-width: 72rem) {
   .page-shell:not(.prediction-home),
-  .mobile-shell:not(.prediction-home) {
+.mobile-shell:not(.prediction-home) {
     grid-template-columns: minmax(280px, 0.38fr) minmax(0, 1fr);
     gap: var(--space-lg) var(--space-xl);
   }
 
   .page-shell:not(.prediction-home) > .hero,
-  .mobile-shell:not(.prediction-home) > .mobile-page-head,
-  .page-shell:not(.prediction-home) > .claim-detail-header {
+.mobile-shell:not(.prediction-home) > .mobile-page-head {
     position: sticky;
     top: calc(76px + var(--space-lg));
     grid-column: 1;
@@ -2063,67 +1887,53 @@ button {
     overflow: auto;
   }
 
-  .page-shell:not(.prediction-home) > :not(.hero):not(.mobile-page-head):not(.claim-detail-header):not(.site-footer):not(.footer):not(.back-row):not(.tight-back-row),
-  .mobile-shell:not(.prediction-home) > :not(.hero):not(.mobile-page-head):not(.claim-detail-header):not(.site-footer):not(.footer):not(.back-row):not(.tight-back-row) {
+  .page-shell:not(.prediction-home) > :not(.hero):not(.mobile-page-head):not(.site-footer):not(.footer):not(.back-row):not(.tight-back-row),
+.mobile-shell:not(.prediction-home) > :not(.hero):not(.mobile-page-head):not(.site-footer):not(.footer):not(.back-row):not(.tight-back-row) {
     grid-column: 2;
   }
 
   .page-shell:not(.prediction-home) > .back-row,
-  .page-shell:not(.prediction-home) > .tight-back-row,
-  .mobile-shell:not(.prediction-home) > .back-row,
-  .mobile-shell:not(.prediction-home) > .tight-back-row,
-  .page-shell:not(.prediction-home) > .site-footer,
-  .page-shell:not(.prediction-home) > .footer,
-  .mobile-shell:not(.prediction-home) > .site-footer,
-  .mobile-shell:not(.prediction-home) > .footer,
-  .page-shell:not(.prediction-home) > .article-detail,
-  .page-shell:not(.prediction-home) > .blog-post-shell,
-  .page-shell:not(.prediction-home) > .claim-detail-grid,
-  .page-shell:not(.prediction-home) > .curator-profile,
-  .mobile-shell:not(.prediction-home) > .article-detail,
-  .mobile-shell:not(.prediction-home) > .blog-post-shell,
-  .mobile-shell:not(.prediction-home) > .claim-detail-grid,
-  .mobile-shell:not(.prediction-home) > .curator-profile {
+.page-shell:not(.prediction-home) > .tight-back-row,
+.mobile-shell:not(.prediction-home) > .back-row,
+.mobile-shell:not(.prediction-home) > .tight-back-row,
+.page-shell:not(.prediction-home) > .site-footer,
+.page-shell:not(.prediction-home) > .footer,
+.mobile-shell:not(.prediction-home) > .site-footer,
+.mobile-shell:not(.prediction-home) > .footer {
     grid-column: 1 / -1;
   }
 
   .page-shell:not(.prediction-home) > .hero.hero-grid,
-  .mobile-shell:not(.prediction-home) > .mobile-page-head.hero-grid {
+.mobile-shell:not(.prediction-home) > .mobile-page-head.hero-grid {
     grid-template-columns: 1fr;
   }
 
   .page-shell:not(.prediction-home) > .hero .hero-panel,
-  .mobile-shell:not(.prediction-home) > .mobile-page-head .hero-panel {
+.mobile-shell:not(.prediction-home) > .mobile-page-head .hero-panel {
     padding: var(--space-md);
   }
 
   .page-shell:not(.prediction-home) > .hero .hero-actions,
-  .mobile-shell:not(.prediction-home) > .mobile-page-head .mobile-hero-actions {
+.mobile-shell:not(.prediction-home) > .mobile-page-head .mobile-hero-actions {
     display: grid;
     align-items: stretch;
   }
 
   .page-shell:not(.prediction-home) > .hero .btn,
-  .mobile-shell:not(.prediction-home) > .mobile-page-head .mobile-action {
+.mobile-shell:not(.prediction-home) > .mobile-page-head .mobile-action {
     width: 100%;
   }
 
   .page-shell:not(.prediction-home) > .hero .hero-title,
-  .mobile-shell:not(.prediction-home) > .mobile-page-head h1,
-  .page-shell:not(.prediction-home) > .claim-detail-header .claim-detail-title {
+.mobile-shell:not(.prediction-home) > .mobile-page-head h1 {
     max-width: 100%;
     font-size: clamp(2rem, 2.35vw, 2.65rem);
     line-height: 1.08;
   }
 
   .page-shell:not(.prediction-home) > .hero .hero-sub,
-  .mobile-shell:not(.prediction-home) > .mobile-page-head p,
-  .page-shell:not(.prediction-home) > .claim-detail-header .blog-post-dek {
+.mobile-shell:not(.prediction-home) > .mobile-page-head p {
     font-size: var(--text-base);
-  }
-
-  .whitepaper-layout {
-    grid-template-columns: minmax(220px, 0.36fr) minmax(0, 1fr);
   }
 
   .home-workbench {
@@ -2167,7 +1977,7 @@ button {
 
 @media (min-width: 96rem) {
   .page-shell:not(.prediction-home),
-  .mobile-shell:not(.prediction-home) {
+.mobile-shell:not(.prediction-home) {
     grid-template-columns: minmax(320px, 0.3fr) minmax(0, 1fr);
     column-gap: var(--space-2xl);
   }
@@ -2181,7 +1991,7 @@ button {
   }
 
   .workbench-feature,
-  .workbench-rail {
+.workbench-rail {
     position: sticky;
     top: calc(76px + var(--space-lg));
   }
@@ -2266,7 +2076,7 @@ button {
 
 @media (max-width: 39.999rem) {
   .page-shell,
-  .mobile-shell {
+.mobile-shell {
     padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right));
   }
 
@@ -2329,37 +2139,31 @@ button {
   }
 
   .section-heading-row,
-  .card-topline,
-  .article-detail-header,
-  .tx-card-header,
-  .curator-profile-header {
+.card-topline,
+.tx-card-header {
     display: grid;
     justify-content: start;
   }
 
   .mobile-metrics,
-  .stats-grid-home,
-  .odds-row,
-  .quest-scoreboard {
+.stats-grid-home,
+.odds-row,
+.quest-scoreboard {
     grid-template-columns: 1fr;
   }
 
   .market-row,
-  .predictor-row,
-  .detail-row,
-  .claim-key-value,
-  .readiness-list li,
-  .bundle-list li,
-  .claim-timeline-item {
+.predictor-row,
+.detail-row,
+.readiness-list li,
+.bundle-list li {
     grid-template-columns: 1fr;
     gap: var(--space-xs);
   }
 
   .hero-title,
-  .mobile-hero h1,
-  .mobile-page-head h1,
-  .claim-detail-title,
-  .blog-post-title {
+.mobile-hero h1,
+.mobile-page-head h1 {
     max-width: 100%;
     font-size: clamp(2rem, 9.2vw, 2.9rem);
   }
@@ -2382,8 +2186,8 @@ button {
   }
 
   *,
-  *::before,
-  *::after {
+*::before,
+*::after {
     animation-duration: 150ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 150ms !important;
@@ -2391,11 +2195,11 @@ button {
   }
 
   .btn:hover,
-  .mobile-action:hover,
-  .market-chip:hover,
-  .market-row:hover,
-  .predictor-row:hover,
-  .nav-pill:hover {
+.mobile-action:hover,
+.market-chip:hover,
+.market-row:hover,
+.predictor-row:hover,
+.nav-pill:hover {
     transform: none;
   }
 }
@@ -2437,9 +2241,7 @@ body {
 .score-badge,
 .tag-pill,
 .status-chip,
-.claim-inline-badge,
-.tx-state-chip,
-.blog-meta-pill {
+.tx-state-chip {
   border-radius: var(--radius-sm);
 }
 
@@ -2520,8 +2322,7 @@ body {
 
 .mobile-hero,
 .page-shell:not(.prediction-home) > .hero,
-.mobile-shell:not(.prediction-home) > .mobile-page-head,
-.page-shell:not(.prediction-home) > .claim-detail-header {
+.mobile-shell:not(.prediction-home) > .mobile-page-head {
   border-color: var(--color-rule-strong);
   border-left: var(--rule-hairline);
   background: color-mix(in oklch, var(--card) 92%, var(--color-accent-soft));
@@ -2567,15 +2368,12 @@ body {
 }
 
 .page-shell:not(.prediction-home) > .hero,
-.mobile-shell:not(.prediction-home) > .mobile-page-head,
-.page-shell:not(.prediction-home) > .claim-detail-header {
+.mobile-shell:not(.prediction-home) > .mobile-page-head {
   border-left: 4px solid var(--color-accent);
 }
 
 .hero-title,
-.mobile-page-head h1,
-.claim-detail-title,
-.blog-post-title {
+.mobile-page-head h1 {
   font-size: clamp(2.35rem, 4.6vw, 5.4rem);
   line-height: 0.98;
 }
@@ -2585,11 +2383,6 @@ body {
 .workflow-card,
 .principle-card,
 .route-panel,
-.article-card,
-.claim-card,
-.claim-panel,
-.claim-detail-header,
-.claim-bundle-card,
 .wallet-panel,
 .tx-card,
 .toc-card,
@@ -2601,9 +2394,6 @@ body {
 .register-placeholder,
 .register-guide-card,
 .status-panel,
-.blog-feature-card,
-.blog-post-header,
-.blog-post-body,
 .quest-card,
 .market-chip,
 .market-row,
@@ -2622,16 +2412,12 @@ body {
 .route-panel,
 .prediction-card,
 .surface,
-.blog-feature-card,
-.blog-post-header,
-.blog-post-body,
 .paper-section {
   position: relative;
 }
 
 .route-panel::before,
 .prediction-card::before,
-.blog-feature-card::before,
 .paper-section::before {
   background: var(--color-accent);
 }
@@ -2703,8 +2489,7 @@ body {
 .mobile-action:not(.mobile-action-primary),
 .filter-chip,
 .status-chip,
-.provider-badge,
-.blog-meta-pill {
+.provider-badge {
   background: var(--color-paper-2);
 }
 
@@ -2722,7 +2507,6 @@ body {
 }
 
 .field-input,
-.claim-input-group input,
 .compose-textarea,
 .code-block,
 .formula {
@@ -2731,7 +2515,6 @@ body {
 }
 
 .field-input:focus,
-.claim-input-group input:focus,
 .compose-textarea:focus {
   background: var(--color-paper-2);
 }
@@ -2750,16 +2533,16 @@ body {
 
 @media (min-width: 72rem) {
   .page-shell:not(.prediction-home),
-  .mobile-shell:not(.prediction-home) {
+.mobile-shell:not(.prediction-home) {
     grid-template-columns: minmax(360px, 0.24fr) minmax(0, 1fr);
   }
 
   .home-workbench {
-    grid-template-columns: minmax(420px, 0.9fr) minmax(520px, 1.4fr) minmax(320px, 0.7fr);
+    grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1.38fr);
     grid-template-areas:
-      "quests tape tape"
-      "quests markets feature"
-      "rail rail rail";
+      "quests tape"
+      "quests markets"
+      "rail feature";
   }
 
   .workbench-quests {
@@ -2773,14 +2556,14 @@ body {
   }
 
   .quest-grid,
-  .quest-scoreboard {
+.quest-scoreboard {
     grid-template-columns: 1fr;
   }
 }
 
 @media (min-width: 96rem) {
   .home-workbench {
-    grid-template-columns: minmax(440px, 0.72fr) minmax(560px, 1.22fr) minmax(380px, 0.76fr);
+    grid-template-columns: minmax(360px, 0.72fr) minmax(0, 1.22fr) minmax(300px, 0.76fr);
     grid-template-areas:
       "quests tape rail"
       "quests markets feature";
@@ -2899,8 +2682,7 @@ body {
 }
 
 .page-shell:not(.prediction-home) > .hero,
-.mobile-shell:not(.prediction-home) > .mobile-page-head,
-.page-shell:not(.prediction-home) > .claim-detail-header {
+.mobile-shell:not(.prediction-home) > .mobile-page-head {
   border-left: var(--rule-hairline);
   border-top: 6px solid var(--color-accent);
   border-radius: var(--radius-sm);
@@ -2910,8 +2692,7 @@ body {
 }
 
 .page-shell:not(.prediction-home) > .hero::before,
-.mobile-shell:not(.prediction-home) > .mobile-page-head::before,
-.page-shell:not(.prediction-home) > .claim-detail-header::before {
+.mobile-shell:not(.prediction-home) > .mobile-page-head::before {
   content: "";
   display: block;
   width: 52px;
@@ -2938,13 +2719,10 @@ body {
 
 .section-title-sm,
 .prediction-card h2,
-.claim-panel h2,
 .route-panel h3,
 .workflow-card h3,
 .product-module h3,
-.claim-bundle-card h3,
-.paper-section h2,
-.blog-post-section h2 {
+.paper-section h2 {
   font-size: clamp(1.05rem, 1.15vw, 1.38rem);
 }
 
@@ -2953,11 +2731,6 @@ body {
 .workflow-card,
 .principle-card,
 .route-panel,
-.article-card,
-.claim-card,
-.claim-panel,
-.claim-detail-header,
-.claim-bundle-card,
 .wallet-panel,
 .tx-card,
 .toc-card,
@@ -2969,9 +2742,6 @@ body {
 .register-placeholder,
 .register-guide-card,
 .status-panel,
-.blog-feature-card,
-.blog-post-header,
-.blog-post-body,
 .quest-card,
 .market-chip,
 .market-row,
@@ -2991,19 +2761,13 @@ body {
 .route-panel,
 .prediction-card,
 .surface,
-.paper-section,
-.blog-feature-card,
-.blog-post-header,
-.blog-post-body {
+.paper-section {
   overflow: clip;
 }
 
 .market-chip,
 .market-row,
 .predictor-row,
-.claim-card,
-.article-card,
-.curator-card,
 .quest-card,
 .prediction-card {
   background:
@@ -3051,19 +2815,18 @@ body {
 
 @media (min-width: 72rem) {
   .page-shell:not(.prediction-home),
-  .mobile-shell:not(.prediction-home) {
+.mobile-shell:not(.prediction-home) {
     grid-template-columns: minmax(420px, 0.28fr) minmax(0, 1fr);
   }
 
   .page-shell:not(.prediction-home) > .hero,
-  .mobile-shell:not(.prediction-home) > .mobile-page-head,
-  .page-shell:not(.prediction-home) > .claim-detail-header {
+.mobile-shell:not(.prediction-home) > .mobile-page-head {
     min-height: calc(100dvh - 156px);
     padding: clamp(28px, 2.4vw, 48px);
   }
 
   .page-shell:not(.prediction-home) > .hero,
-  .mobile-shell:not(.prediction-home) > .mobile-page-head {
+.mobile-shell:not(.prediction-home) > .mobile-page-head {
     grid-row: 1 / span 16;
   }
 
@@ -3073,7 +2836,7 @@ body {
   }
 
   .page-shell:not(.prediction-home) > .hero .hero-actions,
-  .mobile-shell:not(.prediction-home) > .mobile-page-head .mobile-hero-actions {
+.mobile-shell:not(.prediction-home) > .mobile-page-head .mobile-hero-actions {
     margin-top: auto;
   }
 
@@ -3082,10 +2845,11 @@ body {
   }
 
   .home-workbench {
-    grid-template-columns: minmax(260px, 0.78fr) minmax(0, 1.38fr) minmax(260px, 0.74fr);
+    grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1.38fr);
     grid-template-areas:
-      "quests tape rail"
-      "quests markets feature";
+      "quests tape"
+      "quests markets"
+      "rail feature";
   }
 
   .workbench-tape {
@@ -3095,7 +2859,7 @@ body {
   }
 
   .workbench-feature,
-  .workbench-rail {
+.workbench-rail {
     position: static;
     top: auto;
   }
@@ -3105,8 +2869,7 @@ body {
   }
 
   .market-stack,
-  .predictor-list-large,
-  .claims-grid {
+.predictor-list-large {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -3157,26 +2920,15 @@ body {
     margin-top: 0;
   }
 
-  .claim-card {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.48fr);
-    align-items: center;
-    gap: var(--space-lg);
-  }
-
-  .whitepaper-layout,
   .compose-layout,
-  .register-layout,
-  .claim-detail-grid,
-  .article-detail,
-  .blog-post-shell {
+.register-layout {
     gap: var(--space-xl);
   }
 }
 
 @media (min-width: 112rem) {
   .page-shell:not(.prediction-home),
-  .mobile-shell:not(.prediction-home) {
+.mobile-shell:not(.prediction-home) {
     grid-template-columns: minmax(500px, 0.26fr) minmax(0, 1fr);
   }
 

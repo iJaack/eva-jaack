@@ -83,7 +83,7 @@ export default function MarketsPage() {
                 <span className={statusClassName("forecast")}>Forecast</span>
               </div>
               <p className="market-boundary-note">
-                Showing {filteredMarkets.length} of {markets.length} markets. Odds are venue forecasts; final truth status lives in claim bundles and resolved thesis records.
+                Showing {filteredMarkets.length} of {markets.length} markets. Odds are venue forecasts; final truth status lives in resolved thesis records and fact signals.
               </p>
               <div className="desk-summary">
                 <div>

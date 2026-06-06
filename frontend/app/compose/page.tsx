@@ -177,7 +177,7 @@ function ComposeInner() {
                 <span>{identity.xHandle}</span>
                 <span>{identity.walletSource} wallet</span>
               </div>
-              {!identityReady ? <p className="claim-warning">Connect X and a wallet before publishing a thesis.</p> : null}
+              {!identityReady ? <p className="form-warning">Connect X and a wallet before publishing a thesis.</p> : null}
               <label className="field-group">
                 <span className="field-label">Thesis title</span>
                 <input className="field-input" value={title} onChange={(event) => setTitle(event.target.value)} required />
@@ -215,7 +215,7 @@ function ComposeInner() {
                 <span className="field-label">Fact source URL</span>
                 <input className="field-input" value={factUrl} onChange={(event) => setFactUrl(event.target.value)} placeholder="https://..." />
               </label>
-              {error ? <p className="claim-warning">{error}</p> : null}
+              {error ? <p className="form-warning">{error}</p> : null}
               <button className="mobile-action mobile-action-primary compose-submit" type="submit" disabled={!canPublish}>
                 {submitting ? "Publishing..." : "Publish thesis"}
               </button>

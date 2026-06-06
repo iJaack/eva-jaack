@@ -1,1 +1,1 @@
-export { evaTrustGraphAbi } from "./generated/evaTrustGraphAbi";
+export { evaThesisProtocolAbi } from "./generated/evaThesisProtocolAbi";

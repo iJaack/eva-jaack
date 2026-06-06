@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("primary navigation stays focused while footer exposes secondary infrastructure", async ({ page }) => {
+test("primary navigation stays focused on the thesis product", async ({ page }) => {
   await page.goto("/");
 
   const header = page.locator("header.topbar");
@@ -16,27 +16,27 @@ test("primary navigation stays focused while footer exposes secondary infrastruc
 
   await expect(header.getByRole("link", { name: "Markets" })).toBeVisible();
   await expect(header.getByRole("link", { name: "Compose" })).toBeVisible();
-  await expect(header.getByRole("link", { name: "Evidence" })).toBeVisible();
   await expect(header.getByRole("link", { name: "Predictors" })).toBeVisible();
-  await expect(header.getByRole("link", { name: "Claims" })).toBeVisible();
-  await expect(header.getByRole("link", { name: "Register" })).toBeVisible();
-  await expect(header.getByRole("link", { name: "Sources" })).toHaveCount(0);
+  await expect(header.getByRole("link", { name: "Evidence" })).toHaveCount(0);
+  await expect(header.getByRole("link", { name: "Claims" })).toHaveCount(0);
+  await expect(header.getByRole("link", { name: "Register" })).toHaveCount(0);
 
   const loop = page.locator(".participation-dock");
   if (isMobile) {
-    await expect(loop.getByText("Pick · call · verify · resolve · rank")).toBeHidden();
+    await expect(loop.getByText("Find signals · write thesis · track history · build record")).toBeHidden();
   } else {
-    await expect(loop.getByText("Pick · call · verify · resolve · rank")).toBeVisible();
+    await expect(loop.getByText("Find signals · write thesis · track history · build record")).toBeVisible();
   }
-  await expect(loop.getByRole("link", { name: /1 Pick/ })).toBeVisible();
-  await expect(loop.getByRole("link", { name: "Start loop" })).toBeVisible();
+  await expect(loop.getByRole("link", { name: /1 Find/ })).toBeVisible();
+  await expect(loop.getByRole("link", { name: "Start thesis" })).toBeVisible();
 
   const footer = page.locator("footer.site-footer");
-  await expect(footer.getByText("pick markets, publish calls, verify evidence, earn reputation")).toBeVisible();
-  await expect(footer.getByRole("link", { name: "Verify" })).toBeVisible();
-  await expect(footer.getByRole("link", { name: "Claims" })).toBeVisible();
-  await expect(footer.getByRole("link", { name: "Reference" })).toBeVisible();
-  await expect(footer.getByRole("link", { name: "Register" })).toBeVisible();
+  await expect(footer.getByText("publish evolving thesis posts from prediction markets and facts")).toBeVisible();
+  await expect(footer.getByRole("link", { name: "Markets" })).toBeVisible();
+  await expect(footer.getByRole("link", { name: "Compose" })).toBeVisible();
+  await expect(footer.getByRole("link", { name: "Predictors" })).toBeVisible();
+  await expect(footer.getByRole("link", { name: "Verify" })).toHaveCount(0);
+  await expect(footer.getByRole("link", { name: "Claims" })).toHaveCount(0);
   await expect(footer.getByRole("link", { name: "GitHub" })).toBeVisible();
 });
 

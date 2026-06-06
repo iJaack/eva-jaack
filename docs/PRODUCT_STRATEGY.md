@@ -1,85 +1,43 @@
-# Eva Protocol Product Strategy
+# Product Strategy
 
-> Strategy inputs from the completed research pass, converted into product rules for docs, blog,
-> GTM, and autonomy work.
+## Product Thesis
 
-## Strategic decision
+Eva should make public prediction work feel like an interactive blog post instead of a single market
+link. The post is the product object: a broad thesis made from multiple prediction markets, fact
+signals, second/third-order effects, and a visible change history.
 
-Eva should not launch as a real-money exchange. V1 should be an X-native prediction reputation and
-evidence layer.
+## Wedge
 
-The product should help users:
+The SpaceX IPO liquidity rotation thesis is the test case. It should show that one public argument
+can combine:
 
-- Turn market arguments into structured theses.
-- Attach reusable claim bundles and evidence.
-- Separate market odds from truth status.
-- Build predictor and curator reputation through ERC-8004-linked identity.
-- Resolve outcomes with explicit sources and dispute windows.
+- a primary IPO timing market
+- private-market liquidity facts
+- adjacent risk-market signals
+- lateral or second-order effects
+- closed predictions and actual facts after they resolve
+- revisions that preserve prior state
 
-## Claim bundle schema
+## Users
 
-Every structured claim bundle should be able to express:
+- Public predictors who want to explain a broad thesis, then post it to X.
+- Analysts who want a living memo tied to market odds.
+- Agents that need a structured object for forecasts, facts, revisions, and citations.
 
-- claim
-- deadline
-- resolution source
-- evidence
-- identity
-- conflicts
-- resolver
-- dispute window
-- outcome
+## Non-Goals
 
-The bundle can start offchain. Promotion into reputation should happen only after resolution and an
-explicit adapter boundary.
+- Native trading.
+- Sports markets in the current market loader.
+- Curator onboarding.
+- Article verification.
+- Claim staking, challenge windows, or settlement.
+- Platform blog/whitepaper marketing.
 
-## Status taxonomy
+## Design Rules
 
-Use these statuses in product copy and docs:
-
-- `forecast`
-- `unresolved`
-- `verified`
-- `disputed`
-- `resolved`
-- `void`
-
-Market odds are a price signal. They are not a truth status.
-
-## V1 market-loading policy
-
-The market desk should load open provider markets broadly so predictors can find the market they
-want to discuss. For now, exclude sports markets from the loaded provider feed.
-
-Founder-approved examples and public launch posts should still prefer clear resolution sources,
-limited harm surfaces, and events where evidence quality matters more than spectacle.
-
-Do not imply Eva endorses a market just because it appears in the desk. Loaded markets are external
-forecast contexts, not truth claims.
-
-## x402 boundary
-
-x402 should be reserved for paid verification or API access after strict resource-bound request
-verification exists.
-
-Do not enforce or market x402 until the system can prove:
-
-- request authenticity
-- replay protection
-- resource limits
-- abuse controls
-- predictable failure states
-- honest user-facing payment metadata
-
-## Identity spine
-
-ERC-8004 is the identity and reputation spine. Eva app records may start with X identity or app
-identity, but durable trust should connect back to ERC-8004 where possible.
-
-## Copy rules
-
-- Say "market odds" when discussing price or implied probability.
-- Say "truth status" only when discussing evidence or resolution state.
-- Do not call an unresolved forecast true or false.
-- Do not imply Eva places trades, takes bets, or custodies funds.
-- Do not imply a resolved market is identical to verified truth if the resolution source is weak.
+- X plus wallet is the write identity.
+- Embedded wallets are acceptable when the user does not bring a wallet.
+- Market odds and factual truth status must stay separate.
+- Closed predictions can become historical evidence inside a thesis.
+- Every material thesis change should create a revision.
+- Agents must be able to inspect and create the same objects humans use.

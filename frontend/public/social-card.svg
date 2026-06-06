@@ -63,8 +63,8 @@
   </g>
 
   <text x="442" y="198" fill="#9BC5D0" font-family="Space Grotesk, Inter, sans-serif" font-size="34" font-weight="700" letter-spacing="4">EVA PROTOCOL</text>
-  <text x="442" y="286" fill="url(#text-fill)" font-family="Space Grotesk, Inter, sans-serif" font-size="78" font-weight="700">Trust graph core.</text>
-  <text x="442" y="366" fill="url(#text-fill)" font-family="Space Grotesk, Inter, sans-serif" font-size="78" font-weight="700">Distribution-native channels.</text>
-  <text x="442" y="438" fill="#B6CADB" font-family="Space Grotesk, Inter, sans-serif" font-size="30">Curators stake behind signal. Eva verifies claims. Reputation compounds on Avalanche.</text>
-  <text x="442" y="498" fill="#86A8BA" font-family="JetBrains Mono, ui-monospace, monospace" font-size="24">Trust graph • X verification market • ERC-8004 • $EVA</text>
+  <text x="442" y="286" fill="url(#text-fill)" font-family="Space Grotesk, Inter, sans-serif" font-size="78" font-weight="700">Evolving theses.</text>
+  <text x="442" y="366" fill="url(#text-fill)" font-family="Space Grotesk, Inter, sans-serif" font-size="78" font-weight="700">Prediction-market signals.</text>
+  <text x="442" y="438" fill="#B6CADB" font-family="Space Grotesk, Inter, sans-serif" font-size="30">Publish interactive market posts that update as odds, facts, and history change.</text>
+  <text x="442" y="498" fill="#86A8BA" font-family="JetBrains Mono, ui-monospace, monospace" font-size="24">X identity • wallet anchor • thesis history • Avalanche</text>
 </svg>

@@ -1,43 +1,43 @@
-# Eva Protocol Launch Truth Matrix
+# Launch Truth
 
-> Source-of-truth companion for `protocol.config.json`. Use this matrix before public copy,
-> launch notes, deployment smoke, or autonomous status reports describe a feature as live.
+## Live
 
-## Runtime Vocabulary
+| Area | Status |
+|---|---|
+| Site URL | `https://eva.jaack.me` |
+| Chain | Avalanche C-Chain (`43114`) |
+| Eva wallet | `0x0fe61780bd5508b3C99e420662050e5560608cA4` |
+| Eva agent ID | `1599` |
+| Thesis protocol | `0x5eDBd1eea3228662326e60634E53AB8975D6641c` |
+| First thesis | SpaceX IPO liquidity rotation thesis |
+| Market policy | Broad provider markets, sports excluded for now |
 
-| State | Meaning | Allowed copy |
-|---|---|---|
-| `disabled` | Config or deployed address is missing. | Staged, disabled, not available yet. |
-| `offchain-preview` | The product can preview behavior from local/offchain state, but cannot prepare or read the onchain action yet. | Preview-only, evidence record, offchain preflight. |
-| `prepared-transaction` | Backend can prepare unsigned calldata for a wallet or Evalanche signer. | Prepared transaction, user-signed action. |
-| `onchain-readback` | Backend can read deployed contract state for the feature. | Onchain readback, contract-backed status. |
-| `fully-executable` | The full user path is prepared, signed, broadcast, confirmed, and read back. | Executable live action. |
+## Current Product Claims
 
-Do not use "live" for a user action unless it is `fully-executable`, or unless the sentence names
-the narrower live surface explicitly, such as "contract addresses are deployed" or "readback is
-live."
+Eva can claim:
 
-## Current Matrix
+- it creates and displays evolving thesis posts
+- theses combine prediction-market and fact signals
+- thesis revisions preserve history
+- the app prepares thesis anchor transactions
+- the deployed thesis protocol exists on Avalanche
+- the app has MCP/agent-facing thesis tools
 
-| Surface | Current truth | User-action state | Evidence |
-|---|---|---|---|
-| Eva app | Production URL configured at `https://eva.jaack.me`. | Live site surface, still gated by deploy smoke. | `protocol.config.json`, `README.md` |
-| `EvaTrustGraph` | Deployed on Avalanche C-Chain and canonical for graph-backed identity/trust. | Onchain readback through backend trust/curator routes. | `protocol.config.json`, `contracts/deployments/mainnet.json` |
-| Prediction theses | Stored offchain as v1 product objects. | Offchain product flow. | `docs/ARCHITECTURE.md`, backend prediction routes |
-| External market links | Eva references external markets and odds context. | External-link-only, no custody or trade execution. | `docs/GO_TO_MARKET.md`, `README.md` |
-| Claim bundles | Stored offchain with evidence, packets, status, previews, and detail pages. | `offchain-preview` for market actions. | backend claim market service |
-| Verification market contracts | `EvaVerificationMarket` and adapter addresses are configured and recorded. | Contract deployment exists, but claim/stake/challenge actions are not executable from Eva yet. | `protocol.config.json`, `contracts/deployments/mainnet.json` |
-| Claim stake/challenge/settlement | Backend exposes preview endpoints. | `offchain-preview` until calldata preparation and onchain readback exist. | `/api/claims/*/stake-preview`, `/challenge-preview`, `/settlement-preview` |
-| Curator onboarding | Registration UI and preflight exist. | Production readiness depends on wallet gas, signer path, and route smoke. | `docs/ROADMAP.md`, `docs/CURATOR_ONBOARDING_FAQ.md` |
-| x402 | Disabled in config. | Not active. | `protocol.config.json` |
+Eva should not claim:
 
-## Launch Gates
+- native trade execution
+- guaranteed prediction accuracy
+- live sports coverage
+- curator onboarding
+- article verification
+- claim staking or settlement
+- x402 payment enforcement
+- traction, revenue, testimonials, or active user counts without measurement
 
-- Deployment owner and serving-deployment truth are confirmed.
-- Production env vars for signer, LLM/gateway, and storage are present.
-- Agent wallet has enough AVAX for gas.
-- Durable storage, analytics, and monitoring are confirmed.
-- Dynamic smoke IDs exist for article, curator, trust, claim, thesis, market, and predictor routes.
-- Public posts and external outreach have approval.
+## Launch Checks
 
-The launch gate is not closed until the smoke checks and docs agree with this matrix.
+- Home, markets, compose, thesis detail, predictors, and health routes load.
+- `/verify`, `/claims`, `/curators`, `/blog`, and `/whitepaper` are absent.
+- SpaceX thesis page shows market signals, fact signals, revision history, and anchor status.
+- Agent manifest and MCP endpoint respond.
+- Contract deployment config matches `protocol.config.json`.

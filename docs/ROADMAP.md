@@ -1,146 +1,107 @@
 # Eva Protocol Roadmap
 
-> Roadmap for turning Eva into a prediction and verification reputation layer without overstating
-> what is live today.
+## Milestone 1: Thesis Product Cutover
 
-## Operating principles
-
-- Ship one narrow trust or growth loop at a time.
-- Keep `EvaTrustGraph` as the durable reputation primitive.
-- Treat ERC-8004 as the identity and reputation spine.
-- Treat prediction theses as offchain v1 objects until resolved outcomes are robust enough to
-  promote into graph feedback.
-- Do not launch v1 as a real-money exchange.
-- Do not describe a feature as live unless the contract, API, frontend, deployment, and docs agree.
-- Public posts, external outreach, deploy changes, token operations, and legal or financial claims
-  need approval.
-
-## Milestone 1: Launch truth and docs foundation
-
-Goal: make the current product understandable and externally defensible before adding new scope.
+Goal: remove every public and runtime surface that is not part of evolving market theses.
 
 Atomic tasks:
 
-- Refresh architecture, README, and public docs around the current prediction-reputation boundary.
-- Add business-plan and GTM docs that separate assumptions from measured data.
-- Add platform blog posts explaining Eva without claiming traction or testimonials.
-- Document the evaprotocol-ceo autonomy loop and cron/update guidance.
-- Capture exact proposed OpenClaw agent-file changes without writing outside the repo.
+- Keep only home, markets, market detail, compose, thesis detail, predictors, and predictor detail.
+- Keep only market, thesis, predictor, X ingest, copy preview, thesis anchor, MCP, health, and agent manifest APIs.
+- Keep only `EvaThesisProtocol` in contracts and generated ABIs.
+- Rewrite README, architecture, launch truth, roadmap, and smoke checks around the thesis product.
+- Preserve the SpaceX IPO liquidity rotation thesis as the proof object.
 
-Regression and unit checks:
+Checks and regressions:
 
-- Check docs for live/future wording conflicts.
-- Check `protocol.config.json` against docs for chain, addresses, market flags, and x402 status.
-- Run TypeScript or lint checks for edited content sources when blog code changes.
+- Backend typecheck and unit tests.
+- Frontend typecheck and E2E tests for navigation, market loading, compose, thesis detail, and predictors.
+- Contract tests for thesis creation, signal anchoring, revisions, and deployment config.
+- Browser screenshots for desktop and mobile layouts.
+- Text scan for removed routes and product claims.
 
-Milestone 1 is not complete until wording regressions and content-source syntax bugs are fixed.
+Milestone 1 is not complete until discovered regressions are fixed.
 
-## Milestone 2: Conversion-ready curator onboarding
+## Milestone 2: Identity And Wallet Readiness
 
-Goal: make curator activation measurable and usable before broad promotion.
-
-Atomic tasks:
-
-- Confirm the production deploy flow and serving deployment.
-- Confirm required Vercel env vars for signing, verification, and durable storage.
-- Confirm the agent wallet has enough AVAX for gas before live onchain writes.
-- Add or verify onboarding analytics events for wallet connect, preflight, approval need,
-  transaction broadcast, confirmation, and failure.
-- Keep `/curators`, `/curators/register`, and `/curators/faq` copy aligned with actual backend
-  behavior.
-
-Regression and unit checks:
-
-- Backend route tests for curator list, curator detail, registration preflight, trust reads, and
-  verify.
-- Frontend E2E for the curator registration happy path and visible failure states.
-- Deployment smoke for `/`, `/curators`, `/curators/register`, `/api/curators`, `/api/verify`,
-  `/api/trust/<address>`, and `/.well-known/agent.json`.
-
-Milestone 2 is not complete until the app can distinguish "not ready to register" from "backend or
-deployment broken."
-
-## Milestone 3: Prediction thesis loop
-
-Goal: make public market calls reusable, counterable, and measurable.
+Goal: make X plus wallet connection production-ready without changing the thesis data model.
 
 Atomic tasks:
 
-- Stabilize market, thesis, predictor, and claim bundle data contracts.
-- Add claim-bundle fields for claim, deadline, resolution source, evidence, identity, conflicts,
-  resolver, dispute window, and outcome.
-- Add status taxonomy across product and copy: `forecast`, `unresolved`, `verified`, `disputed`,
-  `resolved`, and `void`.
-- Separate market odds from truth status everywhere users inspect or copy a thesis.
-- Support X-originated and web-originated thesis creation without requiring trade execution.
-- Make copy and counter actions explicit about external-link-only behavior.
-- Define resolution states and the boundary for promoting resolved outcomes into reputation.
-- Prepare founder-approved X content templates that point to concrete thesis pages.
+- Select auth/wallet provider for X login plus embedded wallet creation.
+- Prefer free or generous-start providers first; evaluate Privy, Dynamic, Web3Auth, and Coinbase Developer Platform.
+- Map provider user IDs into `ThesisAuthorDto.dynamicUserId`.
+- Support both injected wallets and embedded wallets.
+- Add explicit wallet-source display and failure states.
 
-Regression and unit checks:
+Checks and regressions:
 
-- Backend tests for market, thesis, predictor, X ingest, and copy-preview APIs.
-- Frontend E2E for mobile market feed, thesis compose, market detail, predictor profiles, and copy
-  or counter flows.
-- Content review confirming no copy implies Eva executes trades or guarantees outcomes.
-- Market-loading review confirming provider markets load broadly, sports markets stay excluded for
-  now, and public examples do not imply Eva endorsement or truth status.
+- Unit tests for identity validation and author normalization.
+- Frontend E2E for external wallet, embedded wallet, missing X, missing wallet, and wrong-chain states.
+- Browser screenshots for connected and disconnected compose states.
+- Security review for identity spoofing and wallet-source trust boundaries.
 
-Milestone 3 is not complete until a user can understand a thesis page, its evidence, and what Eva
-does not do.
+Milestone 2 is not complete until invalid identity states cannot publish.
 
-## Milestone 4: Evidence and verification depth
+## Milestone 3: Agent-Ready Thesis Creation
 
-Goal: make verification outputs useful enough to support prediction arguments and curator trust.
+Goal: let agents create, revise, inspect, and anchor theses safely.
 
 Atomic tasks:
 
-- Harden `POST /api/verify` response consistency and error states.
-- Ensure report persistence is durable in production before relying on report links publicly.
-- Link evidence, claims, articles, theses, and curator actions into one inspectable record.
-- Decide whether x402 remains in scope; if yes, implement request verification before enforcing
-  paid verification/API access.
-- Bound x402 by resource limits, replay protection, request signing, and abuse controls before any
-  paid-access launch.
-- Document claim bundle semantics: evidence, dependency, contradiction, resolution, and provenance.
+- Stabilize MCP tool schemas for thesis creation, revision, market lookup, predictor lookup, and anchor preparation.
+- Add an Eva onboarding skill for agent developers.
+- Document required fields, source discipline, signal roles, and revision notes.
+- Add deterministic examples using the SpaceX IPO thesis.
+- Add bounded write permissions for agents.
 
-Regression and unit checks:
+Checks and regressions:
 
-- Backend tests for verify, article list, article detail, storage provider behavior, and trust tags.
-- E2E for verify and article detail pages.
-- Smoke checks against production-like storage configuration.
+- MCP schema validation tests.
+- Backend route tests for all agent-facing endpoints.
+- Dry-run agent workflow that creates a thesis draft and prepares anchor calldata.
+- Text scan to ensure agents do not receive stale curator/verification instructions.
 
-Milestone 4 is not complete until a verification report can be retrieved after deploy/restart in
-the intended production environment.
+Milestone 3 is not complete until a new agent can onboard from docs and create a valid thesis object.
 
-## Milestone 5: Additive market and reputation adapter
+## Milestone 4: Thesis Evolution And History
 
-Goal: add native verification-market mechanics only after the thesis and verification loops prove
-useful.
+Goal: make changing markets and facts visibly evolve the interactive post.
 
 Atomic tasks:
 
-- Deploy market and reputation-adapter modules as additive contracts, not replacements for
-  `EvaTrustGraph`.
-- Wire funding, staking, challenge, settlement, and reward claim flows behind rollout flags.
-- Promote only durable resolved outcomes into reputation feedback.
-- Publish operational playbooks for resolver, treasury, and dispute handling.
+- Add revision creation UI.
+- Add closed-market and resolved-fact signal states.
+- Add score deltas by revision.
+- Add timeline filters for created, revised, signal updated, anchored, and resolved.
+- Add share text that points to the current thesis while preserving history.
 
-Regression and unit checks:
+Checks and regressions:
 
-- Contract tests for funding, staking, settlement, challenge windows, reward claims, and adapter
-  writes.
-- Backend and frontend tests for rollout flags and disabled states.
-- Security review before production activation.
+- Unit tests for revision immutability and score snapshots.
+- Frontend E2E for creating and viewing revisions.
+- Browser screenshots of initial and revised thesis states.
+- Regression checks that prior revision bodies and signal snapshots cannot be overwritten.
 
-Milestone 5 is not complete until disabled-state behavior is as well tested as enabled-state
-behavior.
+Milestone 4 is not complete until history is inspectable and immutable.
 
-## Open gates
+## Milestone 5: Production Deployment And First Thesis Ops
 
-- Deploy ownership and serving-deployment truth
-- Production env vars for signing, LLM/gateway, and storage
-- Agent wallet gas funding
-- Analytics and monitoring access
-- Durable storage choice for verification reports
-- Approval path for public posts and external outreach
+Goal: publish the narrowed product and operate the SpaceX IPO thesis as the first canonical post.
+
+Atomic tasks:
+
+- Run full local checks.
+- Run deployment smoke against the target URL.
+- Confirm deployer wallet before any transaction requiring approval.
+- Publish or update the SpaceX IPO thesis from the same deployer wallet.
+- Verify the live thesis page, anchor status, and explorer links.
+
+Checks and regressions:
+
+- Production smoke for home, markets, SpaceX market, SpaceX thesis, predictors, health, and agent manifest.
+- Browser screenshots against production desktop and mobile.
+- Contract readback for `EvaThesisProtocol`.
+- Final text scan for removed old-product claims.
+
+Milestone 5 is not complete until the deployed app and onchain/source-of-truth data agree.

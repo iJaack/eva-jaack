@@ -28,7 +28,7 @@ Default editable scope for docs/content/autonomy work:
 - `docs/**`
 - `README.md`
 - root `AGENTS.md`
-- blog content source, currently `frontend/lib/blog.ts`
+- agent onboarding docs and MCP skill docs
 
 Avoid edits to frontend behavior, backend behavior, contracts, generated files, package manifests,
 or lockfiles unless the user explicitly assigns that scope.
