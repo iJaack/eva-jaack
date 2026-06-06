@@ -38,6 +38,12 @@ function normalizeString(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+function normalizeTxHash(value: unknown): `0x${string}` | null {
+  const normalized = normalizeString(value);
+  if (!normalized || !/^0x[a-fA-F0-9]{64}$/.test(normalized)) return null;
+  return normalized as `0x${string}`;
+}
+
 function normalizeNumber(value: unknown): number | null {
   if (typeof value === "number") return Number.isFinite(value) ? value : null;
   if (typeof value === "string" && value.trim()) {
@@ -179,9 +185,22 @@ export function createPredictionRoutes(
         return c.json({ error: "Prepared anchor does not match current thesis draft" }, 400);
       }
 
+      const anchorTxHash = normalizeTxHash(body.anchorTxHash);
+      if (!anchorTxHash) {
+        return c.json({ error: "Submit anchor transaction before publishing thesis" }, 400);
+      }
+
       const response = await deps.predictions.createThesis(input);
+      const anchored = await deps.predictions.markThesisAnchorSubmitted(response.thesis.thesisId, anchorTxHash);
       if (response.created) draftAnchors.delete(anchorPreparationId);
-      return c.json<ThesisCreateResponse>(response, response.created ? 201 : 200);
+      return c.json<ThesisCreateResponse>(
+        {
+          created: response.created,
+          thesis: anchored?.thesis ?? response.thesis,
+          markets: anchored?.markets ?? response.markets,
+        },
+        response.created ? 201 : 200,
+      );
     } catch (error) {
       return c.json({ error: error instanceof Error ? error.message : "Failed to create thesis" }, 400);
     }
@@ -288,10 +307,16 @@ export function createPredictionRoutes(
         return c.json({ error: "Prepared anchor does not match current thesis update" }, 400);
       }
 
+      const anchorTxHash = normalizeTxHash(body.anchorTxHash);
+      if (!anchorTxHash) {
+        return c.json({ error: "Submit anchor transaction before publishing thesis update" }, 400);
+      }
+
       const response = await deps.predictions.recordRevision(c.req.param("thesisId"), input);
       if (!response) return c.json({ error: "Thesis not found" }, 404);
+      const anchored = await deps.predictions.markCurrentRevisionAnchorSubmitted(response.thesis.thesisId, anchorTxHash);
       revisionAnchors.delete(anchorPreparationId);
-      return c.json<ThesisDetailResponse>(response);
+      return c.json<ThesisDetailResponse>(anchored ?? response);
     } catch (error) {
       return c.json({ error: error instanceof Error ? error.message : "Failed to revise thesis" }, 400);
     }

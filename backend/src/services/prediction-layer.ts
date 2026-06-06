@@ -255,6 +255,16 @@ function confirmedAnchor(txHash: `0x${string}`, confirmedAt: string): ThesisAnch
   };
 }
 
+function submittedAnchor(txHash: `0x${string}`, submittedAt: string): ThesisAnchorDto {
+  return {
+    status: "submitted",
+    txHash,
+    contractAddress: config.evaThesisProtocol,
+    preparedAt: submittedAt,
+    confirmedAt: null,
+  };
+}
+
 function normalizeHandle(handle: string): string {
   const trimmed = handle.trim();
   if (!trimmed) throw new Error("Connected X identity and wallet are required");
@@ -1097,6 +1107,53 @@ export class LocalPredictionLayerService {
       scoreBefore,
       scoreAfter: thesis.currentScore,
     });
+    await this.writeStore(store);
+    return this.getThesis(thesis.thesisId);
+  }
+
+  async markThesisAnchorSubmitted(thesisId: string, txHash: `0x${string}`): Promise<ThesisDetailResponse | null> {
+    const store = await this.readStore();
+    const thesis = store.theses.find((entry) => entry.thesisId === thesisId || entry.slug === thesisId);
+    if (!thesis) return null;
+
+    const now = new Date().toISOString();
+    const anchor = submittedAnchor(txHash, now);
+    thesis.anchor = anchor;
+    thesis.currentRevision = { ...thesis.currentRevision, anchor };
+    thesis.revisions = thesis.revisions.map((revision) => (revision.revisionId === thesis.currentRevision.revisionId ? { ...revision, anchor } : revision));
+    thesis.updatedAt = now;
+    thesis.timeline.push({
+      timelineId: `tl-${stableHash({ thesisId, txHash, action: "anchored-submitted" })}`,
+      action: "anchored",
+      at: now,
+      note: "Anchor transaction submitted.",
+      scoreBefore: null,
+      scoreAfter: thesis.currentScore,
+    });
+
+    await this.writeStore(store);
+    return this.getThesis(thesis.thesisId);
+  }
+
+  async markCurrentRevisionAnchorSubmitted(thesisId: string, txHash: `0x${string}`): Promise<ThesisDetailResponse | null> {
+    const store = await this.readStore();
+    const thesis = store.theses.find((entry) => entry.thesisId === thesisId || entry.slug === thesisId);
+    if (!thesis) return null;
+
+    const now = new Date().toISOString();
+    const anchor = submittedAnchor(txHash, now);
+    thesis.currentRevision = { ...thesis.currentRevision, anchor };
+    thesis.revisions = thesis.revisions.map((revision) => (revision.revisionId === thesis.currentRevision.revisionId ? { ...revision, anchor } : revision));
+    thesis.updatedAt = now;
+    thesis.timeline.push({
+      timelineId: `tl-${stableHash({ thesisId, revisionId: thesis.currentRevision.revisionId, txHash, action: "revision-anchor-submitted" })}`,
+      action: "anchored",
+      at: now,
+      note: `Revision v${thesis.currentRevision.version} anchor transaction submitted.`,
+      scoreBefore: null,
+      scoreAfter: thesis.currentScore,
+    });
+
     await this.writeStore(store);
     return this.getThesis(thesis.thesisId);
   }

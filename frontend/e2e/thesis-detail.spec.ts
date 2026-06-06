@@ -255,12 +255,14 @@ test("publishing an update appends it to the thesis and creates the next revisio
   await expect(publishButton).toBeDisabled();
   await page.getByRole("button", { name: "Prepare update anchor" }).click();
   await expect(page.getByRole("status")).toContainText("1 update anchor transaction prepared.");
+  await expect(publishButton).toBeDisabled();
+  await page.getByLabel("Update anchor transaction hash").fill("0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
   await expect(publishButton).toBeEnabled();
   await publishButton.click();
 
   expect(preparedRevisionPayloads).toHaveLength(1);
   expect(String(preparedRevisionPayloads[0].body)).toContain("Rates market repriced after CPI");
-  expect(revisionPayloads).toHaveLength(1);
+  await expect.poll(() => revisionPayloads.length).toBe(1);
   expect(revisionPayloads[0]).toMatchObject({
     dynamicUserId: author.dynamicUserId,
     xHandle: author.xHandle,
@@ -268,6 +270,7 @@ test("publishing an update appends it to the thesis and creates the next revisio
     walletSource: author.walletSource,
     note: "CPI update moved signal.",
     anchorPreparationId: "revision-anchor-detail-1",
+    anchorTxHash: "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   });
   expect(String(revisionPayloads[0].body)).toContain("Inflation prints are not soft enough");
   expect(String(revisionPayloads[0].body)).toContain("Rates market repriced after CPI");

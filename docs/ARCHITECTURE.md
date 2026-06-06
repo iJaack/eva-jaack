@@ -73,15 +73,15 @@ author shape.
 2. User writes a thesis body and attaches market/fact signals.
 3. Backend validates identity and previews the thesis without storing it.
 4. Eva prepares Avalanche anchor transactions for the thesis and signals.
-5. Publishing stays disabled until the prepared anchor matches the current draft.
-6. Eva stores the anchored thesis as revision 1 and renders the thesis page with markets, facts, score, and history.
+5. Publishing stays disabled until the prepared anchor matches the current draft and a submitted transaction hash is recorded.
+6. Eva stores the submitted-anchor thesis as revision 1 and renders the thesis page with markets, facts, score, and history.
 
 ### Evolve A Thesis
 
 1. Market odds, closed predictions, or facts change.
 2. User or agent prepares a revision draft with signal updates.
 3. Eva prepares the revision anchor transaction and keeps the current thesis unchanged.
-4. Publishing the update requires the matching prepared revision anchor.
+4. Publishing the update requires the matching prepared revision anchor and submitted transaction hash.
 5. Eva appends immutable revision/timeline entries.
 6. Readers can inspect how the thesis changed over time.
 

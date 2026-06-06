@@ -33,10 +33,10 @@ Milestone UX:
    Eva checks missing identity, missing wallet, invalid source URLs, empty body, unsourced facts, unsupported outcomes, and missing anchor preparation.
 
 6. Anchor
-   Eva prepares the protocol anchor and requires the wallet approval path before the draft can become public.
+   Eva prepares the protocol anchor, requires the wallet approval path, and records the submitted transaction hash before the draft can become public.
 
 7. Publish
-   Eva stores the anchored thesis and creates revision 1.
+   Eva stores the submitted-anchor thesis and creates revision 1.
 
 8. Share
    Eva produces X-native copy and a durable thesis URL.
@@ -55,6 +55,7 @@ Milestone UX:
 - Wallet missing.
 - Anchor missing.
 - Anchor prepared.
+- Anchor transaction submitted.
 - Publish pending.
 - Publish failed.
 - Published successfully.
@@ -177,7 +178,7 @@ Avoid:
 - Inserting a signal must update the draft immediately.
 - Removing a signal must ask only if it would delete body text, not if it only detaches metadata.
 - Publish must be disabled with a visible reason, not silently inactive.
-- Publishing must stay disabled until anchor preparation succeeds.
+- Publishing must stay disabled until anchor preparation succeeds and the submitted transaction hash is recorded.
 - Source selection should use real outcomes from the selected market, not free text.
 - Long market names must truncate in controls but expand in source cards.
 - Mobile users must be able to switch between Write, Sources, Preview, and History without losing scroll position.

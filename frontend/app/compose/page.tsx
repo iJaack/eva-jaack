@@ -77,6 +77,10 @@ function DynamicIdentityLoader({ onIdentity }: { onIdentity: (identity: ThesisId
   return <Bridge onIdentity={onIdentity} />;
 }
 
+function isTxHash(value: string): boolean {
+  return /^0x[a-fA-F0-9]{64}$/.test(value.trim());
+}
+
 function ComposeInner() {
   const searchParams = useSearchParams();
   const [markets, setMarkets] = useState<PredictionMarket[]>([]);
@@ -90,6 +94,7 @@ function ComposeInner() {
   const [attachedSignals, setAttachedSignals] = useState<AttachedSignal[]>([]);
   const [anchorPrepared, setAnchorPrepared] = useState(false);
   const [anchorPreparationId, setAnchorPreparationId] = useState<string | null>(null);
+  const [anchorTxHash, setAnchorTxHash] = useState("");
   const [draftState, setDraftState] = useState("Private draft");
   const [created, setCreated] = useState<Thesis | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -113,14 +118,17 @@ function ComposeInner() {
   const dynamicRequired = Boolean(process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID);
   const usingPreviewIdentity = identity.dynamicUserId === defaultIdentity.dynamicUserId;
   const identityReady = !dynamicRequired || !usingPreviewIdentity;
-  const canPublish = Boolean(title.trim() && body.trim() && attachedSignals.length > 0 && identityReady && anchorPrepared && anchorPreparationId && !submitting && !preparingAnchor);
+  const anchorSubmitted = isTxHash(anchorTxHash);
+  const canPublish = Boolean(title.trim() && body.trim() && attachedSignals.length > 0 && identityReady && anchorPrepared && anchorPreparationId && anchorSubmitted && !submitting && !preparingAnchor);
   const publishBlocker = preparingAnchor
     ? "Preparing anchor"
     : !anchorPrepared || !anchorPreparationId
       ? "Prepare anchor before publishing"
-      : !attachedSignals.length
-        ? "Attach at least one signal before publishing"
-        : null;
+      : !anchorSubmitted
+        ? "Submit anchor transaction before publishing"
+        : !attachedSignals.length
+          ? "Attach at least one signal before publishing"
+          : null;
   const nextSignalLabel = `S${attachedSignals.length + 1}`;
 
   const marketSignalText = selectedMarket
@@ -140,6 +148,7 @@ function ComposeInner() {
     setDraftState(nextDraftState);
     setAnchorPrepared(false);
     setAnchorPreparationId(null);
+    setAnchorTxHash("");
   };
 
   const updateTitle = (nextTitle: string) => {
@@ -227,7 +236,7 @@ function ComposeInner() {
     setDraftState("Private draft saved");
   };
 
-  const thesisPayload = (): Omit<ThesisCreateRequest, "anchorPreparationId"> => ({
+  const thesisPayload = (): Omit<ThesisCreateRequest, "anchorPreparationId" | "anchorTxHash"> => ({
     ...identity,
     title,
     body,
@@ -274,6 +283,7 @@ function ComposeInner() {
       const prepared = await prepareDraftThesisAnchor(thesisPayload());
       setAnchorPreparationId(prepared.anchorPreparationId);
       setAnchorPrepared(true);
+      setAnchorTxHash("");
       setDraftState("Anchor prepared");
     } catch (reason) {
       setAnchorPrepared(false);
@@ -296,6 +306,7 @@ function ComposeInner() {
       const response = await createThesis({
         ...thesisPayload(),
         anchorPreparationId: anchorPreparationId ?? undefined,
+        anchorTxHash: anchorTxHash.trim(),
       });
       setCreated(response.thesis);
     } catch (reason) {
@@ -398,6 +409,12 @@ function ComposeInner() {
                 </button>
               </div>
 
+              {anchorPrepared ? (
+                <label className="field-group">
+                  <span className="field-label">Anchor transaction hash</span>
+                  <input className="field-input" value={anchorTxHash} onChange={(event) => setAnchorTxHash(event.target.value)} placeholder="0x..." />
+                </label>
+              ) : null}
               <div className="compose-publish-gate">
                 {publishBlocker ? <span>{publishBlocker}</span> : <span>Anchor prepared</span>}
                 <button className="mobile-action mobile-action-primary compose-submit" type="submit" disabled={!canPublish}>

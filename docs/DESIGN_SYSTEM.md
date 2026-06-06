@@ -130,6 +130,7 @@ Required states:
 - validation failed,
 - anchor missing,
 - anchor prepared,
+- anchor transaction submitted,
 - publish pending,
 - published.
 

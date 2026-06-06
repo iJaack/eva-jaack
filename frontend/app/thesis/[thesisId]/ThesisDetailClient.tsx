@@ -41,6 +41,10 @@ function thesisBodyParagraphs(body: string): string[] {
   return body.split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean);
 }
 
+function isTxHash(value: string): boolean {
+  return /^0x[a-fA-F0-9]{64}$/.test(value.trim());
+}
+
 export default function ThesisDetailClient() {
   const params = useParams();
   const thesisId = params.thesisId as string;
@@ -52,6 +56,7 @@ export default function ThesisDetailClient() {
   const [updateState, setUpdateState] = useState<string | null>(null);
   const [updatePending, setUpdatePending] = useState(false);
   const [revisionAnchorPreparationId, setRevisionAnchorPreparationId] = useState<string | null>(null);
+  const [revisionAnchorTxHash, setRevisionAnchorTxHash] = useState("");
   const [revisionAnchorPending, setRevisionAnchorPending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -104,6 +109,7 @@ export default function ThesisDetailClient() {
 
   const resetRevisionAnchor = () => {
     setRevisionAnchorPreparationId(null);
+    setRevisionAnchorTxHash("");
     setUpdateState(null);
   };
 
@@ -119,6 +125,7 @@ export default function ThesisDetailClient() {
       const prepared = await prepareThesisRevisionAnchor(detail.thesis.thesisId, input);
       const transactionLabel = prepared.transactions.length === 1 ? "transaction" : "transactions";
       setRevisionAnchorPreparationId(prepared.anchorPreparationId);
+      setRevisionAnchorTxHash("");
       setUpdateState(`${prepared.transactions.length} update anchor ${transactionLabel} prepared.`);
     } catch (reason) {
       setRevisionAnchorPreparationId(null);
@@ -138,16 +145,21 @@ export default function ThesisDetailClient() {
       setUpdateState("Prepare update anchor before publishing.");
       return;
     }
+    if (!isTxHash(revisionAnchorTxHash)) {
+      setUpdateState("Submit update anchor transaction before publishing.");
+      return;
+    }
 
     setUpdatePending(true);
     setUpdateState(null);
 
     try {
-      const response = await recordThesisRevision(detail.thesis.thesisId, { ...input, anchorPreparationId: revisionAnchorPreparationId });
+      const response = await recordThesisRevision(detail.thesis.thesisId, { ...input, anchorPreparationId: revisionAnchorPreparationId, anchorTxHash: revisionAnchorTxHash.trim() });
       setDetail(response);
       setUpdateBody("");
       setUpdateNote("");
       setRevisionAnchorPreparationId(null);
+      setRevisionAnchorTxHash("");
       setUpdateState(`Published update v${response.thesis.currentRevision.version}.`);
     } catch (reason) {
       setRevisionAnchorPreparationId(null);
@@ -157,7 +169,7 @@ export default function ThesisDetailClient() {
     }
   };
 
-  const revisionPublishReady = Boolean(updateBody.trim() && revisionAnchorPreparationId && !updatePending && !revisionAnchorPending);
+  const revisionPublishReady = Boolean(updateBody.trim() && revisionAnchorPreparationId && isTxHash(revisionAnchorTxHash) && !updatePending && !revisionAnchorPending);
 
   return (
     <>
@@ -307,6 +319,12 @@ export default function ThesisDetailClient() {
                     }}
                   />
                 </label>
+                {revisionAnchorPreparationId ? (
+                  <label className="field-group">
+                    <span className="field-label">Update anchor transaction hash</span>
+                    <input className="field-input" value={revisionAnchorTxHash} onChange={(event) => setRevisionAnchorTxHash(event.target.value)} placeholder="0x..." />
+                  </label>
+                ) : null}
                 <div className="thesis-update-actions">
                   <button className="mobile-action" type="button" onClick={prepareUpdateAnchor} disabled={revisionAnchorPending || updatePending || !updateBody.trim()}>
                     {revisionAnchorPending ? "Preparing..." : "Prepare update anchor"}

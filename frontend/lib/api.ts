@@ -94,6 +94,7 @@ export type ThesisCreateRequest = {
   sourcePostUrl?: string;
   counterToThesisId?: string;
   anchorPreparationId?: string;
+  anchorTxHash?: string;
 };
 
 export async function createThesis(input: ThesisCreateRequest): Promise<ThesisCreateResponse> {
@@ -106,7 +107,7 @@ export async function createThesis(input: ThesisCreateRequest): Promise<ThesisCr
   });
 }
 
-export async function prepareDraftThesisAnchor(input: Omit<ThesisCreateRequest, "anchorPreparationId">): Promise<{
+export async function prepareDraftThesisAnchor(input: Omit<ThesisCreateRequest, "anchorPreparationId" | "anchorTxHash">): Promise<{
   anchorPreparationId: string;
   thesisId: string;
   anchorStatus: "prepared";
@@ -139,6 +140,7 @@ export async function recordThesisRevision(
       resolvedOutcomeLabel?: string;
     }>;
     anchorPreparationId?: string;
+    anchorTxHash?: string;
   },
 ): Promise<ThesisDetailResponse> {
   return fetchJson<ThesisDetailResponse>(`${getApiBase()}/theses/${thesisId}/revisions`, {

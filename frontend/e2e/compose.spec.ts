@@ -161,6 +161,8 @@ test("compose page guides required thesis inputs before enabling publish", async
   await page.getByRole("button", { name: "Prepare anchor" }).click();
   expect(preparedPayloads).toHaveLength(1);
   expect(String(preparedPayloads[0].body)).toContain("[S1]");
+  await expect(publishButton).toBeDisabled();
+  await page.getByLabel("Anchor transaction hash").fill("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
   await expect(publishButton).toBeEnabled();
 
   await publishButton.click();
@@ -316,11 +318,15 @@ test("compose supports private structured block drafts with anchored signal cita
   expect(preparedPayloads).toHaveLength(1);
   expect(String(preparedPayloads[0].body)).toContain("[S1]");
   await expect(page.getByTestId("compose-draft-state")).toHaveText("Anchor prepared");
+  await expect(publishButton).toBeDisabled();
+  await expect(page.getByText("Submit anchor transaction before publishing")).toBeVisible();
+  await page.getByLabel("Anchor transaction hash").fill("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
   await expect(publishButton).toBeEnabled();
 
   await publishButton.click();
   expect(publishedPayloads).toHaveLength(1);
   expect(String(publishedPayloads[0].body)).toContain("[S1]");
   expect(publishedPayloads[0].anchorPreparationId).toBe("draft-anchor-compose-2");
+  expect(publishedPayloads[0].anchorTxHash).toBe("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
   await expect(page.getByRole("heading", { name: "Fed hold liquidity thesis" })).toBeVisible();
 });

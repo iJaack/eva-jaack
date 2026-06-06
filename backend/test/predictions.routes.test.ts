@@ -9,6 +9,8 @@ import { fetchJson } from "./helpers.js";
 
 const cleanupDirs: string[] = [];
 const walletAddress = "0x1111111111111111111111111111111111111111";
+const draftAnchorTxHash = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+const revisionAnchorTxHash = "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
 
 afterEach(async () => {
   await Promise.all(cleanupDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
@@ -108,6 +110,7 @@ describe("prediction routes", () => {
       body: JSON.stringify({
         ...payload,
         anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
+        anchorTxHash: draftAnchorTxHash,
       }),
     });
 
@@ -120,6 +123,8 @@ describe("prediction routes", () => {
     expect(detail.body).toMatchObject({
       thesis: {
         title: "SpaceX IPO liquidity rotation thesis",
+        anchor: { status: "submitted", txHash: draftAnchorTxHash },
+        currentRevision: { anchor: { status: "submitted", txHash: draftAnchorTxHash } },
         signals: expect.arrayContaining([expect.objectContaining({ kind: "prediction_market" })]),
       },
     });
@@ -150,13 +155,14 @@ describe("prediction routes", () => {
       body: JSON.stringify({
         ...revisionPayload,
         anchorPreparationId: (preparedRevision.body as { anchorPreparationId: string }).anchorPreparationId,
+        anchorTxHash: revisionAnchorTxHash,
       }),
     });
 
     expect(revised.status).toBe(200);
     expect(revised.body).toMatchObject({
       thesis: {
-        currentRevision: { version: 2 },
+        currentRevision: { version: 2, anchor: { status: "submitted", txHash: revisionAnchorTxHash } },
         timeline: expect.arrayContaining([expect.objectContaining({ action: "revised", scoreBefore: 70 })]),
       },
     });
@@ -219,6 +225,30 @@ describe("prediction routes", () => {
     });
   });
 
+  it("rejects public thesis publishing before anchor transaction submission", async () => {
+    const app = await makeApp();
+    const payload = thesisCreatePayload();
+    const prepared = await fetchJson(app, "/api/thesis-drafts/protocol/prepare-anchor", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const response = await fetchJson(app, "/api/theses", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...payload,
+        anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
+      }),
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      error: "Submit anchor transaction before publishing thesis",
+    });
+  });
+
   it("rejects thesis revision publishing before revision anchor preparation", async () => {
     const app = await makeApp();
     const payload = thesisCreatePayload();
@@ -233,6 +263,7 @@ describe("prediction routes", () => {
       body: JSON.stringify({
         ...payload,
         anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
+        anchorTxHash: draftAnchorTxHash,
       }),
     });
     const thesisId = (created.body as { thesis: { thesisId: string } }).thesis.thesisId;
@@ -267,6 +298,7 @@ describe("prediction routes", () => {
       body: JSON.stringify({
         ...payload,
         anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
+        anchorTxHash: draftAnchorTxHash,
       }),
     });
     const thesisId = (created.body as { thesis: { thesisId: string } }).thesis.thesisId;
@@ -288,6 +320,7 @@ describe("prediction routes", () => {
         ...revisionPayload,
         body: "Changed after revision anchor preparation.",
         anchorPreparationId: (preparedRevision.body as { anchorPreparationId: string }).anchorPreparationId,
+        anchorTxHash: revisionAnchorTxHash,
       }),
     });
 
