@@ -67,44 +67,44 @@ function MarketStrip({ markets }: { markets: PredictionMarket[] }) {
 
 const productModules = [
   {
-    title: "Thesis posts",
-    body: "Interactive essays that combine prediction markets, facts, and revision history.",
+    title: "Readable thesis",
+    body: "A public post that can carry a broad market idea without becoming a dashboard.",
   },
   {
-    title: "Signals",
-    body: "Live markets, closed predictions, lateral facts, and second-order evidence in one basket.",
+    title: "Cited signals",
+    body: "Prediction markets, closed forecasts, facts, and second-order effects stay attached as reviewable sources.",
   },
   {
-    title: "History",
-    body: "Every update keeps the prior score, signal snapshot, and reasoning trail visible.",
+    title: "Visible updates",
+    body: "Each material change appends a revision so readers can see how the argument moved.",
   },
   {
-    title: "Predictors",
-    body: "X identity plus wallet-backed records that can later anchor to protocol state.",
+    title: "Author record",
+    body: "X plus wallet identity gives every thesis an author trail agents and readers can inspect.",
   },
 ] as const;
 
 const participationQuests = [
   {
     step: "01",
-    title: "Write the thesis",
-    body: "Start with a bigger market idea, not a single isolated call.",
+    title: "Start the argument",
+    body: "Write the thesis as a post first, then decide which signals deserve to support it.",
     href: "/compose",
-    cta: "Compose",
+    cta: "Open editor",
   },
   {
     step: "02",
-    title: "Attach markets",
-    body: "Add live or closed prediction markets as first, second, or third-order signals.",
+    title: "Attach sources",
+    body: "Add live markets, closed predictions, facts, and lateral effects as citations.",
     href: "/markets",
-    cta: "Browse signals",
+    cta: "Browse library",
   },
   {
     step: "03",
-    title: "Track the post",
-    body: "Let market odds, facts, and revision history update the public object.",
+    title: "Publish the artifact",
+    body: "Anchor the first version, publish the post, then append updates as the thesis evolves.",
     href: "/thesis/thesis-0fdef25794b38b6e8eed7524",
-    cta: "Open thesis",
+    cta: "Read example",
   },
   {
     step: "04",
@@ -120,10 +120,10 @@ function QuestBoard({ stats }: { stats: PredictionSummary["stats"] }) {
     <section className="prediction-section quest-board workbench-quests" aria-label="Participation missions">
       <div className="quest-board-copy">
         <p className="section-kicker">Start here</p>
-        <h2 className="section-title section-title-sm">One loop, four actions</h2>
+        <h2 className="section-title section-title-sm">From idea to public record</h2>
         <p>
-          Eva should feel like an interactive market blog: choose a thesis, attach signals, publish it,
-          and let the visible history change as markets and facts move.
+          The point is not to place a trade inside Eva. The point is to publish the broader thesis,
+          attach the signals that make it legible, and keep the history honest as odds and facts move.
         </p>
       </div>
       <div className="quest-grid">
@@ -205,7 +205,7 @@ function ThesisCard({ thesis, market }: { thesis: Thesis; market: PredictionMark
       </div>
       <div className="sticky-action-row">
         <button className="mobile-action mobile-action-primary" type="button" onClick={previewCopy} disabled={copyPending}>
-          {copyPending ? "Preparing…" : "Preview Copy"}
+          {copyPending ? "Preparing…" : "Preview X copy"}
         </button>
         <Link className="mobile-action" href={`/compose?counterTo=${thesis.thesisId}`}>
           Build from this
@@ -254,19 +254,49 @@ export default function HomePage() {
       <Nav />
       <main id="main-content" className="mobile-shell prediction-home">
         <section className="mobile-hero home-command">
-          <p className="eyebrow">Thesis posts · signals · evidence · history</p>
-          <h1>Publish public thesis posts.</h1>
+          <p className="eyebrow">Public market theses · cited signals · revision history</p>
+          <h1>Turn market odds into a public thesis.</h1>
           <p>
-            Draft privately, cite live market signals, anchor before publishing, and keep the full revision history visible.
+            Eva lets predictors write an interactive post, cite prediction markets and facts inline,
+            anchor the first version, and keep every update readable over time.
           </p>
           <div className="mobile-hero-actions">
             <Link href="/compose" className="mobile-action mobile-action-primary">
-              Make a thesis
+              Draft the thesis
             </Link>
             <Link href="/markets" className="mobile-action">
-              Browse markets
+              Find signals
             </Link>
           </div>
+          <aside className="home-hero-artifact" aria-label="Example thesis artifact">
+            <div className="artifact-header">
+              <span>Working thesis</span>
+              <strong>v3</strong>
+            </div>
+            <h2>SpaceX IPO liquidity rotation</h2>
+            <p>
+              IPO anticipation can absorb speculative liquidity before the listing window is explicit,
+              then release attention into adjacent risk markets after the path clears.
+            </p>
+            <div className="artifact-signal-grid" aria-label="Attached thesis signals">
+              <div>
+                <span>S1 · IPO timing</span>
+                <strong>Yes priced at 42%</strong>
+              </div>
+              <div>
+                <span>S2 · Tender liquidity</span>
+                <strong>Fact not verified yet</strong>
+              </div>
+              <div>
+                <span>S3 · Risk rotation</span>
+                <strong>Second-order signal</strong>
+              </div>
+            </div>
+            <div className="artifact-history">
+              <span>Initial anchor confirmed</span>
+              <span>2 updates appended</span>
+            </div>
+          </aside>
         </section>
 
         {loading ? (
@@ -275,7 +305,7 @@ export default function HomePage() {
           </div>
         ) : error || !summary ? (
           <section className="prediction-card">
-            <h2>Network unavailable</h2>
+            <h2>Signal network unavailable</h2>
             <p>{error ?? "Eva could not load prediction activity."}</p>
           </section>
         ) : (
@@ -285,11 +315,11 @@ export default function HomePage() {
             <section className="prediction-section workbench-tape">
               <div className="section-heading-row prediction-heading">
                 <div>
-                  <p className="section-kicker">Signal library</p>
-                  <h2 className="section-title section-title-sm">Choose citations for the next thesis</h2>
+                  <p className="section-kicker">Live source tape</p>
+                  <h2 className="section-title section-title-sm">Markets ready to become citations</h2>
                 </div>
                 <Link href="/compose" className="section-link">
-                  New thesis
+                  Draft thesis
                 </Link>
               </div>
               <MarketStrip markets={markets} />
@@ -298,11 +328,11 @@ export default function HomePage() {
             <section className="prediction-section workbench-markets">
               <div className="section-heading-row prediction-heading">
                 <div>
-                  <p className="section-kicker">Markets</p>
-                  <h2 className="section-title section-title-sm">Reusable source cards</h2>
+                  <p className="section-kicker">Market library</p>
+                  <h2 className="section-title section-title-sm">Source cards for thesis builders</h2>
                 </div>
                 <Link href="/markets" className="section-link">
-                  Signal library
+                  Open library
                 </Link>
               </div>
               {markets.length > 0 ? (
@@ -323,8 +353,8 @@ export default function HomePage() {
                 </div>
               ) : (
                 <article className="prediction-card empty-state-card">
-                  <h2>No Markets Loaded</h2>
-                  <p>Refresh or check the API connection.</p>
+                  <h2>No markets loaded</h2>
+                  <p>Refresh or check the API connection before drafting a sourced thesis.</p>
                 </article>
               )}
             </section>
@@ -332,19 +362,19 @@ export default function HomePage() {
             <section className="lead-thesis workbench-feature">
               <div className="section-heading-row prediction-heading">
                 <div>
-                  <p className="section-kicker">Featured thesis</p>
-                  <h2 className="section-title section-title-sm">Inspect the live argument</h2>
+                  <p className="section-kicker">Featured artifact</p>
+                  <h2 className="section-title section-title-sm">Read an evolving thesis</h2>
                 </div>
                 <Link href="/markets" className="section-link">
-                  See all
+                  Find sources
                 </Link>
               </div>
               {leadThesis ? (
                 <ThesisCard thesis={leadThesis} market={leadMarket} />
               ) : (
                 <article className="prediction-card empty-state-card">
-                  <h2>No Featured Thesis</h2>
-                  <p>Publish a thesis to create the first featured market record.</p>
+                  <h2>No featured thesis yet</h2>
+                  <p>Publish the first anchored thesis to create the opening public artifact.</p>
                 </article>
               )}
             </section>
@@ -368,11 +398,11 @@ export default function HomePage() {
               <section className="prediction-section workbench-predictors">
                 <div className="section-heading-row prediction-heading">
                   <div>
-                    <p className="section-kicker">Predictors</p>
-                    <h2 className="section-title section-title-sm">Reputation context</h2>
+                    <p className="section-kicker">Author records</p>
+                    <h2 className="section-title section-title-sm">Who is building a track record</h2>
                   </div>
                   <Link href="/predictors" className="section-link">
-                    Rankings
+                    View records
                   </Link>
                 </div>
                 {predictors.length > 0 ? (
@@ -383,8 +413,8 @@ export default function HomePage() {
                   </div>
                 ) : (
                   <article className="prediction-card empty-state-card">
-                    <h2>No Predictors Yet</h2>
-                    <p>Published theses will create predictor records.</p>
+                    <h2>No predictors yet</h2>
+                    <p>Published theses will create public author records.</p>
                   </article>
                 )}
               </section>
@@ -392,8 +422,8 @@ export default function HomePage() {
               <section className="prediction-section product-system workbench-system">
                 <div className="section-heading-row prediction-heading">
                   <div>
-                    <p className="section-kicker">Product system</p>
-                    <h2 className="section-title section-title-sm">Reasoning layers</h2>
+                    <p className="section-kicker">Product object</p>
+                    <h2 className="section-title section-title-sm">What every thesis carries</h2>
                   </div>
                 </div>
                 <div className="product-module-grid">

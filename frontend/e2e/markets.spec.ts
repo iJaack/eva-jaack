@@ -142,8 +142,9 @@ test("markets page filters source signals and keeps use-in-thesis as the primary
 
   await page.goto("/markets");
 
-  await expect(page.getByRole("heading", { name: "Signal library" })).toBeVisible();
-  await expect(page.getByText("Use markets as citations inside a thesis")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Markets are source material." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Find the market that sharpens the thesis" })).toBeVisible();
+  await expect(page.getByText("Use prediction markets as citations inside a broader thesis")).toBeVisible();
   await expect(page.getByTestId("market-signal-card").filter({ hasText: "Will the Fed cut rates in June?" })).toBeVisible();
   await expect(page.getByTestId("market-signal-card").filter({ hasText: "Will CPI come in above forecast?" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Use in thesis: Will the Fed cut rates in June?" })).toHaveAttribute("href", "/compose?marketId=polymarket-fed-cut");
@@ -205,7 +206,7 @@ test("market detail prioritizes using the market as a thesis signal", async ({ p
 
   await page.goto("/markets/polymarket-fed-cut");
 
-  await expect(page.getByRole("heading", { name: "Use this market as a thesis signal" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Turn this market into a citation" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Use in thesis" })).toHaveAttribute("href", "/compose?marketId=polymarket-fed-cut");
-  await expect(page.getByRole("heading", { name: "Theses using this signal" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Public arguments using this signal" })).toBeVisible();
 });

@@ -322,9 +322,14 @@ function ComposeInner() {
       <DynamicIdentityLoader onIdentity={setIdentity} />
       <main id="main-content" className="mobile-shell compose-publication-shell">
         <section className="mobile-page-head compose-page-head">
-          <p className="eyebrow">Compose</p>
-          <h1>Draft a thesis post.</h1>
-          <p>Eva is a public thesis publishing tool: write privately, cite live signals, prepare the anchor, then publish the thesis as a durable post.</p>
+          <p className="eyebrow">Structured editor</p>
+          <h1>Write the thesis before the tweet.</h1>
+          <p>Draft privately, turn markets and facts into inline citations, prepare the anchor, then publish a durable post you can share on X.</p>
+          <ul className="route-proof-list" aria-label="Compose workflow">
+            <li>Private draft until publish</li>
+            <li>Signals become inline citations</li>
+            <li>Anchor confirmation gates the public post</li>
+          </ul>
         </section>
 
         {created ? (
@@ -370,7 +375,7 @@ function ComposeInner() {
               <div className="compose-editor-heading">
                 <div>
                   <p className="eyebrow">Private workspace</p>
-                  <h2>Private thesis draft</h2>
+                  <h2>Thesis body</h2>
                 </div>
                 <span className={anchorPrepared ? "status-chip status-chip-verified" : "status-chip status-chip-unresolved"} data-testid="compose-draft-state">
                   {draftState}
@@ -428,7 +433,7 @@ function ComposeInner() {
               <section className="prediction-card compose-source-panel">
                 <div>
                   <p className="eyebrow">Source basket</p>
-                  <h2>Signals to write with</h2>
+                  <h2>Signals to cite</h2>
                 </div>
                 <label className="field-group">
                   <span className="field-label">Primary market signal</span>
@@ -487,7 +492,7 @@ function ComposeInner() {
 
               <section className="prediction-card compose-attached-panel" data-testid="attached-signals">
                 <p className="eyebrow">Attached citations</p>
-                <h2>Signal review</h2>
+                <h2>Review sources</h2>
                 {attachedSignals.length ? (
                   <div className="attached-signal-list">
                     {attachedSignals.map((signal, index) => (
@@ -513,13 +518,13 @@ function ComposeInner() {
                     ))}
                   </div>
                 ) : (
-                  <p className="inline-note">Attach market and fact signals before anchoring the draft.</p>
+                  <p className="inline-note">Attach at least one market or fact signal before anchoring the draft.</p>
                 )}
               </section>
 
               <section className="prediction-card compose-preview-panel">
                 <p className="eyebrow">Public preview</p>
-                <h2>Post preview</h2>
+                <h2>Reader view</h2>
                 <article className="compose-post-preview">
                   <h3>{title || "Untitled thesis"}</h3>
                   <div data-testid="compose-preview-body">

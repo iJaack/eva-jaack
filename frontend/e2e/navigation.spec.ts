@@ -8,10 +8,10 @@ test("primary navigation stays focused on the thesis product", async ({ page }) 
 
   await expect(header.getByText("Eva Protocol")).toBeVisible();
   if (isMobile) {
-    await expect(header.getByText("prediction desk")).toBeHidden();
+    await expect(header.getByText("public thesis publishing")).toBeHidden();
     await header.getByRole("button", { name: "Toggle menu" }).click();
   } else {
-    await expect(header.getByText("prediction desk")).toBeVisible();
+    await expect(header.getByText("public thesis publishing")).toBeVisible();
   }
 
   await expect(header.getByRole("link", { name: "Markets" })).toBeVisible();
@@ -23,15 +23,15 @@ test("primary navigation stays focused on the thesis product", async ({ page }) 
 
   const loop = page.locator(".participation-dock");
   if (isMobile) {
-    await expect(loop.getByText("Find signals · write thesis · track history · build record")).toBeHidden();
+    await expect(loop.getByText("Build one public argument from markets, facts, and revisions")).toBeHidden();
   } else {
-    await expect(loop.getByText("Find signals · write thesis · track history · build record")).toBeVisible();
+    await expect(loop.getByText("Build one public argument from markets, facts, and revisions")).toBeVisible();
   }
-  await expect(loop.getByRole("link", { name: /1 Find/ })).toBeVisible();
+  await expect(loop.getByRole("link", { name: /1 Find signals/ })).toBeVisible();
   await expect(loop.getByRole("link", { name: "Start thesis" })).toBeVisible();
 
   const footer = page.locator("footer.site-footer");
-  await expect(footer.getByText("publish evolving thesis posts from prediction markets and facts")).toBeVisible();
+  await expect(footer.getByText("public thesis posts built from prediction markets, facts, anchors, and revision history")).toBeVisible();
   await expect(footer.getByRole("link", { name: "Markets" })).toBeVisible();
   await expect(footer.getByRole("link", { name: "Compose" })).toBeVisible();
   await expect(footer.getByRole("link", { name: "Predictors" })).toBeVisible();

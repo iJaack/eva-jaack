@@ -29,7 +29,7 @@ function providerLabel(provider: PredictionMarket["provider"]): string {
 }
 
 const marketPlaybook = [
-  "Pick a signal",
+  "Find a source",
   "Cite it inline",
   "Anchor the thesis",
   "Track revisions",
@@ -58,9 +58,14 @@ export default function MarketsPage() {
       <Nav />
       <main id="main-content" className="mobile-shell">
         <section className="mobile-page-head">
-          <p className="eyebrow">Markets</p>
-          <h1>Choose thesis signals.</h1>
-          <p>Use markets as citations inside a thesis. Pick the signal, carry it into compose, then let the public post track what changes.</p>
+          <p className="eyebrow">Signal library</p>
+          <h1>Markets are source material.</h1>
+          <p>Use prediction markets as citations inside a broader thesis. Eva keeps venue odds separate from the argument, the facts, and the revision trail.</p>
+          <ul className="route-proof-list" aria-label="Market library rules">
+            <li>Sports markets stay out for now</li>
+            <li>Use in thesis is the primary action</li>
+            <li>Odds are forecasts, not verified facts</li>
+          </ul>
         </section>
 
         {loading ? (
@@ -78,12 +83,12 @@ export default function MarketsPage() {
               <div className="section-heading-row prediction-heading">
                 <div>
                   <p className="section-kicker">Source basket</p>
-                  <h2 className="section-title section-title-sm">Signal library</h2>
+                  <h2 className="section-title section-title-sm">Find the market that sharpens the thesis</h2>
                 </div>
                 <span className={statusClassName("forecast")}>Forecast</span>
               </div>
               <p className="market-boundary-note">
-                Showing {filteredMarkets.length} of {markets.length} markets. Odds are venue forecasts; final truth status lives in thesis revisions, resolved records, and fact signals.
+                Showing {filteredMarkets.length} of {markets.length} markets. Odds are venue forecasts; final truth status belongs in thesis revisions, resolved records, and fact signals.
               </p>
               <div className="desk-summary">
                 <div>
@@ -165,7 +170,7 @@ export default function MarketsPage() {
                         <strong>{formatUsd(market.liquidityUsd)}</strong>
                       </div>
                       <div>
-                        <span>Resolution</span>
+                          <span>Status</span>
                         <strong>{statusLabel(uiStatus)}</strong>
                       </div>
                     </div>

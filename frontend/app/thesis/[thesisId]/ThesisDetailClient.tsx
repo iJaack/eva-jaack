@@ -77,7 +77,7 @@ export default function ThesisDetailClient() {
   const previewAnchor = async () => {
     try {
       const prepared = await prepareThesisAnchor(thesisId);
-      setAnchorState(`${prepared.transactions.length} unsigned protocol transactions prepared. Broadcast still requires approval.`);
+      setAnchorState(`${prepared.transactions.length} anchor transaction${prepared.transactions.length === 1 ? "" : "s"} prepared. Broadcast still requires approval.`);
     } catch (reason) {
       setAnchorState(reason instanceof Error ? reason.message : "Unable to prepare protocol transactions.");
     }
@@ -146,7 +146,7 @@ export default function ThesisDetailClient() {
       return;
     }
     if (!isTxHash(revisionAnchorTxHash)) {
-      setUpdateState("Submit update anchor transaction before publishing.");
+      setUpdateState("Confirm update anchor transaction before publishing.");
       return;
     }
 
@@ -197,7 +197,7 @@ export default function ThesisDetailClient() {
                 </Link>
                 <span>{detail.predictor.profileState === "registered" ? "Wallet-linked" : "Record-only"}</span>
               </div>
-              <p className="eyebrow">Public thesis</p>
+              <p className="eyebrow">Public thesis artifact</p>
               <h1>{detail.thesis.title}</h1>
               <div className="status-row">
                 <span className={statusClassName(scoreUiStatus(detail.thesis.currentScore))}>Score {detail.thesis.currentScore}</span>
@@ -226,13 +226,13 @@ export default function ThesisDetailClient() {
               </div>
               <div className="mobile-bottom-actions thesis-action-row">
                 <button className="mobile-action mobile-action-primary" type="button" onClick={previewCopy}>
-                  Preview copy
+                  Preview X copy
                 </button>
                 <Link className="mobile-action" href={`/compose?counterTo=${detail.thesis.thesisId}`}>
-                  Build from this
+                  Draft response
                 </Link>
                 <button className="mobile-action" type="button" onClick={previewAnchor}>
-                  Prepare anchor
+                  Prepare anchor tx
                 </button>
                 <a
                   className="mobile-action"
@@ -240,7 +240,7 @@ export default function ThesisDetailClient() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Share
+                  Share on X
                 </a>
               </div>
               {copyState ? <p className="inline-note">{copyState}</p> : null}
@@ -250,7 +250,7 @@ export default function ThesisDetailClient() {
             <aside className="thesis-signal-rail">
               <section className="prediction-card thesis-signal-panel">
                 <p className="eyebrow">Citation basket</p>
-                <h2>Attached signals</h2>
+                <h2>Signals supporting the thesis</h2>
                 <div className="attached-signal-list">
                   {detail.thesis.signals.map((signal, index) => (
                     <article key={signal.signalId} className="thesis-signal-card" data-testid="thesis-signal-card">
@@ -295,7 +295,7 @@ export default function ThesisDetailClient() {
 
               <form className="prediction-card thesis-update-panel" onSubmit={publishUpdate}>
                 <p className="eyebrow">Author extension</p>
-                <h2>Publish an update</h2>
+                <h2>Append an update</h2>
                 <label className="field-group">
                   <span className="field-label">Update body</span>
                   <textarea

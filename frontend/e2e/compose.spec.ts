@@ -134,7 +134,7 @@ test("compose page guides required thesis inputs before enabling publish", async
   await page.goto("/compose");
 
   const publishButton = page.getByRole("button", { name: "Publish anchored thesis" });
-  await expect(page.getByRole("heading", { name: "Private thesis draft" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Thesis body" })).toBeVisible();
   await expect(publishButton).toBeDisabled();
   await page.getByLabel("Thesis title").fill("");
   await expect(publishButton).toBeDisabled();
@@ -155,7 +155,7 @@ test("compose page guides required thesis inputs before enabling publish", async
   const draftBody = page.getByLabel("Thesis block 1");
   await expect(draftBody).toHaveValue(/\[S1\]/);
   await expect(draftBody).toHaveValue(/\[S2\]/);
-  await expect(page.getByRole("heading", { name: "Post preview" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Reader view" })).toBeVisible();
   await expect(page.getByTestId("compose-preview-body")).toContainText("[S1]");
 
   await page.getByRole("button", { name: "Prepare anchor" }).click();
@@ -279,7 +279,7 @@ test("compose supports private structured block drafts with anchored signal cita
 
   await page.goto("/compose");
 
-  await expect(page.getByRole("heading", { name: "Private thesis draft" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Thesis body" })).toBeVisible();
   await expect(page.getByLabel("Thesis block 1")).toBeVisible();
   await expect(page.getByRole("button", { name: "Add block" })).toBeVisible();
 

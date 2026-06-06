@@ -42,13 +42,13 @@ export default function PredictorDetailClient() {
         ) : (
           <>
             <section className="mobile-page-head predictor-detail-head">
-              <p className="eyebrow">{detail.predictor.profileState === "registered" ? "Wallet-linked" : "Record-only predictor profile"}</p>
+              <p className="eyebrow">{detail.predictor.profileState === "registered" ? "Wallet-linked author" : "Record-only author profile"}</p>
               <h1>{detail.predictor.handle}</h1>
               <p>
                 {detail.predictor.profileState === "registered"
-                  ? "This predictor is linked to an X identity and wallet."
-                  : "This product record can be linked later by connecting X and a wallet."}
-                {" "}Forecast records and truth or resolution status remain separate.
+                  ? "This author is linked to an X identity and wallet."
+                  : "This public record can be linked later by connecting X and a wallet."}
+                {" "}Published thesis activity and resolved accuracy remain separate.
               </p>
             </section>
 
@@ -68,15 +68,15 @@ export default function PredictorDetailClient() {
             </section>
 
             <section className="prediction-card">
-              <h2>Predictor record</h2>
+              <h2>Author record</h2>
               <div className="record-layers">
                 <div>
                   <span>Eva score</span>
                   <strong>{detail.predictor.trustScore}</strong>
-                  <p>App record from wallet-linked identity, thesis history, and resolved outcomes.</p>
+                  <p>Record from wallet-linked identity, thesis history, and resolved outcomes.</p>
                 </div>
                 <div>
-                  <span>Resolution Record</span>
+                  <span>Resolution record</span>
                   <strong>{detail.predictor.bestCategory ?? "Pending"}</strong>
                   <p>Offchain thesis stats stay separate from resolved outcomes until evidence can feed reputation.</p>
                 </div>

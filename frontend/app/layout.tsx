@@ -4,9 +4,9 @@ import "./globals.css";
 import EvaProviders from "@/components/EvaProviders";
 import { protocol } from "@/lib/protocol";
 
-const title = `${protocol.app.name} — Evolving market theses`;
+const title = `${protocol.app.name} — Public thesis publishing for prediction markets`;
 const description =
-  "Eva turns prediction markets, facts, and second-order signals into evolving thesis posts with visible history.";
+  "Eva turns prediction markets, facts, and second-order signals into public thesis posts with anchors and visible revision history.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(protocol.app.siteUrl),

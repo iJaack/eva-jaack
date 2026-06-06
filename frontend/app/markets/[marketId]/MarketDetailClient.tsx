@@ -49,7 +49,7 @@ export default function MarketDetailClient() {
             <section className="mobile-page-head market-detail-head">
               <p className="eyebrow">{detail.market.category}</p>
               <h1>{detail.market.title}</h1>
-              <p>Use this market as a thesis signal. Eva keeps the market forecast separate from the thesis, its citations, and its revision history.</p>
+              <p>Use this market as one cited signal inside a broader thesis. Eva keeps the venue forecast separate from the article, its facts, and its revision history.</p>
               <div className="status-row">
                 <span className="status-chip status-chip-forecast">Odds forecast</span>
                 <span className={statusClassName(marketUiStatus(detail.market))}>{statusLabel(marketUiStatus(detail.market))}</span>
@@ -60,7 +60,7 @@ export default function MarketDetailClient() {
               <div className="section-heading-row prediction-heading">
                 <div>
                   <p className="section-kicker">Selected source</p>
-                  <h2 className="section-title section-title-sm">Use this market as a thesis signal</h2>
+                  <h2 className="section-title section-title-sm">Turn this market into a citation</h2>
                 </div>
               </div>
               <div className="market-outcomes market-outcomes-large">
@@ -87,12 +87,12 @@ export default function MarketDetailClient() {
               <div className="section-heading-row prediction-heading">
                 <div>
                   <p className="section-kicker">Theses</p>
-                  <h2 className="section-title section-title-sm">Theses using this signal</h2>
+                  <h2 className="section-title section-title-sm">Public arguments using this signal</h2>
                 </div>
               </div>
               <div className="thesis-stack">
                 {detail.theses.length === 0 ? (
-                  <p className="empty-copy">No theses yet. Be first to attach a call.</p>
+                  <p className="empty-copy">No theses yet. Be first to attach this market as source material.</p>
                 ) : (
                   detail.theses.map((thesis) => (
                     <Link key={thesis.thesisId} href={`/thesis/${thesis.thesisId}`} className="prediction-card thesis-list-item">

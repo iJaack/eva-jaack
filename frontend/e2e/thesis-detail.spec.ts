@@ -202,14 +202,14 @@ test("thesis detail reads as a public thesis with attached citation cards and re
 
   await expect(page.getByRole("heading", { name: "Fed hold liquidity thesis" })).toBeVisible();
   await expect(page.getByTestId("thesis-body")).toContainText("[S1]");
-  await expect(page.getByRole("heading", { name: "Attached signals" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Signals supporting the thesis" })).toBeVisible();
   await expect(page.getByTestId("thesis-signal-card").first()).toContainText("S1");
   await expect(page.getByTestId("thesis-signal-card").first()).toContainText("Hold priced at 58%");
   await expect(page.getByTestId("thesis-signal-card").nth(1)).toContainText("S2");
   await expect(page.getByRole("heading", { name: "Revision history" })).toBeVisible();
   await expect(page.getByTestId("revision-card").first()).toContainText("v1");
   await expect(page.getByTestId("revision-card").first()).toContainText("2 signals snapshotted");
-  await expect(page.getByRole("heading", { name: "Publish an update" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Append an update" })).toBeVisible();
 });
 
 test("publishing an update appends it to the thesis and creates the next revision", async ({ page }) => {

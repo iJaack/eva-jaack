@@ -6,7 +6,7 @@ import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import { getPredictors, type Predictor } from "@/lib/api";
 
-const rankingLoop = ["Find signal", "Open record", "Compare accuracy", "Copy or counter"] as const;
+const rankingLoop = ["Read thesis", "Inspect signals", "Check revisions", "Draft response"] as const;
 
 export default function PredictorsPage() {
   const [predictors, setPredictors] = useState<Predictor[]>([]);
@@ -31,9 +31,14 @@ export default function PredictorsPage() {
       <Nav />
       <main id="main-content" className="mobile-shell">
         <section className="mobile-page-head">
-          <p className="eyebrow">Predictors</p>
-          <h1>Follow the record, not the noise.</h1>
-          <p>Wallet-linked predictors build an Eva score. Every open call, copy, and resolved outcome becomes a public record.</p>
+          <p className="eyebrow">Author records</p>
+          <h1>Judge predictors by their thesis trail.</h1>
+          <p>Eva separates activity from proven accuracy. Read the public theses, inspect their signals, and only treat resolved outcomes as performance evidence.</p>
+          <ul className="route-proof-list" aria-label="Author record rules">
+            <li>Activity is separate from accuracy</li>
+            <li>X plus wallet establishes authorship</li>
+            <li>Thesis history comes before ranking</li>
+          </ul>
         </section>
 
         {loading ? (
@@ -51,12 +56,12 @@ export default function PredictorsPage() {
               <div className="section-heading-row prediction-heading">
                 <div>
                   <p className="section-kicker">Reputation desk</p>
-                  <h2 className="section-title section-title-sm">Predictor desk</h2>
+                  <h2 className="section-title section-title-sm">Who is publishing thesis work</h2>
                 </div>
                 <span className="status-chip status-chip-unresolved">{graphBackedCount} graph-backed</span>
               </div>
               <p className="market-boundary-note">
-                Trust score is identity reputation. Forecast accuracy is only promoted when outcomes resolve through evidence or resolver windows.
+                Trust score is an identity and activity signal. Forecast accuracy is promoted only when outcomes resolve through evidence or resolver windows.
               </p>
               <div className="quest-line quest-line-compact" aria-label="Predictor participation loop">
                 {rankingLoop.map((step, index) => (

@@ -49,7 +49,8 @@ test("predictors page filters wallet-linked and record-only records", async ({ p
 
   await page.goto("/predictors");
 
-  await expect(page.getByRole("heading", { name: "Predictor desk" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Judge predictors by their thesis trail." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Who is publishing thesis work" })).toBeVisible();
   await expect(page.getByRole("link", { name: /@macrodesk/i })).toBeVisible();
   await expect(page.getByRole("link", { name: /@eva_agent/i })).toBeVisible();
 

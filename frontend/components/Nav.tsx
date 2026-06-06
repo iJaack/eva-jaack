@@ -13,10 +13,10 @@ const navItems: readonly { href: string; label: string; exact?: boolean; highlig
 ];
 
 const loopItems = [
-  { href: "/markets", label: "Find" },
-  { href: "/compose", label: "Write" },
-  { href: "/thesis/thesis-0fdef25794b38b6e8eed7524", label: "Track" },
-  { href: "/predictors", label: "Record" },
+  { href: "/markets", label: "Find signals" },
+  { href: "/compose", label: "Draft thesis" },
+  { href: "/thesis/thesis-0fdef25794b38b6e8eed7524", label: "Track updates" },
+  { href: "/predictors", label: "Build record" },
 ] as const;
 
 function activeLoopHref(pathname: string): string | null {
@@ -31,10 +31,10 @@ function activeLoopHref(pathname: string): string | null {
 }
 
 function routeCta(pathname: string): { href: string; label: string } {
-  if (pathname.startsWith("/markets")) return { href: "/compose", label: "Make call" };
+  if (pathname.startsWith("/markets")) return { href: "/compose", label: "Use signal" };
   if (pathname.startsWith("/compose")) return { href: "/markets", label: "Add signals" };
-  if (pathname.startsWith("/thesis")) return { href: "/compose", label: "Counter" };
-  if (pathname.startsWith("/predictors")) return { href: "/markets", label: "Find market" };
+  if (pathname.startsWith("/thesis")) return { href: "/compose", label: "Draft response" };
+  if (pathname.startsWith("/predictors")) return { href: "/markets", label: "Find signals" };
   return { href: "/markets", label: "Start thesis" };
 }
 
@@ -54,7 +54,7 @@ export default function Nav() {
           <div className="brand-mark" aria-hidden />
           <div className="brand-text">
             <span className="brand-title">Eva Protocol</span>
-            <span className="brand-sub">prediction desk</span>
+            <span className="brand-sub">public thesis publishing</span>
           </div>
         </Link>
 
@@ -78,7 +78,7 @@ export default function Nav() {
           <DynamicAuthControl />
           <ThemeToggle />
           <Link href="/compose" className="nav-edge-cta" onClick={() => setMenuOpen(false)}>
-            New thesis
+            Start thesis
           </Link>
           <button
             className="nav-hamburger"
@@ -96,7 +96,7 @@ export default function Nav() {
         <div className="participation-dock-inner">
           <div className="participation-dock-copy">
             <span className="participation-kicker">Thesis loop</span>
-            <strong>Find signals · write thesis · track history · build record</strong>
+            <strong>Build one public argument from markets, facts, and revisions</strong>
           </div>
           <nav className="participation-loop" aria-label="Eva participation stages">
             {loopItems.map((item, index) => {

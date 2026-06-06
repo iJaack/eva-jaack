@@ -141,25 +141,26 @@ test("homepage leads with the prediction workbench layout", async ({ page }) => 
 
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "Publish public thesis posts." })).toBeVisible();
-  await expect(page.getByText("Draft privately, cite live market signals, anchor before publishing")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "One loop, four actions" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /01 Write the thesis/i })).toBeVisible();
-  await expect(page.getByRole("link", { name: /02 Attach markets/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Turn market odds into a public thesis." })).toBeVisible();
+  await expect(page.getByText("Eva lets predictors write an interactive post")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "SpaceX IPO liquidity rotation" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "From idea to public record" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /01 Start the argument/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /02 Attach sources/i })).toBeVisible();
   await expect(page.getByText("authors", { exact: true })).toBeVisible();
-  await expect(page.locator(".workbench-tape").getByText("Signal library")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Choose citations for the next thesis" })).toBeVisible();
+  await expect(page.locator(".workbench-tape").getByText("Live source tape")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Markets ready to become citations" })).toBeVisible();
   await expect(page.getByText("active predictors")).toBeVisible();
   await expect(page.getByText("copied theses")).toBeVisible();
-  await expect(page.getByText("Featured thesis")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Inspect the live argument" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Reusable source cards" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Reputation context" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Reasoning layers" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Thesis posts", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Signals", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "History", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Predictors", exact: true })).toBeVisible();
+  await expect(page.getByText("Featured artifact")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Read an evolving thesis" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Source cards for thesis builders" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Who is building a track record" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "What every thesis carries" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Readable thesis", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Cited signals", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Visible updates", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Author record", exact: true })).toBeVisible();
 });
 
 test("copy thesis button shows pending state and announces the result", async ({ page }) => {
@@ -191,7 +192,7 @@ test("copy thesis button shows pending state and announces the result", async ({
 
   await page.goto("/");
 
-  const copyButton = page.getByRole("button", { name: "Preview Copy" });
+  const copyButton = page.getByRole("button", { name: "Preview X copy" });
   await copyButton.click();
 
   await expect(page.getByRole("button", { name: "Preparing…" })).toBeDisabled();
@@ -219,12 +220,12 @@ test("homepage renders compact empty states when prediction summary has no recor
 
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "No Featured Thesis" })).toBeVisible();
-  await expect(page.getByText("Publish a thesis to create the first featured market record.")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "No Markets Loaded" })).toBeVisible();
-  await expect(page.getByText("Refresh or check the API connection.")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "No Predictors Yet" })).toBeVisible();
-  await expect(page.getByText("Published theses will create predictor records.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "No featured thesis yet" })).toBeVisible();
+  await expect(page.getByText("Publish the first anchored thesis to create the opening public artifact.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "No markets loaded" })).toBeVisible();
+  await expect(page.getByText("Refresh or check the API connection before drafting a sourced thesis.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "No predictors yet" })).toBeVisible();
+  await expect(page.getByText("Published theses will create public author records.")).toBeVisible();
 });
 
 test("desktop homepage keeps shared product sections in the main grid", async ({ page }) => {
