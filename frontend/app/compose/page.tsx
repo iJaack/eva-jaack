@@ -118,14 +118,14 @@ function ComposeInner() {
   const dynamicRequired = Boolean(process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID);
   const usingPreviewIdentity = identity.dynamicUserId === defaultIdentity.dynamicUserId;
   const identityReady = !dynamicRequired || !usingPreviewIdentity;
-  const anchorSubmitted = isTxHash(anchorTxHash);
-  const canPublish = Boolean(title.trim() && body.trim() && attachedSignals.length > 0 && identityReady && anchorPrepared && anchorPreparationId && anchorSubmitted && !submitting && !preparingAnchor);
+  const anchorConfirmed = isTxHash(anchorTxHash);
+  const canPublish = Boolean(title.trim() && body.trim() && attachedSignals.length > 0 && identityReady && anchorPrepared && anchorPreparationId && anchorConfirmed && !submitting && !preparingAnchor);
   const publishBlocker = preparingAnchor
     ? "Preparing anchor"
     : !anchorPrepared || !anchorPreparationId
       ? "Prepare anchor before publishing"
-      : !anchorSubmitted
-        ? "Submit anchor transaction before publishing"
+      : !anchorConfirmed
+        ? "Confirm anchor transaction before publishing"
         : !attachedSignals.length
           ? "Attach at least one signal before publishing"
           : null;

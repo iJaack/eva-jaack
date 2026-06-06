@@ -14,6 +14,7 @@ import type {
   ThesisListResponse,
   XCommandIngestResponse,
 } from "../lib/api-types.js";
+import { createAvalancheAnchorVerifier, type AnchorVerifier } from "../services/anchor-verifier.js";
 import {
   getPredictionLayerService,
   type LocalPredictionLayerService,
@@ -25,6 +26,7 @@ import { prepareThesisAnchorTransactions, prepareThesisRevisionAnchorTransaction
 
 type PredictionRouteDeps = {
   predictions: LocalPredictionLayerService;
+  anchorVerifier: AnchorVerifier;
 };
 
 type PredictionSignalInputItem = NonNullable<ThesisCreateInput["predictionSignals"]>[number];
@@ -132,6 +134,7 @@ function draftFingerprint(input: unknown): string {
 export function createPredictionRoutes(
   deps: PredictionRouteDeps = {
     predictions: getPredictionLayerService(),
+    anchorVerifier: createAvalancheAnchorVerifier(),
   },
 ) {
   const routes = new Hono();
@@ -170,7 +173,7 @@ export function createPredictionRoutes(
     if (error || !input) return c.json({ error }, 400);
 
     try {
-      await deps.predictions.previewThesis(input);
+      const detail = await deps.predictions.previewThesis(input);
 
       const anchorPreparationId = normalizeString(body.anchorPreparationId);
       if (!anchorPreparationId) {
@@ -189,9 +192,17 @@ export function createPredictionRoutes(
       if (!anchorTxHash) {
         return c.json({ error: "Submit anchor transaction before publishing thesis" }, 400);
       }
+      const expectedTransactions = prepareThesisAnchorTransactions(detail.thesis);
+      const verification = await deps.anchorVerifier.verifyPreparedAnchor({
+        txHash: anchorTxHash,
+        expectedTransactions,
+      });
+      if (!verification.ok) {
+        return c.json({ error: verification.error }, 400);
+      }
 
       const response = await deps.predictions.createThesis(input);
-      const anchored = await deps.predictions.markThesisAnchorSubmitted(response.thesis.thesisId, anchorTxHash);
+      const anchored = await deps.predictions.markThesisAnchorConfirmed(response.thesis.thesisId, anchorTxHash, verification.confirmedAt);
       if (response.created) draftAnchors.delete(anchorPreparationId);
       return c.json<ThesisCreateResponse>(
         {
@@ -311,10 +322,18 @@ export function createPredictionRoutes(
       if (!anchorTxHash) {
         return c.json({ error: "Submit anchor transaction before publishing thesis update" }, 400);
       }
+      const expectedTransactions = prepareThesisRevisionAnchorTransactions(preview.thesis);
+      const verification = await deps.anchorVerifier.verifyPreparedAnchor({
+        txHash: anchorTxHash,
+        expectedTransactions,
+      });
+      if (!verification.ok) {
+        return c.json({ error: verification.error }, 400);
+      }
 
       const response = await deps.predictions.recordRevision(c.req.param("thesisId"), input);
       if (!response) return c.json({ error: "Thesis not found" }, 404);
-      const anchored = await deps.predictions.markCurrentRevisionAnchorSubmitted(response.thesis.thesisId, anchorTxHash);
+      const anchored = await deps.predictions.markCurrentRevisionAnchorConfirmed(response.thesis.thesisId, anchorTxHash, verification.confirmedAt);
       revisionAnchors.delete(anchorPreparationId);
       return c.json<ThesisDetailResponse>(anchored ?? response);
     } catch (error) {

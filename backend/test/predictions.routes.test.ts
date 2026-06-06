@@ -11,17 +11,32 @@ const cleanupDirs: string[] = [];
 const walletAddress = "0x1111111111111111111111111111111111111111";
 const draftAnchorTxHash = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const revisionAnchorTxHash = "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+const rejectedAnchorTxHash = "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
 
 afterEach(async () => {
   await Promise.all(cleanupDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
 });
 
-async function makeApp() {
+async function makeApp(options: { confirmedTxHashes?: string[]; wrongCalldataTxHashes?: string[] } = {}) {
   const dir = await mkdtemp(join(tmpdir(), "eva-prediction-routes-"));
   cleanupDirs.push(dir);
   const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => [], async () => []);
+  const confirmedTxHashes = new Set(options.confirmedTxHashes ?? [draftAnchorTxHash, revisionAnchorTxHash]);
+  const wrongCalldataTxHashes = new Set(options.wrongCalldataTxHashes ?? []);
+  const anchorVerifier = {
+    async verifyPreparedAnchor({ txHash, expectedTransactions }: { txHash: string; expectedTransactions: Array<{ data: string }> }) {
+      if (!confirmedTxHashes.has(txHash)) {
+        return { ok: false, error: "Anchor transaction is not confirmed" };
+      }
+      if (wrongCalldataTxHashes.has(txHash) || expectedTransactions.length === 0) {
+        return { ok: false, error: "Anchor transaction does not match prepared calldata" };
+      }
+      return { ok: true, confirmedAt: "2026-06-06T21:30:00.000Z" };
+    },
+  };
   const app = new Hono();
-  app.route("/api", createPredictionRoutes({ predictions: service }));
+  const deps = { predictions: service, anchorVerifier };
+  app.route("/api", createPredictionRoutes(deps));
   return app;
 }
 
@@ -123,8 +138,8 @@ describe("prediction routes", () => {
     expect(detail.body).toMatchObject({
       thesis: {
         title: "SpaceX IPO liquidity rotation thesis",
-        anchor: { status: "submitted", txHash: draftAnchorTxHash },
-        currentRevision: { anchor: { status: "submitted", txHash: draftAnchorTxHash } },
+        anchor: { status: "confirmed", txHash: draftAnchorTxHash, confirmedAt: "2026-06-06T21:30:00.000Z" },
+        currentRevision: { anchor: { status: "confirmed", txHash: draftAnchorTxHash, confirmedAt: "2026-06-06T21:30:00.000Z" } },
         signals: expect.arrayContaining([expect.objectContaining({ kind: "prediction_market" })]),
       },
     });
@@ -162,7 +177,7 @@ describe("prediction routes", () => {
     expect(revised.status).toBe(200);
     expect(revised.body).toMatchObject({
       thesis: {
-        currentRevision: { version: 2, anchor: { status: "submitted", txHash: revisionAnchorTxHash } },
+        currentRevision: { version: 2, anchor: { status: "confirmed", txHash: revisionAnchorTxHash, confirmedAt: "2026-06-06T21:30:00.000Z" } },
         timeline: expect.arrayContaining([expect.objectContaining({ action: "revised", scoreBefore: 70 })]),
       },
     });
@@ -246,6 +261,56 @@ describe("prediction routes", () => {
     expect(response.status).toBe(400);
     expect(response.body).toMatchObject({
       error: "Submit anchor transaction before publishing thesis",
+    });
+  });
+
+  it("rejects public thesis publishing before anchor transaction confirmation", async () => {
+    const app = await makeApp({ confirmedTxHashes: [] });
+    const payload = thesisCreatePayload();
+    const prepared = await fetchJson(app, "/api/thesis-drafts/protocol/prepare-anchor", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const response = await fetchJson(app, "/api/theses", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...payload,
+        anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
+        anchorTxHash: rejectedAnchorTxHash,
+      }),
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      error: "Anchor transaction is not confirmed",
+    });
+  });
+
+  it("rejects public thesis publishing when the confirmed anchor does not match prepared calldata", async () => {
+    const app = await makeApp({ confirmedTxHashes: [rejectedAnchorTxHash], wrongCalldataTxHashes: [rejectedAnchorTxHash] });
+    const payload = thesisCreatePayload();
+    const prepared = await fetchJson(app, "/api/thesis-drafts/protocol/prepare-anchor", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const response = await fetchJson(app, "/api/theses", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...payload,
+        anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
+        anchorTxHash: rejectedAnchorTxHash,
+      }),
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      error: "Anchor transaction does not match prepared calldata",
     });
   });
 

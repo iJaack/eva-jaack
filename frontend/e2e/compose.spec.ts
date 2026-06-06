@@ -319,7 +319,7 @@ test("compose supports private structured block drafts with anchored signal cita
   expect(String(preparedPayloads[0].body)).toContain("[S1]");
   await expect(page.getByTestId("compose-draft-state")).toHaveText("Anchor prepared");
   await expect(publishButton).toBeDisabled();
-  await expect(page.getByText("Submit anchor transaction before publishing")).toBeVisible();
+  await expect(page.getByText("Confirm anchor transaction before publishing")).toBeVisible();
   await page.getByLabel("Anchor transaction hash").fill("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
   await expect(publishButton).toBeEnabled();
 
