@@ -56,7 +56,7 @@ export async function getThesisDetail(thesisId: string): Promise<ThesisDetailRes
   return fetchJson<ThesisDetailResponse>(`${getApiBase()}/theses/${thesisId}`);
 }
 
-export async function createThesis(input: {
+export type ThesisCreateRequest = {
   dynamicUserId: string;
   xHandle: string;
   xProfileId?: string;
@@ -93,8 +93,88 @@ export async function createThesis(input: {
   sourceUrl?: string;
   sourcePostUrl?: string;
   counterToThesisId?: string;
-}): Promise<ThesisCreateResponse> {
+  anchorPreparationId?: string;
+};
+
+export async function createThesis(input: ThesisCreateRequest): Promise<ThesisCreateResponse> {
   return fetchJson<ThesisCreateResponse>(`${getApiBase()}/theses`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function prepareDraftThesisAnchor(input: Omit<ThesisCreateRequest, "anchorPreparationId">): Promise<{
+  anchorPreparationId: string;
+  thesisId: string;
+  anchorStatus: "prepared";
+  transactions: Array<{ to: string; data: string; description: string }>;
+}> {
+  return fetchJson(`${getApiBase()}/thesis-drafts/protocol/prepare-anchor`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function recordThesisRevision(
+  thesisId: string,
+  input: {
+    dynamicUserId: string;
+    xHandle: string;
+    xProfileId?: string | null;
+    walletAddress: string;
+    walletSource: "external" | "embedded";
+    body: string;
+    note?: string;
+    signalUpdates?: Array<{
+      signalId: string;
+      currentOdds?: number;
+      weight?: number;
+      status?: string;
+      resolvedOutcomeLabel?: string;
+    }>;
+    anchorPreparationId?: string;
+  },
+): Promise<ThesisDetailResponse> {
+  return fetchJson<ThesisDetailResponse>(`${getApiBase()}/theses/${thesisId}/revisions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function prepareThesisRevisionAnchor(
+  thesisId: string,
+  input: {
+    dynamicUserId: string;
+    xHandle: string;
+    xProfileId?: string | null;
+    walletAddress: string;
+    walletSource: "external" | "embedded";
+    body: string;
+    note?: string;
+    signalUpdates?: Array<{
+      signalId: string;
+      currentOdds?: number;
+      weight?: number;
+      status?: string;
+      resolvedOutcomeLabel?: string;
+    }>;
+  },
+): Promise<{
+  anchorPreparationId: string;
+  thesisId: string;
+  anchorStatus: "prepared";
+  transactions: Array<{ to: string; data: string; description: string }>;
+}> {
+  return fetchJson(`${getApiBase()}/theses/${thesisId}/revision-drafts/protocol/prepare-anchor`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

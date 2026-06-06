@@ -29,10 +29,10 @@ function providerLabel(provider: PredictionMarket["provider"]): string {
 }
 
 const marketPlaybook = [
-  "Pick a question",
-  "Choose your side",
-  "Publish the reason",
-  "Track resolution",
+  "Pick a signal",
+  "Cite it inline",
+  "Anchor the thesis",
+  "Track revisions",
 ] as const;
 
 export default function MarketsPage() {
@@ -59,8 +59,8 @@ export default function MarketsPage() {
       <main id="main-content" className="mobile-shell">
         <section className="mobile-page-head">
           <p className="eyebrow">Markets</p>
-          <h1>Choose the next call.</h1>
-          <p>Every market is a starting tile: inspect the odds, publish your reason, then let evidence and resolution decide reputation.</p>
+          <h1>Choose thesis signals.</h1>
+          <p>Use markets as citations inside a thesis. Pick the signal, carry it into compose, then let the public post track what changes.</p>
         </section>
 
         {loading ? (
@@ -77,13 +77,13 @@ export default function MarketsPage() {
             <section className="prediction-card route-panel">
               <div className="section-heading-row prediction-heading">
                 <div>
-                  <p className="section-kicker">Forecast desk</p>
-                  <h2 className="section-title section-title-sm">Live market desk</h2>
+                  <p className="section-kicker">Source basket</p>
+                  <h2 className="section-title section-title-sm">Signal library</h2>
                 </div>
                 <span className={statusClassName("forecast")}>Forecast</span>
               </div>
               <p className="market-boundary-note">
-                Showing {filteredMarkets.length} of {markets.length} markets. Odds are venue forecasts; final truth status lives in resolved thesis records and fact signals.
+                Showing {filteredMarkets.length} of {markets.length} markets. Odds are venue forecasts; final truth status lives in thesis revisions, resolved records, and fact signals.
               </p>
               <div className="desk-summary">
                 <div>
@@ -133,10 +133,10 @@ export default function MarketsPage() {
                 const uiStatus = marketUiStatus(market);
 
                 return (
-                  <Link
+                  <article
                     key={market.marketId}
-                    href={`/markets/${market.marketId}`}
                     className={`prediction-card market-card-large ${providerClassName(market.provider)}`}
+                    data-testid="market-signal-card"
                   >
                     <div className="card-topline">
                       <span>{market.category}</span>
@@ -169,7 +169,24 @@ export default function MarketsPage() {
                         <strong>{statusLabel(uiStatus)}</strong>
                       </div>
                     </div>
-                  </Link>
+                    <div className="market-card-actions">
+                      <Link
+                        className="mobile-action mobile-action-primary"
+                        href={`/compose?marketId=${market.marketId}`}
+                        aria-label={`Use in thesis: ${market.title}`}
+                      >
+                        Use in thesis
+                      </Link>
+                      <Link className="mobile-action" href={`/markets/${market.marketId}`}>
+                        Review signal
+                      </Link>
+                      {market.url ? (
+                        <a className="mobile-action" href={market.url} target="_blank" rel="noreferrer">
+                          Source
+                        </a>
+                      ) : null}
+                    </div>
+                  </article>
                 );
               })}
             </section>

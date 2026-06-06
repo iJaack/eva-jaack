@@ -131,7 +131,7 @@ test("markets page color-codes Polymarket and Kalshi provider badges", async ({ 
   await expect(kalshiCard.locator(".provider-badge")).toHaveCSS("border-radius", "4px");
 });
 
-test("markets page filters by provider without losing the market desk context", async ({ page }) => {
+test("markets page filters source signals and keeps use-in-thesis as the primary action", async ({ page }) => {
   await page.route("**/api/markets", async (route) => {
     await route.fulfill({
       status: 200,
@@ -142,15 +142,33 @@ test("markets page filters by provider without losing the market desk context", 
 
   await page.goto("/markets");
 
-  await expect(page.getByRole("heading", { name: "Live market desk" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Will the Fed cut rates in June/i })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Will CPI come in above forecast/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Signal library" })).toBeVisible();
+  await expect(page.getByText("Use markets as citations inside a thesis")).toBeVisible();
+  await expect(page.getByTestId("market-signal-card").filter({ hasText: "Will the Fed cut rates in June?" })).toBeVisible();
+  await expect(page.getByTestId("market-signal-card").filter({ hasText: "Will CPI come in above forecast?" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Use in thesis: Will the Fed cut rates in June?" })).toHaveAttribute("href", "/compose?marketId=polymarket-fed-cut");
+  await expect(page.getByRole("link", { name: "Use in thesis: Will CPI come in above forecast?" })).toHaveAttribute("href", "/compose?marketId=kalshi-cpi");
 
   await page.getByRole("button", { name: "Kalshi" }).click();
 
-  await expect(page.getByRole("link", { name: /Will CPI come in above forecast/i })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Will the Fed cut rates in June/i })).toHaveCount(0);
+  await expect(page.getByTestId("market-signal-card").filter({ hasText: "Will CPI come in above forecast?" })).toBeVisible();
+  await expect(page.getByTestId("market-signal-card").filter({ hasText: "Will the Fed cut rates in June?" })).toHaveCount(0);
   await expect(page.getByText("Showing 1 of 2 markets")).toBeVisible();
+});
+
+test("use in thesis from the market library opens compose with the selected market", async ({ page }) => {
+  await page.route("**/api/markets", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(marketsPayload),
+    });
+  });
+
+  await page.goto("/markets");
+  await page.getByRole("link", { name: "Use in thesis: Will the Fed cut rates in June?" }).click();
+
+  await expect(page).toHaveURL(/\/compose\?marketId=polymarket-fed-cut$/);
 });
 
 test("market detail content starts beside the hero on desktop", async ({ page }) => {
@@ -174,4 +192,20 @@ test("market detail content starts beside the hero on desktop", async ({ page })
     const outcomesBox = await outcomes.boundingBox();
     return Boolean(heroBox && outcomesBox && outcomesBox.x > heroBox.x + heroBox.width && outcomesBox.y < 360);
   }).toBe(true);
+});
+
+test("market detail prioritizes using the market as a thesis signal", async ({ page }) => {
+  await page.route("**/api/markets/polymarket-fed-cut", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(marketDetailPayload),
+    });
+  });
+
+  await page.goto("/markets/polymarket-fed-cut");
+
+  await expect(page.getByRole("heading", { name: "Use this market as a thesis signal" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Use in thesis" })).toHaveAttribute("href", "/compose?marketId=polymarket-fed-cut");
+  await expect(page.getByRole("heading", { name: "Theses using this signal" })).toBeVisible();
 });

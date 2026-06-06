@@ -97,3 +97,21 @@ export function prepareThesisAnchorTransactions(thesis: ThesisDto): PreparedThes
 
   return txs;
 }
+
+export function prepareThesisRevisionAnchorTransactions(thesis: ThesisDto): PreparedThesisTransaction[] {
+  if (/^0x0{40}$/i.test(config.evaThesisProtocol)) {
+    throw new Error("EVA_THESIS_PROTOCOL is not configured");
+  }
+
+  return [
+    {
+      to: config.evaThesisProtocol,
+      description: `Record revision v${thesis.currentRevision.version} for ${thesis.title}`,
+      data: encodeFunctionData({
+        abi: evaThesisProtocolAbi,
+        functionName: "recordRevision",
+        args: [hashRef(thesis.thesisId), thesisRevisionHash(thesis), scoreToUint16(thesis.currentScore)],
+      }),
+    },
+  ];
+}

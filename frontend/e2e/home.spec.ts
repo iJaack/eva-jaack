@@ -141,19 +141,19 @@ test("homepage leads with the prediction workbench layout", async ({ page }) => 
 
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "Publish evolving market theses." })).toBeVisible();
-  await expect(page.getByText("Combine prediction markets, closed outcomes, and verified facts")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Publish public thesis posts." })).toBeVisible();
+  await expect(page.getByText("Draft privately, cite live market signals, anchor before publishing")).toBeVisible();
   await expect(page.getByRole("heading", { name: "One loop, four actions" })).toBeVisible();
   await expect(page.getByRole("link", { name: /01 Write the thesis/i })).toBeVisible();
   await expect(page.getByRole("link", { name: /02 Attach markets/i })).toBeVisible();
   await expect(page.getByText("authors", { exact: true })).toBeVisible();
-  await expect(page.getByText("Market tape")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Scan what moved first" })).toBeVisible();
+  await expect(page.locator(".workbench-tape").getByText("Signal library")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Choose citations for the next thesis" })).toBeVisible();
   await expect(page.getByText("active predictors")).toBeVisible();
   await expect(page.getByText("copied theses")).toBeVisible();
   await expect(page.getByText("Featured thesis")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Inspect the live argument" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Where the network is focused" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Reusable source cards" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Reputation context" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Reasoning layers" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Thesis posts", exact: true })).toBeVisible();

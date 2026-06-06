@@ -255,9 +255,9 @@ export default function HomePage() {
       <main id="main-content" className="mobile-shell prediction-home">
         <section className="mobile-hero home-command">
           <p className="eyebrow">Thesis posts · signals · evidence · history</p>
-          <h1>Publish evolving market theses.</h1>
+          <h1>Publish public thesis posts.</h1>
           <p>
-            Combine prediction markets, closed outcomes, and verified facts into one interactive post that evolves over time.
+            Draft privately, cite live market signals, anchor before publishing, and keep the full revision history visible.
           </p>
           <div className="mobile-hero-actions">
             <Link href="/compose" className="mobile-action mobile-action-primary">
@@ -285,8 +285,8 @@ export default function HomePage() {
             <section className="prediction-section workbench-tape">
               <div className="section-heading-row prediction-heading">
                 <div>
-                  <p className="section-kicker">Market tape</p>
-                  <h2 className="section-title section-title-sm">Scan what moved first</h2>
+                  <p className="section-kicker">Signal library</p>
+                  <h2 className="section-title section-title-sm">Choose citations for the next thesis</h2>
                 </div>
                 <Link href="/compose" className="section-link">
                   New thesis
@@ -299,10 +299,10 @@ export default function HomePage() {
               <div className="section-heading-row prediction-heading">
                 <div>
                   <p className="section-kicker">Markets</p>
-                  <h2 className="section-title section-title-sm">Where the network is focused</h2>
+                  <h2 className="section-title section-title-sm">Reusable source cards</h2>
                 </div>
                 <Link href="/markets" className="section-link">
-                  Markets
+                  Signal library
                 </Link>
               </div>
               {markets.length > 0 ? (

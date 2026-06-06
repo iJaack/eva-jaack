@@ -793,6 +793,50 @@ function revisionFor(version: number, body: string, note: string | null, signals
   };
 }
 
+function buildThesisDraft(markets: PredictionMarketDto[], input: ThesisCreateInput, author: ThesisAuthorDto, createdAt: string): ThesisDto {
+  const title = input.title.trim();
+  const body = input.body.trim();
+  const thesisId = `thesis-${stableHash({ title: title.toLowerCase(), author: author.xHandle.toLowerCase(), body })}`;
+  const signals = [
+    ...(input.predictionSignals ?? []).map((signal) => buildPredictionSignal(markets, signal, createdAt)),
+    ...(input.factSignals ?? []).map((signal) => buildFactSignal(signal, createdAt)),
+  ];
+  const revision = revisionFor(1, body, "Initial thesis published.", signals, null, createdAt);
+  const score = revision.scoreAfter;
+  return {
+    thesisId,
+    title,
+    slug: `${slugify(title)}-${thesisId.slice(-6)}`,
+    author,
+    body,
+    currentRevision: revision,
+    revisions: [revision],
+    signals,
+    currentScore: score,
+    evidenceLinks: input.evidenceLinks?.filter((link) => link.trim()).map((link) => link.trim()) ?? [],
+    sourceUrl: input.sourceUrl?.trim() || null,
+    sourcePostUrl: input.sourcePostUrl?.trim() || null,
+    counterToThesisId: input.counterToThesisId?.trim() || null,
+    copiedCount: 0,
+    challengedCount: input.counterToThesisId ? 1 : 0,
+    status: "active",
+    resolution: { ...emptyResolution },
+    timeline: [
+      {
+        timelineId: `tl-${stableHash({ thesisId, createdAt, action: "created" })}`,
+        action: "created",
+        at: createdAt,
+        note: "Thesis published with initial signal basket.",
+        scoreBefore: null,
+        scoreAfter: score,
+      },
+    ],
+    anchor: emptyAnchor(),
+    createdAt,
+    updatedAt: createdAt,
+  };
+}
+
 function bestCategory(theses: ThesisDto[]): string | null {
   const counts = new Map<string, number>();
   for (const thesis of theses) {
@@ -914,53 +958,101 @@ export class LocalPredictionLayerService {
     if (!input.title.trim() || !input.body.trim()) throw new Error("title and body are required");
     const store = await this.readStore();
     const createdAt = new Date().toISOString();
-    const title = input.title.trim();
-    const thesisId = `thesis-${stableHash({ title: title.toLowerCase(), author: author.xHandle.toLowerCase(), body: input.body.trim() })}`;
-    const existing = store.theses.find((thesis) => thesis.thesisId === thesisId);
+    const thesis = buildThesisDraft(store.markets, input, author, createdAt);
+    const existing = store.theses.find((entry) => entry.thesisId === thesis.thesisId);
     if (existing) {
       return { created: false, thesis: existing, markets: this.marketsForThesis(store.markets, existing) };
     }
-    const signals = [
-      ...(input.predictionSignals ?? []).map((signal) => buildPredictionSignal(store.markets, signal, createdAt)),
-      ...(input.factSignals ?? []).map((signal) => buildFactSignal(signal, createdAt)),
-    ];
-    const revision = revisionFor(1, input.body.trim(), "Initial thesis published.", signals, null, createdAt);
-    const score = revision.scoreAfter;
-    const thesis: ThesisDto = {
-      thesisId,
-      title,
-      slug: `${slugify(title)}-${thesisId.slice(-6)}`,
-      author,
-      body: input.body.trim(),
-      currentRevision: revision,
-      revisions: [revision],
-      signals,
-      currentScore: score,
-      evidenceLinks: input.evidenceLinks?.filter((link) => link.trim()).map((link) => link.trim()) ?? [],
-      sourceUrl: input.sourceUrl?.trim() || null,
-      sourcePostUrl: input.sourcePostUrl?.trim() || null,
-      counterToThesisId: input.counterToThesisId?.trim() || null,
-      copiedCount: 0,
-      challengedCount: input.counterToThesisId ? 1 : 0,
-      status: "active",
-      resolution: { ...emptyResolution },
-      timeline: [
-        {
-          timelineId: `tl-${stableHash({ thesisId, createdAt, action: "created" })}`,
-          action: "created",
-          at: createdAt,
-          note: "Thesis published with initial signal basket.",
-          scoreBefore: null,
-          scoreAfter: score,
-        },
-      ],
-      anchor: emptyAnchor(),
-      createdAt,
-      updatedAt: createdAt,
-    };
     store.theses.push(thesis);
     await this.writeStore(store);
     return { created: true, thesis, markets: this.marketsForThesis(store.markets, thesis) };
+  }
+
+  async previewThesis(input: ThesisCreateInput): Promise<ThesisDetailResponse> {
+    const author = normalizeIdentity(input.identity);
+    if (!input.title.trim() || !input.body.trim()) throw new Error("title and body are required");
+    const store = await this.readStore();
+    const thesis = buildThesisDraft(store.markets, input, author, new Date().toISOString());
+    const predictors = await this.listPredictors();
+    return {
+      thesis,
+      markets: this.marketsForThesis(store.markets, thesis),
+      predictor:
+        predictors.predictors.find((entry) => entry.handle.toLowerCase() === thesis.author.xHandle.toLowerCase()) ??
+        ({
+          predictorId: `predictor-${stableHash(thesis.author.walletAddress.toLowerCase())}`,
+          handle: thesis.author.xHandle,
+          wallet: thesis.author.walletAddress,
+          agentId: null,
+          registered: false,
+          profileState: "unclaimed",
+          trustScore: 0,
+          openTheses: 0,
+          resolvedTheses: 0,
+          accuracy: null,
+          avgOddsEdge: null,
+          copiedTheses: 0,
+          bestCategory: null,
+          badges: [],
+        } satisfies PredictorDto),
+      counters: [],
+    };
+  }
+
+  async previewRevision(thesisId: string, input: ThesisRevisionInput): Promise<ThesisDetailResponse | null> {
+    const actor = normalizeIdentity(input.identity);
+    const store = await this.readStore();
+    const original = store.theses.find((entry) => entry.thesisId === thesisId || entry.slug === thesisId);
+    if (!original) return null;
+    if (original.author.walletAddress.toLowerCase() !== actor.walletAddress.toLowerCase()) {
+      throw new Error("Only the thesis author can revise this thesis");
+    }
+
+    const thesis = structuredClone(original);
+    const now = new Date().toISOString();
+    const scoreBefore = thesis.currentScore;
+    const signals = thesis.signals.map((signal) => {
+      const update = input.signalUpdates?.find((entry) => entry.signalId === signal.signalId);
+      if (!update || signal.kind !== "prediction_market") return signal;
+      const next = {
+        ...signal,
+        currentOdds: normalizeProbability(update.currentOdds, signal.currentOdds),
+        weight: clampWeight(update.weight ?? signal.weight),
+        status: update.status ?? signal.status,
+        resolvedOutcomeLabel: update.resolvedOutcomeLabel?.trim() || signal.resolvedOutcomeLabel,
+        updatedAt: now,
+      };
+      return {
+        ...next,
+        signalScore: predictionSignalScore(next),
+      };
+    });
+    const body = input.body?.trim() || thesis.body;
+    const revision = revisionFor(thesis.revisions.length + 1, body, input.note?.trim() || null, signals, scoreBefore, now);
+    thesis.body = body;
+    thesis.signals = signals;
+    thesis.currentRevision = revision;
+    thesis.revisions.push(revision);
+    thesis.currentScore = revision.scoreAfter;
+    thesis.updatedAt = now;
+    thesis.timeline.push({
+      timelineId: `tl-${stableHash({ thesisId, now, action: "revised" })}`,
+      action: "revised",
+      at: now,
+      note: input.note?.trim() || "Thesis revised.",
+      scoreBefore,
+      scoreAfter: thesis.currentScore,
+    });
+
+    const predictors = await this.listPredictors();
+    const predictor = predictors.predictors.find((entry) => entry.handle.toLowerCase() === thesis.author.xHandle.toLowerCase());
+    if (!predictor) return null;
+    return {
+      thesis,
+      markets: this.marketsForThesis(store.markets, thesis),
+      predictor,
+      counters: store.theses.filter((entry) => entry.counterToThesisId === thesis.thesisId),
+    };
   }
 
   async recordRevision(thesisId: string, input: ThesisRevisionInput): Promise<ThesisDetailResponse | null> {

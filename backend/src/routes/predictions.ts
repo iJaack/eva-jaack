@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { Hono } from "hono";
 import type { Context } from "hono";
 import type {
@@ -8,6 +9,7 @@ import type {
   PredictorDetailResponse,
   PredictorListResponse,
   ThesisCreateResponse,
+  ThesisDraftAnchorPrepareResponse,
   ThesisDetailResponse,
   ThesisListResponse,
   XCommandIngestResponse,
@@ -16,9 +18,10 @@ import {
   getPredictionLayerService,
   type LocalPredictionLayerService,
   type ThesisCreateInput,
+  type ThesisRevisionInput,
   type XCommandIngestInput,
 } from "../services/prediction-layer.js";
-import { prepareThesisAnchorTransactions } from "../services/thesis-protocol.js";
+import { prepareThesisAnchorTransactions, prepareThesisRevisionAnchorTransactions } from "../services/thesis-protocol.js";
 
 type PredictionRouteDeps = {
   predictions: LocalPredictionLayerService;
@@ -26,6 +29,10 @@ type PredictionRouteDeps = {
 
 type PredictionSignalInputItem = NonNullable<ThesisCreateInput["predictionSignals"]>[number];
 type FactSignalInputItem = NonNullable<ThesisCreateInput["factSignals"]>[number];
+type DraftAnchorPreparation = {
+  fingerprint: string;
+  preparedAt: string;
+};
 
 function normalizeString(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
@@ -58,48 +65,16 @@ async function readJsonBody(c: Context): Promise<Record<string, unknown> | null>
   }
 }
 
-export function createPredictionRoutes(
-  deps: PredictionRouteDeps = {
-    predictions: getPredictionLayerService(),
-  },
-) {
-  const routes = new Hono();
+function thesisCreateInputFromBody(body: Record<string, unknown>): { input: ThesisCreateInput | null; error: string | null } {
+  const title = normalizeString(body.title);
+  const thesisBody = normalizeString(body.body);
+  if (!title || !thesisBody) {
+    return { input: null, error: "Missing required fields: title, body" };
+  }
 
-  routes.get("/prediction-summary", async (c) => {
-    const response = await deps.predictions.getSummary();
-    return c.json<PredictionNetworkSummaryResponse>(response);
-  });
-
-  routes.get("/markets", async (c) => {
-    const response = await deps.predictions.listMarkets();
-    return c.json<MarketListResponse>(response);
-  });
-
-  routes.get("/markets/:marketId", async (c) => {
-    const response = await deps.predictions.getMarket(c.req.param("marketId"));
-    if (!response) return c.json({ error: "Market not found" }, 404);
-    return c.json<MarketDetailResponse>(response);
-  });
-
-  routes.get("/theses", async (c) => {
-    const response = await deps.predictions.listTheses({
-      marketId: c.req.query("marketId") ?? null,
-      author: c.req.query("author") ?? null,
-    });
-    return c.json<ThesisListResponse>(response);
-  });
-
-  routes.post("/theses", async (c) => {
-    const body = await readJsonBody(c);
-    if (!body) return c.json({ error: "Invalid JSON body" }, 400);
-
-    const title = normalizeString(body.title);
-    const thesisBody = normalizeString(body.body);
-    if (!title || !thesisBody) {
-      return c.json({ error: "Missing required fields: title, body" }, 400);
-    }
-
-    const input: ThesisCreateInput = {
+  return {
+    error: null,
+    input: {
       identity: {
         dynamicUserId: normalizeString(body.dynamicUserId) ?? normalizeString(body.identity && typeof body.identity === "object" ? (body.identity as Record<string, unknown>).dynamicUserId : null) ?? "",
         xHandle: normalizeString(body.xHandle) ?? normalizeString(body.identity && typeof body.identity === "object" ? (body.identity as Record<string, unknown>).xHandle : null) ?? "",
@@ -140,13 +115,148 @@ export function createPredictionRoutes(
       sourceUrl: normalizeString(body.sourceUrl),
       sourcePostUrl: normalizeString(body.sourcePostUrl),
       counterToThesisId: normalizeString(body.counterToThesisId),
-    };
+    },
+  };
+}
+
+function draftFingerprint(input: unknown): string {
+  return createHash("sha256").update(JSON.stringify(input)).digest("hex");
+}
+
+export function createPredictionRoutes(
+  deps: PredictionRouteDeps = {
+    predictions: getPredictionLayerService(),
+  },
+) {
+  const routes = new Hono();
+  const draftAnchors = new Map<string, DraftAnchorPreparation>();
+  const revisionAnchors = new Map<string, DraftAnchorPreparation>();
+
+  routes.get("/prediction-summary", async (c) => {
+    const response = await deps.predictions.getSummary();
+    return c.json<PredictionNetworkSummaryResponse>(response);
+  });
+
+  routes.get("/markets", async (c) => {
+    const response = await deps.predictions.listMarkets();
+    return c.json<MarketListResponse>(response);
+  });
+
+  routes.get("/markets/:marketId", async (c) => {
+    const response = await deps.predictions.getMarket(c.req.param("marketId"));
+    if (!response) return c.json({ error: "Market not found" }, 404);
+    return c.json<MarketDetailResponse>(response);
+  });
+
+  routes.get("/theses", async (c) => {
+    const response = await deps.predictions.listTheses({
+      marketId: c.req.query("marketId") ?? null,
+      author: c.req.query("author") ?? null,
+    });
+    return c.json<ThesisListResponse>(response);
+  });
+
+  routes.post("/theses", async (c) => {
+    const body = await readJsonBody(c);
+    if (!body) return c.json({ error: "Invalid JSON body" }, 400);
+
+    const { input, error } = thesisCreateInputFromBody(body);
+    if (error || !input) return c.json({ error }, 400);
 
     try {
+      await deps.predictions.previewThesis(input);
+
+      const anchorPreparationId = normalizeString(body.anchorPreparationId);
+      if (!anchorPreparationId) {
+        return c.json({ error: "Prepare anchor before publishing thesis" }, 400);
+      }
+
+      const prepared = draftAnchors.get(anchorPreparationId);
+      if (!prepared) {
+        return c.json({ error: "Prepare anchor before publishing thesis" }, 400);
+      }
+      if (prepared.fingerprint !== draftFingerprint(input)) {
+        return c.json({ error: "Prepared anchor does not match current thesis draft" }, 400);
+      }
+
       const response = await deps.predictions.createThesis(input);
+      if (response.created) draftAnchors.delete(anchorPreparationId);
       return c.json<ThesisCreateResponse>(response, response.created ? 201 : 200);
     } catch (error) {
       return c.json({ error: error instanceof Error ? error.message : "Failed to create thesis" }, 400);
+    }
+  });
+
+  routes.post("/thesis-drafts/protocol/prepare-anchor", async (c) => {
+    const body = await readJsonBody(c);
+    if (!body) return c.json({ error: "Invalid JSON body" }, 400);
+
+    const { input, error } = thesisCreateInputFromBody(body);
+    if (error || !input) return c.json({ error }, 400);
+
+    try {
+      const detail = await deps.predictions.previewThesis(input);
+      const fingerprint = draftFingerprint(input);
+      const anchorPreparationId = `draft-anchor-${fingerprint.slice(0, 24)}`;
+      draftAnchors.set(anchorPreparationId, {
+        fingerprint,
+        preparedAt: new Date().toISOString(),
+      });
+      return c.json<ThesisDraftAnchorPrepareResponse>({
+        anchorPreparationId,
+        thesisId: detail.thesis.thesisId,
+        anchorStatus: "prepared",
+        transactions: prepareThesisAnchorTransactions(detail.thesis),
+      });
+    } catch (error) {
+      return c.json({ error: error instanceof Error ? error.message : "Failed to prepare draft anchor transactions" }, 400);
+    }
+  });
+
+  function thesisRevisionInputFromBody(body: Record<string, unknown>): ThesisRevisionInput {
+    return {
+      identity: {
+        dynamicUserId: normalizeString(body.dynamicUserId) ?? "",
+        xHandle: normalizeString(body.xHandle) ?? "",
+        xProfileId: normalizeString(body.xProfileId),
+        walletAddress: normalizeString(body.walletAddress),
+        walletSource: normalizeString(body.walletSource) as "external" | "embedded" | null,
+      },
+      body: normalizeString(body.body),
+      note: normalizeString(body.note),
+      signalUpdates: normalizeObjectArray(body.signalUpdates).map((update) => ({
+        signalId: normalizeString(update.signalId) ?? "",
+        currentOdds: normalizeNumber(update.currentOdds),
+        weight: normalizeNumber(update.weight),
+        status: normalizeString(update.status) as PredictionSignalInputItem["status"],
+        resolvedOutcomeLabel: normalizeString(update.resolvedOutcomeLabel),
+      })),
+    };
+  }
+
+  routes.post("/theses/:thesisId/revision-drafts/protocol/prepare-anchor", async (c) => {
+    const body = await readJsonBody(c);
+    if (!body) return c.json({ error: "Invalid JSON body" }, 400);
+
+    const input = thesisRevisionInputFromBody(body);
+    try {
+      const detail = await deps.predictions.previewRevision(c.req.param("thesisId"), input);
+      if (!detail) return c.json({ error: "Thesis not found" }, 404);
+
+      const fingerprint = draftFingerprint(input);
+      const anchorPreparationId = `revision-anchor-${fingerprint.slice(0, 24)}`;
+      revisionAnchors.set(anchorPreparationId, {
+        fingerprint,
+        preparedAt: new Date().toISOString(),
+      });
+      return c.json({
+        anchorPreparationId,
+        thesisId: detail.thesis.thesisId,
+        anchorStatus: "prepared",
+        transactions: prepareThesisRevisionAnchorTransactions(detail.thesis),
+      });
+    } catch (error) {
+      return c.json({ error: error instanceof Error ? error.message : "Failed to prepare revision anchor transactions" }, 400);
     }
   });
 
@@ -161,25 +271,26 @@ export function createPredictionRoutes(
     if (!body) return c.json({ error: "Invalid JSON body" }, 400);
 
     try {
-      const response = await deps.predictions.recordRevision(c.req.param("thesisId"), {
-        identity: {
-          dynamicUserId: normalizeString(body.dynamicUserId) ?? "",
-          xHandle: normalizeString(body.xHandle) ?? "",
-          xProfileId: normalizeString(body.xProfileId),
-          walletAddress: normalizeString(body.walletAddress),
-          walletSource: normalizeString(body.walletSource) as "external" | "embedded" | null,
-        },
-        body: normalizeString(body.body),
-        note: normalizeString(body.note),
-        signalUpdates: normalizeObjectArray(body.signalUpdates).map((update) => ({
-          signalId: normalizeString(update.signalId) ?? "",
-          currentOdds: normalizeNumber(update.currentOdds),
-          weight: normalizeNumber(update.weight),
-          status: normalizeString(update.status) as PredictionSignalInputItem["status"],
-          resolvedOutcomeLabel: normalizeString(update.resolvedOutcomeLabel),
-        })),
-      });
+      const input = thesisRevisionInputFromBody(body);
+      const preview = await deps.predictions.previewRevision(c.req.param("thesisId"), input);
+      if (!preview) return c.json({ error: "Thesis not found" }, 404);
+
+      const anchorPreparationId = normalizeString(body.anchorPreparationId);
+      if (!anchorPreparationId) {
+        return c.json({ error: "Prepare anchor before publishing thesis update" }, 400);
+      }
+
+      const prepared = revisionAnchors.get(anchorPreparationId);
+      if (!prepared) {
+        return c.json({ error: "Prepare anchor before publishing thesis update" }, 400);
+      }
+      if (prepared.fingerprint !== draftFingerprint(input)) {
+        return c.json({ error: "Prepared anchor does not match current thesis update" }, 400);
+      }
+
+      const response = await deps.predictions.recordRevision(c.req.param("thesisId"), input);
       if (!response) return c.json({ error: "Thesis not found" }, 404);
+      revisionAnchors.delete(anchorPreparationId);
       return c.json<ThesisDetailResponse>(response);
     } catch (error) {
       return c.json({ error: error instanceof Error ? error.message : "Failed to revise thesis" }, 400);

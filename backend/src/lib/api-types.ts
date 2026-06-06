@@ -207,6 +207,19 @@ export interface ThesisCreateResponse {
   markets: PredictionMarketDto[];
 }
 
+export interface PreparedProtocolTransactionDto {
+  to: string;
+  data: string;
+  description: string;
+}
+
+export interface ThesisDraftAnchorPrepareResponse {
+  anchorPreparationId: string;
+  thesisId: string;
+  anchorStatus: "prepared";
+  transactions: PreparedProtocolTransactionDto[];
+}
+
 export interface PredictorListResponse {
   count: number;
   predictors: PredictorDto[];

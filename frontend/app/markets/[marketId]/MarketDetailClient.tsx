@@ -49,14 +49,20 @@ export default function MarketDetailClient() {
             <section className="mobile-page-head market-detail-head">
               <p className="eyebrow">{detail.market.category}</p>
               <h1>{detail.market.title}</h1>
-              <p>Odds stay external and remain forecasts. Eva tracks theses, counters, evidence, and separate resolution status around the market.</p>
+              <p>Use this market as a thesis signal. Eva keeps the market forecast separate from the thesis, its citations, and its revision history.</p>
               <div className="status-row">
                 <span className="status-chip status-chip-forecast">Odds forecast</span>
                 <span className={statusClassName(marketUiStatus(detail.market))}>{statusLabel(marketUiStatus(detail.market))}</span>
               </div>
             </section>
 
-            <section className="prediction-card">
+            <section className="prediction-card market-detail-signal-panel">
+              <div className="section-heading-row prediction-heading">
+                <div>
+                  <p className="section-kicker">Selected source</p>
+                  <h2 className="section-title section-title-sm">Use this market as a thesis signal</h2>
+                </div>
+              </div>
               <div className="market-outcomes market-outcomes-large">
                 {detail.market.outcomes.map((outcome) => (
                   <div key={outcome.outcomeId}>
@@ -67,7 +73,7 @@ export default function MarketDetailClient() {
               </div>
               <div className="sticky-action-row">
                 <Link className="mobile-action mobile-action-primary" href={`/compose?marketId=${detail.market.marketId}`}>
-                  Add thesis
+                  Use in thesis
                 </Link>
                 {detail.market.url ? (
                   <a className="mobile-action" href={detail.market.url} target="_blank" rel="noreferrer">
@@ -81,7 +87,7 @@ export default function MarketDetailClient() {
               <div className="section-heading-row prediction-heading">
                 <div>
                   <p className="section-kicker">Theses</p>
-                  <h2 className="section-title section-title-sm">Calls attached to this market</h2>
+                  <h2 className="section-title section-title-sm">Theses using this signal</h2>
                 </div>
               </div>
               <div className="thesis-stack">

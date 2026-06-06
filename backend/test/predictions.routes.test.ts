@@ -33,6 +33,35 @@ function identityPayload() {
   };
 }
 
+function thesisCreatePayload(overrides: Record<string, unknown> = {}) {
+  return {
+    ...identityPayload(),
+    title: "SpaceX IPO liquidity rotation thesis",
+    body: "SpaceX IPO anticipation is absorbing speculative liquidity now.",
+    predictionSignals: [
+      {
+        marketId: "spacex-ipo-before-2027",
+        selectedOutcomeLabel: "Yes",
+        oddsAtAdd: 0.24,
+        currentOdds: 0.36,
+        weight: 60,
+        role: "core",
+      },
+    ],
+    factSignals: [
+      {
+        claimText: "SpaceX has explored tender offers before a public listing.",
+        verifierVerdict: "likely_true",
+        verifierScore: 82,
+        reportUri: "ipfs://route-fact",
+        weight: 40,
+        role: "second_order",
+      },
+    ],
+    ...overrides,
+  };
+}
+
 describe("prediction routes", () => {
   it("serves summary, market detail, and predictor rankings", async () => {
     const app = await makeApp();
@@ -60,33 +89,25 @@ describe("prediction routes", () => {
 
   it("creates and revises a multi-signal thesis", async () => {
     const app = await makeApp();
+    const payload = thesisCreatePayload();
+    const prepared = await fetchJson(app, "/api/thesis-drafts/protocol/prepare-anchor", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    expect(prepared.status).toBe(200);
+    expect(prepared.body).toMatchObject({
+      anchorPreparationId: expect.stringMatching(/^draft-anchor-/),
+      anchorStatus: "prepared",
+      transactions: expect.arrayContaining([expect.objectContaining({ description: expect.stringContaining("Create thesis protocol record") })]),
+    });
+
     const created = await fetchJson(app, "/api/theses", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        ...identityPayload(),
-        title: "SpaceX IPO liquidity rotation thesis",
-        body: "SpaceX IPO anticipation is absorbing speculative liquidity now.",
-        predictionSignals: [
-          {
-            marketId: "spacex-ipo-before-2027",
-            selectedOutcomeLabel: "Yes",
-            oddsAtAdd: 0.24,
-            currentOdds: 0.36,
-            weight: 60,
-            role: "core",
-          },
-        ],
-        factSignals: [
-          {
-            claimText: "SpaceX has explored tender offers before a public listing.",
-            verifierVerdict: "likely_true",
-            verifierScore: 82,
-            reportUri: "ipfs://route-fact",
-            weight: 40,
-            role: "second_order",
-          },
-        ],
+        ...payload,
+        anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
       }),
     });
 
@@ -104,14 +125,31 @@ describe("prediction routes", () => {
     });
 
     const signalId = (created.body as { thesis: { signals: Array<{ signalId: string }> } }).thesis.signals[0]!.signalId;
+    const revisionPayload = {
+      ...identityPayload(),
+      body: "SpaceX IPO timing odds strengthened, so the thesis confidence improved.",
+      note: "IPO timing signal moved.",
+      signalUpdates: [{ signalId, currentOdds: 0.45 }],
+    };
+    const preparedRevision = await fetchJson(app, `/api/theses/${thesisId}/revision-drafts/protocol/prepare-anchor`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(revisionPayload),
+    });
+    expect(preparedRevision.status).toBe(200);
+    expect(preparedRevision.body).toMatchObject({
+      anchorPreparationId: expect.stringMatching(/^revision-anchor-/),
+      thesisId,
+      anchorStatus: "prepared",
+      transactions: expect.arrayContaining([expect.objectContaining({ description: expect.stringContaining("Record revision") })]),
+    });
+
     const revised = await fetchJson(app, `/api/theses/${thesisId}/revisions`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        ...identityPayload(),
-        body: "SpaceX IPO timing odds strengthened, so the thesis confidence improved.",
-        note: "IPO timing signal moved.",
-        signalUpdates: [{ signalId, currentOdds: 0.45 }],
+        ...revisionPayload,
+        anchorPreparationId: (preparedRevision.body as { anchorPreparationId: string }).anchorPreparationId,
       }),
     });
 
@@ -138,6 +176,124 @@ describe("prediction routes", () => {
     expect(response.status).toBe(400);
     expect(response.body).toMatchObject({
       error: "Connected X identity and wallet are required",
+    });
+  });
+
+  it("rejects public thesis publishing before draft anchor preparation", async () => {
+    const app = await makeApp();
+
+    const response = await fetchJson(app, "/api/theses", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(thesisCreatePayload()),
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      error: "Prepare anchor before publishing thesis",
+    });
+  });
+
+  it("rejects public thesis publishing when the prepared draft changed", async () => {
+    const app = await makeApp();
+    const payload = thesisCreatePayload();
+    const prepared = await fetchJson(app, "/api/thesis-drafts/protocol/prepare-anchor", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const response = await fetchJson(app, "/api/theses", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...payload,
+        body: `${payload.body} Materially changed after anchor preparation.`,
+        anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
+      }),
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      error: "Prepared anchor does not match current thesis draft",
+    });
+  });
+
+  it("rejects thesis revision publishing before revision anchor preparation", async () => {
+    const app = await makeApp();
+    const payload = thesisCreatePayload();
+    const prepared = await fetchJson(app, "/api/thesis-drafts/protocol/prepare-anchor", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const created = await fetchJson(app, "/api/theses", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...payload,
+        anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
+      }),
+    });
+    const thesisId = (created.body as { thesis: { thesisId: string } }).thesis.thesisId;
+
+    const response = await fetchJson(app, `/api/theses/${thesisId}/revisions`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...identityPayload(),
+        body: "Unanchored revision should not publish.",
+        note: "No revision anchor.",
+      }),
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      error: "Prepare anchor before publishing thesis update",
+    });
+  });
+
+  it("rejects thesis revision publishing when the prepared revision changed", async () => {
+    const app = await makeApp();
+    const payload = thesisCreatePayload();
+    const prepared = await fetchJson(app, "/api/thesis-drafts/protocol/prepare-anchor", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const created = await fetchJson(app, "/api/theses", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...payload,
+        anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
+      }),
+    });
+    const thesisId = (created.body as { thesis: { thesisId: string } }).thesis.thesisId;
+    const revisionPayload = {
+      ...identityPayload(),
+      body: "Prepared revision body.",
+      note: "Prepared revision.",
+    };
+    const preparedRevision = await fetchJson(app, `/api/theses/${thesisId}/revision-drafts/protocol/prepare-anchor`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(revisionPayload),
+    });
+
+    const response = await fetchJson(app, `/api/theses/${thesisId}/revisions`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...revisionPayload,
+        body: "Changed after revision anchor preparation.",
+        anchorPreparationId: (preparedRevision.body as { anchorPreparationId: string }).anchorPreparationId,
+      }),
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      error: "Prepared anchor does not match current thesis update",
     });
   });
 });
