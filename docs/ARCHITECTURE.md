@@ -71,22 +71,26 @@ author shape.
 
 1. User connects X plus wallet.
 2. User writes a thesis body and attaches market/fact signals.
-3. Backend validates identity and stores a new thesis revision.
-4. Frontend renders the thesis page with markets, facts, score, and history.
-5. User can prepare Avalanche anchor transactions for the thesis and signals.
+3. Backend validates identity and previews the thesis without storing it.
+4. Eva prepares Avalanche anchor transactions for the thesis and signals.
+5. Publishing stays disabled until the prepared anchor matches the current draft.
+6. Eva stores the anchored thesis as revision 1 and renders the thesis page with markets, facts, score, and history.
 
 ### Evolve A Thesis
 
 1. Market odds, closed predictions, or facts change.
-2. User or agent records a revision with signal updates.
-3. Eva appends immutable revision/timeline entries.
-4. Readers can inspect how the thesis changed over time.
+2. User or agent prepares a revision draft with signal updates.
+3. Eva prepares the revision anchor transaction and keeps the current thesis unchanged.
+4. Publishing the update requires the matching prepared revision anchor.
+5. Eva appends immutable revision/timeline entries.
+6. Readers can inspect how the thesis changed over time.
 
 ### X And Agent Use
 
 1. X commands can track, counter, copy, or draft a thesis.
-2. MCP exposes thesis creation/inspection primitives for agents.
-3. Agent outputs must preserve source URLs, signal weights, and revision notes.
+2. MCP exposes market search, thesis inspection, draft-anchor preparation, and revision-anchor preparation primitives for agents.
+3. Agent draft tools return `publishState: "anchor_prepared_not_published"` rather than silently storing public theses.
+4. Agent outputs must preserve source URLs, signal weights, and revision notes.
 
 ## Shared Configuration
 

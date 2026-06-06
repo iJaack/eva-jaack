@@ -1,8 +1,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import { createEvaMcpToolHandlers } from "./mcp-tools.js";
 import { getPredictionLayerService } from "./services/prediction-layer.js";
-import { prepareThesisAnchorTransactions } from "./services/thesis-protocol.js";
 
 const server = new McpServer({
   name: "eva-thesis",
@@ -10,21 +10,10 @@ const server = new McpServer({
 });
 
 const predictions = getPredictionLayerService();
+const handlers = createEvaMcpToolHandlers(predictions);
 
 server.tool("search_markets", { query: z.string().optional() }, async ({ query }) => {
-  const markets = await predictions.listMarkets();
-  const normalized = query?.toLowerCase().trim();
-  const filtered = normalized
-    ? markets.markets.filter((market) => `${market.title} ${market.category}`.toLowerCase().includes(normalized))
-    : markets.markets;
-  return {
-    content: [
-      {
-        type: "text",
-        text: JSON.stringify(filtered.slice(0, 20), null, 2),
-      },
-    ],
-  };
+  return handlers.searchMarkets({ query });
 });
 
 server.tool(
@@ -68,22 +57,15 @@ server.tool(
       .default([]),
   },
   async ({ title, body, xHandle, walletAddress, walletSource, predictionSignals, factSignals }) => {
-    const created = await predictions.createThesis({
-      identity: {
-        dynamicUserId: `mcp:${xHandle}`,
-        xHandle,
-        xProfileId: null,
-        walletAddress,
-        walletSource,
-      },
+    return handlers.createThesisDraft({
       title,
       body,
+      xHandle,
+      walletAddress,
+      walletSource,
       predictionSignals,
       factSignals,
     });
-    return {
-      content: [{ type: "text", text: JSON.stringify(created.thesis, null, 2) }],
-    };
   },
 );
 
@@ -93,15 +75,12 @@ server.tool(
     thesisId: z.string(),
   },
   async ({ thesisId }) => {
-    const detail = await predictions.getThesis(thesisId);
-    return {
-      content: [{ type: "text", text: JSON.stringify(detail, null, 2) }],
-    };
+    return handlers.getThesis({ thesisId });
   },
 );
 
 server.tool(
-  "record_revision",
+  "prepare_revision_draft",
   {
     thesisId: z.string(),
     body: z.string(),
@@ -110,20 +89,13 @@ server.tool(
     walletAddress: z.string(),
   },
   async ({ thesisId, body, note, xHandle, walletAddress }) => {
-    const revised = await predictions.recordRevision(thesisId, {
-      identity: {
-        dynamicUserId: `mcp:${xHandle}`,
-        xHandle,
-        xProfileId: null,
-        walletAddress,
-        walletSource: "external",
-      },
+    return handlers.prepareRevisionDraft({
+      thesisId,
       body,
       note,
+      xHandle,
+      walletAddress,
     });
-    return {
-      content: [{ type: "text", text: JSON.stringify(revised, null, 2) }],
-    };
   },
 );
 
@@ -133,17 +105,7 @@ server.tool(
     thesisId: z.string(),
   },
   async ({ thesisId }) => {
-    const detail = await predictions.getThesis(thesisId);
-    if (!detail) {
-      return {
-        isError: true,
-        content: [{ type: "text", text: `Thesis not found: ${thesisId}` }],
-      };
-    }
-    const prepared = prepareThesisAnchorTransactions(detail.thesis);
-    return {
-      content: [{ type: "text", text: JSON.stringify(prepared, null, 2) }],
-    };
+    return handlers.prepareExistingThesisAnchorTransaction({ thesisId });
   },
 );
 

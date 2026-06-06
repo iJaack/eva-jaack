@@ -15,6 +15,7 @@ Recommended first agent workflow:
 
 1. Load market candidates through the Eva MCP or `/api/markets`.
 2. Draft a thesis with one core market signal and one lateral or second-order fact signal.
-3. Call thesis creation with X plus wallet identity.
-4. Prepare anchor transactions only after the user confirms the deployer/wallet.
-5. Revisit the thesis when market odds, closed predictions, or facts change.
+3. Call the MCP thesis draft tool with X plus wallet identity; treat the result as `anchor_prepared_not_published`.
+4. Ask the user to approve the prepared anchor transaction before using the public publish path.
+5. For updates, call the MCP revision draft tool and publish only after the matching revision anchor is approved.
+6. Revisit the thesis when market odds, closed predictions, or facts change.
