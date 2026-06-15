@@ -1,4 +1,26 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+const embeddedWalletAddress = "0x0fe61780bd5508b3C99e420662050e5560608cA4";
+const externalWalletAddress = "0x1111111111111111111111111111111111111111";
+
+type DynamicTestContext = { primaryWallet: unknown; user: unknown };
+
+const embeddedDynamicContext: DynamicTestContext = {
+  primaryWallet: { address: embeddedWalletAddress, connector: { key: "dynamic-embedded-wallet" } },
+  user: {
+    userId: "dyn-spacethesis",
+    verifiedCredentials: [
+      { oauthProvider: "twitter", username: "spacethesis" },
+      { address: embeddedWalletAddress, walletProvider: "dynamic embedded wallet" },
+    ],
+  },
+};
+
+async function seedDynamicContext(page: Page, context: DynamicTestContext = embeddedDynamicContext) {
+  await page.addInitScript((dynamicContext) => {
+    (window as Window & { __evaDynamicContext?: unknown }).__evaDynamicContext = dynamicContext;
+  }, context);
+}
 
 const marketsPayload = {
   count: 1,
@@ -29,6 +51,8 @@ test("compose page guides required thesis inputs before enabling publish", async
   let publishedBody = "";
   let publishedAnchorPreparationId = "";
   const preparedPayloads: Array<Record<string, unknown>> = [];
+
+  await seedDynamicContext(page);
 
   await page.route("**/api/markets", async (route) => {
     await route.fulfill({
@@ -135,6 +159,8 @@ test("compose page guides required thesis inputs before enabling publish", async
 
   const publishButton = page.getByRole("button", { name: "Publish anchored thesis" });
   await expect(page.getByRole("heading", { name: "Thesis body" })).toBeVisible();
+  await expect(page.getByTestId("compose-identity-panel")).toContainText("Ready to publish");
+  await expect(page.getByTestId("compose-identity-panel")).toContainText("embedded");
   await expect(publishButton).toBeDisabled();
   await page.getByLabel("Thesis title").fill("");
   await expect(publishButton).toBeDisabled();
@@ -177,6 +203,8 @@ test("compose page guides required thesis inputs before enabling publish", async
 test("compose supports private structured block drafts with anchored signal citations before publishing", async ({ page }) => {
   const publishedPayloads: Array<Record<string, unknown>> = [];
   const preparedPayloads: Array<Record<string, unknown>> = [];
+
+  await seedDynamicContext(page);
 
   await page.route("**/api/markets", async (route) => {
     await route.fulfill({
@@ -280,6 +308,7 @@ test("compose supports private structured block drafts with anchored signal cita
   await page.goto("/compose");
 
   await expect(page.getByRole("heading", { name: "Thesis body" })).toBeVisible();
+  await expect(page.getByTestId("compose-identity-panel")).toContainText("@spacethesis");
   await expect(page.getByLabel("Thesis block 1")).toBeVisible();
   await expect(page.getByRole("button", { name: "Add block" })).toBeVisible();
 
@@ -329,4 +358,91 @@ test("compose supports private structured block drafts with anchored signal cita
   expect(publishedPayloads[0].anchorPreparationId).toBe("draft-anchor-compose-2");
   expect(publishedPayloads[0].anchorTxHash).toBe("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
   await expect(page.getByRole("heading", { name: "Fed hold liquidity thesis" })).toBeVisible();
+});
+
+test("compose maps external Dynamic X and wallet identity into prepared anchor payloads", async ({ page }) => {
+  const preparedPayloads: Array<Record<string, unknown>> = [];
+
+  await seedDynamicContext(page, {
+    primaryWallet: { address: externalWalletAddress, connector: { key: "metamask" } },
+    user: {
+      userId: "dyn-macrodesk",
+      verifiedCredentials: [
+        { oauthProvider: "twitter", username: "macrodesk" },
+        { address: externalWalletAddress, walletProvider: "metamask" },
+      ],
+    },
+  });
+
+  await page.route("**/api/markets", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(marketsPayload),
+    });
+  });
+
+  await page.route("**/api/thesis-drafts/protocol/prepare-anchor", async (route) => {
+    preparedPayloads.push(route.request().postDataJSON());
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        anchorPreparationId: "draft-anchor-external-wallet",
+        thesisId: "thesis-fed-hold",
+        anchorStatus: "prepared",
+        transactions: [],
+      }),
+    });
+  });
+
+  await page.goto("/compose");
+
+  await expect(page.getByTestId("compose-identity-panel")).toContainText("Ready to publish");
+  await expect(page.getByTestId("compose-identity-panel")).toContainText("@macrodesk");
+  await expect(page.getByTestId("compose-identity-panel")).toContainText("external");
+
+  await page.getByLabel("Thesis title").fill("External wallet thesis");
+  await page.getByLabel("Thesis block 1").fill("External wallet authorship should flow into anchor preparation.");
+  await page.getByLabel("Primary market signal").selectOption("fed-hold");
+  await page.getByLabel("Outcome").selectOption("Hold");
+  await page.getByRole("button", { name: "Attach market signal" }).click();
+  await page.getByRole("button", { name: "Prepare anchor" }).click();
+
+  expect(preparedPayloads).toHaveLength(1);
+  expect(preparedPayloads[0]).toMatchObject({
+    dynamicUserId: "dyn-macrodesk",
+    xHandle: "@macrodesk",
+    xProfileId: "dyn-macrodesk",
+    walletAddress: externalWalletAddress,
+    walletSource: "external",
+  });
+});
+
+test("compose blocks Dynamic sessions without X or wallet identity", async ({ page }) => {
+  await seedDynamicContext(page, {
+    primaryWallet: { address: externalWalletAddress, connector: { key: "metamask" } },
+    user: { userId: "dyn-no-x", verifiedCredentials: [{ address: externalWalletAddress, walletProvider: "metamask" }] },
+  });
+
+  await page.route("**/api/markets", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(marketsPayload) });
+  });
+
+  await page.goto("/compose");
+  await expect(page.getByTestId("compose-identity-panel")).toContainText("Identity required");
+  await expect(page.getByText("Connect an X account in Dynamic before publishing a thesis.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Prepare anchor" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Publish anchored thesis" })).toBeDisabled();
+
+  await page.addInitScript(() => {
+    (window as Window & { __evaDynamicContext?: unknown }).__evaDynamicContext = {
+      primaryWallet: null,
+      user: { userId: "dyn-no-wallet", verifiedCredentials: [{ oauthProvider: "twitter", username: "spacethesis" }] },
+    };
+  });
+  await page.goto("/compose?case=missing-wallet");
+  await expect(page.getByTestId("compose-identity-panel")).toContainText("Identity required");
+  await expect(page.getByText("Connect or create an Ethereum wallet before publishing a thesis.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Prepare anchor" })).toBeDisabled();
 });
