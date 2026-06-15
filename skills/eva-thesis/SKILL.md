@@ -10,10 +10,13 @@ Use this when an agent needs to create, inspect, or revise an Eva thesis.
 ## Workflow
 
 1. Search markets with the `search_markets` MCP tool.
-2. Create the thesis draft with `create_thesis_draft`.
-3. Add market and fact signals through the Eva app/API when available.
-4. Record revisions with `record_revision` whenever the thesis body or signal interpretation changes.
-5. Never claim protocol anchoring unless anchor status is `confirmed`.
+2. Inspect existing theses with `get_thesis` before revising.
+3. Create a new thesis preview with `create_thesis_draft`, including market and fact signals in the tool input.
+4. Prepare updates with `prepare_revision_draft`; there is no live `record_revision` MCP tool.
+5. Treat MCP write outputs as `anchor_prepared_not_published` until the user approves the public publish path and a matching transaction is confirmed.
+6. Never claim protocol anchoring unless anchor status is `confirmed` via receipt or contract readback.
+
+See `docs/MCP_AGENT_GUIDE.md` for schemas, allowed enums, and safe write boundaries.
 
 ## SpaceX IPO Example
 
