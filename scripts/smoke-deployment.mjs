@@ -32,6 +32,23 @@ const checks = [
   { name: "predictor detail API", method: "GET", path: `${protocol.app.apiBasePath}/predictors/${predictorId}` },
   { name: "health", method: "GET", path: protocol.app.healthPath },
   { name: "agent manifest", method: "GET", path: protocol.app.agentManifestPath },
+  { name: "mcp discovery", method: "GET", path: `${protocol.app.apiBasePath}/mcp` },
+  {
+    name: "mcp initialize",
+    method: "POST",
+    path: `${protocol.app.apiBasePath}/mcp`,
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "initialize",
+      params: {
+        protocolVersion: "2025-06-18",
+        capabilities: {},
+        clientInfo: { name: "eva-smoke", version: "0.0.0" },
+      },
+    }),
+    headers: { accept: "application/json, text/event-stream", "content-type": "application/json" },
+  },
 ];
 
 if (thesisId) {
