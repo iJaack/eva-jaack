@@ -79,7 +79,7 @@ describe("Eva MCP tool handlers", () => {
     const { service, handlers } = await makeService();
     const created = await service.createThesis({
       identity: {
-        dynamicUserId: "seed:@agentalpha",
+        dynamicUserId: "mcp:@agentalpha",
         xHandle: "@agentalpha",
         xProfileId: null,
         walletAddress,
