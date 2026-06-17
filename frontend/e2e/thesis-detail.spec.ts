@@ -209,6 +209,7 @@ test("thesis detail reads as a public thesis with attached citation cards and re
   await expect(page.getByRole("heading", { name: "Revision history" })).toBeVisible();
   await expect(page.getByTestId("revision-card").first()).toContainText("v1");
   await expect(page.getByTestId("revision-card").first()).toContainText("2 signals snapshotted");
+  await expect(page.getByTestId("revision-card").first()).toContainText("Delta new · 64");
   await expect(page.getByRole("heading", { name: "Append an update" })).toBeVisible();
 });
 
@@ -278,4 +279,5 @@ test("publishing an update appends it to the thesis and creates the next revisio
   await expect(page.getByTestId("thesis-body")).toContainText("Rates market repriced after CPI");
   await expect(page.getByTestId("revision-card").first()).toContainText("v2");
   await expect(page.getByTestId("revision-card").first()).toContainText("CPI update moved signal.");
+  await expect(page.getByTestId("revision-card").first()).toContainText("Delta +6");
 });

@@ -45,6 +45,24 @@ function isTxHash(value: string): boolean {
   return /^0x[a-fA-F0-9]{64}$/.test(value.trim());
 }
 
+function scoreDeltaLabel(scoreBefore: number | null, scoreAfter: number): string {
+  if (scoreBefore === null) return `Delta new · ${scoreAfter}`;
+
+  const delta = scoreAfter - scoreBefore;
+  if (delta === 0) return "Delta ±0";
+
+  return `Delta ${delta > 0 ? "+" : ""}${delta}`;
+}
+
+function scoreDeltaClassName(scoreBefore: number | null, scoreAfter: number): string {
+  if (scoreBefore === null) return "status-chip status-chip-unresolved";
+
+  const delta = scoreAfter - scoreBefore;
+  if (delta > 0) return "status-chip status-chip-verified";
+  if (delta < 0) return "status-chip status-chip-disputed";
+  return "status-chip status-chip-forecast";
+}
+
 export default function ThesisDetailClient() {
   const params = useParams();
   const thesisId = params.thesisId as string;
@@ -352,6 +370,7 @@ export default function ThesisDetailClient() {
                     <div className="status-row">
                       <span className="status-chip status-chip-forecast">Before {revision.scoreBefore ?? "new"}</span>
                       <span className="status-chip status-chip-unresolved">After {revision.scoreAfter}</span>
+                      <span className={scoreDeltaClassName(revision.scoreBefore, revision.scoreAfter)}>{scoreDeltaLabel(revision.scoreBefore, revision.scoreAfter)}</span>
                       <span className="status-chip status-chip-verified">Anchor {revision.anchor.status}</span>
                     </div>
                   </article>
