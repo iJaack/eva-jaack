@@ -2,7 +2,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { LocalPredictionLayerService } from "../src/services/prediction-layer.js";
+import { LocalPredictionLayerService, resolvePredictionIndexPath } from "../src/services/prediction-layer.js";
 import { samplePredictorIdentity } from "./fixtures.js";
 
 const cleanupDirs: string[] = [];
@@ -21,6 +21,12 @@ describe("prediction layer service", () => {
   afterEach(async () => {
     await Promise.all(cleanupDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
     vi.unstubAllGlobals();
+  });
+
+  it("uses tmp-backed storage on serverless hosts when no durable storage dir is configured", () => {
+    expect(resolvePredictionIndexPath("/var/eva", { VERCEL: "1" })).toBe(join("/var/eva", "predictions.json"));
+    expect(resolvePredictionIndexPath("", { VERCEL: "1" })).toBe(join(tmpdir(), "eva-predictions/index.json"));
+    expect(resolvePredictionIndexPath("", { AWS_LAMBDA_FUNCTION_NAME: "eva-api" })).toBe(join(tmpdir(), "eva-predictions/index.json"));
   });
 
   it("creates a multi-signal evolving thesis with weighted market and fact scores", async () => {

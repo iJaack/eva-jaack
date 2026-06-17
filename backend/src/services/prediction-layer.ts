@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { config } from "../config.js";
@@ -126,10 +127,21 @@ type KalshiMarketListResponse = {
   cursor?: string;
 };
 
-const defaultPredictionIndexPath = resolve(
+const localPredictionIndexPath = resolve(
   dirname(fileURLToPath(import.meta.url)),
   "../../../.data/eva-predictions/index.json",
 );
+
+export function resolvePredictionIndexPath(
+  storageDir = config.storageDir,
+  env: Record<string, string | undefined> = process.env,
+): string {
+  if (storageDir) return resolve(storageDir, "predictions.json");
+  if (env.VERCEL || env.AWS_LAMBDA_FUNCTION_NAME || env.NETLIFY) {
+    return resolve(tmpdir(), "eva-predictions/index.json");
+  }
+  return localPredictionIndexPath;
+}
 const liveMarketFetchTimeoutMs = 4500;
 const liveMarketCacheTtlMs = 60_000;
 const providerMarketLimit = 250;
@@ -871,9 +883,7 @@ export class LocalPredictionLayerService {
   private liveMarketCache: { loadedAt: number; markets: PredictionMarketDto[] } | null = null;
 
   constructor(
-    private readonly indexPath = config.storageDir
-      ? resolve(config.storageDir, "predictions.json")
-      : defaultPredictionIndexPath,
+    private readonly indexPath = resolvePredictionIndexPath(),
     private readonly registeredIdentityLoader: () => Promise<PredictorIdentityDto[]> = async () => [],
     private readonly liveMarketLoader: LiveMarketLoader = loadProviderMarkets,
   ) {}
