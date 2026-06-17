@@ -112,4 +112,37 @@ describe("Eva MCP tool handlers", () => {
     expect(stored?.thesis.currentRevision.version).toBe(1);
     expect(stored?.thesis.body).toBe("Initial thesis body.");
   });
+
+  it("wraps existing-thesis anchor preparation in the same not-published boundary", async () => {
+    const { service, handlers } = await makeService();
+    const created = await service.createThesis({
+      identity: {
+        dynamicUserId: "seed:@agentalpha",
+        xHandle: "@agentalpha",
+        xProfileId: null,
+        walletAddress,
+        walletSource: "external",
+      },
+      title: "Seed thesis for re-anchor prep",
+      body: "Initial thesis body.",
+      predictionSignals: [{ selectedOutcomeLabel: "Yes", oddsAtAdd: 0.3, currentOdds: 0.3, weight: 100 }],
+    });
+
+    const result = await handlers.prepareExistingThesisAnchorTransaction({ thesisId: created.thesis.thesisId });
+    const body = parseToolJson(result);
+
+    expect(body).toMatchObject({
+      publishState: "anchor_prepared_not_published",
+      anchorStatus: "prepared",
+      thesis: {
+        thesisId: created.thesis.thesisId,
+        title: "Seed thesis for re-anchor prep",
+      },
+      transactions: expect.arrayContaining([
+        expect.objectContaining({ description: expect.stringContaining("Create thesis protocol record") }),
+      ]),
+      nextStep: expect.stringContaining("approve and confirm"),
+    });
+    expect(body).toHaveProperty("anchorPreparationId");
+  });
 });

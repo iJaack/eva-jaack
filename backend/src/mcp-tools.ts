@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { ClaimVerdict, PredictionMarketStatus, ThesisSignalRole, ThesisWalletSource } from "./lib/api-types.js";
+import type { ClaimVerdict, PredictionMarketStatus, ThesisDetailResponse, ThesisSignalRole, ThesisWalletSource } from "./lib/api-types.js";
 import type { LocalPredictionLayerService, ThesisCreateInput, ThesisRevisionInput } from "./services/prediction-layer.js";
 import { prepareThesisAnchorTransactions, prepareThesisRevisionAnchorTransactions } from "./services/thesis-protocol.js";
 
@@ -68,6 +68,27 @@ function draftFingerprint(input: unknown): string {
   return createHash("sha256").update(JSON.stringify(input)).digest("hex");
 }
 
+function preparedAnchorPayload(input: {
+  preparationKind: "draft" | "revision" | "existing";
+  fingerprintInput: unknown;
+  detail: ThesisDetailResponse;
+  transactions: ReturnType<typeof prepareThesisAnchorTransactions>;
+  nextStep: string;
+}) {
+  const fingerprint = draftFingerprint(input.fingerprintInput);
+  return {
+    publishState: "anchor_prepared_not_published",
+    anchorPreparationId: `mcp-${input.preparationKind}-anchor-${fingerprint.slice(0, 24)}`,
+    anchorStatus: "prepared",
+    thesis: input.detail.thesis,
+    markets: input.detail.markets,
+    predictor: input.detail.predictor,
+    counters: input.detail.counters,
+    transactions: input.transactions,
+    nextStep: input.nextStep,
+  };
+}
+
 function identityFor(input: { xHandle: string; walletAddress: string; walletSource?: ThesisWalletSource }): ThesisCreateInput["identity"] {
   return {
     dynamicUserId: `mcp:${input.xHandle}`,
@@ -98,18 +119,13 @@ export function createEvaMcpToolHandlers(predictions: LocalPredictionLayerServic
         factSignals: input.factSignals,
       };
       const preview = await predictions.previewThesis(thesisInput);
-      const fingerprint = draftFingerprint(thesisInput);
-      return toolJson({
-        publishState: "anchor_prepared_not_published",
-        anchorPreparationId: `mcp-draft-anchor-${fingerprint.slice(0, 24)}`,
-        anchorStatus: "prepared",
-        thesis: preview.thesis,
-        markets: preview.markets,
-        predictor: preview.predictor,
-        counters: preview.counters,
+      return toolJson(preparedAnchorPayload({
+        preparationKind: "draft",
+        fingerprintInput: thesisInput,
+        detail: preview,
         transactions: prepareThesisAnchorTransactions(preview.thesis),
         nextStep: "Have the user approve and confirm the anchor transaction before publishing this thesis through Eva.",
-      });
+      }));
     },
 
     async getThesis({ thesisId }: { thesisId: string }): Promise<ToolTextResult> {
@@ -126,24 +142,25 @@ export function createEvaMcpToolHandlers(predictions: LocalPredictionLayerServic
       const preview = await predictions.previewRevision(input.thesisId, revisionInput);
       if (!preview) return toolError(`Thesis not found: ${input.thesisId}`);
 
-      const fingerprint = draftFingerprint({ thesisId: input.thesisId, ...revisionInput });
-      return toolJson({
-        publishState: "anchor_prepared_not_published",
-        anchorPreparationId: `mcp-revision-anchor-${fingerprint.slice(0, 24)}`,
-        anchorStatus: "prepared",
-        thesis: preview.thesis,
-        markets: preview.markets,
-        predictor: preview.predictor,
-        counters: preview.counters,
+      return toolJson(preparedAnchorPayload({
+        preparationKind: "revision",
+        fingerprintInput: { thesisId: input.thesisId, ...revisionInput },
+        detail: preview,
         transactions: prepareThesisRevisionAnchorTransactions(preview.thesis),
         nextStep: "Have the user approve and confirm the revision anchor transaction before publishing this update through Eva.",
-      });
+      }));
     },
 
     async prepareExistingThesisAnchorTransaction({ thesisId }: { thesisId: string }): Promise<ToolTextResult> {
       const detail = await predictions.getThesis(thesisId);
       if (!detail) return toolError(`Thesis not found: ${thesisId}`);
-      return toolJson(prepareThesisAnchorTransactions(detail.thesis));
+      return toolJson(preparedAnchorPayload({
+        preparationKind: "existing",
+        fingerprintInput: { thesisId: detail.thesis.thesisId, revision: detail.thesis.currentRevision.version },
+        detail,
+        transactions: prepareThesisAnchorTransactions(detail.thesis),
+        nextStep: "Have the user approve and confirm the anchor transaction before publishing or re-anchoring this thesis through Eva.",
+      }));
     },
   };
 }
