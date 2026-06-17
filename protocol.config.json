@@ -15,7 +15,7 @@
     "explorerUrl": "https://snowtrace.io"
   },
   "contracts": {
-    "deployBlock": 79554000,
+    "deployBlock": 87265823,
     "evaThesisProtocol": "0x5eDBd1eea3228662326e60634E53AB8975D6641c"
   },
   "agents": {

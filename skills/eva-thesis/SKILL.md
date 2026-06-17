@@ -7,16 +7,19 @@ description: Create and update Eva evolving thesis posts with market and fact si
 
 Use this when an agent needs to create, inspect, or revise an Eva thesis.
 
-Canonical MCP and safety guide: `docs/AGENT_MCP_GUIDE.md`.
+Canonical MCP and safety guide: `docs/MCP_AGENT_GUIDE.md`.
 
 ## Workflow
 
 1. Search markets with the `search_markets` MCP tool.
-2. Inspect existing context with `get_thesis` when revising.
-3. Prepare the thesis draft with `create_thesis_draft`, or prepare an update with `prepare_revision_draft`.
-4. Preserve market URLs, source URLs, signal weights, signal roles, and revision notes.
-5. Treat `publishState: "anchor_prepared_not_published"` as draft/anchor-prep only.
-6. Never claim public publishing or protocol confirmation unless a user-approved transaction has a receipt or contract readback.
+2. Inspect existing theses with `get_thesis` before revising.
+3. Create a new thesis preview with `create_thesis_draft`, including market and fact signals in the tool input.
+4. Prepare updates with `prepare_revision_draft`; there is no live `record_revision` MCP tool.
+5. Preserve market URLs, source URLs, signal weights, signal roles, and revision notes.
+6. Treat MCP write outputs as `anchor_prepared_not_published` until the user approves the public publish path and a matching transaction is confirmed.
+7. Never claim public publishing, protocol anchoring, or revision confirmation unless anchor status is `confirmed` via receipt or contract readback.
+
+See `docs/MCP_AGENT_GUIDE.md` for schemas, allowed enums, and safe write boundaries.
 
 ## Safe Write Boundary
 
