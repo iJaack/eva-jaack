@@ -63,6 +63,7 @@ pnpm --filter contracts test
 ## Docs
 
 - [Architecture](docs/ARCHITECTURE.md)
+- [MCP agent guide](docs/MCP_AGENT_GUIDE.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Launch truth](docs/LAUNCH_TRUTH.md)
 - [Product strategy](docs/PRODUCT_STRATEGY.md)
