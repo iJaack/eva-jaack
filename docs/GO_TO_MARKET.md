@@ -26,6 +26,18 @@ matters.
 - Agent demos that create or revise a thesis.
 - Direct outreach to public predictors and analysts.
 
+## Current Campaign: @evapredicts Follow CTA
+
+Hypothesis: prediction-market-native readers are more likely to follow @evapredicts when the homepage frames Eva as a living thesis record instead of another odds dashboard.
+
+Primary audience: public predictors, crypto analysts, and market-curious builders who already post broad theses on X.
+
+CTA: follow @evapredicts and read the SpaceX IPO liquidity rotation launch thesis.
+
+Metric to watch: clicks from the homepage CTA to @evapredicts and the launch thesis before the broader public push.
+
+Next follow-up: if CTA clicks show intent, turn the SpaceX thesis into the first approved @evapredicts thread and reply sequence.
+
 ## Activation Metrics
 
 - Thesis pages created.
