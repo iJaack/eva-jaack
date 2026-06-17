@@ -5,6 +5,7 @@ import type { NextConfig } from "next";
 const currentDir = dirname(fileURLToPath(import.meta.url));
 const localBackendOrigin = process.env.EVA_BACKEND_ORIGIN ?? "http://127.0.0.1:3001";
 const dynamicAuthEnabled = Boolean(process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID);
+const dynamicTestContextEnabled = process.env.NEXT_PUBLIC_DYNAMIC_TEST_CONTEXT === "1";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -17,7 +18,7 @@ const nextConfig: NextConfig = {
     root: resolve(currentDir, ".."),
   },
   webpack(config) {
-    if (!dynamicAuthEnabled) {
+    if (!dynamicAuthEnabled || dynamicTestContextEnabled) {
       config.resolve = config.resolve ?? {};
       config.resolve.alias = {
         ...(typeof config.resolve.alias === "object" && !Array.isArray(config.resolve.alias) ? config.resolve.alias : {}),

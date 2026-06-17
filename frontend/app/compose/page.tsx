@@ -6,15 +6,10 @@ import { FormEvent, Suspense, useEffect, useMemo, useState, type ComponentType }
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import { createThesis, getMarkets, prepareDraftThesisAnchor, type PredictionMarket, type Thesis, type ThesisCreateRequest } from "@/lib/api";
+import type { DynamicIdentityState, DynamicThesisIdentity } from "@/lib/dynamic-identity";
 import { protocol } from "@/lib/protocol";
 
-type ThesisIdentity = {
-  dynamicUserId: string;
-  xHandle: string;
-  xProfileId: string;
-  walletAddress: string;
-  walletSource: "external" | "embedded";
-};
+type ThesisIdentity = DynamicThesisIdentity;
 
 type DraftBlock = {
   id: string;
@@ -56,25 +51,36 @@ const initialBlocks: DraftBlock[] = [
   },
 ];
 
-function DynamicIdentityLoader({ onIdentity }: { onIdentity: (identity: ThesisIdentity) => void }) {
-  const [Bridge, setBridge] = useState<ComponentType<{ onIdentity: (identity: ThesisIdentity) => void }> | null>(null);
+function DynamicIdentityLoader({
+  onIdentity,
+  onIdentityState,
+}: {
+  onIdentity: (identity: ThesisIdentity) => void;
+  onIdentityState: (state: DynamicIdentityState) => void;
+}) {
+  const [Bridge, setBridge] = useState<ComponentType<{ onIdentity: (identity: ThesisIdentity) => void; onIdentityState: (state: DynamicIdentityState) => void }> | null>(null);
   const environmentId = process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
+  const testMode = process.env.NEXT_PUBLIC_DYNAMIC_TEST_CONTEXT === "1";
 
   useEffect(() => {
-    if (!environmentId) return;
+    if (!environmentId && !testMode) return;
     let cancelled = false;
     import("@/components/DynamicComposeIdentityBridge")
       .then((module) => {
-        if (!cancelled) setBridge(() => module.default as ComponentType<{ onIdentity: (identity: ThesisIdentity) => void }>);
+        if (!cancelled) setBridge(() => module.default as ComponentType<{ onIdentity: (identity: ThesisIdentity) => void; onIdentityState: (state: DynamicIdentityState) => void }>);
       })
       .catch(() => setBridge(null));
     return () => {
       cancelled = true;
     };
-  }, [environmentId]);
+  }, [environmentId, testMode]);
 
-  if (!environmentId || !Bridge) return null;
-  return <Bridge onIdentity={onIdentity} />;
+  if ((!environmentId && !testMode) || !Bridge) return null;
+  return <Bridge onIdentity={onIdentity} onIdentityState={onIdentityState} />;
+}
+
+function shortWallet(address: string): string {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
 function isTxHash(value: string): boolean {
@@ -101,6 +107,7 @@ function ComposeInner() {
   const [submitting, setSubmitting] = useState(false);
   const [preparingAnchor, setPreparingAnchor] = useState(false);
   const [identity, setIdentity] = useState<ThesisIdentity>(defaultIdentity);
+  const [identityState, setIdentityState] = useState<DynamicIdentityState | null>(null);
 
   useEffect(() => {
     getMarkets().then((response) => setMarkets(response.markets)).catch(() => setMarkets([]));
@@ -115,20 +122,22 @@ function ComposeInner() {
   const selectedOutcomePrice = selectedOutcome?.price ?? 0.5;
   const normalizedFactClaim = factClaim.trim().replace(/[.]+$/, "");
   const body = blocks.map((block) => block.text.trim()).filter(Boolean).join("\n\n");
-  const dynamicRequired = Boolean(process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID);
-  const usingPreviewIdentity = identity.dynamicUserId === defaultIdentity.dynamicUserId;
-  const identityReady = !dynamicRequired || !usingPreviewIdentity;
+  const dynamicRequired = Boolean(process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID || process.env.NEXT_PUBLIC_DYNAMIC_TEST_CONTEXT === "1");
+  const identityReady = !dynamicRequired || identityState?.status === "ready";
+  const identityMessage = dynamicRequired ? identityState?.message ?? "Connect with Dynamic before publishing a thesis." : "Preview identity active for local compose.";
   const anchorConfirmed = isTxHash(anchorTxHash);
   const canPublish = Boolean(title.trim() && body.trim() && attachedSignals.length > 0 && identityReady && anchorPrepared && anchorPreparationId && anchorConfirmed && !submitting && !preparingAnchor);
   const publishBlocker = preparingAnchor
     ? "Preparing anchor"
-    : !anchorPrepared || !anchorPreparationId
-      ? "Prepare anchor before publishing"
-      : !anchorConfirmed
-        ? "Confirm anchor transaction before publishing"
-        : !attachedSignals.length
-          ? "Attach at least one signal before publishing"
-          : null;
+    : !identityReady
+      ? "Connect X and a wallet before publishing"
+      : !anchorPrepared || !anchorPreparationId
+        ? "Prepare anchor before publishing"
+        : !anchorConfirmed
+          ? "Confirm anchor transaction before publishing"
+          : !attachedSignals.length
+            ? "Attach at least one signal before publishing"
+            : null;
   const nextSignalLabel = `S${attachedSignals.length + 1}`;
 
   const marketSignalText = selectedMarket
@@ -273,6 +282,10 @@ function ComposeInner() {
   });
 
   const prepareAnchor = async () => {
+    if (!identityReady) {
+      setError(identityMessage);
+      return;
+    }
     if (!title.trim() || !body.trim() || !attachedSignals.length) {
       setError("Add a title, thesis blocks, and at least one attached signal before preparing the anchor.");
       return;
@@ -319,7 +332,7 @@ function ComposeInner() {
   return (
     <>
       <Nav />
-      <DynamicIdentityLoader onIdentity={setIdentity} />
+      <DynamicIdentityLoader onIdentity={setIdentity} onIdentityState={setIdentityState} />
       <main id="main-content" className="mobile-shell compose-publication-shell">
         <section className="mobile-page-head compose-page-head">
           <p className="eyebrow">Structured editor</p>
@@ -370,7 +383,28 @@ function ComposeInner() {
             <form className="prediction-card compose-form compose-editor-panel" onSubmit={submit}>
               <div className="card-topline">
                 <span>{identity.xHandle}</span>
-                <span>{identity.walletSource} wallet</span>
+                <span>{identity.walletSource} wallet · {shortWallet(identity.walletAddress)}</span>
+              </div>
+              <div className="wallet-panel compose-identity-panel" data-testid="compose-identity-panel">
+                <div>
+                  <p className="eyebrow">Author identity</p>
+                  <h3>{identityReady ? "Ready to publish" : "Identity required"}</h3>
+                  <p>{identityMessage}</p>
+                </div>
+                <div className="wallet-panel-grid">
+                  <div>
+                    <span>X account</span>
+                    <strong>{identityReady || !dynamicRequired ? identity.xHandle : "Not connected"}</strong>
+                  </div>
+                  <div>
+                    <span>Wallet source</span>
+                    <strong>{identityReady || !dynamicRequired ? identity.walletSource : "Missing"}</strong>
+                  </div>
+                  <div>
+                    <span>Wallet</span>
+                    <strong>{identityReady || !dynamicRequired ? shortWallet(identity.walletAddress) : "Not connected"}</strong>
+                  </div>
+                </div>
               </div>
               <div className="compose-editor-heading">
                 <div>
@@ -409,7 +443,7 @@ function ComposeInner() {
                 <button className="mobile-action" type="button" onClick={savePrivateDraft}>
                   Save private draft
                 </button>
-                <button className="mobile-action" type="button" onClick={prepareAnchor} disabled={preparingAnchor}>
+                <button className="mobile-action" type="button" onClick={prepareAnchor} disabled={preparingAnchor || !identityReady}>
                   {preparingAnchor ? "Preparing..." : "Prepare anchor"}
                 </button>
               </div>

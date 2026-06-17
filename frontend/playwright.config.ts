@@ -11,7 +11,7 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: "pnpm exec next dev --webpack --hostname 127.0.0.1 --port 4281",
+    command: "NEXT_PUBLIC_DYNAMIC_TEST_CONTEXT=1 pnpm exec next dev --webpack --hostname 127.0.0.1 --port 4281",
     url: "http://127.0.0.1:4281",
     cwd: ".",
     reuseExistingServer: !process.env.CI,
