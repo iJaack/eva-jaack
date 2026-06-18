@@ -26,6 +26,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9
     },
     {
+      url: `${base}/campaigns/trust-receipts`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.85
+    },
+    {
       url: `${base}/predictors`,
       lastModified: new Date(),
       changeFrequency: "daily",
