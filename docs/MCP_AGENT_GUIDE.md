@@ -10,7 +10,7 @@ Run the local MCP server from the repo root:
 pnpm --filter backend mcp
 ```
 
-Prefer the local server for agent work. Treat remote MCP write tools as unavailable unless the agent has scoped credentials for the task.
+Prefer the local server for agent work. Treat remote MCP write tools as unavailable unless the agent has scoped credentials for the task and the operator explicitly approved that path.
 
 ## Live Tools
 
@@ -142,6 +142,22 @@ Expected output uses the same safe boundary wrapper as draft/revision preparatio
 - existing `thesis`, linked `markets`, `predictor`, and `counters`
 - `transactions` for user-approved anchoring
 - `nextStep` telling the agent to get user approval before broadcasting
+
+## Agent Checklist
+
+Before draft prep:
+
+1. Confirm the X handle that should own the draft.
+2. Confirm the wallet address and wallet source.
+3. Preserve source URLs for fact and market signals.
+4. Assign weights deliberately. Use contradictions for signals that weaken the thesis, not as generic caveats.
+
+After draft prep:
+
+1. Report `publishState`, `anchorStatus`, and `anchorPreparationId` to the operator.
+2. Summarize what transactions were prepared, without calling them published.
+3. Ask for explicit approval before any broadcast path.
+4. After broadcast, require a transaction receipt or contract readback before saying `confirmed`.
 
 ## Safe Write Boundary
 
