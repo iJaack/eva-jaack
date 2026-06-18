@@ -30,6 +30,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.9
+    },
+    {
+      url: `${base}/campaigns/agent-receipts`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.85
     }
   ];
 }

@@ -25,6 +25,17 @@ matters.
 - Replies to prediction-market discussions.
 - Agent demos that create or revise a thesis.
 - Direct outreach to public predictors and analysts.
+- Campaign landing pages for narrow thesis angles, starting with `/campaigns/agent-receipts`.
+
+## Active Campaigns
+
+### Agent receipts
+
+- **Hypothesis:** agent-generated market calls will convert better when Eva is framed as the receipt layer for public predictions, not another odds dashboard.
+- **Audience:** prediction-market writers, crypto analysts, and agent builders who need inspectable records before automating public commentary.
+- **CTA:** follow @evapredicts, read the example thesis, or draft a sourced thesis.
+- **Measurement:** compare sessions, follow clicks, example-thesis clicks, and compose starts carrying `utm_campaign=agent_receipts`.
+- **Follow-up:** if the page beats the SpaceX launch thesis on intent, turn the receipt-layer angle into the next approved @evapredicts thread.
 
 ## Activation Metrics
 
@@ -34,6 +45,7 @@ matters.
 - Revisions per thesis.
 - Readers clicking market/source links.
 - Wallet-linked authors.
+- Campaign CTA clicks by UTM campaign.
 
 ## Do Not Claim
 
