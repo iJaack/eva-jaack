@@ -35,6 +35,19 @@ What is ready:
 Next step: approve the transaction payload before any broadcast. I will not claim this is live until there is a tx hash plus confirmed receipt/readback.
 ```
 
+If the draft has no linked signals yet, say that directly instead of padding the report:
+
+```text
+prepared: thesis draft is ready for review and anchor approval.
+
+What is ready:
+- title: <title>
+- signals: 0 market signals, 0 fact signals (intentionally signal-light; no sources were invented)
+- anchor status: prepared, not published
+
+Next step: add/approve evidence sources if needed, then approve the transaction payload before any broadcast.
+```
+
 ### Revision prepared
 
 ```text
@@ -73,6 +86,7 @@ I did not broadcast, publish, or mark anything live.
 
 - "draft prepared" needs the MCP result or local preview output.
 - "revision prepared" needs `get_thesis` first, then the revision-prep result.
+- "signal-backed" needs actual market/fact signal fields and source URLs where available; empty signal arrays are allowed but should be described as signal-light.
 - "transaction submitted" needs a tx hash from the broadcaster.
 - "anchored" or "confirmed" needs a receipt or contract readback matching the thesis/revision.
 - "public article/blog published" is out of current MCP scope unless a separate approved public publish path returns its own URL/evidence.

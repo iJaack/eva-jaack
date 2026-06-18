@@ -19,6 +19,7 @@ Canonical MCP and safety guide: `docs/MCP_AGENT_GUIDE.md`.
 6. Treat MCP write outputs as `anchor_prepared_not_published` until the user approves the public publish path and a matching transaction is confirmed.
 7. Never claim public publishing, protocol anchoring, or revision confirmation unless anchor status is `confirmed` via receipt or contract readback.
 8. For final handoff text after draft prep, use `docs/AGENT_SAFE_OUTPUTS.md` for short updates or `docs/MCP_AGENT_HANDOFF_TEMPLATE.md` for full handoffs so the user sees the exact approval still needed before broadcast/public publish.
+9. If no reliable signals are ready, create a signal-light draft with empty signal arrays and say so. Do not invent evidence to satisfy the schema.
 
 ## Claim Language Guardrails
 
@@ -27,6 +28,7 @@ Canonical MCP and safety guide: `docs/MCP_AGENT_GUIDE.md`.
 - `prepare_anchor_transaction` rebuilds transaction payloads; it does not publish, revise, or prove anchoring.
 - A transaction hash without matching receipt/readback is pending, not confirmed.
 - Missing or unauthorized identity is a blocker. Do not substitute another wallet or X handle to continue.
+- Empty signal arrays are allowed for drafts, but they are not evidence. Call them signal-light and collect real sources before making signal-backed claims.
 
 See `docs/MCP_AGENT_GUIDE.md` for schemas, allowed enums, and safe write boundaries.
 See `docs/MCP_AGENT_ERROR_HANDLING.md` when a tool name, schema, credential, or output shape is unclear.
