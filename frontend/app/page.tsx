@@ -26,6 +26,8 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
+const evaPredictsUrl = "https://x.com/evapredicts";
+
 function formatUsd(value: number | null): string {
   if (value === null) return "—";
   return compactUsdFormatter.format(value);
@@ -114,6 +116,46 @@ const participationQuests = [
     cta: "View records",
   },
 ] as const;
+
+const campaignProofPoints = [
+  "watch one public thesis move over time",
+  "inspect every market and fact signal attached to it",
+  "copy the format when you have a broader market call",
+] as const;
+
+function CampaignCallout() {
+  return (
+    <section className="prediction-section campaign-callout" aria-label="Current Eva Protocol campaign">
+      <div className="campaign-callout-copy">
+        <p className="section-kicker">@evapredicts campaign</p>
+        <h2 className="section-title section-title-sm">follow the thesis, not just the odds.</h2>
+        <p>
+          The launch wedge is simple: pull public predictors from one-off market takes into a thesis page with
+          cited signals, revision history, and a shareable record they can point back to later.
+        </p>
+      </div>
+      <div className="campaign-proof-grid" aria-label="Campaign proof points">
+        {campaignProofPoints.map((point) => (
+          <div key={point}>
+            <span>proof</span>
+            <strong>{point}</strong>
+          </div>
+        ))}
+      </div>
+      <div className="campaign-action-row">
+        <Link href={evaPredictsUrl} className="mobile-action mobile-action-primary" target="_blank" rel="noreferrer">
+          Follow @evapredicts
+        </Link>
+        <Link href="/thesis/thesis-0fdef25794b38b6e8eed7524" className="mobile-action">
+          Read the launch thesis
+        </Link>
+      </div>
+      <p className="inline-note">
+        Metric to watch: clicks from this CTA into @evapredicts and the SpaceX thesis before any broader launch push.
+      </p>
+    </section>
+  );
+}
 
 function QuestBoard({ stats }: { stats: PredictionSummary["stats"] }) {
   return (
@@ -267,6 +309,9 @@ export default function HomePage() {
             <Link href="/markets" className="mobile-action">
               Find signals
             </Link>
+            <Link href={evaPredictsUrl} className="mobile-action" target="_blank" rel="noreferrer">
+              Follow @evapredicts
+            </Link>
           </div>
           <aside className="home-hero-artifact" aria-label="Example thesis artifact">
             <div className="artifact-header">
@@ -310,6 +355,7 @@ export default function HomePage() {
           </section>
         ) : (
           <section className="home-workbench" aria-label="Eva prediction workbench">
+            <CampaignCallout />
             <QuestBoard stats={summary.stats} />
 
             <section className="prediction-section workbench-tape">

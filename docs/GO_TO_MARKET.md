@@ -37,6 +37,18 @@ matters.
 - **Measurement:** compare sessions, follow clicks, example-thesis clicks, and compose starts carrying `utm_campaign=agent_receipts`.
 - **Follow-up:** if the page beats the SpaceX launch thesis on intent, turn the receipt-layer angle into the next approved @evapredicts thread.
 
+## Current Campaign: @evapredicts Follow CTA
+
+Hypothesis: prediction-market-native readers are more likely to follow @evapredicts when the homepage frames Eva as a living thesis record instead of another odds dashboard.
+
+Primary audience: public predictors, crypto analysts, and market-curious builders who already post broad theses on X.
+
+CTA: follow @evapredicts and read the SpaceX IPO liquidity rotation launch thesis.
+
+Metric to watch: clicks from the homepage CTA to @evapredicts and the launch thesis before the broader public push.
+
+Next follow-up: if CTA clicks show intent, turn the SpaceX thesis into the first approved @evapredicts thread and reply sequence.
+
 ## Activation Metrics
 
 - Thesis pages created.
