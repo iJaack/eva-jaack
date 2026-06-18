@@ -159,6 +159,25 @@ After draft prep:
 3. Ask for explicit approval before any broadcast path.
 4. After broadcast, require a transaction receipt or contract readback before saying `confirmed`.
 
+## Revision Lifecycle Checklist
+
+Use this sequence every time an agent updates an existing thesis:
+
+1. Call `get_thesis` for the live `thesisId` and quote the current title/status in your notes.
+2. Decide what changed: catalyst, odds movement, fact correction, or contradiction. If nothing materially changed, do not prepare a revision.
+3. Call `prepare_revision_draft` with the full replacement body plus a short `note`. The note should explain the delta, not repeat the whole thesis.
+4. Treat the response as a preview only while `publishState` is `anchor_prepared_not_published` and `anchorStatus` is `prepared`.
+5. Show the user the revision summary, anchor preparation id, and transaction payload. Ask for explicit approval before any broadcast.
+6. After approval, require a transaction hash plus receipt or contract readback before saying the revision is live.
+
+Evidence ladder for agent language:
+
+- Draft prepared: MCP returned `anchor_prepared_not_published`.
+- Broadcast submitted: there is a transaction hash, but confirmation is still pending.
+- Revision live: the transaction is confirmed and a contract readback or receipt matches the prepared thesis/revision.
+
+Do not use issue comments, screenshots, stale draft JSON, or prior agent notes as proof of current revision state. Use `get_thesis` first, and use onchain confirmation before making public claims.
+
 ## Safe Write Boundary
 
 Agents may:
