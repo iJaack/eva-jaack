@@ -13,7 +13,7 @@
 - [ ] Choose X plus embedded-wallet provider.
 - [x] Add provider-backed auth to compose.
 - [x] Add E2E coverage for external wallet and embedded wallet paths.
-- [ ] Add spoofing checks for author identity payloads.
+- [x] Add spoofing checks for author identity payloads.
 
 ## Thesis Evolution
 
@@ -27,7 +27,7 @@
 - [x] Expand MCP tests for prepare-first thesis and revision drafts.
 - [ ] Add agent onboarding skill examples.
 - [x] Add bounded write policy for agent-created thesis drafts.
-- [ ] Add SpaceX thesis dry-run script documentation.
+- [x] Add SpaceX thesis dry-run script documentation.
 
 ## Deployment
 

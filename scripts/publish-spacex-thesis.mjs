@@ -8,6 +8,18 @@ function hasFlag(flag) {
   return process.argv.includes(flag);
 }
 
+function printUsage() {
+  console.log(`Usage: pnpm publish:spacex-thesis [--dry-run] [--publish] [--api-base <url>] [--wallet <0x...>]
+
+Defaults to --dry-run. In dry-run mode the script prints the payload only and does not call Eva APIs.
+
+Boundary notes:
+- --dry-run is for agent rehearsal and payload review.
+- --publish creates the app thesis through the HTTP API after duplicate detection.
+- neither mode broadcasts an Avalanche transaction or confirms an onchain anchor.
+- use Eva's sovereign wallet only when the operator explicitly approved that signer for the task.`);
+}
+
 function argValue(name) {
   const index = process.argv.indexOf(name);
   if (index === -1) return null;
@@ -31,6 +43,11 @@ async function fetchJson(url, init) {
 const apiBase = normalizeApiBase(argValue("--api-base") ?? defaultApiBase);
 const walletAddress = argValue("--wallet") ?? defaultWallet;
 const dryRun = hasFlag("--dry-run") || !hasFlag("--publish");
+
+if (hasFlag("--help") || hasFlag("-h")) {
+  printUsage();
+  process.exit(0);
+}
 
 const payload = {
   dynamicUserId: "evalanche:spacex-ipo-liquidity",
@@ -97,7 +114,7 @@ if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
 }
 
 if (dryRun) {
-  console.log(JSON.stringify({ apiBase, dryRun: true, payload }, null, 2));
+  console.log(JSON.stringify({ apiBase, dryRun: true, boundary: "payload_preview_only_no_api_write_no_onchain_anchor", payload }, null, 2));
   process.exit(0);
 }
 

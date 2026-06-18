@@ -25,6 +25,27 @@ function formatDate(value: string): string {
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(value));
 }
 
+function humanize(value: string): string {
+  return value.replace(/_/g, " ");
+}
+
+function predictionSignalCopy(signal: ReturnType<typeof predictionSignals>[number]): string {
+  if (signal.status === "resolved") {
+    const resolvedOutcome = signal.resolvedOutcomeLabel ? ` as ${signal.resolvedOutcomeLabel}` : "";
+    return `${signal.selectedOutcomeLabel} resolved${resolvedOutcome} at final ${formatOdds(signal.currentOdds)}.`;
+  }
+
+  if (signal.status === "closed") {
+    return `${signal.selectedOutcomeLabel} closed at ${formatOdds(signal.currentOdds)}.`;
+  }
+
+  if (signal.status === "cancelled") {
+    return `${signal.selectedOutcomeLabel} market was cancelled. Last shown at ${formatOdds(signal.currentOdds)}.`;
+  }
+
+  return `${signal.selectedOutcomeLabel} priced at ${formatOdds(signal.currentOdds)}.`;
+}
+
 function predictionSignals(thesis: Thesis) {
   return thesis.signals.filter((signal) => signal.kind === "prediction_market");
 }
@@ -43,6 +64,24 @@ function thesisBodyParagraphs(body: string): string[] {
 
 function isTxHash(value: string): boolean {
   return /^0x[a-fA-F0-9]{64}$/.test(value.trim());
+}
+
+function scoreDeltaLabel(scoreBefore: number | null, scoreAfter: number): string {
+  if (scoreBefore === null) return `Delta new · ${scoreAfter}`;
+
+  const delta = scoreAfter - scoreBefore;
+  if (delta === 0) return "Delta ±0";
+
+  return `Delta ${delta > 0 ? "+" : ""}${delta}`;
+}
+
+function scoreDeltaClassName(scoreBefore: number | null, scoreAfter: number): string {
+  if (scoreBefore === null) return "status-chip status-chip-unresolved";
+
+  const delta = scoreAfter - scoreBefore;
+  if (delta > 0) return "status-chip status-chip-verified";
+  if (delta < 0) return "status-chip status-chip-disputed";
+  return "status-chip status-chip-forecast";
 }
 
 export default function ThesisDetailClient() {
@@ -256,36 +295,47 @@ export default function ThesisDetailClient() {
                     <article key={signal.signalId} className="thesis-signal-card" data-testid="thesis-signal-card">
                       <div className="card-topline">
                         <span>{signalLabel(index)}</span>
-                        <span>{signal.kind === "prediction_market" ? signal.role.replace(/_/g, " ") : "fact"}</span>
+                        <span>{signal.kind === "prediction_market" ? humanize(signal.role) : "fact"}</span>
                       </div>
                       <h3>{signal.title}</h3>
                       {signal.kind === "prediction_market" ? (
                         <>
-                          <p>{signal.selectedOutcomeLabel} priced at {formatOdds(signal.currentOdds)}.</p>
+                          <p>{predictionSignalCopy(signal)}</p>
                           <div className="odds-row">
                             <div>
                               <span>Added</span>
                               <strong>{formatOdds(signal.oddsAtAdd)}</strong>
                             </div>
                             <div>
+                              <span>Status</span>
+                              <strong>{humanize(signal.status)}</strong>
+                            </div>
+                            <div>
                               <span>Weight</span>
                               <strong>{signal.weight}</strong>
                             </div>
                           </div>
+                          {signal.resolvedOutcomeLabel ? <p className="inline-note">Resolved outcome: {signal.resolvedOutcomeLabel}</p> : null}
                         </>
                       ) : (
                         <>
                           <p>{signal.claimText}</p>
+                          <p className="inline-note">Fact verdict: {humanize(signal.verifierVerdict)}.</p>
                           <div className="odds-row">
                             <div>
                               <span>Verdict</span>
-                              <strong>{signal.verifierVerdict.replace(/_/g, " ")}</strong>
+                              <strong>{humanize(signal.verifierVerdict)}</strong>
                             </div>
                             <div>
                               <span>Score</span>
                               <strong>{signal.verifierScore}</strong>
                             </div>
                           </div>
+                          {signal.sourceUrl ? (
+                            <a className="section-link" href={signal.sourceUrl} target="_blank" rel="noreferrer">
+                              Source evidence
+                            </a>
+                          ) : null}
                         </>
                       )}
                     </article>
@@ -352,6 +402,7 @@ export default function ThesisDetailClient() {
                     <div className="status-row">
                       <span className="status-chip status-chip-forecast">Before {revision.scoreBefore ?? "new"}</span>
                       <span className="status-chip status-chip-unresolved">After {revision.scoreAfter}</span>
+                      <span className={scoreDeltaClassName(revision.scoreBefore, revision.scoreAfter)}>{scoreDeltaLabel(revision.scoreBefore, revision.scoreAfter)}</span>
                       <span className="status-chip status-chip-verified">Anchor {revision.anchor.status}</span>
                     </div>
                   </article>

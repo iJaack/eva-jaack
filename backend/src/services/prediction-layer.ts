@@ -288,6 +288,49 @@ function normalizeIdentity(identity: ThesisIdentityInput): ThesisAuthorDto {
   };
 }
 
+function sameOptionalValue(left: string | null, right: string | null): boolean {
+  if (!left || !right) return true;
+  return left.toLowerCase() === right.toLowerCase();
+}
+
+function sameAuthorIdentity(left: ThesisAuthorDto, right: ThesisAuthorDto): boolean {
+  return (
+    left.dynamicUserId.toLowerCase() === right.dynamicUserId.toLowerCase() &&
+    left.xHandle.toLowerCase() === right.xHandle.toLowerCase() &&
+    sameOptionalValue(left.xProfileId, right.xProfileId) &&
+    left.walletAddress.toLowerCase() === right.walletAddress.toLowerCase()
+  );
+}
+
+function assertSameAuthorIdentity(expected: ThesisAuthorDto, actual: ThesisAuthorDto): void {
+  if (!sameAuthorIdentity(expected, actual)) {
+    throw new Error("Only the thesis author can revise this thesis");
+  }
+}
+
+function assertNoAuthorIdentityConflict(theses: ThesisDto[], author: ThesisAuthorDto): void {
+  const incomingDynamicUserId = author.dynamicUserId.toLowerCase();
+  const incomingHandle = author.xHandle.toLowerCase();
+  const incomingProfileId = author.xProfileId?.toLowerCase() ?? null;
+  const incomingWallet = author.walletAddress.toLowerCase();
+
+  const conflict = theses.find((thesis) => {
+    const existing = thesis.author;
+    if (sameAuthorIdentity(existing, author)) return false;
+
+    return (
+      existing.dynamicUserId.toLowerCase() === incomingDynamicUserId ||
+      existing.xHandle.toLowerCase() === incomingHandle ||
+      (!!incomingProfileId && existing.xProfileId?.toLowerCase() === incomingProfileId) ||
+      existing.walletAddress.toLowerCase() === incomingWallet
+    );
+  });
+
+  if (conflict) {
+    throw new Error("Identity payload conflicts with an existing thesis author");
+  }
+}
+
 async function fetchJsonWithTimeout<T>(url: string): Promise<T> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), liveMarketFetchTimeoutMs);
@@ -967,6 +1010,7 @@ export class LocalPredictionLayerService {
     const author = normalizeIdentity(input.identity);
     if (!input.title.trim() || !input.body.trim()) throw new Error("title and body are required");
     const store = await this.readStore();
+    assertNoAuthorIdentityConflict(store.theses, author);
     const createdAt = new Date().toISOString();
     const thesis = buildThesisDraft(store.markets, input, author, createdAt);
     const existing = store.theses.find((entry) => entry.thesisId === thesis.thesisId);
@@ -982,6 +1026,7 @@ export class LocalPredictionLayerService {
     const author = normalizeIdentity(input.identity);
     if (!input.title.trim() || !input.body.trim()) throw new Error("title and body are required");
     const store = await this.readStore();
+    assertNoAuthorIdentityConflict(store.theses, author);
     const thesis = buildThesisDraft(store.markets, input, author, new Date().toISOString());
     const predictors = await this.listPredictors();
     return {
@@ -1014,9 +1059,7 @@ export class LocalPredictionLayerService {
     const store = await this.readStore();
     const original = store.theses.find((entry) => entry.thesisId === thesisId || entry.slug === thesisId);
     if (!original) return null;
-    if (original.author.walletAddress.toLowerCase() !== actor.walletAddress.toLowerCase()) {
-      throw new Error("Only the thesis author can revise this thesis");
-    }
+    assertSameAuthorIdentity(original.author, actor);
 
     const thesis = structuredClone(original);
     const now = new Date().toISOString();
@@ -1070,9 +1113,7 @@ export class LocalPredictionLayerService {
     const store = await this.readStore();
     const thesis = store.theses.find((entry) => entry.thesisId === thesisId || entry.slug === thesisId);
     if (!thesis) return null;
-    if (thesis.author.walletAddress.toLowerCase() !== actor.walletAddress.toLowerCase()) {
-      throw new Error("Only the thesis author can revise this thesis");
-    }
+    assertSameAuthorIdentity(thesis.author, actor);
     const now = new Date().toISOString();
     const scoreBefore = thesis.currentScore;
     const signals = thesis.signals.map((signal) => {

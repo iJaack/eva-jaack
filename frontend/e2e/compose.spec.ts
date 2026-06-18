@@ -47,6 +47,21 @@ const marketsPayload = {
   ],
 };
 
+test("compose hides the preview identity and editor until Dynamic identity is ready", async ({ page }) => {
+  await page.route("**/api/markets", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(marketsPayload) });
+  });
+
+  await page.goto("/compose");
+
+  await expect(page.getByTestId("compose-auth-gate")).toBeVisible();
+  await expect(page.getByTestId("compose-auth-gate")).toContainText(/Connect with Dynamic before/);
+  await expect(page.getByText("@spacethesis")).toHaveCount(0);
+  await expect(page.getByText("embedded wallet")).toHaveCount(0);
+  await expect(page.getByLabel("Thesis title")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Publish anchored thesis" })).toHaveCount(0);
+});
+
 test("compose page guides required thesis inputs before enabling publish", async ({ page }) => {
   let publishedBody = "";
   let publishedAnchorPreparationId = "";
@@ -430,10 +445,11 @@ test("compose blocks Dynamic sessions without X or wallet identity", async ({ pa
   });
 
   await page.goto("/compose");
-  await expect(page.getByTestId("compose-identity-panel")).toContainText("Identity required");
-  await expect(page.getByText("Connect an X account in Dynamic before publishing a thesis.")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Prepare anchor" })).toBeDisabled();
-  await expect(page.getByRole("button", { name: "Publish anchored thesis" })).toBeDisabled();
+  await expect(page.getByTestId("compose-auth-gate")).toContainText("Connect an X account in Dynamic before publishing a thesis.");
+  await expect(page.getByText("@spacethesis")).toHaveCount(0);
+  await expect(page.getByLabel("Thesis title")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Prepare anchor" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Publish anchored thesis" })).toHaveCount(0);
 
   await page.addInitScript(() => {
     (window as Window & { __evaDynamicContext?: unknown }).__evaDynamicContext = {
@@ -442,7 +458,6 @@ test("compose blocks Dynamic sessions without X or wallet identity", async ({ pa
     };
   });
   await page.goto("/compose?case=missing-wallet");
-  await expect(page.getByTestId("compose-identity-panel")).toContainText("Identity required");
-  await expect(page.getByText("Connect or create an Ethereum wallet before publishing a thesis.")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Prepare anchor" })).toBeDisabled();
+  await expect(page.getByTestId("compose-auth-gate")).toContainText("Connect or create an Ethereum wallet before publishing a thesis.");
+  await expect(page.getByLabel("Thesis title")).toHaveCount(0);
 });

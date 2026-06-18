@@ -22,7 +22,7 @@ Prefer the local server for agent work. Treat remote MCP write tools as unavaila
 | `prepare_revision_draft` | Preview a new revision and prepare revision-anchor calldata. | No |
 | `prepare_anchor_transaction` | Rebuild anchor calldata for an existing thesis. | No |
 
-The create and revision tools return `publishState: "anchor_prepared_not_published"`. That is the boundary. A prepared anchor is not a published thesis, not a confirmed revision, and not evidence of an onchain record.
+Every write-adjacent MCP tool (`create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`) returns `publishState: "anchor_prepared_not_published"`. That is the boundary. A prepared anchor is not a published thesis, not a confirmed revision, and not evidence of an onchain record.
 
 ## Identity Requirements
 
@@ -91,7 +91,7 @@ Important ranges and enums:
 - market status: `open`, `closed`, `resolved`
 - fact verdicts: `verified`, `likely_true`, `mixed`, `misleading`, `likely_false`, `false`, `unverifiable_yet`, `non_falsifiable`
 
-Expected output includes:
+Expected draft-prep output includes:
 
 - `publishState: "anchor_prepared_not_published"`
 - `anchorPreparationId`
@@ -133,6 +133,15 @@ This previews the next revision and prepares calldata. It does not append to the
 ```
 
 Use this to rebuild anchor calldata for an existing thesis. It is still preparation only.
+
+Expected output uses the same safe boundary wrapper as draft/revision preparation:
+
+- `publishState: "anchor_prepared_not_published"`
+- `anchorPreparationId`
+- `anchorStatus: "prepared"`
+- existing `thesis`, linked `markets`, `predictor`, and `counters`
+- `transactions` for user-approved anchoring
+- `nextStep` telling the agent to get user approval before broadcasting
 
 ## Agent Checklist
 
@@ -177,3 +186,21 @@ Agents must not:
 4. Show the prepared summary and transactions to the user.
 5. Wait for explicit approval before any broadcast or public publish path.
 6. For updates, call `get_thesis`, then `prepare_revision_draft`, then repeat the approval boundary.
+
+## SpaceX Thesis Dry Run
+
+Use the repo script when an agent needs a deterministic SpaceX IPO payload example without guessing at schema shape:
+
+```bash
+pnpm publish:spacex-thesis --dry-run
+```
+
+Dry run is the default. It prints the API payload and does not write to Eva, publish a thesis, broadcast a transaction, or confirm an onchain anchor. This makes it safe for onboarding, fixture review, and copy/schema rehearsal.
+
+Before using `--publish`, the operator must explicitly approve the write target and signer:
+
+```bash
+pnpm publish:spacex-thesis --publish --api-base https://api.eva.jaack.me/api --wallet 0x1111111111111111111111111111111111111111
+```
+
+`--publish` creates the app thesis through the HTTP API after duplicate detection. It still does not broadcast Avalanche transactions and still must not be described as an onchain anchor or public protocol confirmation. Treat any anchor work as a separate approval-gated transaction flow.
