@@ -136,6 +136,12 @@ const activeCampaigns = [
     href: "/campaigns/agent-receipts?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=agent_receipts&utm_content=agent_receipts_card",
     metric: "compose starts, follow clicks, and example-thesis clicks",
   },
+  {
+    title: "reply sprint",
+    body: "An approval-ready @evapredicts distribution loop for live prediction-market conversations, with target-specific UTM links.",
+    href: "/campaigns/reply-sprint?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=evapredicts_reply_sprint&utm_content=reply_sprint_card",
+    metric: "qualified thesis visits from X replies",
+  },
 ] as const;
 
 function CampaignCallout() {
