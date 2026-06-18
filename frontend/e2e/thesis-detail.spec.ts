@@ -205,6 +205,7 @@ test("thesis detail reads as a public thesis with attached citation cards and re
   await expect(page.getByRole("heading", { name: "Signals supporting the thesis" })).toBeVisible();
   await expect(page.getByTestId("thesis-signal-card").first()).toContainText("S1");
   await expect(page.getByTestId("thesis-signal-card").first()).toContainText("Hold priced at 58%");
+  await expect(page.getByTestId("thesis-signal-card").first()).toContainText("open");
   await expect(page.getByTestId("thesis-signal-card").nth(1)).toContainText("S2");
   await expect(page.getByRole("heading", { name: "Revision history" })).toBeVisible();
   await expect(page.getByTestId("revision-card").first()).toContainText("v1");
@@ -252,6 +253,10 @@ test("publishing an update appends it to the thesis and creates the next revisio
   await expect(publishButton).toBeDisabled();
   await page.getByLabel("Update body").fill("Rates market repriced after CPI, so this thesis now needs a stronger liquidity extension. [S1]");
   await page.getByLabel("Update note").fill("CPI update moved signal.");
+  await page.getByLabel("S1 current odds (%)").fill("74");
+  await page.getByLabel("S1 weight").fill("80");
+  await page.getByLabel("S1 status").selectOption("resolved");
+  await page.getByLabel("S1 resolved outcome").fill("Hold");
   await expect(publishButton).toBeDisabled();
   await page.getByRole("button", { name: "Prepare update anchor" }).click();
   await expect(page.getByRole("status")).toContainText("1 update anchor transaction prepared.");
@@ -262,6 +267,9 @@ test("publishing an update appends it to the thesis and creates the next revisio
 
   expect(preparedRevisionPayloads).toHaveLength(1);
   expect(String(preparedRevisionPayloads[0].body)).toContain("Rates market repriced after CPI");
+  expect(preparedRevisionPayloads[0]).toMatchObject({
+    signalUpdates: [{ signalId: "sig-fed-hold", currentOdds: 0.74, weight: 80, status: "resolved", resolvedOutcomeLabel: "Hold" }],
+  });
   await expect.poll(() => revisionPayloads.length).toBe(1);
   expect(revisionPayloads[0]).toMatchObject({
     dynamicUserId: author.dynamicUserId,
@@ -271,6 +279,7 @@ test("publishing an update appends it to the thesis and creates the next revisio
     note: "CPI update moved signal.",
     anchorPreparationId: "revision-anchor-detail-1",
     anchorTxHash: "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    signalUpdates: [{ signalId: "sig-fed-hold", currentOdds: 0.74, weight: 80, status: "resolved", resolvedOutcomeLabel: "Hold" }],
   });
   expect(String(revisionPayloads[0].body)).toContain("Inflation prints are not soft enough");
   expect(String(revisionPayloads[0].body)).toContain("Rates market repriced after CPI");

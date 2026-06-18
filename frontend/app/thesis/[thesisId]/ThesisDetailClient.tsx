@@ -17,6 +17,13 @@ import {
 import { protocol } from "@/lib/protocol";
 import { scoreUiStatus, statusClassName, statusLabel, thesisUiStatus } from "@/lib/status";
 
+type SignalUpdateDraft = {
+  currentOddsPercent: string;
+  weight: string;
+  status: "open" | "closed" | "resolved" | "cancelled";
+  resolvedOutcomeLabel: string;
+};
+
 function formatOdds(value: number): string {
   return `${Math.round(value * 100)}%`;
 }
@@ -37,6 +44,21 @@ function signalLabel(index: number): string {
   return `S${index + 1}`;
 }
 
+function signalDraftFor(signal: ReturnType<typeof predictionSignals>[number]): SignalUpdateDraft {
+  return {
+    currentOddsPercent: String(Math.round(signal.currentOdds * 100)),
+    weight: String(signal.weight),
+    status: signal.status,
+    resolvedOutcomeLabel: signal.resolvedOutcomeLabel ?? "",
+  };
+}
+
+function clampPercent(value: string, fallback: number): number {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(0, Math.min(100, parsed));
+}
+
 function thesisBodyParagraphs(body: string): string[] {
   return body.split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean);
 }
@@ -54,6 +76,7 @@ export default function ThesisDetailClient() {
   const [updateBody, setUpdateBody] = useState("");
   const [updateNote, setUpdateNote] = useState("");
   const [updateState, setUpdateState] = useState<string | null>(null);
+  const [signalUpdateDrafts, setSignalUpdateDrafts] = useState<Record<string, SignalUpdateDraft>>({});
   const [updatePending, setUpdatePending] = useState(false);
   const [revisionAnchorPreparationId, setRevisionAnchorPreparationId] = useState<string | null>(null);
   const [revisionAnchorTxHash, setRevisionAnchorTxHash] = useState("");
@@ -68,6 +91,11 @@ export default function ThesisDetailClient() {
       .catch((reason) => setError(reason instanceof Error ? reason.message : "Failed to load thesis."))
       .finally(() => setLoading(false));
   }, [thesisId]);
+
+  useEffect(() => {
+    if (!detail) return;
+    setSignalUpdateDrafts(Object.fromEntries(predictionSignals(detail.thesis).map((signal) => [signal.signalId, signalDraftFor(signal)])));
+  }, [detail]);
 
   const previewCopy = async () => {
     const preview = await getCopyPreview(thesisId);
@@ -86,6 +114,17 @@ export default function ThesisDetailClient() {
   const buildRevisionInput = () => {
     if (!detail || !updateBody.trim()) return;
 
+    const nextSignalUpdates = predictionSignals(detail.thesis).map((signal) => {
+      const draft = signalUpdateDrafts[signal.signalId] ?? signalDraftFor(signal);
+      return {
+        signalId: signal.signalId,
+        currentOdds: clampPercent(draft.currentOddsPercent, signal.currentOdds * 100) / 100,
+        weight: clampPercent(draft.weight, signal.weight),
+        status: draft.status,
+        resolvedOutcomeLabel: draft.resolvedOutcomeLabel.trim() || undefined,
+      };
+    });
+
     const nextVersion = detail.thesis.currentRevision.version + 1;
     const body = `${detail.thesis.body.trim()}\n\nUpdate v${nextVersion}\n${updateBody.trim()}`;
 
@@ -97,14 +136,20 @@ export default function ThesisDetailClient() {
       walletSource: detail.thesis.author.walletSource,
       body,
       note: updateNote.trim() || `Published update v${nextVersion}.`,
-      signalUpdates: predictionSignals(detail.thesis).map((signal) => ({
-        signalId: signal.signalId,
-        currentOdds: signal.currentOdds,
-        weight: signal.weight,
-        status: signal.status,
-        resolvedOutcomeLabel: signal.resolvedOutcomeLabel ?? undefined,
-      })),
+      signalUpdates: nextSignalUpdates,
     };
+  };
+
+  const validateResolvedSignals = () => {
+    if (!detail) return true;
+    const missingOutcome = predictionSignals(detail.thesis).some((signal) => {
+      const draft = signalUpdateDrafts[signal.signalId] ?? signalDraftFor(signal);
+      return draft.status === "resolved" && !draft.resolvedOutcomeLabel.trim();
+    });
+
+    if (!missingOutcome) return true;
+    setUpdateState("Resolved signals need an outcome label before preparing an update.");
+    return false;
   };
 
   const resetRevisionAnchor = () => {
@@ -117,6 +162,7 @@ export default function ThesisDetailClient() {
     if (!detail) return;
     const input = buildRevisionInput();
     if (!input) return;
+    if (!validateResolvedSignals()) return;
 
     setRevisionAnchorPending(true);
     setUpdateState(null);
@@ -141,6 +187,7 @@ export default function ThesisDetailClient() {
 
     const input = buildRevisionInput();
     if (!input) return;
+    if (!validateResolvedSignals()) return;
     if (!revisionAnchorPreparationId) {
       setUpdateState("Prepare update anchor before publishing.");
       return;
@@ -256,12 +303,13 @@ export default function ThesisDetailClient() {
                     <article key={signal.signalId} className="thesis-signal-card" data-testid="thesis-signal-card">
                       <div className="card-topline">
                         <span>{signalLabel(index)}</span>
-                        <span>{signal.kind === "prediction_market" ? signal.role.replace(/_/g, " ") : "fact"}</span>
+                        <span>{signal.kind === "prediction_market" ? `${signal.role.replace(/_/g, " ")} · ${signal.status}` : `fact · ${signal.verifierVerdict.replace(/_/g, " ")}`}</span>
                       </div>
                       <h3>{signal.title}</h3>
                       {signal.kind === "prediction_market" ? (
                         <>
                           <p>{signal.selectedOutcomeLabel} priced at {formatOdds(signal.currentOdds)}.</p>
+                          {signal.resolvedOutcomeLabel ? <p>Resolved outcome: {signal.resolvedOutcomeLabel}</p> : null}
                           <div className="odds-row">
                             <div>
                               <span>Added</span>
@@ -319,6 +367,71 @@ export default function ThesisDetailClient() {
                     }}
                   />
                 </label>
+                {predictionSignals(detail.thesis).length > 0 ? (
+                  <div className="attached-signal-list" data-testid="revision-signal-controls">
+                    {predictionSignals(detail.thesis).map((signal, index) => {
+                      const draft = signalUpdateDrafts[signal.signalId] ?? signalDraftFor(signal);
+                      const label = signalLabel(index);
+                      const updateDraft = (patch: Partial<SignalUpdateDraft>) => {
+                        setSignalUpdateDrafts((drafts) => ({
+                          ...drafts,
+                          [signal.signalId]: { ...(drafts[signal.signalId] ?? signalDraftFor(signal)), ...patch },
+                        }));
+                        resetRevisionAnchor();
+                      };
+
+                      return (
+                        <article key={signal.signalId} className="thesis-signal-card">
+                          <div className="card-topline">
+                            <span>{label}</span>
+                            <span>{signal.title}</span>
+                          </div>
+                          <label className="field-group">
+                            <span className="field-label">{label} current odds (%)</span>
+                            <input
+                              className="field-input"
+                              type="number"
+                              inputMode="decimal"
+                              min="0"
+                              max="100"
+                              step="1"
+                              value={draft.currentOddsPercent}
+                              onChange={(event) => updateDraft({ currentOddsPercent: event.target.value })}
+                            />
+                          </label>
+                          <label className="field-group">
+                            <span className="field-label">{label} weight</span>
+                            <input
+                              className="field-input"
+                              type="number"
+                              inputMode="decimal"
+                              min="0"
+                              max="100"
+                              step="1"
+                              value={draft.weight}
+                              onChange={(event) => updateDraft({ weight: event.target.value })}
+                            />
+                          </label>
+                          <label className="field-group">
+                            <span className="field-label">{label} status</span>
+                            <select className="field-input" value={draft.status} onChange={(event) => updateDraft({ status: event.target.value as SignalUpdateDraft["status"] })}>
+                              <option value="open">Open</option>
+                              <option value="closed">Closed</option>
+                              <option value="resolved">Resolved</option>
+                              <option value="cancelled">Cancelled</option>
+                            </select>
+                          </label>
+                          {draft.status === "resolved" ? (
+                            <label className="field-group">
+                              <span className="field-label">{label} resolved outcome</span>
+                              <input className="field-input" value={draft.resolvedOutcomeLabel} onChange={(event) => updateDraft({ resolvedOutcomeLabel: event.target.value })} placeholder={signal.selectedOutcomeLabel} />
+                            </label>
+                          ) : null}
+                        </article>
+                      );
+                    })}
+                  </div>
+                ) : null}
                 {revisionAnchorPreparationId ? (
                   <label className="field-group">
                     <span className="field-label">Update anchor transaction hash</span>
