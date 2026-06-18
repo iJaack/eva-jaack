@@ -91,6 +91,22 @@ Important ranges and enums:
 - market status: `open`, `closed`, `resolved`, `cancelled`
 - fact verdicts: `verified`, `likely_true`, `mixed`, `misleading`, `likely_false`, `false`, `unverifiable_yet`, `non_falsifiable`
 
+Minimum valid draft-prep payload when no material signals are ready yet:
+
+```json
+{
+  "title": "SpaceX IPO liquidity rotation thesis",
+  "body": "Draft thesis body...",
+  "xHandle": "@agentalpha",
+  "walletAddress": "0x1111111111111111111111111111111111111111",
+  "walletSource": "external",
+  "predictionSignals": [],
+  "factSignals": []
+}
+```
+
+`predictionSignals` and `factSignals` may be empty, but that should be an explicit choice. Do not invent markets, sources, URLs, scores, or weights just to make a draft look complete.
+
 Expected draft-prep output includes:
 
 - `publishState: "anchor_prepared_not_published"`
@@ -119,6 +135,8 @@ If the result contains an error, missing thesis, or mismatched identity, stop an
 - A `cancelled` prediction market is valid input. Use it when a market was removed/cancelled by the source, and explain why it still matters in `rationale`.
 - `cancelled` is a market status, not a thesis publish state. It does not mean a prepared draft, revision, or anchor payload was cancelled.
 - If a market is no longer useful evidence, omit it instead of forcing it into `closed`, `resolved`, or `contradiction`.
+- Schema defaults exist for generic fields (`selectedOutcomeLabel`, `weight`, `role`, `status`, `verifierVerdict`, `verifierScore`, and `walletSource` where supported). Prefer explicit values when the field affects the thesis; defaults are for low-risk drafts, not evidence shortcuts.
+- URLs must be valid URLs when supplied. If the source URL is unknown, omit it and call out the missing source in the handoff instead of using placeholders.
 - `prepare_revision_draft` currently accepts `thesisId`, `body`, `note`, `xHandle`, and `walletAddress`; it does not accept `walletSource` yet.
 
 ### `get_thesis`
@@ -176,6 +194,7 @@ Before draft prep:
 2. Confirm the wallet address and wallet source.
 3. Preserve source URLs for fact and market signals.
 4. Assign weights deliberately. Use contradictions for signals that weaken the thesis, not as generic caveats.
+5. If there are no reliable signals yet, pass empty signal arrays and state that the draft is intentionally signal-light.
 
 After draft prep:
 

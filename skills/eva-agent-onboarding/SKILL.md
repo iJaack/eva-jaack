@@ -18,6 +18,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Treat remote MCP write tools as unavailable unless the agent has scoped credentials and the operator explicitly approved that path.
 - Confirm X identity, wallet address, and wallet source before preparing protocol transactions.
 - Use `0x0fe61780bd5508b3C99e420662050e5560608cA4` only when the operator explicitly approved that signer for the task.
+- If no reliable market or fact signals are ready, pass empty signal arrays and say the draft is intentionally signal-light. Do not invent sources, URLs, scores, or weights.
 
 ## Safety Rules
 
@@ -44,6 +45,8 @@ When an agent revises an existing thesis:
 Current live schema note: `prepare_revision_draft` accepts `thesisId`, `body`, `note`, `xHandle`, and `walletAddress`. It does not accept `walletSource` yet.
 
 Current market status enum: `open`, `closed`, `resolved`, `cancelled`. Treat `cancelled` as a source-market state only; it is not a thesis publish state and does not imply an Eva draft or anchor was cancelled.
+
+Schema defaults exist for low-risk draft prep, but evidence-bearing fields should be explicit when known. Use valid URLs only; omit unknown source URLs and report the gap in the handoff.
 
 ## User-Facing Result Language
 
