@@ -29,6 +29,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Broadcasts require explicit user approval at action time.
 - Never mark a thesis, thesis revision, or signal as confirmed without a transaction receipt or contract readback.
 - If MCP output is ambiguous, report the exact missing evidence and do not infer publication.
+- Do not swap in a different `xHandle`, `walletAddress`, or wallet source to make a draft work. If identity is missing, invalid, or unauthorized, stop and ask for the correct operator-approved identity.
 - Do not expand agent powers into trades, custody, staking, claims markets, articles, or blog publishing.
 
 ## Revision Handoff
@@ -41,6 +42,15 @@ When an agent revises an existing thesis:
 4. Only say "revision live" after a receipt or contract readback matches the prepared revision.
 
 Current live schema note: `prepare_revision_draft` accepts `thesisId`, `body`, `note`, `xHandle`, and `walletAddress`. It does not accept `walletSource` yet.
+
+## User-Facing Result Language
+
+- Prepared MCP draft output: "prepared for review", not "published".
+- Prepared anchor transaction: "calldata ready for approval", not "anchored".
+- Submitted transaction without receipt: "pending confirmation", not "confirmed".
+- Receipt or contract readback matching the thesis/revision: "confirmed".
+
+If a tool returns an error or a missing thesis, report the blocker directly. Do not retry with a guessed thesis ID or alternate wallet.
 
 ## Reporting Pattern
 

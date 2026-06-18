@@ -100,6 +100,20 @@ Expected draft-prep output includes:
 - `transactions` for user-approved anchoring
 - `nextStep` telling the agent to get user approval before publishing
 
+### Output Claim Matrix
+
+Use this matrix when summarizing MCP results back to a user or another agent:
+
+| Observed output | Safe claim | Unsafe claim |
+|---|---|---|
+| `publishState: "anchor_prepared_not_published"` | "I prepared a draft/anchor payload for review." | "The thesis is published." |
+| `anchorStatus: "prepared"` | "The transaction calldata is ready for approval." | "The thesis is anchored onchain." |
+| `transactions` array only from `prepare_anchor_transaction` | "I rebuilt the anchor transaction payload." | "I updated or fixed the stored thesis." |
+| submitted tx hash but no receipt/readback | "A transaction was submitted; confirmation is pending." | "The revision is confirmed." |
+| receipt or contract readback matching the thesis/revision | "The anchor is confirmed." | N/A |
+
+If the result contains an error, missing thesis, or mismatched identity, stop and report the blocker. Do not retry with a different wallet, X handle, or public publish path unless the operator explicitly approves that change.
+
 ### `get_thesis`
 
 ```json
@@ -132,7 +146,11 @@ This previews the next revision and prepares calldata. It does not append to the
 }
 ```
 
-Use this to rebuild anchor calldata for an existing thesis. It is still preparation only.
+Use this to rebuild anchor calldata for an existing thesis. It returns transaction payloads only. It does not store a new thesis, append a revision, publish anything publicly, or prove the thesis is anchored.
+
+Safe summary language:
+
+> Prepared anchor transaction payload for `thesis_abc123`; user approval and confirmed onchain receipt are still required.
 
 Expected output uses the same safe boundary wrapper as draft/revision preparation:
 
@@ -188,6 +206,8 @@ Agents may:
 - draft revisions,
 - prepare anchor calldata,
 - summarize the prepared transaction for the user.
+
+Agents may not change identity fields opportunistically. If the requested `xHandle` or `walletAddress` is wrong, missing, or unauthorized, ask for the correct identity rather than substituting Eva's wallet, an embedded wallet, or a remembered address.
 
 Agents must not:
 
