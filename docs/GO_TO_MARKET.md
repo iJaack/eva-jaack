@@ -45,6 +45,14 @@ matters.
 - **Measurement:** track thesis sessions with `utm_campaign=evapredicts_reply_sprint`, plus downstream preview-copy clicks, share/copy events, and follow clicks.
 - **Follow-up:** after explicit posting approval, publish two replies max, then keep only the angle that creates product-learning signals.
 
+### Policy-safe theses
+
+- **Hypothesis:** high-context builders will trust Eva faster when @evapredicts makes V1 exclusions explicit instead of pretending every market is equally launch-safe.
+- **Audience:** prediction-market operators, agent builders, and public analysts who care about distribution boundaries before automation.
+- **CTA:** draft a policy-safe thesis, review the source library, read the SpaceX example, or follow @evapredicts.
+- **Measurement:** compare sessions, follow clicks, example-thesis clicks, and compose starts carrying `utm_campaign=policy_safe_theses` against trust-receipts and reply-sprint traffic.
+- **Follow-up:** after prohibited-market filtering is verified in production, turn the boundary-first angle into the next approved @evapredicts post before widening the reply sprint.
+
 ## Current Campaign: @evapredicts Follow CTA
 
 Hypothesis: prediction-market-native readers are more likely to follow @evapredicts when the homepage frames Eva as a living thesis record instead of another odds dashboard.
@@ -72,5 +80,6 @@ Next follow-up: if CTA clicks show intent, turn the SpaceX thesis into the first
 - Active revenue, users, volume, or testimonials unless measured.
 - Native trade execution.
 - Sports coverage.
+- Election, war, assassination, criminal-investigation, personal-tragedy, or easily manipulated markets as supported V1 campaign surfaces.
 - Curator or verification-market features.
 - Guaranteed prediction accuracy.
