@@ -10,7 +10,7 @@
 | Eva agent ID | `1599` |
 | Thesis protocol | `0x5eDBd1eea3228662326e60634E53AB8975D6641c` |
 | First thesis | SpaceX IPO liquidity rotation thesis |
-| Market policy | Broad provider markets, sports excluded for now |
+| Market policy | V1 provider markets filtered against `docs/MARKET_POLICY.md` |
 
 ## Current Product Claims
 

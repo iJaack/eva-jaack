@@ -218,10 +218,20 @@ function titleCategory(title: string, fallback: string): string {
   return fallback;
 }
 
+const v1ProhibitedCategoryPattern = /\b(sports?|politics?|elections?|geopolitics?|war|crime|criminal)\b/i;
+const v1ProhibitedMarketPatterns = [
+  /\b(nba|nfl|mlb|nhl|soccer|football|basketball|baseball|hockey|ufc|mma|tennis|golf|f1|formula 1|match|game|super bowl|world cup|champions league|premier league)\b/i,
+  /\b(elections?|presidential|president|nomination|nominee|primary|caucus|senate|senator|congress|parliament|prime minister|mayor|governor|trump|biden|harris|putin)\b/i,
+  /\b(war|invade|invasion|blockade|ceasefire|missile|nuclear|airstrike|bombing|attack|terror|taiwan|ukraine|gaza|israel|iran|russia)\b/i,
+  /\b(assassinat(?:e|ed|ion)?|murder|killed|shooting|death|die|dies|dead|hospitalized|illness|injury)\b/i,
+  /\b(criminal|indict(?:ed|ment)?|convict(?:ed|ion)?|arrest(?:ed)?|prison|jail|trial|investigation|charged with)\b/i,
+  /\b(tweet|tweets|post on x|post on twitter|instagram|tiktok|youtube|say on (?:x|twitter)|mention on (?:x|twitter))\b/i,
+];
+
 function isAllowedV1Market(market: PredictionMarketDto): boolean {
-  const category = market.category.toLowerCase();
-  const title = market.title.toLowerCase();
-  return category !== "sports" && !/\b(nba|nfl|mlb|nhl|soccer|football|basketball|baseball|hockey|ufc|mma|tennis|golf|f1|formula 1|match|game|super bowl|world cup|champions league|premier league)\b/.test(title);
+  const category = market.category.trim();
+  const searchable = `${market.title} ${category} ${market.url ?? ""}`;
+  return !v1ProhibitedCategoryPattern.test(category) && !v1ProhibitedMarketPatterns.some((pattern) => pattern.test(searchable));
 }
 
 function applyV1MarketPolicy(markets: PredictionMarketDto[]): PredictionMarketDto[] {

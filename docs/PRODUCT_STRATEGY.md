@@ -27,7 +27,9 @@ can combine:
 ## Non-Goals
 
 - Native trading.
-- Sports markets in the current market loader.
+- V1-prohibited market categories in the current market loader: sports, elections/political offices,
+  war/geopolitics, assassination/personal tragedy, criminal investigations, and easily manipulable
+  social-action prompts.
 - Curator onboarding.
 - Article verification.
 - Claim staking, challenge windows, or settlement.

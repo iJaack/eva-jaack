@@ -232,13 +232,32 @@ describe("prediction layer service", () => {
     ).rejects.toThrow("Only the thesis author can revise this thesis");
   });
 
-  it("loads provider markets broadly while excluding sports markets", async () => {
+  it("loads provider markets broadly while excluding V1-prohibited market categories", async () => {
     const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
     cleanupDirs.push(dir);
     const service = new LocalPredictionLayerService(
       join(dir, "index.json"),
       async () => [],
       async () => [
+        {
+          marketId: "polymarket-fed-cut",
+          provider: "polymarket",
+          externalId: "macro-1",
+          url: "https://polymarket.com/event/will-the-fed-cut-rates",
+          title: "Will the Fed cut rates before September?",
+          category: "Macro",
+          status: "open",
+          volumeUsd: 12_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.42 },
+            { outcomeId: "no", label: "No", price: 0.58 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
         {
           marketId: "polymarket-presidential-nomination",
           provider: "polymarket",
@@ -253,6 +272,63 @@ describe("prediction layer service", () => {
           outcomes: [
             { outcomeId: "yes", label: "Yes", price: 0.12 },
             { outcomeId: "no", label: "No", price: 0.88 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-taiwan-blockade",
+          provider: "polymarket",
+          externalId: "geopolitics-1",
+          url: "https://polymarket.com/event/will-china-blockade-taiwan",
+          title: "Will China blockade Taiwan by June 30?",
+          category: "Geopolitics",
+          status: "open",
+          volumeUsd: 8_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.2 },
+            { outcomeId: "no", label: "No", price: 0.8 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-criminal-trial",
+          provider: "polymarket",
+          externalId: "crime-1",
+          url: "https://polymarket.com/event/will-example-be-convicted",
+          title: "Will Example be convicted in a criminal trial?",
+          category: "Law",
+          status: "open",
+          volumeUsd: 7_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.5 },
+            { outcomeId: "no", label: "No", price: 0.5 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-tweet",
+          provider: "polymarket",
+          externalId: "manipulable-1",
+          url: "https://polymarket.com/event/will-example-tweet",
+          title: "Will Example tweet the word AI this week?",
+          category: "Culture",
+          status: "open",
+          volumeUsd: 6_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.5 },
+            { outcomeId: "no", label: "No", price: 0.5 },
           ],
           linkedClaimIds: [],
           createdAt: new Date().toISOString(),
@@ -281,7 +357,11 @@ describe("prediction layer service", () => {
     );
 
     const markets = await service.listMarkets();
-    expect(markets.markets.map((market) => market.marketId)).toContain("polymarket-presidential-nomination");
+    expect(markets.markets.map((market) => market.marketId)).toContain("polymarket-fed-cut");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-presidential-nomination");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-taiwan-blockade");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-criminal-trial");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-tweet");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-super-bowl");
   });
 });
