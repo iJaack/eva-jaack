@@ -286,8 +286,13 @@ test("publishing an update appends it to the thesis and creates the next revisio
   await page.goto("/thesis/thesis-fed-hold");
   const publishButton = page.getByRole("button", { name: "Publish update" });
   await expect(publishButton).toBeDisabled();
+  await expect(page.getByRole("heading", { name: "Update market state for this revision" })).toBeVisible();
   await page.getByLabel("Update body").fill("Rates market repriced after CPI, so this thesis now needs a stronger liquidity extension. [S1]");
   await page.getByLabel("Update note").fill("CPI update moved signal.");
+  await page.getByLabel("S1 current odds").fill("72");
+  await page.getByLabel("S1 weight").fill("80");
+  await page.getByLabel("S1 status").selectOption("resolved");
+  await page.getByLabel("S1 resolved outcome").fill("Hold");
   await expect(publishButton).toBeDisabled();
   await page.getByRole("button", { name: "Prepare update anchor" }).click();
   await expect(page.getByRole("status")).toContainText("1 update anchor transaction prepared.");
@@ -307,6 +312,15 @@ test("publishing an update appends it to the thesis and creates the next revisio
     note: "CPI update moved signal.",
     anchorPreparationId: "revision-anchor-detail-1",
     anchorTxHash: "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    signalUpdates: [
+      {
+        signalId: predictionSignal.signalId,
+        currentOdds: 0.72,
+        weight: 80,
+        status: "resolved",
+        resolvedOutcomeLabel: "Hold",
+      },
+    ],
   });
   expect(String(revisionPayloads[0].body)).toContain("Inflation prints are not soft enough");
   expect(String(revisionPayloads[0].body)).toContain("Rates market repriced after CPI");

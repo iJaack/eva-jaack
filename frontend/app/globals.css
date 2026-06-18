@@ -1807,6 +1807,47 @@ button {
   gap: var(--space-xs);
 }
 
+.revision-signal-editor {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: var(--rule-hairline);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklch, var(--color-accent) 4%, var(--card));
+}
+
+.revision-signal-editor h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  line-height: 1.2;
+}
+
+.revision-signal-row {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.revision-signal-row > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.revision-signal-row strong {
+  color: var(--ink);
+  font-weight: 700;
+  text-align: end;
+}
+
+.revision-signal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xs);
+}
+
 @media (max-width: 39.99rem) {
   .compose-editor-actions {
     grid-template-columns: minmax(0, 1fr);
@@ -1818,6 +1859,10 @@ button {
   }
 
   .thesis-action-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .revision-signal-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
