@@ -133,6 +133,32 @@ describe("prediction layer service", () => {
       "Initial thesis.",
       "Updated thesis after IPO timing odds improved.",
     ]);
+    expect(revised?.thesis.revisions[0]?.scoreBefore).toBeNull();
+    expect(revised?.thesis.revisions[0]?.scoreAfter).toBe(50);
+    expect(revised?.thesis.revisions[0]?.signalSnapshot[0]).toMatchObject({ currentOdds: 0.25, signalScore: 50 });
+    expect(revised?.thesis.revisions[1]?.scoreBefore).toBe(50);
+    expect(revised?.thesis.revisions[1]?.scoreAfter).toBe(70);
+    expect(revised?.thesis.revisions[1]?.signalSnapshot[0]).toMatchObject({ currentOdds: 0.45, signalScore: 70 });
+
+    const reRevised = await service.recordRevision(created.thesis.thesisId, {
+      identity: auth(),
+      body: "Updated thesis after IPO timing odds strengthened again.",
+      note: "Second market repricing.",
+      signalUpdates: [
+        {
+          signalId: created.thesis.signals[0]!.signalId,
+          currentOdds: 0.6,
+          weight: 100,
+        },
+      ],
+    });
+
+    expect(reRevised?.thesis.currentScore).toBe(85);
+    expect(reRevised?.thesis.revisions.map((revision) => revision.scoreAfter)).toEqual([50, 70, 85]);
+    expect(reRevised?.thesis.revisions.map((revision) => revision.signalSnapshot[0]?.signalScore)).toEqual([50, 70, 85]);
+    expect(reRevised?.thesis.revisions.map((revision) => revision.signalSnapshot[0]?.currentOdds)).toEqual([0.25, 0.45, 0.6]);
+    expect(reRevised?.thesis.timeline.map((entry) => entry.scoreBefore)).toEqual([null, 50, 70]);
+    expect(reRevised?.thesis.timeline.map((entry) => entry.scoreAfter)).toEqual([50, 70, 85]);
   });
 
   it("scores closed prediction signals from resolved outcomes", async () => {
