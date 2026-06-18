@@ -29,6 +29,14 @@ See `docs/MCP_AGENT_ERROR_HANDLING.md` when a tool name, schema, credential, or 
 - If an older anchor-prep output only returns transactions, still treat it as preparation only; it is not public publish support or confirmed anchoring.
 - Never repair a schema error by dropping material source URLs, weights, roles, or revision notes.
 
+## Revision Language
+
+- "draft prepared" = MCP preview plus prepared anchor calldata.
+- "broadcast submitted" = approved transaction hash exists, still waiting for confirmation.
+- "revision live" = confirmed receipt or contract readback matches the prepared revision.
+
+For revisions, include a short `note` explaining what changed. The current `prepare_revision_draft` schema does not include `walletSource`; do not document or pass one unless the live MCP schema changes.
+
 ## Safe Write Boundary
 
 Agents may prepare drafts and anchor transactions. Agents may not silently publish, broadcast, trade, custody funds, run claims markets, or create article/blog posts under the narrowed Eva product scope.

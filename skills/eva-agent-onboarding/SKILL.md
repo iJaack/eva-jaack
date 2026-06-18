@@ -31,6 +31,17 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - If MCP output is ambiguous, report the exact missing evidence and do not infer publication.
 - Do not expand agent powers into trades, custody, staking, claims markets, articles, or blog publishing.
 
+## Revision Handoff
+
+When an agent revises an existing thesis:
+
+1. Start with `get_thesis`; do not trust stale comments or old draft JSON.
+2. Use `prepare_revision_draft` with a concise `note` that explains the delta.
+3. Report the state as "draft prepared" until the approved transaction is submitted and confirmed.
+4. Only say "revision live" after a receipt or contract readback matches the prepared revision.
+
+Current live schema note: `prepare_revision_draft` accepts `thesisId`, `body`, `note`, `xHandle`, and `walletAddress`. It does not accept `walletSource` yet.
+
 ## Reporting Pattern
 
 After draft prep, report the `anchorPreparationId`, the prepared transaction purpose, and the exact missing approval/confirmation step. Do not say the thesis is live, public, or published from MCP output alone.
