@@ -43,6 +43,8 @@ When an agent revises an existing thesis:
 
 Current live schema note: `prepare_revision_draft` accepts `thesisId`, `body`, `note`, `xHandle`, and `walletAddress`. It does not accept `walletSource` yet.
 
+Current market status enum: `open`, `closed`, `resolved`, `cancelled`. Treat `cancelled` as a source-market state only; it is not a thesis publish state and does not imply an Eva draft or anchor was cancelled.
+
 ## User-Facing Result Language
 
 - Prepared MCP draft output: "prepared for review", not "published".

@@ -88,7 +88,7 @@ Important ranges and enums:
 - odds: `0` to `1`
 - weights: `1` to `100`
 - signal roles: `core`, `lateral`, `second_order`, `third_order`, `hedge`, `contradiction`
-- market status: `open`, `closed`, `resolved`
+- market status: `open`, `closed`, `resolved`, `cancelled`
 - fact verdicts: `verified`, `likely_true`, `mixed`, `misleading`, `likely_false`, `false`, `unverifiable_yet`, `non_falsifiable`
 
 Expected draft-prep output includes:
@@ -113,6 +113,13 @@ Use this matrix when summarizing MCP results back to a user or another agent:
 | receipt or contract readback matching the thesis/revision | "The anchor is confirmed." | N/A |
 
 If the result contains an error, missing thesis, or mismatched identity, stop and report the blocker. Do not retry with a different wallet, X handle, or public publish path unless the operator explicitly approves that change.
+
+### Schema Gotchas For Agents
+
+- A `cancelled` prediction market is valid input. Use it when a market was removed/cancelled by the source, and explain why it still matters in `rationale`.
+- `cancelled` is a market status, not a thesis publish state. It does not mean a prepared draft, revision, or anchor payload was cancelled.
+- If a market is no longer useful evidence, omit it instead of forcing it into `closed`, `resolved`, or `contradiction`.
+- `prepare_revision_draft` currently accepts `thesisId`, `body`, `note`, `xHandle`, and `walletAddress`; it does not accept `walletSource` yet.
 
 ### `get_thesis`
 
