@@ -68,6 +68,10 @@ test("trust receipts campaign page carries measurable launch CTAs", async ({ pag
     "href",
     /utm_campaign=trust_receipts_launch.*utm_content=read_example/,
   );
+  await expect(page.getByRole("link", { name: "Follow @evapredicts" })).toHaveAttribute(
+    "href",
+    "https://x.com/evapredicts",
+  );
   await expect(page.getByRole("link", { name: "Find live signals" })).toHaveAttribute(
     "href",
     /utm_campaign=trust_receipts_launch.*utm_content=find_signals/,

@@ -7,6 +7,7 @@ const campaign = "trust_receipts_launch";
 const composeHref = `/compose?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=draft_thesis`;
 const marketsHref = `/markets?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=find_signals`;
 const exampleHref = `/thesis/thesis-0fdef25794b38b6e8eed7524?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=read_example`;
+const followHref = "https://x.com/evapredicts";
 
 export const metadata: Metadata = {
   title: "Eva Protocol trust receipts campaign",
@@ -35,7 +36,7 @@ const proofPoints = [
 const launchSequence = [
   "Post from @evapredicts with the SpaceX IPO thesis as the concrete example.",
   "Send traffic to this page with utm_campaign=trust_receipts_launch.",
-  "Measure clicks into Draft thesis, Find signals, and Read example before widening the campaign.",
+  "Measure clicks into Draft thesis, Find signals, Read example, and @evapredicts follow intent before widening the campaign.",
 ] as const;
 
 export default function TrustReceiptsCampaignPage() {
@@ -57,6 +58,9 @@ export default function TrustReceiptsCampaignPage() {
             <Link href={exampleHref} className="btn">
               Read the example
             </Link>
+            <a href={followHref} className="btn" target="_blank" rel="noreferrer">
+              Follow @evapredicts
+            </a>
           </div>
         </section>
 
