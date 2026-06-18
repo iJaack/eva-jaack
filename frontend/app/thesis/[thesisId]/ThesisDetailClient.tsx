@@ -32,6 +32,27 @@ function formatDate(value: string): string {
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(value));
 }
 
+function humanize(value: string): string {
+  return value.replace(/_/g, " ");
+}
+
+function predictionSignalCopy(signal: ReturnType<typeof predictionSignals>[number]): string {
+  if (signal.status === "resolved") {
+    const resolvedOutcome = signal.resolvedOutcomeLabel ? ` as ${signal.resolvedOutcomeLabel}` : "";
+    return `${signal.selectedOutcomeLabel} resolved${resolvedOutcome} at final ${formatOdds(signal.currentOdds)}.`;
+  }
+
+  if (signal.status === "closed") {
+    return `${signal.selectedOutcomeLabel} closed at ${formatOdds(signal.currentOdds)}.`;
+  }
+
+  if (signal.status === "cancelled") {
+    return `${signal.selectedOutcomeLabel} market was cancelled. Last shown at ${formatOdds(signal.currentOdds)}.`;
+  }
+
+  return `${signal.selectedOutcomeLabel} priced at ${formatOdds(signal.currentOdds)}.`;
+}
+
 function predictionSignals(thesis: Thesis) {
   return thesis.signals.filter((signal) => signal.kind === "prediction_market");
 }
@@ -67,6 +88,46 @@ function isTxHash(value: string): boolean {
   return /^0x[a-fA-F0-9]{64}$/.test(value.trim());
 }
 
+function scoreDeltaLabel(scoreBefore: number | null, scoreAfter: number): string {
+  if (scoreBefore === null) return `Delta new · ${scoreAfter}`;
+
+  const delta = scoreAfter - scoreBefore;
+  if (delta === 0) return "Delta ±0";
+
+  return `Delta ${delta > 0 ? "+" : ""}${delta}`;
+}
+
+function scoreDeltaClassName(scoreBefore: number | null, scoreAfter: number): string {
+  if (scoreBefore === null) return "status-chip status-chip-unresolved";
+
+  const delta = scoreAfter - scoreBefore;
+  if (delta > 0) return "status-chip status-chip-verified";
+  if (delta < 0) return "status-chip status-chip-disputed";
+  return "status-chip status-chip-forecast";
+}
+
+type TimelineAction = Thesis["timeline"][number]["action"];
+type TimelineFilter = "all" | TimelineAction;
+
+const timelineFilters: Array<{ value: TimelineFilter; label: string }> = [
+  { value: "all", label: "All" },
+  { value: "created", label: "Created" },
+  { value: "revised", label: "Revised" },
+  { value: "signal_added", label: "Signal added" },
+  { value: "signal_updated", label: "Signal updated" },
+  { value: "anchored", label: "Anchored" },
+  { value: "resolved", label: "Resolved" },
+];
+
+function timelineActionLabel(action: TimelineAction): string {
+  return timelineFilters.find((filter) => filter.value === action)?.label ?? action.replace(/_/g, " ");
+}
+
+function timelineFilterCount(thesis: Thesis, filter: TimelineFilter): number {
+  if (filter === "all") return thesis.timeline.length;
+  return thesis.timeline.filter((entry) => entry.action === filter).length;
+}
+
 export default function ThesisDetailClient() {
   const params = useParams();
   const thesisId = params.thesisId as string;
@@ -81,6 +142,7 @@ export default function ThesisDetailClient() {
   const [revisionAnchorPreparationId, setRevisionAnchorPreparationId] = useState<string | null>(null);
   const [revisionAnchorTxHash, setRevisionAnchorTxHash] = useState("");
   const [revisionAnchorPending, setRevisionAnchorPending] = useState(false);
+  const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -217,6 +279,11 @@ export default function ThesisDetailClient() {
   };
 
   const revisionPublishReady = Boolean(updateBody.trim() && revisionAnchorPreparationId && isTxHash(revisionAnchorTxHash) && !updatePending && !revisionAnchorPending);
+  const timelineEntries = detail
+    ? [...detail.thesis.timeline]
+        .filter((entry) => timelineFilter === "all" || entry.action === timelineFilter)
+        .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
+    : [];
 
   return (
     <>
@@ -303,37 +370,47 @@ export default function ThesisDetailClient() {
                     <article key={signal.signalId} className="thesis-signal-card" data-testid="thesis-signal-card">
                       <div className="card-topline">
                         <span>{signalLabel(index)}</span>
-                        <span>{signal.kind === "prediction_market" ? `${signal.role.replace(/_/g, " ")} · ${signal.status}` : `fact · ${signal.verifierVerdict.replace(/_/g, " ")}`}</span>
+                        <span>{signal.kind === "prediction_market" ? `${humanize(signal.role)} · ${humanize(signal.status)}` : `fact · ${humanize(signal.verifierVerdict)}`}</span>
                       </div>
                       <h3>{signal.title}</h3>
                       {signal.kind === "prediction_market" ? (
                         <>
-                          <p>{signal.selectedOutcomeLabel} priced at {formatOdds(signal.currentOdds)}.</p>
-                          {signal.resolvedOutcomeLabel ? <p>Resolved outcome: {signal.resolvedOutcomeLabel}</p> : null}
+                          <p>{predictionSignalCopy(signal)}</p>
                           <div className="odds-row">
                             <div>
                               <span>Added</span>
                               <strong>{formatOdds(signal.oddsAtAdd)}</strong>
                             </div>
                             <div>
+                              <span>Status</span>
+                              <strong>{humanize(signal.status)}</strong>
+                            </div>
+                            <div>
                               <span>Weight</span>
                               <strong>{signal.weight}</strong>
                             </div>
                           </div>
+                          {signal.resolvedOutcomeLabel ? <p className="inline-note">Resolved outcome: {signal.resolvedOutcomeLabel}</p> : null}
                         </>
                       ) : (
                         <>
                           <p>{signal.claimText}</p>
+                          <p className="inline-note">Fact verdict: {humanize(signal.verifierVerdict)}.</p>
                           <div className="odds-row">
                             <div>
                               <span>Verdict</span>
-                              <strong>{signal.verifierVerdict.replace(/_/g, " ")}</strong>
+                              <strong>{humanize(signal.verifierVerdict)}</strong>
                             </div>
                             <div>
                               <span>Score</span>
                               <strong>{signal.verifierScore}</strong>
                             </div>
                           </div>
+                          {signal.sourceUrl ? (
+                            <a className="section-link" href={signal.sourceUrl} target="_blank" rel="noreferrer">
+                              Source evidence
+                            </a>
+                          ) : null}
                         </>
                       )}
                     </article>
@@ -465,11 +542,58 @@ export default function ThesisDetailClient() {
                     <div className="status-row">
                       <span className="status-chip status-chip-forecast">Before {revision.scoreBefore ?? "new"}</span>
                       <span className="status-chip status-chip-unresolved">After {revision.scoreAfter}</span>
+                      <span className={scoreDeltaClassName(revision.scoreBefore, revision.scoreAfter)}>{scoreDeltaLabel(revision.scoreBefore, revision.scoreAfter)}</span>
                       <span className="status-chip status-chip-verified">Anchor {revision.anchor.status}</span>
                     </div>
                   </article>
                 ))}
               </div>
+            </section>
+
+            <section className="prediction-card thesis-timeline-panel">
+              <div className="section-heading-row prediction-heading">
+                <div>
+                  <p className="section-kicker">Activity trail</p>
+                  <h2 className="section-title section-title-sm">Thesis timeline</h2>
+                </div>
+                <span className="status-chip status-chip-unresolved">{detail.thesis.timeline.length} events</span>
+              </div>
+              <div className="filter-bar" aria-label="Timeline filters">
+                {timelineFilters.map((filter) => {
+                  const count = timelineFilterCount(detail.thesis, filter.value);
+
+                  return (
+                    <button
+                      key={filter.value}
+                      type="button"
+                      className={`filter-chip${timelineFilter === filter.value ? " filter-chip-active" : ""}`}
+                      onClick={() => setTimelineFilter(filter.value)}
+                      disabled={count === 0}
+                    >
+                      {filter.label} <span>{count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              {timelineEntries.length > 0 ? (
+                <div className="thesis-timeline-list" data-testid="thesis-timeline-list">
+                  {timelineEntries.map((entry) => (
+                    <article key={entry.timelineId} className="timeline-card" data-testid="timeline-card">
+                      <div className="card-topline">
+                        <span>{timelineActionLabel(entry.action)}</span>
+                        <span>{formatDate(entry.at)}</span>
+                      </div>
+                      <h3>{entry.note ?? `${timelineActionLabel(entry.action)} event`}</h3>
+                      <div className="status-row">
+                        <span className="status-chip status-chip-forecast">Before {entry.scoreBefore ?? "new"}</span>
+                        <span className="status-chip status-chip-unresolved">After {entry.scoreAfter}</span>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="inline-note">No timeline events match this filter yet.</p>
+              )}
             </section>
           </section>
         )}

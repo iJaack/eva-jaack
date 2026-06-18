@@ -10,7 +10,7 @@ Run the local MCP server from the repo root:
 pnpm --filter backend mcp
 ```
 
-Prefer the local server for agent work. Treat remote MCP write tools as unavailable unless the agent has scoped credentials for the task.
+Prefer the local server for agent work. Treat remote MCP write tools as unavailable unless the agent has scoped credentials for the task and the operator explicitly approved that path.
 
 ## Live Tools
 
@@ -22,7 +22,7 @@ Prefer the local server for agent work. Treat remote MCP write tools as unavaila
 | `prepare_revision_draft` | Preview a new revision and prepare revision-anchor calldata. | No |
 | `prepare_anchor_transaction` | Rebuild anchor calldata for an existing thesis. | No |
 
-The create and revision tools return `publishState: "anchor_prepared_not_published"`. That is the boundary. A prepared anchor is not a published thesis, not a confirmed revision, and not evidence of an onchain record.
+Every write-adjacent MCP tool (`create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`) returns `publishState: "anchor_prepared_not_published"`. That is the boundary. A prepared anchor is not a published thesis, not a confirmed revision, and not evidence of an onchain record.
 
 ## Identity Requirements
 
@@ -91,7 +91,7 @@ Important ranges and enums:
 - market status: `open`, `closed`, `resolved`
 - fact verdicts: `verified`, `likely_true`, `mixed`, `misleading`, `likely_false`, `false`, `unverifiable_yet`, `non_falsifiable`
 
-Expected output includes:
+Expected draft-prep output includes:
 
 - `publishState: "anchor_prepared_not_published"`
 - `anchorPreparationId`
@@ -99,6 +99,20 @@ Expected output includes:
 - previewed `thesis`, `markets`, `predictor`, and `counters`
 - `transactions` for user-approved anchoring
 - `nextStep` telling the agent to get user approval before publishing
+
+### Output Claim Matrix
+
+Use this matrix when summarizing MCP results back to a user or another agent:
+
+| Observed output | Safe claim | Unsafe claim |
+|---|---|---|
+| `publishState: "anchor_prepared_not_published"` | "I prepared a draft/anchor payload for review." | "The thesis is published." |
+| `anchorStatus: "prepared"` | "The transaction calldata is ready for approval." | "The thesis is anchored onchain." |
+| `transactions` array only from `prepare_anchor_transaction` | "I rebuilt the anchor transaction payload." | "I updated or fixed the stored thesis." |
+| submitted tx hash but no receipt/readback | "A transaction was submitted; confirmation is pending." | "The revision is confirmed." |
+| receipt or contract readback matching the thesis/revision | "The anchor is confirmed." | N/A |
+
+If the result contains an error, missing thesis, or mismatched identity, stop and report the blocker. Do not retry with a different wallet, X handle, or public publish path unless the operator explicitly approves that change.
 
 ### `get_thesis`
 
@@ -132,7 +146,55 @@ This previews the next revision and prepares calldata. It does not append to the
 }
 ```
 
-Use this to rebuild anchor calldata for an existing thesis. It is still preparation only.
+Use this to rebuild anchor calldata for an existing thesis. It returns transaction payloads only. It does not store a new thesis, append a revision, publish anything publicly, or prove the thesis is anchored.
+
+Safe summary language:
+
+> Prepared anchor transaction payload for `thesis_abc123`; user approval and confirmed onchain receipt are still required.
+
+Expected output uses the same safe boundary wrapper as draft/revision preparation:
+
+- `publishState: "anchor_prepared_not_published"`
+- `anchorPreparationId`
+- `anchorStatus: "prepared"`
+- existing `thesis`, linked `markets`, `predictor`, and `counters`
+- `transactions` for user-approved anchoring
+- `nextStep` telling the agent to get user approval before broadcasting
+
+## Agent Checklist
+
+Before draft prep:
+
+1. Confirm the X handle that should own the draft.
+2. Confirm the wallet address and wallet source.
+3. Preserve source URLs for fact and market signals.
+4. Assign weights deliberately. Use contradictions for signals that weaken the thesis, not as generic caveats.
+
+After draft prep:
+
+1. Report `publishState`, `anchorStatus`, and `anchorPreparationId` to the operator.
+2. Summarize what transactions were prepared, without calling them published.
+3. Ask for explicit approval before any broadcast path.
+4. After broadcast, require a transaction receipt or contract readback before saying `confirmed`.
+
+## Revision Lifecycle Checklist
+
+Use this sequence every time an agent updates an existing thesis:
+
+1. Call `get_thesis` for the live `thesisId` and quote the current title/status in your notes.
+2. Decide what changed: catalyst, odds movement, fact correction, or contradiction. If nothing materially changed, do not prepare a revision.
+3. Call `prepare_revision_draft` with the full replacement body plus a short `note`. The note should explain the delta, not repeat the whole thesis.
+4. Treat the response as a preview only while `publishState` is `anchor_prepared_not_published` and `anchorStatus` is `prepared`.
+5. Show the user the revision summary, anchor preparation id, and transaction payload. Ask for explicit approval before any broadcast.
+6. After approval, require a transaction hash plus receipt or contract readback before saying the revision is live.
+
+Evidence ladder for agent language:
+
+- Draft prepared: MCP returned `anchor_prepared_not_published`.
+- Broadcast submitted: there is a transaction hash, but confirmation is still pending.
+- Revision live: the transaction is confirmed and a contract readback or receipt matches the prepared thesis/revision.
+
+Do not use issue comments, screenshots, stale draft JSON, or prior agent notes as proof of current revision state. Use `get_thesis` first, and use onchain confirmation before making public claims.
 
 ## Safe Write Boundary
 
@@ -145,6 +207,8 @@ Agents may:
 - prepare anchor calldata,
 - summarize the prepared transaction for the user.
 
+Agents may not change identity fields opportunistically. If the requested `xHandle` or `walletAddress` is wrong, missing, or unauthorized, ask for the correct identity rather than substituting Eva's wallet, an embedded wallet, or a remembered address.
+
 Agents must not:
 
 - broadcast transactions without explicit approval,
@@ -152,6 +216,12 @@ Agents must not:
 - claim public blog/article support,
 - reintroduce removed `/claims`, `/articles`, curator, staking, challenge, settlement, paid-verification, or LLM-verification scope,
 - omit source URLs, signal weights, or revision notes when they materially affect the thesis.
+
+## Agent Handoff Contract
+
+After any draft-prep tool call, return a handoff that separates preparation from publication. Include the thesis title or id, wallet used, signal counts, `publishState` / `anchorPreparationId` when present, and the exact user approval still needed before broadcast.
+
+Use `docs/AGENT_SAFE_OUTPUTS.md` for short user-facing snippets. Use `docs/MCP_AGENT_HANDOFF_TEMPLATE.md` for full handoffs and the status ladder from `draft prepared` to `published/live`.
 
 ## Minimal Agent Workflow
 
@@ -161,3 +231,21 @@ Agents must not:
 4. Show the prepared summary and transactions to the user.
 5. Wait for explicit approval before any broadcast or public publish path.
 6. For updates, call `get_thesis`, then `prepare_revision_draft`, then repeat the approval boundary.
+
+## SpaceX Thesis Dry Run
+
+Use the repo script when an agent needs a deterministic SpaceX IPO payload example without guessing at schema shape:
+
+```bash
+pnpm publish:spacex-thesis --dry-run
+```
+
+Dry run is the default. It prints the API payload and does not write to Eva, publish a thesis, broadcast a transaction, or confirm an onchain anchor. This makes it safe for onboarding, fixture review, and copy/schema rehearsal.
+
+Before using `--publish`, the operator must explicitly approve the write target and signer:
+
+```bash
+pnpm publish:spacex-thesis --publish --api-base https://api.eva.jaack.me/api --wallet 0x1111111111111111111111111111111111111111
+```
+
+`--publish` creates the app thesis through the HTTP API after duplicate detection. It still does not broadcast Avalanche transactions and still must not be described as an onchain anchor or public protocol confirmation. Treat any anchor work as a separate approval-gated transaction flow.
