@@ -7,22 +7,53 @@ description: Onboard agents to Eva Protocol through MCP and wallet-aware thesis 
 
 Use this when an agent needs to work with Eva Protocol safely.
 
+Canonical guide: `docs/MCP_AGENT_GUIDE.md`.
+Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
+
 ## Requirements
 
 - Use the local MCP server first: `pnpm --filter backend mcp`.
 - Keep `docs/MCP_AGENT_GUIDE.md` open when creating or revising theses.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
-- Treat remote MCP write tools as unavailable unless the agent has scoped credentials.
-- Confirm wallet identity before preparing or broadcasting protocol transactions.
+- Treat remote MCP write tools as unavailable unless the agent has scoped credentials and the operator explicitly approved that path.
+- Confirm X identity, wallet address, and wallet source before preparing protocol transactions.
 - Use `0x0fe61780bd5508b3C99e420662050e5560608cA4` only when the operator explicitly approved that signer for the task.
 
 ## Safety Rules
 
 - Read tools (`search_markets`, `get_thesis`) are safe by default.
 - Draft-prep tools (`create_thesis_draft`, `prepare_revision_draft`, `prepare_anchor_transaction`) prepare calldata and previews only.
-- MCP draft/anchor-prep output means `anchor_prepared_not_published`; it is not public publish support.
+- MCP draft/anchor-prep output means `publishState: "anchor_prepared_not_published"` and `anchorStatus: "prepared"`; it is not public publish support.
 - `prepare_anchor_transaction` rebuilds calldata for an existing thesis; it still does not broadcast, confirm, or publish anything.
 - Transaction preparation is not transaction broadcast.
 - Broadcasts require explicit user approval at action time.
-- Never mark a thesis revision or signal as confirmed without a transaction receipt or contract readback.
+- Never mark a thesis, thesis revision, or signal as confirmed without a transaction receipt or contract readback.
 - If MCP output is ambiguous, report the exact missing evidence and do not infer publication.
+- Do not swap in a different `xHandle`, `walletAddress`, or wallet source to make a draft work. If identity is missing, invalid, or unauthorized, stop and ask for the correct operator-approved identity.
+- Do not expand agent powers into trades, custody, staking, claims markets, articles, or blog publishing.
+
+## Revision Handoff
+
+When an agent revises an existing thesis:
+
+1. Start with `get_thesis`; do not trust stale comments or old draft JSON.
+2. Use `prepare_revision_draft` with a concise `note` that explains the delta.
+3. Report the state as "draft prepared" until the approved transaction is submitted and confirmed.
+4. Only say "revision live" after a receipt or contract readback matches the prepared revision.
+
+Current live schema note: `prepare_revision_draft` accepts `thesisId`, `body`, `note`, `xHandle`, and `walletAddress`. It does not accept `walletSource` yet.
+
+## User-Facing Result Language
+
+- Prepared MCP draft output: "prepared for review", not "published".
+- Prepared anchor transaction: "calldata ready for approval", not "anchored".
+- Submitted transaction without receipt: "pending confirmation", not "confirmed".
+- Receipt or contract readback matching the thesis/revision: "confirmed".
+
+If a tool returns an error or a missing thesis, report the blocker directly. Do not retry with a guessed thesis ID or alternate wallet.
+
+## Reporting Pattern
+
+After draft prep, report the `anchorPreparationId`, the prepared transaction purpose, and the exact missing approval/confirmation step. Do not say the thesis is live, public, or published from MCP output alone.
+
+Use `docs/AGENT_SAFE_OUTPUTS.md` for short user-facing wording and `docs/MCP_AGENT_HANDOFF_TEMPLATE.md` for full handoffs between agents, reviewers, or issue comments.

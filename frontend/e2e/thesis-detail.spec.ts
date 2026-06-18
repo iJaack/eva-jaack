@@ -140,6 +140,30 @@ function thesisDetail(body = "Inflation prints are not soft enough for a cut, so
                 scoreBefore: 64,
                 scoreAfter: 70,
               },
+              {
+                timelineId: "tl-signal-updated",
+                action: "signal_updated",
+                at: "2026-04-23T01:00:00.000Z",
+                note: "Fed hold odds moved to 58%.",
+                scoreBefore: 64,
+                scoreAfter: 70,
+              },
+              {
+                timelineId: "tl-anchored",
+                action: "anchored",
+                at: "2026-04-23T02:00:00.000Z",
+                note: "Revision anchor confirmed.",
+                scoreBefore: 70,
+                scoreAfter: 70,
+              },
+              {
+                timelineId: "tl-resolved",
+                action: "resolved",
+                at: "2026-04-24T00:00:00.000Z",
+                note: "Market resolved after the Fed decision.",
+                scoreBefore: 70,
+                scoreAfter: 76,
+              },
             ],
       evidenceLinks: ["https://example.com/cpi"],
       sourceUrl: "https://example.com/market/fed-hold",
@@ -206,11 +230,15 @@ test("thesis detail reads as a public thesis with attached citation cards and re
   await expect(page.getByRole("heading", { name: "Signals supporting the thesis" })).toBeVisible();
   await expect(page.getByTestId("thesis-signal-card").first()).toContainText("S1");
   await expect(page.getByTestId("thesis-signal-card").first()).toContainText("Hold priced at 58%");
+  await expect(page.getByTestId("thesis-signal-card").first()).toContainText("open");
   await expect(page.getByTestId("thesis-signal-card").nth(1)).toContainText("S2");
   await expect(page.getByRole("heading", { name: "Revision history" })).toBeVisible();
   await expect(page.getByTestId("revision-card").first()).toContainText("v1");
   await expect(page.getByTestId("revision-card").first()).toContainText("2 signals snapshotted");
   await expect(page.getByTestId("revision-card").first()).toContainText("Delta new · 64");
+  await expect(page.getByRole("heading", { name: "Thesis timeline" })).toBeVisible();
+  await expect(page.getByTestId("timeline-card")).toHaveCount(1);
+  await expect(page.getByTestId("timeline-card").first()).toContainText("Thesis published with initial signal basket.");
   await expect(page.getByRole("heading", { name: "Append an update" })).toBeVisible();
 });
 
@@ -246,6 +274,27 @@ test("thesis detail shows resolved market outcomes and fact verdict context", as
   await expect(page.getByTestId("thesis-signal-card").first()).toContainText("Resolved outcome: Hold");
   await expect(page.getByTestId("thesis-signal-card").nth(1)).toContainText("Fact verdict: misleading.");
   await expect(page.getByTestId("thesis-signal-card").nth(1).getByRole("link", { name: "Source evidence" })).toHaveAttribute("href", "https://example.com/cpi");
+});
+
+test("thesis timeline can be filtered by event type", async ({ page }) => {
+  await page.route("**/api/theses/thesis-fed-hold", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(thesisDetail(undefined, 2)) });
+  });
+
+  await page.goto("/thesis/thesis-fed-hold");
+
+  await expect(page.getByTestId("timeline-card")).toHaveCount(5);
+  await page.getByRole("button", { name: /^Revised\s+1$/ }).click();
+  await expect(page.getByTestId("timeline-card")).toHaveCount(1);
+  await expect(page.getByTestId("timeline-card").first()).toContainText("CPI update moved signal.");
+
+  await page.getByRole("button", { name: /^Signal updated\s+1$/ }).click();
+  await expect(page.getByTestId("timeline-card")).toHaveCount(1);
+  await expect(page.getByTestId("timeline-card").first()).toContainText("Fed hold odds moved to 58%.");
+
+  await page.getByRole("button", { name: /^Resolved\s+1$/ }).click();
+  await expect(page.getByTestId("timeline-card")).toHaveCount(1);
+  await expect(page.getByTestId("timeline-card").first()).toContainText("Market resolved after the Fed decision.");
 });
 
 test("publishing an update appends it to the thesis and creates the next revision", async ({ page }) => {
@@ -286,10 +335,9 @@ test("publishing an update appends it to the thesis and creates the next revisio
   await page.goto("/thesis/thesis-fed-hold");
   const publishButton = page.getByRole("button", { name: "Publish update" });
   await expect(publishButton).toBeDisabled();
-  await expect(page.getByRole("heading", { name: "Update market state for this revision" })).toBeVisible();
   await page.getByLabel("Update body").fill("Rates market repriced after CPI, so this thesis now needs a stronger liquidity extension. [S1]");
   await page.getByLabel("Update note").fill("CPI update moved signal.");
-  await page.getByLabel("S1 current odds").fill("72");
+  await page.getByLabel("S1 current odds (%)").fill("74");
   await page.getByLabel("S1 weight").fill("80");
   await page.getByLabel("S1 status").selectOption("resolved");
   await page.getByLabel("S1 resolved outcome").fill("Hold");
@@ -303,6 +351,9 @@ test("publishing an update appends it to the thesis and creates the next revisio
 
   expect(preparedRevisionPayloads).toHaveLength(1);
   expect(String(preparedRevisionPayloads[0].body)).toContain("Rates market repriced after CPI");
+  expect(preparedRevisionPayloads[0]).toMatchObject({
+    signalUpdates: [{ signalId: "sig-fed-hold", currentOdds: 0.74, weight: 80, status: "resolved", resolvedOutcomeLabel: "Hold" }],
+  });
   await expect.poll(() => revisionPayloads.length).toBe(1);
   expect(revisionPayloads[0]).toMatchObject({
     dynamicUserId: author.dynamicUserId,
@@ -312,15 +363,7 @@ test("publishing an update appends it to the thesis and creates the next revisio
     note: "CPI update moved signal.",
     anchorPreparationId: "revision-anchor-detail-1",
     anchorTxHash: "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-    signalUpdates: [
-      {
-        signalId: predictionSignal.signalId,
-        currentOdds: 0.72,
-        weight: 80,
-        status: "resolved",
-        resolvedOutcomeLabel: "Hold",
-      },
-    ],
+    signalUpdates: [{ signalId: "sig-fed-hold", currentOdds: 0.74, weight: 80, status: "resolved", resolvedOutcomeLabel: "Hold" }],
   });
   expect(String(revisionPayloads[0].body)).toContain("Inflation prints are not soft enough");
   expect(String(revisionPayloads[0].body)).toContain("Rates market repriced after CPI");
