@@ -140,6 +140,30 @@ function thesisDetail(body = "Inflation prints are not soft enough for a cut, so
                 scoreBefore: 64,
                 scoreAfter: 70,
               },
+              {
+                timelineId: "tl-signal-updated",
+                action: "signal_updated",
+                at: "2026-04-23T01:00:00.000Z",
+                note: "Fed hold odds moved to 58%.",
+                scoreBefore: 64,
+                scoreAfter: 70,
+              },
+              {
+                timelineId: "tl-anchored",
+                action: "anchored",
+                at: "2026-04-23T02:00:00.000Z",
+                note: "Revision anchor confirmed.",
+                scoreBefore: 70,
+                scoreAfter: 70,
+              },
+              {
+                timelineId: "tl-resolved",
+                action: "resolved",
+                at: "2026-04-24T00:00:00.000Z",
+                note: "Market resolved after the Fed decision.",
+                scoreBefore: 70,
+                scoreAfter: 76,
+              },
             ],
       evidenceLinks: ["https://example.com/cpi"],
       sourceUrl: "https://example.com/market/fed-hold",
@@ -211,6 +235,9 @@ test("thesis detail reads as a public thesis with attached citation cards and re
   await expect(page.getByTestId("revision-card").first()).toContainText("v1");
   await expect(page.getByTestId("revision-card").first()).toContainText("2 signals snapshotted");
   await expect(page.getByTestId("revision-card").first()).toContainText("Delta new · 64");
+  await expect(page.getByRole("heading", { name: "Thesis timeline" })).toBeVisible();
+  await expect(page.getByTestId("timeline-card")).toHaveCount(1);
+  await expect(page.getByTestId("timeline-card").first()).toContainText("Thesis published with initial signal basket.");
   await expect(page.getByRole("heading", { name: "Append an update" })).toBeVisible();
 });
 
@@ -246,6 +273,27 @@ test("thesis detail shows resolved market outcomes and fact verdict context", as
   await expect(page.getByTestId("thesis-signal-card").first()).toContainText("Resolved outcome: Hold");
   await expect(page.getByTestId("thesis-signal-card").nth(1)).toContainText("Fact verdict: misleading.");
   await expect(page.getByTestId("thesis-signal-card").nth(1).getByRole("link", { name: "Source evidence" })).toHaveAttribute("href", "https://example.com/cpi");
+});
+
+test("thesis timeline can be filtered by event type", async ({ page }) => {
+  await page.route("**/api/theses/thesis-fed-hold", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(thesisDetail(undefined, 2)) });
+  });
+
+  await page.goto("/thesis/thesis-fed-hold");
+
+  await expect(page.getByTestId("timeline-card")).toHaveCount(5);
+  await page.getByRole("button", { name: /^Revised\s+1$/ }).click();
+  await expect(page.getByTestId("timeline-card")).toHaveCount(1);
+  await expect(page.getByTestId("timeline-card").first()).toContainText("CPI update moved signal.");
+
+  await page.getByRole("button", { name: /^Signal updated\s+1$/ }).click();
+  await expect(page.getByTestId("timeline-card")).toHaveCount(1);
+  await expect(page.getByTestId("timeline-card").first()).toContainText("Fed hold odds moved to 58%.");
+
+  await page.getByRole("button", { name: /^Resolved\s+1$/ }).click();
+  await expect(page.getByTestId("timeline-card")).toHaveCount(1);
+  await expect(page.getByTestId("timeline-card").first()).toContainText("Market resolved after the Fed decision.");
 });
 
 test("publishing an update appends it to the thesis and creates the next revision", async ({ page }) => {
