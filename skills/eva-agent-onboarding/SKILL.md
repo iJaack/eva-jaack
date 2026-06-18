@@ -20,7 +20,8 @@ Use this when an agent needs to work with Eva Protocol safely.
 
 - Read tools (`search_markets`, `get_thesis`) are safe by default.
 - Draft-prep tools (`create_thesis_draft`, `prepare_revision_draft`, `prepare_anchor_transaction`) prepare calldata and previews only.
-- MCP draft output means `anchor_prepared_not_published`; it is not public publish support.
+- MCP draft/anchor-prep output means `anchor_prepared_not_published`; it is not public publish support.
+- `prepare_anchor_transaction` rebuilds calldata for an existing thesis; it still does not broadcast, confirm, or publish anything.
 - Transaction preparation is not transaction broadcast.
 - Broadcasts require explicit user approval at action time.
 - Never mark a thesis revision or signal as confirmed without a transaction receipt or contract readback.

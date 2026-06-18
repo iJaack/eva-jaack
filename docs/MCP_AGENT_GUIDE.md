@@ -22,7 +22,7 @@ Prefer the local server for agent work. Treat remote MCP write tools as unavaila
 | `prepare_revision_draft` | Preview a new revision and prepare revision-anchor calldata. | No |
 | `prepare_anchor_transaction` | Rebuild anchor calldata for an existing thesis. | No |
 
-The create and revision tools return `publishState: "anchor_prepared_not_published"`. That is the boundary. A prepared anchor is not a published thesis, not a confirmed revision, and not evidence of an onchain record.
+Every write-adjacent MCP tool (`create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`) returns `publishState: "anchor_prepared_not_published"`. That is the boundary. A prepared anchor is not a published thesis, not a confirmed revision, and not evidence of an onchain record.
 
 ## Identity Requirements
 
@@ -91,7 +91,7 @@ Important ranges and enums:
 - market status: `open`, `closed`, `resolved`
 - fact verdicts: `verified`, `likely_true`, `mixed`, `misleading`, `likely_false`, `false`, `unverifiable_yet`, `non_falsifiable`
 
-Expected output includes:
+Expected draft-prep output includes:
 
 - `publishState: "anchor_prepared_not_published"`
 - `anchorPreparationId`
@@ -133,6 +133,15 @@ This previews the next revision and prepares calldata. It does not append to the
 ```
 
 Use this to rebuild anchor calldata for an existing thesis. It is still preparation only.
+
+Expected output uses the same safe boundary wrapper as draft/revision preparation:
+
+- `publishState: "anchor_prepared_not_published"`
+- `anchorPreparationId`
+- `anchorStatus: "prepared"`
+- existing `thesis`, linked `markets`, `predictor`, and `counters`
+- `transactions` for user-approved anchoring
+- `nextStep` telling the agent to get user approval before broadcasting
 
 ## Safe Write Boundary
 
