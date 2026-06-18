@@ -10,7 +10,7 @@ const cleanupDirs: string[] = [];
 function auth() {
   return {
     dynamicUserId: "dyn-user-1",
-    xHandle: "@spacethesis",
+    xHandle: "@macrodesk",
     xProfileId: "x-42",
     walletAddress: samplePredictorIdentity.address,
     walletSource: "external" as const,
@@ -68,7 +68,7 @@ describe("prediction layer service", () => {
 
     expect(created.created).toBe(true);
     expect(created.thesis.title).toBe("SpaceX IPO liquidity rotation thesis");
-    expect(created.thesis.author.xHandle).toBe("@spacethesis");
+    expect(created.thesis.author.xHandle).toBe("@macrodesk");
     expect(created.thesis.author.walletAddress).toBe(samplePredictorIdentity.address);
     expect(created.thesis.signals).toHaveLength(2);
     expect(created.thesis.currentScore).toBe(70);
@@ -184,6 +184,52 @@ describe("prediction layer service", () => {
         body: "This should fail.",
       }),
     ).rejects.toThrow("Connected X identity and wallet are required");
+  });
+
+  it("rejects spoofed author identity payloads for existing thesis authors", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
+    cleanupDirs.push(dir);
+    const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => [], async () => []);
+
+    const created = await service.createThesis({
+      identity: auth(),
+      title: "Author binding thesis",
+      body: "The first thesis binds X, Dynamic, and wallet identity.",
+      predictionSignals: [
+        {
+          provider: "manual",
+          marketTitle: "Will identity spoofing be blocked?",
+          selectedOutcomeLabel: "Yes",
+          oddsAtAdd: 0.5,
+          currentOdds: 0.5,
+          weight: 100,
+          role: "core",
+          status: "open",
+        },
+      ],
+    });
+
+    await expect(
+      service.previewThesis({
+        identity: {
+          ...auth(),
+          dynamicUserId: "dyn-attacker",
+          walletAddress: "0x2222222222222222222222222222222222222222",
+        },
+        title: "Spoofed same handle thesis",
+        body: "This should not preview as the existing handle.",
+      }),
+    ).rejects.toThrow("Identity payload conflicts with an existing thesis author");
+
+    await expect(
+      service.previewRevision(created.thesis.thesisId, {
+        identity: {
+          ...auth(),
+          xHandle: "@spoofedhandle",
+        },
+        body: "A same-wallet actor cannot silently change the author handle during revision.",
+      }),
+    ).rejects.toThrow("Only the thesis author can revise this thesis");
   });
 
   it("loads provider markets broadly while excluding sports markets", async () => {

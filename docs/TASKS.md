@@ -13,7 +13,7 @@
 - [ ] Choose X plus embedded-wallet provider.
 - [x] Add provider-backed auth to compose.
 - [x] Add E2E coverage for external wallet and embedded wallet paths.
-- [ ] Add spoofing checks for author identity payloads.
+- [x] Add spoofing checks for author identity payloads.
 
 ## Thesis Evolution
 
