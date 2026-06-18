@@ -144,6 +144,15 @@ test("homepage leads with the prediction workbench layout", async ({ page }) => 
   await expect(page.getByRole("heading", { name: "Turn market odds into a public thesis." })).toBeVisible();
   await expect(page.getByText("Eva lets predictors write an interactive post")).toBeVisible();
   await expect(page.getByRole("heading", { name: "SpaceX IPO liquidity rotation" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "send curious predictors to one clean next step." })).toBeVisible();
+  await expect(page.getByRole("link", { name: /trust receipts/i })).toHaveAttribute(
+    "href",
+    /utm_campaign=trust_receipts_launch.*utm_content=trust_receipts_card/,
+  );
+  await expect(page.getByRole("link", { name: /agent receipts/i })).toHaveAttribute(
+    "href",
+    /utm_campaign=agent_receipts.*utm_content=agent_receipts_card/,
+  );
   await expect(page.getByRole("heading", { name: "From idea to public record" })).toBeVisible();
   await expect(page.getByRole("link", { name: /01 Start the argument/i })).toBeVisible();
   await expect(page.getByRole("link", { name: /02 Attach sources/i })).toBeVisible();

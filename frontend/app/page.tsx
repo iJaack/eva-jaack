@@ -123,6 +123,21 @@ const campaignProofPoints = [
   "copy the format when you have a broader market call",
 ] as const;
 
+const activeCampaigns = [
+  {
+    title: "trust receipts",
+    body: "A launch page for prediction-market operators who need cited theses, visible revisions, and author records instead of screenshots.",
+    href: "/campaigns/trust-receipts?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=trust_receipts_launch&utm_content=trust_receipts_card",
+    metric: "draft-thesis clicks and example-thesis reads",
+  },
+  {
+    title: "agent receipts",
+    body: "A sharper wedge for agent builders: public market calls are only useful when the underlying signals and revisions are inspectable.",
+    href: "/campaigns/agent-receipts?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=agent_receipts&utm_content=agent_receipts_card",
+    metric: "compose starts, follow clicks, and example-thesis clicks",
+  },
+] as const;
+
 function CampaignCallout() {
   return (
     <section className="prediction-section campaign-callout" aria-label="Current Eva Protocol campaign">
@@ -153,6 +168,31 @@ function CampaignCallout() {
       <p className="inline-note">
         Metric to watch: clicks from this CTA into @evapredicts and the SpaceX thesis before any broader launch push.
       </p>
+    </section>
+  );
+}
+
+function CampaignDirectory() {
+  return (
+    <section className="prediction-section campaign-directory" aria-label="Active Eva Protocol campaigns">
+      <div className="section-heading-row prediction-heading">
+        <div>
+          <p className="section-kicker">campaign directory</p>
+          <h2 className="section-title section-title-sm">send curious predictors to one clean next step.</h2>
+        </div>
+        <Link href="/campaigns/trust-receipts?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=trust_receipts_launch&utm_content=section_link" className="section-link">
+          Open launch page
+        </Link>
+      </div>
+      <div className="product-module-grid">
+        {activeCampaigns.map((campaign) => (
+          <Link key={campaign.title} href={campaign.href} className="product-module">
+            <h3>{campaign.title}</h3>
+            <p>{campaign.body}</p>
+            <span className="quest-card-cta">watch: {campaign.metric}</span>
+          </Link>
+        ))}
+      </div>
     </section>
   );
 }
@@ -356,6 +396,7 @@ export default function HomePage() {
         ) : (
           <section className="home-workbench" aria-label="Eva prediction workbench">
             <CampaignCallout />
+            <CampaignDirectory />
             <QuestBoard stats={summary.stats} />
 
             <section className="prediction-section workbench-tape">
