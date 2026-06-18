@@ -170,3 +170,21 @@ Agents must not:
 4. Show the prepared summary and transactions to the user.
 5. Wait for explicit approval before any broadcast or public publish path.
 6. For updates, call `get_thesis`, then `prepare_revision_draft`, then repeat the approval boundary.
+
+## SpaceX Thesis Dry Run
+
+Use the repo script when an agent needs a deterministic SpaceX IPO payload example without guessing at schema shape:
+
+```bash
+pnpm publish:spacex-thesis --dry-run
+```
+
+Dry run is the default. It prints the API payload and does not write to Eva, publish a thesis, broadcast a transaction, or confirm an onchain anchor. This makes it safe for onboarding, fixture review, and copy/schema rehearsal.
+
+Before using `--publish`, the operator must explicitly approve the write target and signer:
+
+```bash
+pnpm publish:spacex-thesis --publish --api-base https://api.eva.jaack.me/api --wallet 0x1111111111111111111111111111111111111111
+```
+
+`--publish` creates the app thesis through the HTTP API after duplicate detection. It still does not broadcast Avalanche transactions and still must not be described as an onchain anchor or public protocol confirmation. Treat any anchor work as a separate approval-gated transaction flow.
