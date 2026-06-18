@@ -27,7 +27,7 @@
 - [x] Expand MCP tests for prepare-first thesis and revision drafts.
 - [ ] Add agent onboarding skill examples.
 - [x] Add bounded write policy for agent-created thesis drafts.
-- [ ] Add SpaceX thesis dry-run script documentation.
+- [x] Add SpaceX thesis dry-run script documentation.
 
 ## Deployment
 
