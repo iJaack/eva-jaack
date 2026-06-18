@@ -18,6 +18,7 @@ Canonical MCP and safety guide: `docs/MCP_AGENT_GUIDE.md`.
 5. Preserve market URLs, source URLs, signal weights, signal roles, and revision notes.
 6. Treat MCP write outputs as `anchor_prepared_not_published` until the user approves the public publish path and a matching transaction is confirmed.
 7. Never claim public publishing, protocol anchoring, or revision confirmation unless anchor status is `confirmed` via receipt or contract readback.
+8. For final handoff text after draft prep, use `docs/AGENT_SAFE_OUTPUTS.md` for short updates or `docs/MCP_AGENT_HANDOFF_TEMPLATE.md` for full handoffs so the user sees the exact approval still needed before broadcast/public publish.
 
 See `docs/MCP_AGENT_GUIDE.md` for schemas, allowed enums, and safe write boundaries.
 See `docs/MCP_AGENT_ERROR_HANDLING.md` when a tool name, schema, credential, or output shape is unclear.

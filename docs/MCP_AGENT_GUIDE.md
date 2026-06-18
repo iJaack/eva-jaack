@@ -178,6 +178,12 @@ Agents must not:
 - reintroduce removed `/claims`, `/articles`, curator, staking, challenge, settlement, paid-verification, or LLM-verification scope,
 - omit source URLs, signal weights, or revision notes when they materially affect the thesis.
 
+## Agent Handoff Contract
+
+After any draft-prep tool call, return a handoff that separates preparation from publication. Include the thesis title or id, wallet used, signal counts, `publishState` / `anchorPreparationId` when present, and the exact user approval still needed before broadcast.
+
+Use `docs/AGENT_SAFE_OUTPUTS.md` for short user-facing snippets. Use `docs/MCP_AGENT_HANDOFF_TEMPLATE.md` for full handoffs and the status ladder from `draft prepared` to `published/live`.
+
 ## Minimal Agent Workflow
 
 1. `search_markets` for candidate market signals.
