@@ -84,6 +84,28 @@ function scoreDeltaClassName(scoreBefore: number | null, scoreAfter: number): st
   return "status-chip status-chip-forecast";
 }
 
+type TimelineAction = Thesis["timeline"][number]["action"];
+type TimelineFilter = "all" | TimelineAction;
+
+const timelineFilters: Array<{ value: TimelineFilter; label: string }> = [
+  { value: "all", label: "All" },
+  { value: "created", label: "Created" },
+  { value: "revised", label: "Revised" },
+  { value: "signal_added", label: "Signal added" },
+  { value: "signal_updated", label: "Signal updated" },
+  { value: "anchored", label: "Anchored" },
+  { value: "resolved", label: "Resolved" },
+];
+
+function timelineActionLabel(action: TimelineAction): string {
+  return timelineFilters.find((filter) => filter.value === action)?.label ?? action.replace(/_/g, " ");
+}
+
+function timelineFilterCount(thesis: Thesis, filter: TimelineFilter): number {
+  if (filter === "all") return thesis.timeline.length;
+  return thesis.timeline.filter((entry) => entry.action === filter).length;
+}
+
 export default function ThesisDetailClient() {
   const params = useParams();
   const thesisId = params.thesisId as string;
@@ -97,6 +119,7 @@ export default function ThesisDetailClient() {
   const [revisionAnchorPreparationId, setRevisionAnchorPreparationId] = useState<string | null>(null);
   const [revisionAnchorTxHash, setRevisionAnchorTxHash] = useState("");
   const [revisionAnchorPending, setRevisionAnchorPending] = useState(false);
+  const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -209,6 +232,11 @@ export default function ThesisDetailClient() {
   };
 
   const revisionPublishReady = Boolean(updateBody.trim() && revisionAnchorPreparationId && isTxHash(revisionAnchorTxHash) && !updatePending && !revisionAnchorPending);
+  const timelineEntries = detail
+    ? [...detail.thesis.timeline]
+        .filter((entry) => timelineFilter === "all" || entry.action === timelineFilter)
+        .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
+    : [];
 
   return (
     <>
@@ -408,6 +436,52 @@ export default function ThesisDetailClient() {
                   </article>
                 ))}
               </div>
+            </section>
+
+            <section className="prediction-card thesis-timeline-panel">
+              <div className="section-heading-row prediction-heading">
+                <div>
+                  <p className="section-kicker">Activity trail</p>
+                  <h2 className="section-title section-title-sm">Thesis timeline</h2>
+                </div>
+                <span className="status-chip status-chip-unresolved">{detail.thesis.timeline.length} events</span>
+              </div>
+              <div className="filter-bar" aria-label="Timeline filters">
+                {timelineFilters.map((filter) => {
+                  const count = timelineFilterCount(detail.thesis, filter.value);
+
+                  return (
+                    <button
+                      key={filter.value}
+                      type="button"
+                      className={`filter-chip${timelineFilter === filter.value ? " filter-chip-active" : ""}`}
+                      onClick={() => setTimelineFilter(filter.value)}
+                      disabled={count === 0}
+                    >
+                      {filter.label} <span>{count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              {timelineEntries.length > 0 ? (
+                <div className="thesis-timeline-list" data-testid="thesis-timeline-list">
+                  {timelineEntries.map((entry) => (
+                    <article key={entry.timelineId} className="timeline-card" data-testid="timeline-card">
+                      <div className="card-topline">
+                        <span>{timelineActionLabel(entry.action)}</span>
+                        <span>{formatDate(entry.at)}</span>
+                      </div>
+                      <h3>{entry.note ?? `${timelineActionLabel(entry.action)} event`}</h3>
+                      <div className="status-row">
+                        <span className="status-chip status-chip-forecast">Before {entry.scoreBefore ?? "new"}</span>
+                        <span className="status-chip status-chip-unresolved">After {entry.scoreAfter}</span>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="inline-note">No timeline events match this filter yet.</p>
+              )}
             </section>
           </section>
         )}

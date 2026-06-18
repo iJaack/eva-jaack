@@ -1726,7 +1726,8 @@ button {
 .thesis-article-panel,
 .thesis-signal-panel,
 .thesis-update-panel,
-.thesis-revision-panel {
+.thesis-revision-panel,
+.thesis-timeline-panel {
   display: grid;
   gap: var(--space-md);
   align-content: start;
@@ -1761,7 +1762,8 @@ button {
 }
 
 .thesis-signal-card,
-.revision-card {
+.revision-card,
+.timeline-card {
   display: grid;
   gap: var(--space-sm);
   padding: var(--space-md);
@@ -1771,7 +1773,8 @@ button {
 }
 
 .thesis-signal-card h3,
-.revision-card h3 {
+.revision-card h3,
+.timeline-card h3 {
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--text-base);
@@ -1780,14 +1783,16 @@ button {
 }
 
 .thesis-signal-card p,
-.revision-card p {
+.revision-card p,
+.timeline-card p {
   margin: 0;
   color: var(--muted);
   font-size: var(--text-sm);
   line-height: 1.55;
 }
 
-.thesis-revision-list {
+.thesis-revision-list,
+.thesis-timeline-list {
   display: grid;
   gap: var(--space-sm);
 }
