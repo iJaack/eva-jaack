@@ -20,6 +20,14 @@ Canonical MCP and safety guide: `docs/MCP_AGENT_GUIDE.md`.
 7. Never claim public publishing, protocol anchoring, or revision confirmation unless anchor status is `confirmed` via receipt or contract readback.
 
 See `docs/MCP_AGENT_GUIDE.md` for schemas, allowed enums, and safe write boundaries.
+See `docs/MCP_AGENT_ERROR_HANDLING.md` when a tool name, schema, credential, or output shape is unclear.
+
+## Tool Recovery Rules
+
+- Use only the live MCP allowlist: `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`.
+- If a prompt or client suggests `record_revision`, article/claim tools, curator tools, staking, challenge, settlement, paid-verification, or LLM-verification flows, treat that as stale scope.
+- If an older anchor-prep output only returns transactions, still treat it as preparation only; it is not public publish support or confirmed anchoring.
+- Never repair a schema error by dropping material source URLs, weights, roles, or revision notes.
 
 ## Safe Write Boundary
 
