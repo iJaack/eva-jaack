@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useMemo, useState, type ComponentType } from "react";
+import DynamicAuthControl from "@/components/DynamicAuthControl";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import { createThesis, getMarkets, prepareDraftThesisAnchor, type PredictionMarket, type Thesis, type ThesisCreateRequest } from "@/lib/api";
@@ -138,6 +139,8 @@ function ComposeInner() {
           : !attachedSignals.length
             ? "Attach at least one signal before publishing"
             : null;
+  const showComposeWorkspace = !dynamicRequired || identityReady;
+  const authGateMessage = identityState?.message ?? "Connect with Dynamic before drafting a public thesis.";
   const nextSignalLabel = `S${attachedSignals.length + 1}`;
 
   const marketSignalText = selectedMarket
@@ -377,6 +380,18 @@ function ComposeInner() {
                 Share on X
               </a>
             </div>
+          </section>
+        ) : !showComposeWorkspace ? (
+          <section className="prediction-card compose-auth-gate" data-testid="compose-auth-gate">
+            <p className="eyebrow">Author identity required</p>
+            <h2>Connect before drafting a public thesis.</h2>
+            <p>{authGateMessage}</p>
+            <DynamicAuthControl />
+            <ul className="route-proof-list" aria-label="Compose auth requirements">
+              <li>No preview author or wallet is shown before Dynamic identity is ready</li>
+              <li>X identity and wallet are required before the draft editor loads</li>
+              <li>Anchoring and publishing stay locked behind the verified session</li>
+            </ul>
           </section>
         ) : (
           <section className="compose-layout compose-publication-layout">
