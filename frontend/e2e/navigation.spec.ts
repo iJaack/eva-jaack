@@ -53,3 +53,23 @@ test("skip link appears on keyboard focus and targets the main content", async (
   await expect(page).toHaveURL(/#main-content$/);
   await expect(page.locator("#main-content")).toBeVisible();
 });
+
+test("trust receipts campaign page carries measurable launch CTAs", async ({ page }) => {
+  await page.goto("/campaigns/trust-receipts");
+
+  await expect(page.getByRole("heading", { name: "prediction markets need trust receipts." })).toBeVisible();
+  await expect(page.getByText("trust receipts convert better than generic prediction-market copy.")).toBeVisible();
+
+  await expect(page.getByRole("link", { name: "Draft a thesis" })).toHaveAttribute(
+    "href",
+    /utm_campaign=trust_receipts_launch.*utm_content=draft_thesis/,
+  );
+  await expect(page.getByRole("link", { name: "Read the example" })).toHaveAttribute(
+    "href",
+    /utm_campaign=trust_receipts_launch.*utm_content=read_example/,
+  );
+  await expect(page.getByRole("link", { name: "Find live signals" })).toHaveAttribute(
+    "href",
+    /utm_campaign=trust_receipts_launch.*utm_content=find_signals/,
+  );
+});

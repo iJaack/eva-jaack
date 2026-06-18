@@ -1,0 +1,106 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import Nav from "@/components/Nav";
+import SiteFooter from "@/components/SiteFooter";
+
+const campaign = "trust_receipts_launch";
+const composeHref = `/compose?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=draft_thesis`;
+const marketsHref = `/markets?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=find_signals`;
+const exampleHref = `/thesis/thesis-0fdef25794b38b6e8eed7524?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=read_example`;
+
+export const metadata: Metadata = {
+  title: "Eva Protocol trust receipts campaign",
+  description:
+    "Launch page for prediction-market operators who want public theses with citations, revisions, and author records instead of screenshots and vibes.",
+};
+
+const proofPoints = [
+  {
+    label: "Problem",
+    value: "market takes decay into screenshots",
+    body: "Prediction-market posts move fast, but the reasoning, source trail, and later corrections usually disappear from the feed.",
+  },
+  {
+    label: "Promise",
+    value: "one thesis, cited and revisable",
+    body: "Eva turns a take into a public object with attached markets, facts, wallet/X authorship, and a visible update path.",
+  },
+  {
+    label: "CTA",
+    value: "draft one live thesis",
+    body: "The launch action is not a generic signup. It asks a high-context predictor to convert one current market opinion into a record.",
+  },
+] as const;
+
+const launchSequence = [
+  "Post from @evapredicts with the SpaceX IPO thesis as the concrete example.",
+  "Send traffic to this page with utm_campaign=trust_receipts_launch.",
+  "Measure clicks into Draft thesis, Find signals, and Read example before widening the campaign.",
+] as const;
+
+export default function TrustReceiptsCampaignPage() {
+  return (
+    <>
+      <Nav />
+      <main id="main-content" className="page-shell">
+        <section className="hero">
+          <p className="eyebrow">@evapredicts launch path</p>
+          <h1>prediction markets need trust receipts.</h1>
+          <p>
+            If the take matters, it should not live only as a tweet. Eva lets operators publish the thesis,
+            cite the odds and facts behind it, and update the record when reality moves.
+          </p>
+          <div className="hero-actions">
+            <Link href={composeHref} className="btn btn-primary">
+              Draft a thesis
+            </Link>
+            <Link href={exampleHref} className="btn">
+              Read the example
+            </Link>
+          </div>
+        </section>
+
+        <section className="paper-section" aria-label="Campaign hypothesis">
+          <p className="section-kicker">Campaign hypothesis</p>
+          <h2>trust receipts convert better than generic prediction-market copy.</h2>
+          <p>
+            The audience already knows odds. The sharper wedge is accountability: every public market thesis
+            should carry sources, revision history, and an inspectable author record.
+          </p>
+        </section>
+
+        <section className="prediction-section" aria-label="Proof points">
+          <div className="product-module-grid">
+            {proofPoints.map((point) => (
+              <article key={point.label} className="product-module">
+                <p className="section-kicker">{point.label}</p>
+                <h3>{point.value}</h3>
+                <p>{point.body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="paper-section" aria-label="Launch sequence">
+          <p className="section-kicker">Launch sequence</p>
+          <h2>run one narrow loop before asking for broad attention.</h2>
+          <ul>
+            {launchSequence.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ul>
+          <div className="route-actions">
+            <Link href={marketsHref} className="mobile-action mobile-action-primary">
+              Find live signals
+            </Link>
+            <Link href={composeHref} className="mobile-action">
+              Start from a draft
+            </Link>
+          </div>
+        </section>
+
+        <SiteFooter />
+      </main>
+    </>
+  );
+}
