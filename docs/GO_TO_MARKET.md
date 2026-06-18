@@ -37,6 +37,14 @@ matters.
 - **Measurement:** compare sessions, follow clicks, example-thesis clicks, and compose starts carrying `utm_campaign=agent_receipts`.
 - **Follow-up:** if the page beats the SpaceX launch thesis on intent, turn the receipt-layer angle into the next approved @evapredicts thread.
 
+### Reply sprint
+
+- **Hypothesis:** live prediction-market conversations will produce higher-intent thesis visits than a cold launch post because the reply can contrast “odds link” with “cited thesis record” in context.
+- **Audience:** public predictors, crypto analysts, InfoFi builders, and agent builders discussing prediction-market distribution or UX friction.
+- **CTA:** read the SpaceX IPO liquidity rotation thesis, then follow @evapredicts or draft one sourced thesis.
+- **Measurement:** track thesis sessions with `utm_campaign=evapredicts_reply_sprint`, plus downstream preview-copy clicks, share/copy events, and follow clicks.
+- **Follow-up:** after explicit posting approval, publish two replies max, then keep only the angle that creates product-learning signals.
+
 ## Current Campaign: @evapredicts Follow CTA
 
 Hypothesis: prediction-market-native readers are more likely to follow @evapredicts when the homepage frames Eva as a living thesis record instead of another odds dashboard.
