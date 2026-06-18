@@ -76,4 +76,7 @@ test("trust receipts campaign page carries measurable launch CTAs", async ({ pag
     "href",
     /utm_campaign=trust_receipts_launch.*utm_content=find_signals/,
   );
+  await expect(page.getByRole("heading", { name: "one post, one example, one measurable CTA." })).toBeVisible();
+  await expect(page.getByText("prediction markets need trust receipts, not just screenshots.")).toBeVisible();
+  await expect(page.locator("blockquote").getByText(/utm_content=launch_post/)).toBeVisible();
 });

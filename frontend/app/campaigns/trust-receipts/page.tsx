@@ -2,18 +2,45 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
+import { protocol } from "@/lib/protocol";
 
 const campaign = "trust_receipts_launch";
+const campaignPath = "/campaigns/trust-receipts";
+const campaignUrl = `${protocol.app.siteUrl}${campaignPath}`;
 const composeHref = `/compose?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=draft_thesis`;
 const marketsHref = `/markets?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=find_signals`;
 const exampleHref = `/thesis/thesis-0fdef25794b38b6e8eed7524?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=read_example`;
+const xLaunchHref = `${campaignUrl}?utm_source=x&utm_medium=social&utm_campaign=${campaign}&utm_content=launch_post`;
 const followHref = "https://x.com/evapredicts";
 
 export const metadata: Metadata = {
   title: "Eva Protocol trust receipts campaign",
   description:
     "Launch page for prediction-market operators who want public theses with citations, revisions, and author records instead of screenshots and vibes.",
+  alternates: {
+    canonical: campaignPath,
+  },
+  openGraph: {
+    title: "prediction markets need trust receipts",
+    description:
+      "Turn a market take into a cited, revisable public thesis with author records and source trails.",
+    url: campaignUrl,
+    siteName: "Eva Protocol",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "prediction markets need trust receipts",
+    description:
+      "Turn a market take into a cited, revisable public thesis with author records and source trails.",
+  },
 };
+
+const launchPost = [
+  "prediction markets need trust receipts, not just screenshots.",
+  "Eva turns a take into a public thesis with cited odds, facts, revision history, and an author record.",
+  `start with the SpaceX IPO liquidity rotation example: ${xLaunchHref}`,
+] as const;
 
 const proofPoints = [
   {
@@ -101,6 +128,21 @@ export default function TrustReceiptsCampaignPage() {
               Start from a draft
             </Link>
           </div>
+        </section>
+
+        <section className="paper-section" aria-label="@evapredicts launch copy">
+          <p className="section-kicker">@evapredicts copy to approve</p>
+          <h2>one post, one example, one measurable CTA.</h2>
+          <p>
+            Publishing still needs explicit approval. When approved, use this as the first post and watch
+            campaign-page clicks before expanding into replies or a thread.
+          </p>
+          <blockquote>
+            {launchPost.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </blockquote>
+          <p className="inline-note">Primary metric: clicks to Draft a thesis and Read the example from utm_content=launch_post.</p>
         </section>
 
         <SiteFooter />
