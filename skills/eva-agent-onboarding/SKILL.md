@@ -45,3 +45,5 @@ Current live schema note: `prepare_revision_draft` accepts `thesisId`, `body`, `
 ## Reporting Pattern
 
 After draft prep, report the `anchorPreparationId`, the prepared transaction purpose, and the exact missing approval/confirmation step. Do not say the thesis is live, public, or published from MCP output alone.
+
+Use `docs/AGENT_SAFE_OUTPUTS.md` for short user-facing wording and `docs/MCP_AGENT_HANDOFF_TEMPLATE.md` for full handoffs between agents, reviewers, or issue comments.
