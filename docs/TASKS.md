@@ -17,7 +17,7 @@
 
 ## Thesis Evolution
 
-- [ ] Add revision creation UI.
+- [x] Add revision creation UI.
 - [x] Add closed-prediction/fact resolution UI.
 - [ ] Add timeline filters.
 - [ ] Add tests for immutable revisions and score snapshots.
