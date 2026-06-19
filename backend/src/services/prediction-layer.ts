@@ -220,10 +220,10 @@ function titleCategory(title: string, fallback: string): string {
 
 const v1ProhibitedCategoryPattern = /\b(sports?|politics?|elections?|geopolitics?|war|crime|criminal)\b/i;
 const v1ProhibitedMarketPatterns = [
-  /\b(nba|nfl|mlb|nhl|soccer|football|basketball|baseball|hockey|ufc|mma|tennis|golf|f1|formula 1|match|game|super bowl|world cup|champions league|premier league)\b/i,
-  /\b(elections?|presidential|president|nomination|nominee|primary|caucus|senate|senator|congress|parliament|prime minister|mayor|governor|trump|biden|harris|putin)\b/i,
+  /\b(nba|nfl|mlb|nhl|soccer|football|basketball|baseball|hockey|ufc|mma|tennis|golf|f1|formula 1|match|game|super bowl|world cup|champions league|premier league|sports? event(?:s)?|sports? contract(?:s)?)\b/i,
+  /\b(elections?|presidential|president|nomination|nominee|primary|caucus|senate|senator|congress|parliament|prime minister|mayor|governor|supreme court|scotus|trump|biden|harris|putin|xi jinping|jinping|netanyahu)\b/i,
   /\b(war|invade|invasion|blockade|ceasefire|missile|nuclear|airstrike|bombing|attack|terror|taiwan|ukraine|gaza|israel|iran|russia)\b/i,
-  /\b(assassinat(?:e|ed|ion)?|murder|killed|shooting|death|die|dies|dead|hospitalized|illness|injury)\b/i,
+  /\b(assassinat(?:e|ed|ion)?|murder|killed|shooting|death|die|dies|dead|hospitalized|illness|injury|pregnan(?:t|cy)|marriage|divorce)\b/i,
   /\b(criminal|indict(?:ed|ment)?|convict(?:ed|ion)?|arrest(?:ed)?|prison|jail|trial|investigation|charged with)\b/i,
   /\b(tweet|tweets|post on x|post on twitter|instagram|tiktok|youtube|say on (?:x|twitter)|mention on (?:x|twitter))\b/i,
 ];

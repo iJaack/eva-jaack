@@ -379,6 +379,82 @@ describe("prediction layer service", () => {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
+        {
+          marketId: "polymarket-xi-jinping",
+          provider: "polymarket",
+          externalId: "politics-2",
+          url: "https://polymarket.com/event/xi-jinping-out-before-2027",
+          title: "Xi Jinping out before 2027?",
+          category: "News",
+          status: "open",
+          volumeUsd: 5_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.18 },
+            { outcomeId: "no", label: "No", price: 0.82 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-netanyahu",
+          provider: "polymarket",
+          externalId: "politics-3",
+          url: "https://polymarket.com/event/netanyahu-out-by-end-of-2026",
+          title: "Netanyahu out by end of 2026?",
+          category: "News",
+          status: "open",
+          volumeUsd: 4_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.3 },
+            { outcomeId: "no", label: "No", price: 0.7 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-taylor-pregnant",
+          provider: "polymarket",
+          externalId: "personal-1",
+          url: "https://polymarket.com/event/taylor-swift-pregnant-before-marriage",
+          title: "Taylor Swift pregnant before marriage?",
+          category: "Culture",
+          status: "open",
+          volumeUsd: 3_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.25 },
+            { outcomeId: "no", label: "No", price: 0.75 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "kalshi-scotus-sports-contract",
+          provider: "kalshi",
+          externalId: "legal-sports-1",
+          url: "https://kalshi.com/markets/kxscotus-sports-event-contract",
+          title: "SCOTUS accepts sports event contract case by July 31, 2026?",
+          category: "Law",
+          status: "open",
+          volumeUsd: 2_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.35 },
+            { outcomeId: "no", label: "No", price: 0.65 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
       ],
     );
 
@@ -389,5 +465,9 @@ describe("prediction layer service", () => {
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-criminal-trial");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-tweet");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-super-bowl");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-xi-jinping");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-netanyahu");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-taylor-pregnant");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("kalshi-scotus-sports-contract");
   });
 });
