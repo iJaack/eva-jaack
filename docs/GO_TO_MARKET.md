@@ -53,6 +53,14 @@ matters.
 - **Measurement:** compare sessions, follow clicks, example-thesis clicks, and compose starts carrying `utm_campaign=policy_safe_theses` against trust-receipts and reply-sprint traffic.
 - **Follow-up:** after prohibited-market filtering is verified in production, turn the boundary-first angle into the next approved @evapredicts post before widening the reply sprint.
 
+### Launch truth status loop
+
+- **Hypothesis:** a transparent “not launch-clear yet” stance will build more trust with agent and prediction-market builders than a premature launch announcement.
+- **Audience:** builders evaluating whether Eva can be a trustworthy public forecast surface, especially those sensitive to policy, source quality, and agent-output receipts.
+- **CTA:** read the current launch truth, then follow @evapredicts for the first public thesis loop once policy-safe markets and durable write readiness are verified.
+- **Measurement:** track sessions carrying `utm_campaign=launch_truth_status`, follow clicks from the launch-truth CTA, and downstream clicks into the SpaceX proof thesis.
+- **Follow-up:** when launch blockers clear, convert the same thread into a “what changed” post instead of pretending the product was always ready.
+
 ## Current Campaign: @evapredicts Follow CTA
 
 Hypothesis: prediction-market-native readers are more likely to follow @evapredicts when the homepage frames Eva as a living thesis record instead of another odds dashboard.
