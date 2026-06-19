@@ -121,10 +121,30 @@ Watch these without inventing traction:
 
 - @evapredicts profile visits and follows after posting
 - thesis page sessions with `utm_campaign=evapredicts_spacex_launch`
+- homepage proof CTA sessions with `utm_campaign=homepage_spacex_proof`
 - primary thesis link CTR from the launch thread
 - replies that identify missing signals or confusing product boundaries
 - copy preview events and thesis shares inside the app
 - new thesis drafts created after the campaign window
+
+## Homepage Proof CTA
+
+Channel: Eva homepage hero and current-campaign block.
+
+Hypothesis: until public posting is approved, the safest growth action is to route cold homepage traffic into the concrete SpaceX proof record instead of asking unauthenticated visitors to start in `/compose`.
+
+Target audience: prediction-market writers, crypto analysts, and agent builders who need to inspect the object before following @evapredicts.
+
+Primary CTA: `Read launch thesis` / `Read the proof record`.
+
+Tracked links:
+
+- `/thesis/thesis-0fdef25794b38b6e8eed7524?utm_source=homepage&utm_medium=proof_cta&utm_campaign=homepage_spacex_proof&utm_content=launch_thesis`
+- `/campaigns/trust-receipts?utm_source=homepage&utm_medium=proof_cta&utm_campaign=homepage_spacex_proof&utm_content=campaign_page`
+
+Metric to watch: proof-record reads and campaign-page clicks from `utm_campaign=homepage_spacex_proof`, then compare against @evapredicts follow clicks after posting approval.
+
+Next follow-up: if the proof CTA gets traffic but no follow intent, tighten the thesis-page above-the-fold copy before broadening the X reply sprint.
 
 ## Follow-up Sequence
 

@@ -27,6 +27,10 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
 });
 
 const evaPredictsUrl = "https://x.com/evapredicts";
+const launchThesisId = "thesis-0fdef25794b38b6e8eed7524";
+const homepageProofCampaign = "homepage_spacex_proof";
+const launchThesisHref = `/thesis/${launchThesisId}?utm_source=homepage&utm_medium=proof_cta&utm_campaign=${homepageProofCampaign}&utm_content=launch_thesis`;
+const campaignPageHref = `/campaigns/trust-receipts?utm_source=homepage&utm_medium=proof_cta&utm_campaign=${homepageProofCampaign}&utm_content=campaign_page`;
 
 function formatUsd(value: number | null): string {
   if (value === null) return "—";
@@ -170,15 +174,18 @@ function CampaignCallout() {
         ))}
       </div>
       <div className="campaign-action-row">
-        <Link href={evaPredictsUrl} className="mobile-action mobile-action-primary" target="_blank" rel="noreferrer">
-          Follow @evapredicts
+        <Link href={launchThesisHref} className="mobile-action mobile-action-primary">
+          Read the proof record
         </Link>
-        <Link href="/thesis/thesis-0fdef25794b38b6e8eed7524" className="mobile-action">
-          Read the launch thesis
+        <Link href={campaignPageHref} className="mobile-action">
+          Open campaign page
+        </Link>
+        <Link href={evaPredictsUrl} className="mobile-action" target="_blank" rel="noreferrer">
+          Follow @evapredicts
         </Link>
       </div>
       <p className="inline-note">
-        Metric to watch: clicks from this CTA into @evapredicts and the SpaceX thesis before any broader launch push.
+        Metric to watch: utm_campaign=homepage_spacex_proof clicks into the SpaceX thesis and campaign page before any broader launch push.
       </p>
     </section>
   );
@@ -355,11 +362,11 @@ export default function HomePage() {
             anchor the first version, and keep every update readable over time.
           </p>
           <div className="mobile-hero-actions">
-            <Link href="/compose" className="mobile-action mobile-action-primary">
-              Draft the thesis
+            <Link href={launchThesisHref} className="mobile-action mobile-action-primary">
+              Read launch thesis
             </Link>
-            <Link href="/markets" className="mobile-action">
-              Find signals
+            <Link href={campaignPageHref} className="mobile-action">
+              Open campaign page
             </Link>
             <Link href={evaPredictsUrl} className="mobile-action" target="_blank" rel="noreferrer">
               Follow @evapredicts
