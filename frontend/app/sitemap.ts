@@ -54,6 +54,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.85
+    },
+    {
+      url: `${base}/campaigns/launch-truth-status`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.85
     }
   ];
 }

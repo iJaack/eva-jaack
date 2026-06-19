@@ -152,6 +152,12 @@ const activeCampaigns = [
     href: "/campaigns/policy-safe-theses?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=policy_safe_theses&utm_content=policy_safe_card",
     metric: "safe-thesis starts, follow clicks, and example reads",
   },
+  {
+    title: "launch truth status",
+    body: "A transparent status page for what is live, what stays gated, and why @evapredicts will not fake launch certainty.",
+    href: "/campaigns/launch-truth-status?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=launch_truth_status&utm_content=launch_truth_card",
+    metric: "status-page visits, follow clicks, and proof-thesis reads",
+  },
 ] as const;
 
 function CampaignCallout() {

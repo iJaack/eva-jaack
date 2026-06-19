@@ -80,3 +80,25 @@ test("trust receipts campaign page carries measurable launch CTAs", async ({ pag
   await expect(page.getByText("prediction markets need trust receipts, not just screenshots.")).toBeVisible();
   await expect(page.locator("blockquote").getByText(/utm_content=launch_post/)).toBeVisible();
 });
+
+test("launch truth status page carries transparent campaign CTAs", async ({ page }) => {
+  await page.goto("/campaigns/launch-truth-status");
+
+  await expect(page.getByRole("heading", { name: "launch status should be a receipt, not a vibe." })).toBeVisible();
+  await expect(page.getByText("transparent launch gates will convert better than premature certainty.")).toBeVisible();
+
+  await expect(page.getByRole("link", { name: "Read proof thesis" })).toHaveAttribute(
+    "href",
+    /utm_campaign=launch_truth_status.*utm_content=spacex_proof/,
+  );
+  await expect(page.getByRole("link", { name: "Review policy gate" })).toHaveAttribute(
+    "href",
+    /utm_campaign=launch_truth_status.*utm_content=policy_safe_page/,
+  );
+  await expect(page.getByRole("link", { name: "Follow @evapredicts" })).toHaveAttribute(
+    "href",
+    /https:\/\/x\.com\/evapredicts.*utm_campaign=launch_truth_status/,
+  );
+  await expect(page.getByText("what @evapredicts will not hand-wave.")).toBeVisible();
+  await expect(page.locator("blockquote").getByText(/utm_content=status_post/)).toBeVisible();
+});
