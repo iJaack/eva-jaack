@@ -39,6 +39,14 @@ const defaultIdentity: ThesisIdentity = {
   walletSource: "embedded" as const,
 };
 
+const dynamicEnvironmentId = process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
+const dynamicTestMode = process.env.NEXT_PUBLIC_DYNAMIC_TEST_CONTEXT === "1";
+const previewIdentityEnabled = process.env.NEXT_PUBLIC_COMPOSE_PREVIEW_IDENTITY === "1" && process.env.NODE_ENV !== "production";
+const dynamicIdentityRequired = dynamicTestMode || Boolean(dynamicEnvironmentId) || !previewIdentityEnabled;
+const dynamicUnavailableMessage = dynamicEnvironmentId
+  ? "Connect with Dynamic before drafting a public thesis."
+  : "Dynamic identity is required before drafting a public thesis. Configure Dynamic auth before enabling the editor.";
+
 const initialBlocks: DraftBlock[] = [
   {
     id: "block-1",
@@ -60,11 +68,9 @@ function DynamicIdentityLoader({
   onIdentityState: (state: DynamicIdentityState) => void;
 }) {
   const [Bridge, setBridge] = useState<ComponentType<{ onIdentity: (identity: ThesisIdentity) => void; onIdentityState: (state: DynamicIdentityState) => void }> | null>(null);
-  const environmentId = process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
-  const testMode = process.env.NEXT_PUBLIC_DYNAMIC_TEST_CONTEXT === "1";
 
   useEffect(() => {
-    if (!environmentId && !testMode) return;
+    if (!dynamicEnvironmentId && !dynamicTestMode) return;
     let cancelled = false;
     import("@/components/DynamicComposeIdentityBridge")
       .then((module) => {
@@ -74,9 +80,9 @@ function DynamicIdentityLoader({
     return () => {
       cancelled = true;
     };
-  }, [environmentId, testMode]);
+  }, []);
 
-  if ((!environmentId && !testMode) || !Bridge) return null;
+  if ((!dynamicEnvironmentId && !dynamicTestMode) || !Bridge) return null;
   return <Bridge onIdentity={onIdentity} onIdentityState={onIdentityState} />;
 }
 
@@ -123,9 +129,8 @@ function ComposeInner() {
   const selectedOutcomePrice = selectedOutcome?.price ?? 0.5;
   const normalizedFactClaim = factClaim.trim().replace(/[.]+$/, "");
   const body = blocks.map((block) => block.text.trim()).filter(Boolean).join("\n\n");
-  const dynamicRequired = Boolean(process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID || process.env.NEXT_PUBLIC_DYNAMIC_TEST_CONTEXT === "1");
-  const identityReady = !dynamicRequired || identityState?.status === "ready";
-  const identityMessage = dynamicRequired ? identityState?.message ?? "Connect with Dynamic before publishing a thesis." : "Preview identity active for local compose.";
+  const identityReady = !dynamicIdentityRequired || identityState?.status === "ready";
+  const identityMessage = dynamicIdentityRequired ? identityState?.message ?? dynamicUnavailableMessage : "Preview identity active for local compose.";
   const anchorConfirmed = isTxHash(anchorTxHash);
   const canPublish = Boolean(title.trim() && body.trim() && attachedSignals.length > 0 && identityReady && anchorPrepared && anchorPreparationId && anchorConfirmed && !submitting && !preparingAnchor);
   const publishBlocker = preparingAnchor
@@ -139,8 +144,8 @@ function ComposeInner() {
           : !attachedSignals.length
             ? "Attach at least one signal before publishing"
             : null;
-  const showComposeWorkspace = !dynamicRequired || identityReady;
-  const authGateMessage = identityState?.message ?? "Connect with Dynamic before drafting a public thesis.";
+  const showComposeWorkspace = !dynamicIdentityRequired || identityReady;
+  const authGateMessage = identityState?.message ?? dynamicUnavailableMessage;
   const nextSignalLabel = `S${attachedSignals.length + 1}`;
 
   const marketSignalText = selectedMarket
@@ -409,15 +414,15 @@ function ComposeInner() {
                 <div className="wallet-panel-grid">
                   <div>
                     <span>X account</span>
-                    <strong>{identityReady || !dynamicRequired ? identity.xHandle : "Not connected"}</strong>
+                    <strong>{identityReady || !dynamicIdentityRequired ? identity.xHandle : "Not connected"}</strong>
                   </div>
                   <div>
                     <span>Wallet source</span>
-                    <strong>{identityReady || !dynamicRequired ? identity.walletSource : "Missing"}</strong>
+                    <strong>{identityReady || !dynamicIdentityRequired ? identity.walletSource : "Missing"}</strong>
                   </div>
                   <div>
                     <span>Wallet</span>
-                    <strong>{identityReady || !dynamicRequired ? shortWallet(identity.walletAddress) : "Not connected"}</strong>
+                    <strong>{identityReady || !dynamicIdentityRequired ? shortWallet(identity.walletAddress) : "Not connected"}</strong>
                   </div>
                 </div>
               </div>
