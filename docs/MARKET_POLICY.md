@@ -7,9 +7,10 @@ Eva V1 is a thesis surface, not an everything-market directory. The provider fee
 Exclude markets whose title, category, or provider URL indicates:
 
 - sports or sports-betting outcomes
-- elections, nominations, political offices, named political-candidate flows, named political-leader tenure flows, or court/political-office prompts
+- elections, nominations, political offices, balance-of-power control markets, named political-candidate flows, named political-leader tenure flows, or court/political-office prompts
 - war, invasion, blockade, ceasefire, terrorism, or active geopolitics/armed-conflict prompts
 - assassination, death, illness, injury, pregnancy, marriage, divorce, or other personal-tragedy / private-life prompts
+- religious prophecy / novelty prompts that are not usable macro, crypto, company, liquidity, or technology thesis signals
 - criminal investigations, arrests, indictments, convictions, prison, or trial outcomes
 - easily manipulable social/action prompts such as whether someone tweets, posts, says, or mentions a word on a social platform
 

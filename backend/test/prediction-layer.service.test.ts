@@ -455,6 +455,63 @@ describe("prediction layer service", () => {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
+        {
+          marketId: "polymarket-jesus-gta",
+          provider: "polymarket",
+          externalId: "religion-1",
+          url: "https://polymarket.com/event/will-jesus-christ-return-before-gta-vi",
+          title: "Will Jesus Christ return before GTA VI?",
+          category: "Culture",
+          status: "open",
+          volumeUsd: 1_000_000,
+          liquidityUsd: 500_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.01 },
+            { outcomeId: "no", label: "No", price: 0.99 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-starmer-out",
+          provider: "polymarket",
+          externalId: "politics-4",
+          url: "https://polymarket.com/event/starmer-out-by-june-30-2026",
+          title: "Starmer out by June 30, 2026?",
+          category: "News",
+          status: "open",
+          volumeUsd: 1_000_000,
+          liquidityUsd: 500_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.25 },
+            { outcomeId: "no", label: "No", price: 0.75 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-balance-of-power-other",
+          provider: "polymarket",
+          externalId: "politics-5",
+          url: "https://polymarket.com/event/2026-balance-of-power-other",
+          title: "2026 Balance of Power: Other",
+          category: "News",
+          status: "open",
+          volumeUsd: 1_000_000,
+          liquidityUsd: 500_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.08 },
+            { outcomeId: "no", label: "No", price: 0.92 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
       ],
     );
 
@@ -469,5 +526,8 @@ describe("prediction layer service", () => {
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-netanyahu");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-taylor-pregnant");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("kalshi-scotus-sports-contract");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-jesus-gta");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-starmer-out");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-balance-of-power-other");
   });
 });
