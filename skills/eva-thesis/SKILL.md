@@ -8,6 +8,7 @@ description: Create and update Eva evolving thesis posts with market and fact si
 Use this when an agent needs to create, inspect, or revise an Eva thesis.
 
 Canonical MCP and safety guide: `docs/MCP_AGENT_GUIDE.md`.
+Copy-paste MCP payload examples: `docs/MCP_AGENT_EXAMPLES.md`.
 
 ## Workflow
 
@@ -31,6 +32,7 @@ Canonical MCP and safety guide: `docs/MCP_AGENT_GUIDE.md`.
 - Empty signal arrays are allowed for drafts, but they are not evidence. Call them signal-light and collect real sources before making signal-backed claims.
 
 See `docs/MCP_AGENT_GUIDE.md` for schemas, allowed enums, and safe write boundaries.
+See `docs/MCP_AGENT_EXAMPLES.md` for ready market-search, draft, revision, anchor-rebuild, and blocked-identity examples.
 See `docs/MCP_AGENT_ERROR_HANDLING.md` when a tool name, schema, credential, or output shape is unclear.
 
 ## Tool Recovery Rules

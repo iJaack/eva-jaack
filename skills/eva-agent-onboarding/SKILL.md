@@ -8,12 +8,14 @@ description: Onboard agents to Eva Protocol through MCP and wallet-aware thesis 
 Use this when an agent needs to work with Eva Protocol safely.
 
 Canonical guide: `docs/MCP_AGENT_GUIDE.md`.
+Copy-paste payloads: `docs/MCP_AGENT_EXAMPLES.md`.
 Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 
 ## Requirements
 
 - Use the local MCP server first: `pnpm --filter backend mcp`.
 - Keep `docs/MCP_AGENT_GUIDE.md` open when creating or revising theses.
+- Use `docs/MCP_AGENT_EXAMPLES.md` for known-good payload shapes before improvising schema fields.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
 - Treat remote MCP write tools as unavailable unless the agent has scoped credentials and the operator explicitly approved that path.
 - Confirm X identity, wallet address, and wallet source before preparing protocol transactions.

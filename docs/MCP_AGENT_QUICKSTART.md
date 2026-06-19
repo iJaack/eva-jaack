@@ -1,6 +1,6 @@
 # MCP Agent Quickstart
 
-Use this as the five-minute path for agents that need to create or revise Eva theses without guessing at write boundaries. The deeper references are `docs/MCP_AGENT_GUIDE.md`, `docs/MCP_AGENT_ERROR_HANDLING.md`, and `docs/AGENT_SAFE_OUTPUTS.md`.
+Use this as the five-minute path for agents that need to create or revise Eva theses without guessing at write boundaries. The deeper references are `docs/MCP_AGENT_GUIDE.md`, `docs/MCP_AGENT_EXAMPLES.md`, `docs/MCP_AGENT_ERROR_HANDLING.md`, and `docs/AGENT_SAFE_OUTPUTS.md`.
 
 ## Boundary First
 
@@ -39,6 +39,8 @@ Only these MCP tools are live for agent thesis work:
 | `prepare_anchor_transaction` | Rebuild anchor calldata for an existing thesis. | Anchor calldata rebuilt, not broadcast. |
 
 If a prompt, client, or autocomplete shows any other write tool, stop and treat it as stale.
+
+For copy-paste payloads that match these tools, use `docs/MCP_AGENT_EXAMPLES.md`.
 
 ## Pick The Right Operation
 
