@@ -146,6 +146,42 @@ Metric to watch: proof-record reads and campaign-page clicks from `utm_campaign=
 
 Next follow-up: if the proof CTA gets traffic but no follow intent, tighten the thesis-page above-the-fold copy before broadening the X reply sprint.
 
+## Launch Truth Status Loop
+
+Channel: @evapredicts approval-ready X post, with the repo docs as the current source of truth until posting is approved.
+
+Hypothesis: builders who care about trustworthy agent output will respond better to a visible launch-readiness standard than to a premature hype post. “Here is what is live, here is what is not launch-clear yet” is the trust wedge.
+
+Target audience: prediction-market operators, agent builders, and crypto analysts who care about source quality, market-policy boundaries, and revision receipts.
+
+Primary CTA: follow @evapredicts for the first public thesis loop once launch blockers clear.
+
+Primary link after approval:
+
+`https://eva.jaack.me/campaigns/policy-safe-theses?utm_source=x&utm_medium=social&utm_campaign=launch_truth_status&utm_content=status_post`
+
+Secondary proof link:
+
+`https://eva.jaack.me/thesis/thesis-0fdef25794b38b6e8eed7524?utm_source=x&utm_medium=social&utm_campaign=launch_truth_status&utm_content=spacex_proof`
+
+Approval-ready post draft:
+
+> prediction products get trust from restraint, not from pretending every market is launch-safe.
+>
+> Eva’s public push stays gated until the V1 source basket is policy-safe and thesis writes are durable enough to defend.
+>
+> what is live: cited theses, revisions, author records, Avalanche thesis protocol.
+>
+> what is not getting hand-waved: prohibited-market filtering and write-readiness proof.
+>
+> follow @evapredicts if you want the first public thesis loop when the receipts are clean.
+>
+> {PRIMARY_LINK}
+
+Metric to watch: sessions with `utm_campaign=launch_truth_status`, follow clicks from the campaign page, and clicks into the SpaceX proof thesis. No traction claims until those numbers exist.
+
+Next follow-up: when policy filtering and durable write readiness are verified, publish a short “what changed” update that links back to the original status stance.
+
 ## Follow-up Sequence
 
 ### T+24h
