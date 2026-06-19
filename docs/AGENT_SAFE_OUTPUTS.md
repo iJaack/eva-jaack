@@ -8,6 +8,18 @@ A prepared draft, revision, or anchor transaction is not a public publish event.
 
 Agents may describe prepared content and transaction calldata. Agents must not claim a thesis is live, anchored, revised, or publicly published until there is explicit user approval plus a submitted transaction hash and confirmed receipt or contract readback.
 
+## Permission Ladder
+
+Use the lowest rung supported by direct evidence:
+
+1. `read-only` — market or thesis inspection only.
+2. `draft prepared` — draft/revision preview exists and `publishState: "anchor_prepared_not_published"` is present.
+3. `anchor prepared` — transaction calldata is ready for approval.
+4. `submitted` — the user approved the exact transaction and a tx hash exists.
+5. `published/live` — the public publish path completed and receipt/readback matches the prepared thesis or revision.
+
+MCP alone never reaches the `submitted` or `published/live` rungs. If the output is ambiguous, stay on the lower rung and say what evidence is missing.
+
 ## Output States
 
 | MCP result | Agent-safe wording | Do not say |

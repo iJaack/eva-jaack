@@ -8,6 +8,18 @@ This quickstart is expected to match the live MCP server allowlist and Zod schem
 
 Eva MCP is draft-and-anchor-prep only.
 
+Use this permission ladder before and after every write-adjacent call:
+
+| Rung | Evidence required | Safe language |
+|---|---|---|
+| `read-only` | `search_markets` or `get_thesis` result only | "inspected" / "found candidates" |
+| `draft prepared` | `create_thesis_draft` or `prepare_revision_draft` returned `publishState: "anchor_prepared_not_published"` | "prepared for review" |
+| `anchor prepared` | `anchorStatus: "prepared"` plus transaction calldata | "calldata ready for approval" |
+| `submitted` | explicit user approval plus a transaction hash | "submitted, pending confirmation" |
+| `published/live` | public publish path completed and receipt/readback matches the thesis or revision | "live" / "confirmed" |
+
+MCP alone never reaches the `submitted` or `published/live` rungs. Do not skip rungs when reporting status.
+
 Agents may:
 
 - search markets,

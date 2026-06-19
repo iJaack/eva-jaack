@@ -30,6 +30,20 @@ Prefer the local server for agent work. Treat remote MCP write tools as unavaila
 
 Every write-adjacent MCP tool (`create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`) returns `publishState: "anchor_prepared_not_published"`. That is the boundary. A prepared anchor is not a published thesis, not a confirmed revision, and not evidence of an onchain record.
 
+### Permission Ladder
+
+Use this ladder to choose both the tool and the words you report back. Do not skip rungs.
+
+| Rung | Evidence required | Safe claim | Unsafe jump |
+|---|---|---|---|
+| `read-only` | `search_markets` or `get_thesis` output | "inspected" or "found candidates" | "drafted" |
+| `draft prepared` | Draft/revision tool returned `publishState: "anchor_prepared_not_published"` | "prepared for review" | "published" |
+| `anchor prepared` | `anchorStatus: "prepared"` and transaction calldata | "calldata ready for approval" | "anchored" |
+| `submitted` | Explicit user approval plus transaction hash | "submitted, pending confirmation" | "confirmed" |
+| `published/live` | Public publish path completed and receipt/readback matches the prepared thesis/revision | "live" or "confirmed" with evidence | N/A |
+
+MCP alone never reaches the `submitted` or `published/live` rungs. If you cannot name the evidence for the next rung, stay on the current rung and report the missing evidence.
+
 ### Tool Selection Decision Tree
 
 Before calling a draft-prep tool, choose the smallest live operation that matches the task:

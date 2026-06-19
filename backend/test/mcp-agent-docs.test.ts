@@ -56,4 +56,20 @@ describe("Eva MCP agent docs", () => {
     expect(docs).toContain("Broadcasts require explicit user approval");
     expect(docs).toContain("Do not expand agent powers into trades, custody, staking, claims markets, articles, or blog publishing");
   });
+
+  it("documents the evidence ladder that prevents draft prep being reported as publish", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const rung of ["read-only", "draft prepared", "anchor prepared", "submitted", "published/live"]) {
+      expect(docs, `agent docs should include permission ladder rung ${rung}`).toContain(rung);
+    }
+
+    expect(docs).toContain("MCP alone never reaches the `submitted` or `published/live` rungs");
+  });
 });

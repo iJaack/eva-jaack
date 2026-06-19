@@ -188,3 +188,13 @@ Before running a draft-prep tool:
 - Market statuses are one of `open`, `closed`, `resolved`, or `cancelled`.
 - Fact verdicts are one of `verified`, `likely_true`, `mixed`, `misleading`, `likely_false`, `false`, `unverifiable_yet`, or `non_falsifiable`.
 - No removed-scope path is implied: claims, articles, curator, staking, challenge/settlement, paid verification, LLM verification, public publish, or transaction broadcast.
+
+Before reporting the result, place it on the permission ladder:
+
+- `read-only`: searched or inspected only.
+- `draft prepared`: preview exists and `publishState: "anchor_prepared_not_published"` is present.
+- `anchor prepared`: calldata is ready for approval.
+- `submitted`: exact transaction was user-approved and a tx hash exists.
+- `published/live`: public publish path completed and receipt/readback matches the prepared thesis or revision.
+
+MCP alone never reaches the `submitted` or `published/live` rungs.
