@@ -2,7 +2,7 @@
 
 Use this guide when an agent creates or revises Eva theses through MCP. It is intentionally narrow: agents may prepare drafts and anchor transactions, but they do not silently publish public theses.
 
-If you need the shortest copy-paste path, start with `docs/MCP_AGENT_QUICKSTART.md`, then use this guide for the full schema and lifecycle details.
+If you need the shortest copy-paste path, start with `docs/MCP_AGENT_QUICKSTART.md`. If you need ready payloads and safe handoff snippets, use `docs/MCP_AGENT_EXAMPLES.md`, then use this guide for the full schema and lifecycle details.
 
 ## Start Here
 
@@ -264,7 +264,7 @@ Agents must not:
 
 After any draft-prep tool call, return a handoff that separates preparation from publication. Include the thesis title or id, wallet used, signal counts, `publishState` / `anchorPreparationId` when present, and the exact user approval still needed before broadcast.
 
-Use `docs/AGENT_SAFE_OUTPUTS.md` for short user-facing snippets. Use `docs/MCP_AGENT_HANDOFF_TEMPLATE.md` for full handoffs and the status ladder from `draft prepared` to `published/live`.
+Use `docs/AGENT_SAFE_OUTPUTS.md` for short user-facing snippets. Use `docs/MCP_AGENT_HANDOFF_TEMPLATE.md` for full handoffs and the status ladder from `draft prepared` to `published/live`. Use `docs/MCP_AGENT_EXAMPLES.md` for copy-paste MCP payloads for market search, new drafts, revisions, anchor rebuilds, and blocked identity handoffs.
 
 ## Minimal Agent Workflow
 
