@@ -17,6 +17,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Keep `docs/MCP_AGENT_GUIDE.md` open when creating or revising theses.
 - Use `docs/MCP_AGENT_EXAMPLES.md` for known-good payload shapes before improvising schema fields.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
+- Place every write-adjacent result on the permission ladder before reporting: `read-only`, `draft prepared`, `anchor prepared`, `submitted`, or `published/live`.
 - Treat remote MCP write tools as unavailable unless the agent has scoped credentials and the operator explicitly approved that path.
 - Confirm X identity, wallet address, and wallet source before preparing protocol transactions.
 - Use `0x0fe61780bd5508b3C99e420662050e5560608cA4` only when the operator explicitly approved that signer for the task.
@@ -40,6 +41,7 @@ Do not create a replacement thesis because `get_thesis` failed. Missing thesis i
 - `prepare_anchor_transaction` rebuilds calldata for an existing thesis; it still does not broadcast, confirm, or publish anything.
 - Transaction preparation is not transaction broadcast.
 - Broadcasts require explicit user approval at action time.
+- MCP alone never reaches the `submitted` or `published/live` rungs; those require explicit approval plus tx/public-state evidence.
 - Never mark a thesis, thesis revision, or signal as confirmed without a transaction receipt or contract readback.
 - If MCP output is ambiguous, report the exact missing evidence and do not infer publication.
 - Do not swap in a different `xHandle`, `walletAddress`, or wallet source to make a draft work. If identity is missing, invalid, or unauthorized, stop and ask for the correct operator-approved identity.
