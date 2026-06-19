@@ -142,6 +142,12 @@ const activeCampaigns = [
     href: "/campaigns/reply-sprint?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=evapredicts_reply_sprint&utm_content=reply_sprint_card",
     metric: "qualified thesis visits from X replies",
   },
+  {
+    title: "policy-safe theses",
+    body: "A boundary-first launch page that explains which markets @evapredicts will not amplify before the public reply sprint widens.",
+    href: "/campaigns/policy-safe-theses?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=policy_safe_theses&utm_content=policy_safe_card",
+    metric: "safe-thesis starts, follow clicks, and example reads",
+  },
 ] as const;
 
 function CampaignCallout() {
