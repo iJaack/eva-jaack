@@ -20,6 +20,16 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Use `0x0fe61780bd5508b3C99e420662050e5560608cA4` only when the operator explicitly approved that signer for the task.
 - If no reliable market or fact signals are ready, pass empty signal arrays and say the draft is intentionally signal-light. Do not invent sources, URLs, scores, or weights.
 
+## Tool Selection Shortcut
+
+- Research only: use `search_markets`.
+- Existing thesis update: call `get_thesis` first, then `prepare_revision_draft` with a concise delta note.
+- New thesis preview: use `create_thesis_draft`.
+- Existing thesis calldata rebuild with no text change: use `prepare_anchor_transaction`.
+- Publish, broadcast, article/blog output, claims, staking, challenge/settlement, paid verification, or LLM verification: stop unless a separate approved path and evidence exist.
+
+Do not create a replacement thesis because `get_thesis` failed. Missing thesis id, mismatched identity, or unauthorized wallet authority is a blocker.
+
 ## Safety Rules
 
 - Read tools (`search_markets`, `get_thesis`) are safe by default.
@@ -47,6 +57,8 @@ Current live schema note: `prepare_revision_draft` accepts `thesisId`, `body`, `
 Current market status enum: `open`, `closed`, `resolved`, `cancelled`. Treat `cancelled` as a source-market state only; it is not a thesis publish state and does not imply an Eva draft or anchor was cancelled.
 
 Schema defaults exist for low-risk draft prep, but evidence-bearing fields should be explicit when known. Use valid URLs only; omit unknown source URLs and report the gap in the handoff.
+
+Fact signals may include optional `reportUri` and `reportHash` evidence pointers. Include them only when they already exist; do not fabricate verifier reports, hashes, or storage URIs.
 
 ## User-Facing Result Language
 
