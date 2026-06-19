@@ -13,6 +13,8 @@ Use alongside:
 
 ## 1. Read-only market search
 
+Tool: `search_markets`
+
 Use this before drafting when the thesis needs prediction-market evidence.
 
 ```json
@@ -28,6 +30,8 @@ found candidate markets for review. no draft, transaction, or public publish hap
 ```
 
 ## 2. Signal-light new thesis draft
+
+Tool: `create_thesis_draft`
 
 Use this only when the operator wants a draft scaffold and no reliable evidence sources are ready yet. Empty signal arrays are safer than invented evidence.
 
@@ -61,6 +65,8 @@ this is not published or anchored. explicit approval, broadcast, and receipt/rea
 ```
 
 ## 3. Signal-backed new thesis draft
+
+Tool: `create_thesis_draft`
 
 Use this when the agent has real market and fact evidence. Keep URLs, weights, roles, and rationales explicit.
 
@@ -103,6 +109,8 @@ Do not replace missing URLs with placeholders in real runs. If a source URL is u
 
 ## 4. Existing thesis revision prep
 
+Tools: `get_thesis`, then `prepare_revision_draft`
+
 Use this when an existing thesis changes. Always inspect the thesis first.
 
 First call `get_thesis`:
@@ -134,6 +142,8 @@ this does not update the live thesis. the previous public state remains the sour
 ```
 
 ## 5. Existing thesis anchor rebuild
+
+Tool: `prepare_anchor_transaction`
 
 Use this only to rebuild calldata for an already-prepared or stored thesis without changing text.
 
