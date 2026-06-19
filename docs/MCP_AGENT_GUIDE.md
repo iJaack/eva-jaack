@@ -4,6 +4,10 @@ Use this guide when an agent creates or revises Eva theses through MCP. It is in
 
 If you need the shortest copy-paste path, start with `docs/MCP_AGENT_QUICKSTART.md`. If you need ready payloads and safe handoff snippets, use `docs/MCP_AGENT_EXAMPLES.md`, then use this guide for the full schema and lifecycle details.
 
+## Drift Guardrail
+
+The live tool allowlist and schema enums are tested against these agent docs. When `backend/src/mcp-server.ts` or `backend/src/mcp-schemas.ts` changes, update this guide, `docs/MCP_AGENT_QUICKSTART.md`, `docs/MCP_AGENT_EXAMPLES.md`, `docs/MCP_AGENT_ERROR_HANDLING.md`, and `skills/eva-agent-onboarding/SKILL.md` in the same change. If the docs and live server disagree, the server wins and the docs must be fixed before agents use the new path.
+
 ## Start Here
 
 Run the local MCP server from the repo root:

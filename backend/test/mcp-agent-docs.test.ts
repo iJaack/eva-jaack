@@ -1,0 +1,59 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
+import { describe, expect, it } from "vitest";
+import { evaMcpToolNames } from "../src/mcp-server.js";
+import { claimVerdictValues, predictionMarketStatusValues, thesisSignalRoleValues } from "../src/mcp-schemas.js";
+
+const testDir = dirname(fileURLToPath(import.meta.url));
+const repoRoot = resolve(testDir, "../..");
+
+function readRepoFile(path: string) {
+  return readFileSync(resolve(repoRoot, path), "utf8");
+}
+
+describe("Eva MCP agent docs", () => {
+  const canonicalAgentDocs = [
+    "docs/MCP_AGENT_GUIDE.md",
+    "docs/MCP_AGENT_QUICKSTART.md",
+    "docs/MCP_AGENT_EXAMPLES.md",
+    "docs/MCP_AGENT_ERROR_HANDLING.md",
+    "skills/eva-agent-onboarding/SKILL.md",
+  ];
+
+  it("document every live MCP tool exposed by the server", () => {
+    for (const path of canonicalAgentDocs) {
+      const text = readRepoFile(path);
+      for (const toolName of evaMcpToolNames) {
+        expect(text, `${path} should mention live tool ${toolName}`).toContain(toolName);
+      }
+    }
+  });
+
+  it("keeps documented schema enums aligned with live Zod schemas", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const value of [...thesisSignalRoleValues, ...predictionMarketStatusValues, ...claimVerdictValues]) {
+      expect(docs, `agent docs should mention schema enum value ${value}`).toContain(value);
+    }
+  });
+
+  it("preserves the safe draft/anchor-prep boundary in agent docs", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("docs/MCP_AGENT_HANDOFF_TEMPLATE.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    expect(docs).toContain('publishState: "anchor_prepared_not_published"');
+    expect(docs).toContain("not published");
+    expect(docs).toContain("Broadcasts require explicit user approval");
+    expect(docs).toContain("Do not expand agent powers into trades, custody, staking, claims markets, articles, or blog publishing");
+  });
+});
