@@ -26,6 +26,18 @@ Prefer the local server for agent work. Treat remote MCP write tools as unavaila
 
 Every write-adjacent MCP tool (`create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`) returns `publishState: "anchor_prepared_not_published"`. That is the boundary. A prepared anchor is not a published thesis, not a confirmed revision, and not evidence of an onchain record.
 
+### Tool Selection Decision Tree
+
+Before calling a draft-prep tool, choose the smallest live operation that matches the task:
+
+1. Market research only -> `search_markets`.
+2. Existing thesis update -> `get_thesis`, verify title/current revision/identity, then `prepare_revision_draft`.
+3. New thesis preview -> `create_thesis_draft`.
+4. Existing thesis calldata rebuild with no text change -> `prepare_anchor_transaction`.
+5. Public publish, transaction broadcast, article/blog output, claims, staking, challenge/settlement, paid verification, or LLM verification -> stop unless a separate approved path and evidence exist.
+
+Do not work around a failed revision lookup by creating a replacement thesis. A missing `thesisId`, mismatched wallet, or unauthorized X handle is a blocker, not permission to change identity or scope.
+
 ## Identity Requirements
 
 All draft or revision preparation requires:
@@ -77,6 +89,8 @@ Use Eva's sovereign wallet (`0x0fe61780bd5508b3C99e420662050e5560608cA4`) only w
       "sourceUrl": "https://example.com/source",
       "verifierVerdict": "likely_true",
       "verifierScore": 82,
+      "reportUri": "ipfs://example-report",
+      "reportHash": "0xabc123",
       "weight": 40,
       "role": "second_order",
       "rationale": "Supports private-market liquidity pressure."
@@ -139,6 +153,7 @@ If the result contains an error, missing thesis, or mismatched identity, stop an
 - If a market is no longer useful evidence, omit it instead of forcing it into `closed`, `resolved`, or `contradiction`.
 - Schema defaults exist for generic fields (`selectedOutcomeLabel`, `weight`, `role`, `status`, `verifierVerdict`, `verifierScore`, and `walletSource` where supported). Prefer explicit values when the field affects the thesis; defaults are for low-risk drafts, not evidence shortcuts.
 - URLs must be valid URLs when supplied. If the source URL is unknown, omit it and call out the missing source in the handoff instead of using placeholders.
+- Fact signals may include optional `reportUri` and `reportHash` evidence pointers. Include them only when a verifier/report already produced them; never fabricate hashes or storage URIs to make a signal look stronger.
 - `prepare_revision_draft` currently accepts `thesisId`, `body`, `note`, `xHandle`, and `walletAddress`; it does not accept `walletSource` yet.
 
 ### `get_thesis`

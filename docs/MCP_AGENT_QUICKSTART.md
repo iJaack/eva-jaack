@@ -40,6 +40,18 @@ Only these MCP tools are live for agent thesis work:
 
 If a prompt, client, or autocomplete shows any other write tool, stop and treat it as stale.
 
+## Pick The Right Operation
+
+Use this decision path before touching a write-adjacent tool:
+
+1. Need evidence candidates only? Use `search_markets` and stop at read-only notes.
+2. Need to change an existing thesis? Use `get_thesis` first, then `prepare_revision_draft`. Do not create a replacement thesis because the old id is missing or inconvenient.
+3. Need a brand-new thesis preview? Use `create_thesis_draft`.
+4. Need to rebuild calldata for an already-prepared thesis without changing text? Use `prepare_anchor_transaction`.
+5. Need publication, transaction broadcast, article/blog output, claims, staking, challenge/settlement, paid verification, or LLM verification? Stop. That is outside current MCP scope unless a separate approved path and evidence are provided.
+
+Identity rule: if the requested `xHandle`, `walletAddress`, or signer authority is missing or mismatched, block and ask for the correct approved identity. Do not swap wallets, invent handles, or use Eva's wallet as a convenience fallback.
+
 ## New Draft: Minimum Safe Payload
 
 Use empty signal arrays when evidence is not ready yet. Do not invent markets, URLs, scores, or weights to satisfy the schema.
@@ -103,6 +115,8 @@ Use real source URLs and explicit weights when signals are material.
       "sourceUrl": "https://example.com/source",
       "verifierVerdict": "likely_true",
       "verifierScore": 82,
+      "reportUri": "ipfs://example-report",
+      "reportHash": "0xabc123",
       "weight": 40,
       "role": "second_order",
       "rationale": "Supports private-market liquidity pressure."
@@ -143,6 +157,7 @@ When validation fails, repair the payload instead of changing the task boundary.
 - market statuses are `open`, `closed`, `resolved`, or `cancelled`.
 - fact verdicts are `verified`, `likely_true`, `mixed`, `misleading`, `likely_false`, `false`, `unverifiable_yet`, or `non_falsifiable`.
 - URLs must be valid URLs when supplied. Omit unknown URLs and state the missing source in the handoff.
+- `reportUri` and `reportHash` are optional fact-signal evidence pointers. Include them only when they already exist; do not fabricate hashes or storage URIs.
 - identity fields are not interchangeable. If the wallet or X handle is wrong, ask for the correct approved identity.
 
 ## Stop Conditions
