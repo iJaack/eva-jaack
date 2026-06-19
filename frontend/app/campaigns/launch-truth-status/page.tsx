@@ -11,6 +11,7 @@ const proofHref = `/thesis/thesis-0fdef25794b38b6e8eed7524?utm_source=campaign_p
 const policyHref = `/campaigns/policy-safe-theses?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=policy_safe_page`;
 const composeHref = `/compose?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=draft_after_clearance`;
 const followHref = `https://x.com/evapredicts?utm_source=eva_site&utm_medium=campaign_page&utm_campaign=${campaign}`;
+const homepageHref = `${campaignPath}?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${campaign}&utm_content=launch_truth_status`;
 const xPostHref = `${campaignUrl}?utm_source=x&utm_medium=social&utm_campaign=${campaign}&utm_content=status_post`;
 
 export const metadata: Metadata = {
@@ -47,12 +48,27 @@ const liveProof = [
   },
   {
     label: "campaign routes",
-    body: "Trust receipts, agent receipts, reply sprint, and policy-safe thesis pages already carry measurable UTMs.",
+    body: "Trust receipts, agent receipts, reply sprint, policy-safe theses, and launch-truth status pages already carry measurable UTMs.",
+  },
+] as const;
+
+const currentBlockers = [
+  {
+    label: "market policy filter",
+    body: "The public source basket still needs production proof that V1-prohibited political, religious, war, sports, and tragedy-adjacent prompts stay out of the launch surface.",
+  },
+  {
+    label: "durable thesis writes",
+    body: "The write path needs an observable readiness signal before @evapredicts asks people to rely on persisted thesis updates.",
+  },
+  {
+    label: "signer and runtime parity",
+    body: "Production identity and environment assumptions need to match the repo source of truth before the launch thread widens.",
   },
 ] as const;
 
 const guardedGates = [
-  "do not widen the public @evapredicts push until V1-prohibited market filtering is verified in production",
+  "do not widen the public @evapredicts push until prohibited-market filtering is verified in production",
   "do not pretend thesis writes are launch-clear until durable write/readiness proof is observable",
   "do not claim users, revenue, accuracy, testimonials, or native trading without measured evidence",
 ] as const;
@@ -75,8 +91,8 @@ export default function LaunchTruthStatusCampaignPage() {
           <h1>launch status should be a receipt, not a vibe.</h1>
           <p>
             Eva can already show the thesis object: a public argument with cited market signals, fact signals, revisions,
-            and an author trail. The growth move now is sharper than hype: route qualified builders to the proof record
-            while being explicit about the launch gates that still need evidence.
+            and an author trail. The growth move now is sharper than hype: route qualified builders to a launch-truth
+            receipt first, then let them inspect the proof thesis once the boundary feels honest.
           </p>
           <div className="hero-actions">
             <Link href={proofHref} className="btn btn-primary">
@@ -113,6 +129,27 @@ export default function LaunchTruthStatusCampaignPage() {
           </div>
         </section>
 
+        <section className="prediction-section" aria-label="Current launch blockers">
+          <div className="section-heading-row prediction-heading">
+            <div>
+              <p className="section-kicker">Current blockers</p>
+              <h2 className="section-title section-title-sm">the public loop waits for these receipts.</h2>
+            </div>
+            <Link href={homepageHref} className="section-link">
+              Tracked homepage CTA
+            </Link>
+          </div>
+          <div className="product-module-grid">
+            {currentBlockers.map((blocker) => (
+              <article key={blocker.label} className="product-module">
+                <p className="section-kicker">not launch-clear</p>
+                <h3>{blocker.label}</h3>
+                <p>{blocker.body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
         <section className="paper-section" aria-label="Guarded launch gates">
           <p className="section-kicker">Guarded gates</p>
           <h2>what @evapredicts will not hand-wave.</h2>
@@ -144,8 +181,9 @@ export default function LaunchTruthStatusCampaignPage() {
             ))}
           </blockquote>
           <p className="inline-note">
-            Metric to watch: sessions with <strong>utm_campaign=launch_truth_status</strong>, follow clicks from this
-            page, clicks into the SpaceX proof thesis, and downstream draft starts after launch gates clear.
+            Metric to watch: sessions with <strong>utm_campaign=launch_truth_status</strong>, homepage CTA clicks into
+            this page, follow clicks from the status page, clicks into the SpaceX proof thesis, and downstream draft
+            starts after launch gates clear.
           </p>
         </section>
 

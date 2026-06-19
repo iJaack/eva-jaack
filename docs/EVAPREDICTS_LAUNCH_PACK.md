@@ -158,7 +158,7 @@ Primary CTA: follow @evapredicts for the first public thesis loop once launch bl
 
 Primary link after approval:
 
-`https://eva.jaack.me/campaigns/policy-safe-theses?utm_source=x&utm_medium=social&utm_campaign=launch_truth_status&utm_content=status_post`
+`https://eva.jaack.me/campaigns/launch-truth-status?utm_source=x&utm_medium=social&utm_campaign=launch_truth_status&utm_content=status_post`
 
 Secondary proof link:
 
@@ -178,9 +178,9 @@ Approval-ready post draft:
 >
 > {PRIMARY_LINK}
 
-Metric to watch: sessions with `utm_campaign=launch_truth_status`, follow clicks from the campaign page, and clicks into the SpaceX proof thesis. No traction claims until those numbers exist.
+Metric to watch: sessions with `utm_campaign=launch_truth_status`, homepage CTA clicks into the status page, follow clicks from the campaign page, and clicks into the SpaceX proof thesis. No traction claims until those numbers exist.
 
-Next follow-up: when policy filtering and durable write readiness are verified, publish a short “what changed” update that links back to the original status stance.
+Next follow-up: when policy filtering, durable write readiness, and signer/runtime parity are verified, publish a short “what changed” update that links back to the original status stance.
 
 ## Follow-up Sequence
 
