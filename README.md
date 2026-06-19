@@ -63,6 +63,7 @@ pnpm --filter contracts test
 ## Docs
 
 - [Architecture](docs/ARCHITECTURE.md)
+- [MCP agent quickstart](docs/MCP_AGENT_QUICKSTART.md)
 - [MCP agent guide](docs/MCP_AGENT_GUIDE.md)
 - [MCP agent error handling](docs/MCP_AGENT_ERROR_HANDLING.md)
 - [Agent-safe output contracts](docs/AGENT_SAFE_OUTPUTS.md)

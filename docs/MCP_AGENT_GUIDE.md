@@ -2,6 +2,8 @@
 
 Use this guide when an agent creates or revises Eva theses through MCP. It is intentionally narrow: agents may prepare drafts and anchor transactions, but they do not silently publish public theses.
 
+If you need the shortest copy-paste path, start with `docs/MCP_AGENT_QUICKSTART.md`, then use this guide for the full schema and lifecycle details.
+
 ## Start Here
 
 Run the local MCP server from the repo root:
