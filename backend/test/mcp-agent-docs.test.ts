@@ -125,4 +125,21 @@ describe("Eva MCP agent docs", () => {
     expect(docs).toContain("local stdio server");
     expect(docs).toContain("remote write tools");
   });
+
+  it("ships concrete onboarding skill examples for agent rehearsals", () => {
+    const skill = readRepoFile("skills/eva-agent-onboarding/SKILL.md");
+
+    for (const phrase of [
+      "## Onboarding Drill",
+      "SpaceX IPO",
+      "create_thesis_draft",
+      "prepare_revision_draft",
+      "expectedPublishState",
+      "anchor_prepared_not_published",
+      "walletSource",
+      "no transaction broadcast and no public publish happened",
+    ]) {
+      expect(skill, `onboarding skill should include rehearsal phrase ${phrase}`).toContain(phrase);
+    }
+  });
 });

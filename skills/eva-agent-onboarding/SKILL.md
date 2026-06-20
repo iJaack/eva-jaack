@@ -36,6 +36,81 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 
 Do not create a replacement thesis because `get_thesis` failed. Missing thesis id, mismatched identity, or unauthorized wallet authority is a blocker.
 
+## Onboarding Drill
+
+Use this drill for a new agent before it touches a real user-requested thesis. It proves the agent can route reads, draft prep, revision prep, and handoff wording without implying publication.
+
+1. Start the local MCP server with the repo root as `cwd`:
+
+```json
+{
+  "eva-thesis": {
+    "command": "pnpm",
+    "args": ["--filter", "backend", "mcp"],
+    "cwd": "/absolute/path/to/eva-jaack"
+  }
+}
+```
+
+2. Read/search first. Use the SpaceX proof object unless the operator gave a different scope:
+
+```json
+{
+  "tool": "search_markets",
+  "input": { "query": "SpaceX IPO" },
+  "expectedRung": "read-only"
+}
+```
+
+3. Prepare a signal-light draft only when the operator-approved identity is known. This example uses Eva's wallet as a rehearsal identity; do not swap it into live work without task-time approval:
+
+```json
+{
+  "tool": "create_thesis_draft",
+  "input": {
+    "title": "SpaceX IPO liquidity rotation rehearsal",
+    "body": "If SpaceX IPO probability rises, attention and liquidity should rotate toward adjacent launch, satellite, and private-market infrastructure narratives. This is a rehearsal draft for agent onboarding, not a live market call.",
+    "xHandle": "@evajaack",
+    "walletAddress": "0x0fe61780bd5508b3C99e420662050e5560608cA4",
+    "walletSource": "external",
+    "predictionSignals": [],
+    "factSignals": []
+  },
+  "expectedRung": "draft prepared",
+  "expectedPublishState": "anchor_prepared_not_published"
+}
+```
+
+4. Prepare a revision only after `get_thesis` confirms the exact thesis and identity. Use a short delta note:
+
+```json
+{
+  "tool": "prepare_revision_draft",
+  "input": {
+    "thesisId": "<confirmed-thesis-id>",
+    "body": "<full replacement thesis body>",
+    "note": "Adds the latest odds move and separates catalyst from second-order liquidity impact.",
+    "xHandle": "@evajaack",
+    "walletAddress": "0x0fe61780bd5508b3C99e420662050e5560608cA4"
+  },
+  "expectedRung": "draft prepared",
+  "expectedPublishState": "anchor_prepared_not_published"
+}
+```
+
+5. Practice the final handoff. A correct onboarding result says prepared, not published:
+
+```text
+prepared: new thesis draft
+tool: create_thesis_draft
+rung: draft prepared / anchor prepared only
+publishState: anchor_prepared_not_published
+anchorStatus: prepared
+storage: not assessed
+next evidence needed: explicit approval, transaction hash, receipt/readback, and durable storage check before any live claim
+boundary: no transaction broadcast and no public publish happened
+```
+
 ## Safety Rules
 
 - Read tools (`search_markets`, `get_thesis`) are safe by default.
