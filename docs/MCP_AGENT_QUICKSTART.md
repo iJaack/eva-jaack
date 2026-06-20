@@ -8,6 +8,8 @@ This quickstart is expected to match the live MCP server allowlist and Zod schem
 
 Eva MCP is draft-and-anchor-prep only.
 
+The broader app has HTTP routes for thesis creation and anchor preparation, but those are not agent-default publish powers. Do not call `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or production write endpoints as a workaround for MCP limits. Direct REST writes require a separate approved path, scoped credentials, and receipt/readback evidence before any stronger claim.
+
 ## No-Guesswork Preflight
 
 Before any write-adjacent MCP call, fill this out mentally or in the handoff. If any row is unclear, stop before preparing calldata.
@@ -18,7 +20,7 @@ Before any write-adjacent MCP call, fill this out mentally or in the handoff. If
 | Identity | operator-approved `xHandle` and `walletAddress` | Block; do not substitute Eva's wallet or a remembered address. |
 | Signer/source | `walletSource` when the live tool accepts it | Use `external` only when that is the approved signer source. |
 | Evidence | real market/source URLs, or an explicit signal-light choice | Use empty arrays and say signal-light; do not invent evidence. |
-| Scope | no request for publish, broadcast, claims, articles/blog, staking, custody, settlement, or LLM verification | Stop unless a separate approved path and evidence exist. |
+| Scope | no request for publish, broadcast, direct REST writes, claims, articles/blog, staking, custody, settlement, or LLM verification | Stop unless a separate approved path and evidence exist. |
 | Storage claim | `storage not assessed`, `storage readiness blocked`, or `storage verified by <check>` | Default to `storage not assessed` for local MCP prep. |
 
 This preflight is part of the safety boundary. It is better to return `blocked:` with one missing field than to prepare the wrong identity, imply publication, or turn a storage unknown into launch readiness.
@@ -109,7 +111,7 @@ Use this decision path before touching a write-adjacent tool:
 2. Need to change an existing thesis? Use `get_thesis` first, then `prepare_revision_draft`. Do not create a replacement thesis because the old id is missing or inconvenient.
 3. Need a brand-new thesis preview? Use `create_thesis_draft`.
 4. Need to rebuild calldata for an already-prepared thesis without changing text? Use `prepare_anchor_transaction`.
-5. Need publication, transaction broadcast, article/blog output, claims, staking, challenge/settlement, paid verification, or LLM verification? Stop. That is outside current MCP scope unless a separate approved path and evidence are provided.
+5. Need publication, transaction broadcast, direct REST writes, article/blog output, claims, staking, challenge/settlement, paid verification, or LLM verification? Stop. That is outside current MCP scope unless a separate approved path and evidence are provided.
 
 Identity rule: if the requested `xHandle`, `walletAddress`, or signer authority is missing or mismatched, block and ask for the correct approved identity. Do not swap wallets, invent handles, or use Eva's wallet as a convenience fallback.
 

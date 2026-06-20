@@ -18,6 +18,8 @@ pnpm --filter backend mcp
 
 Prefer the local server for agent work. Treat remote MCP write tools as unavailable unless the agent has scoped credentials for the task and the operator explicitly approved that path.
 
+Do not bypass MCP by calling app HTTP routes directly. Routes such as `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or any production write endpoint are app/runtime surfaces, not agent-default publish powers. An agent may use MCP to prepare draft/anchor payloads; direct REST writes need a separate approved execution path, scoped credentials, and their own receipt/readback evidence.
+
 For MCP clients that need an explicit local server entry, configure the stdio server with the repo root as `cwd`:
 
 ```json
@@ -84,7 +86,7 @@ Before calling a draft-prep tool, choose the smallest live operation that matche
 2. Existing thesis update -> `get_thesis`, verify title/current revision/identity, then `prepare_revision_draft`.
 3. New thesis preview -> `create_thesis_draft`.
 4. Existing thesis calldata rebuild with no text change -> `prepare_anchor_transaction`.
-5. Public publish, transaction broadcast, article/blog output, claims, staking, challenge/settlement, paid verification, or LLM verification -> stop unless a separate approved path and evidence exist.
+5. Public publish, transaction broadcast, direct REST writes, article/blog output, claims, staking, challenge/settlement, paid verification, or LLM verification -> stop unless a separate approved path and evidence exist.
 
 Do not work around a failed revision lookup by creating a replacement thesis. A missing `thesisId`, mismatched wallet, or unauthorized X handle is a blocker, not permission to change identity or scope.
 

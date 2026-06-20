@@ -22,6 +22,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Place every write-adjacent result on the permission ladder before reporting: `read-only`, `draft prepared`, `anchor prepared`, `submitted`, or `published/live`.
 - Treat remote MCP write tools as unavailable unless the agent has scoped credentials and the operator explicitly approved that path.
 - If the local stdio server cannot start, report that setup blocker instead of scraping the UI, using unauthenticated HTTP, or switching to remote write tools.
+- Do not bypass MCP by calling app HTTP routes such as `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or production write endpoints. Direct REST writes require a separate approved execution path, scoped credentials, and receipt/readback evidence.
 - Confirm X identity, wallet address, and wallet source before preparing protocol transactions.
 - Use `0x0fe61780bd5508b3C99e420662050e5560608cA4` only when the operator explicitly approved that signer for the task.
 - If no reliable market or fact signals are ready, pass empty signal arrays and say the draft is intentionally signal-light. Do not invent sources, URLs, scores, or weights.
@@ -32,7 +33,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Existing thesis update: call `get_thesis` first, then `prepare_revision_draft` with a concise delta note.
 - New thesis preview: use `create_thesis_draft`.
 - Existing thesis calldata rebuild with no text change: use `prepare_anchor_transaction`.
-- Publish, broadcast, article/blog output, claims, staking, challenge/settlement, paid verification, or LLM verification: stop unless a separate approved path and evidence exist.
+- Publish, broadcast, direct REST writes, article/blog output, claims, staking, challenge/settlement, paid verification, or LLM verification: stop unless a separate approved path and evidence exist.
 
 Do not create a replacement thesis because `get_thesis` failed. Missing thesis id, mismatched identity, or unauthorized wallet authority is a blocker.
 
