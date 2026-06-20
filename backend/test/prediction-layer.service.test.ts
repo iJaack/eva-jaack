@@ -534,6 +534,63 @@ describe("prediction layer service", () => {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
+        {
+          marketId: "polymarket-erdogan-out",
+          provider: "polymarket",
+          externalId: "politics-6",
+          url: "https://polymarket.com/event/erdoan-out-before-2027",
+          title: "Erdoğan out by December 31, 2026?",
+          category: "Polymarket",
+          status: "open",
+          volumeUsd: 1_000_000,
+          liquidityUsd: 500_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.19 },
+            { outcomeId: "no", label: "No", price: 0.81 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-macron-out",
+          provider: "polymarket",
+          externalId: "politics-7",
+          url: "https://polymarket.com/event/macron-out-by-june-30-2026-273",
+          title: "Macron out by June 30, 2026?",
+          category: "Polymarket",
+          status: "open",
+          volumeUsd: 1_000_000,
+          liquidityUsd: 500_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.22 },
+            { outcomeId: "no", label: "No", price: 0.78 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-bernie-endorse-senate",
+          provider: "polymarket",
+          externalId: "politics-8",
+          url: "https://polymarket.com/event/will-bernie-endorse-james-talarico-for-tx-sen-by-nov-2-2026-et",
+          title: "Will Bernie endorse James Talarico for TX-Sen by Nov 2 2026 ET?",
+          category: "Polymarket",
+          status: "open",
+          volumeUsd: 1_000_000,
+          liquidityUsd: 500_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.31 },
+            { outcomeId: "no", label: "No", price: 0.69 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
       ],
     );
 
@@ -551,5 +608,8 @@ describe("prediction layer service", () => {
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-jesus-gta");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-starmer-out");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-balance-of-power-other");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-erdogan-out");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-macron-out");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-bernie-endorse-senate");
   });
 });
