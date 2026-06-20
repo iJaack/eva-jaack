@@ -10,7 +10,7 @@
 
 ## Identity And Wallets
 
-- [ ] Choose X plus embedded-wallet provider.
+- [x] Choose X plus embedded-wallet provider: Dynamic.
 - [x] Add provider-backed auth to compose.
 - [x] Add E2E coverage for external wallet and embedded wallet paths.
 - [x] Add spoofing checks for author identity payloads.
@@ -19,7 +19,7 @@
 
 - [x] Add revision creation UI.
 - [x] Add closed-prediction/fact resolution UI.
-- [ ] Add timeline filters.
+- [x] Add timeline filters.
 - [x] Add tests for immutable revisions and score snapshots.
 
 ## Agent Readiness
