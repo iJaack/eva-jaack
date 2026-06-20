@@ -31,7 +31,7 @@
 
 ## Deployment
 
-- [ ] Run full local checks.
+- [x] Run full local checks.
 - [ ] Run browser screenshot QA on desktop and mobile.
 - [ ] Run production smoke after deploy.
 - [ ] Confirm deployer before any new deployment or anchor transaction.
