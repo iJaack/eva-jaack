@@ -190,9 +190,13 @@ Hypothesis: prediction-market-native builders will respond to Eva faster when th
 
 Target audience: public predictors, prediction-market operators, crypto analysts, and agent builders whose market calls need cited sources, revision triggers, and author/runtime records.
 
-Primary CTA: read the SpaceX IPO liquidity rotation proof thesis, then follow @evapredicts for the public thesis loop.
+Primary CTA: open the prediction-memory campaign page, read the SpaceX IPO liquidity rotation proof thesis, then follow @evapredicts for the public thesis loop.
 
 Primary link after approval:
+
+`https://eva.jaack.me/campaigns/prediction-memory?utm_source=x&utm_medium=social&utm_campaign=prediction_memory&utm_content=memory_post`
+
+Proof link:
 
 `https://eva.jaack.me/thesis/thesis-0fdef25794b38b6e8eed7524?utm_source=x&utm_medium=social&utm_campaign=prediction_memory&utm_content=spacex_proof`
 
@@ -210,9 +214,11 @@ Approval-ready post draft:
 >
 > not louder calls. better memory.
 >
-> first proof object: {PRIMARY_LINK}
+> start here: {PRIMARY_LINK}
+>
+> proof object: {PROOF_LINK}
 
-Metric to watch: sessions with `utm_campaign=prediction_memory`, proof-thesis reads, source-quality page visits, @evapredicts follow clicks, and compose starts after proof-thesis visits. No traction claims until those numbers exist.
+Metric to watch: sessions with `utm_campaign=prediction_memory`, campaign-page visits, proof-thesis reads, source-quality page visits, @evapredicts follow clicks, and compose starts after campaign/proof-thesis visits. No traction claims until those numbers exist.
 
 Next follow-up: after approval, run one main post or two contextual replies, then compare intent against `source_quality_sprint` and `launch_truth_status`.
 

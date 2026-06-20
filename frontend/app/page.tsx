@@ -30,8 +30,10 @@ const evaPredictsUrl = "https://x.com/evapredicts";
 const launchThesisId = "thesis-0fdef25794b38b6e8eed7524";
 const homepageProofCampaign = "homepage_spacex_proof";
 const launchTruthCampaign = "launch_truth_status";
+const predictionMemoryCampaign = "prediction_memory";
 const launchThesisHref = `/thesis/${launchThesisId}?utm_source=homepage&utm_medium=proof_cta&utm_campaign=${homepageProofCampaign}&utm_content=launch_thesis`;
 const launchTruthHref = `/campaigns/launch-truth-status?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${launchTruthCampaign}&utm_content=launch_truth_status`;
+const predictionMemoryHref = `/campaigns/prediction-memory?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${predictionMemoryCampaign}&utm_content=prediction_memory`;
 
 function formatUsd(value: number | null): string {
   if (value === null) return "—";
@@ -123,9 +125,9 @@ const participationQuests = [
 ] as const;
 
 const campaignProofPoints = [
-  "see what is live before the launch push widens",
-  "inspect the SpaceX proof thesis without fake traction claims",
-  "track the exact gates @evapredicts will not hand-wave",
+  "inspect the SpaceX proof thesis as a memory object, not an odds screenshot",
+  "see the cited signals, revision trail, and author record in one shareable artifact",
+  "measure prediction-memory clicks before widening the @evapredicts push",
 ] as const;
 
 const activeCampaigns = [
@@ -165,6 +167,12 @@ const activeCampaigns = [
     href: "/campaigns/source-quality-sprint?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=source_quality_sprint&utm_content=source_quality_card",
     metric: "proof-thesis reads, source-library clicks, compose starts, and follows",
   },
+  {
+    title: "prediction memory",
+    body: "The current @evapredicts wedge: prediction markets price the moment, but Eva keeps the thesis, sources, revisions, and author trail inspectable.",
+    href: "/campaigns/prediction-memory?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=prediction_memory&utm_content=prediction_memory_card",
+    metric: "prediction-memory sessions, proof-thesis reads, compose starts, and follows",
+  },
 ] as const;
 
 function CampaignCallout() {
@@ -172,10 +180,10 @@ function CampaignCallout() {
     <section className="prediction-section campaign-callout" aria-label="Current Eva Protocol campaign">
       <div className="campaign-callout-copy">
         <p className="section-kicker">@evapredicts campaign</p>
-        <h2 className="section-title section-title-sm">trust starts with the launch truth.</h2>
+        <h2 className="section-title section-title-sm">prediction markets price the moment. Eva remembers the thesis.</h2>
         <p>
-          The current growth wedge is not a hype post. It is a transparent status loop: what is live, what stays gated,
-          and why @evapredicts will only widen the public thesis campaign once the receipts are clean.
+          The current growth wedge is prediction memory: public market theses with cited signals, visible revisions, and
+          an author trail that survives after the timeline moves on.
         </p>
       </div>
       <div className="campaign-proof-grid" aria-label="Campaign proof points">
@@ -187,8 +195,8 @@ function CampaignCallout() {
         ))}
       </div>
       <div className="campaign-action-row">
-        <Link href={launchTruthHref} className="mobile-action mobile-action-primary">
-          Open launch status
+        <Link href={predictionMemoryHref} className="mobile-action mobile-action-primary">
+          Open memory campaign
         </Link>
         <Link href={launchThesisHref} className="mobile-action">
           Read the proof record
@@ -198,7 +206,7 @@ function CampaignCallout() {
         </Link>
       </div>
       <p className="inline-note">
-        Metric to watch: utm_campaign=launch_truth_status clicks into the status page, then proof-thesis reads and follow clicks before any broader launch push.
+        Metric to watch: utm_campaign=prediction_memory clicks into the campaign page, then proof-thesis reads, compose starts, and follow clicks before any broader launch push.
       </p>
     </section>
   );

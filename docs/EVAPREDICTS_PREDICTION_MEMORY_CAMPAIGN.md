@@ -21,6 +21,10 @@ Read the SpaceX IPO liquidity rotation proof thesis, then follow @evapredicts fo
 
 Primary link:
 
+`https://eva.jaack.me/campaigns/prediction-memory?utm_source=x&utm_medium=social&utm_campaign=prediction_memory&utm_content=memory_post`
+
+Proof link:
+
 `https://eva.jaack.me/thesis/thesis-0fdef25794b38b6e8eed7524?utm_source=x&utm_medium=social&utm_campaign=prediction_memory&utm_content=spacex_proof`
 
 Secondary link:
@@ -29,9 +33,11 @@ Secondary link:
 
 ## Channel
 
-Intended channel: @evapredicts on X.
+Live campaign page: `https://eva.jaack.me/campaigns/prediction-memory`
 
-Execution state: approval-ready only. External @evapredicts publishing still needs explicit human approval.
+Intended social channel: @evapredicts on X.
+
+Execution state: campaign page shipped via repo; external @evapredicts publishing still needs explicit human approval.
 
 ## Approval-Ready Main Post
 
@@ -43,7 +49,9 @@ that is the wedge for Eva: public market theses with cited signals, revision his
 
 not louder calls. better memory.
 
-first proof object: {PRIMARY_LINK}
+start here: {PRIMARY_LINK}
+
+proof object: {PROOF_LINK}
 
 ## Reply Drafts
 
@@ -97,6 +105,7 @@ Eva’s first proof thesis keeps those signals in one inspectable record: {PRIMA
 Watch without inventing traction:
 
 - sessions with `utm_campaign=prediction_memory`
+- campaign-page visits from `utm_content=memory_post`
 - proof-thesis reads from `utm_content=spacex_proof`
 - source-quality page visits from `utm_content=source_quality_page`
 - @evapredicts profile clicks and follows after approval
