@@ -53,6 +53,7 @@ Expected safe markers:
 - `anchorStatus: "prepared"`
 - `anchorPreparationId`
 - transaction payloads for later approval
+- storage state: `storage not assessed` unless a separate persistence/readback check was run
 
 Safe result language:
 
@@ -60,6 +61,7 @@ Safe result language:
 prepared: signal-light thesis draft and anchor calldata are ready for review.
 
 signals: 0 market signals, 0 fact signals. no sources were invented.
+storage: not assessed by this MCP call.
 
 this is not published or anchored. explicit approval, broadcast, and receipt/readback are still required before calling it live.
 ```
@@ -139,6 +141,7 @@ Safe result language:
 prepared: revision draft and revision-anchor calldata are ready for review.
 
 this does not update the live thesis. the previous public state remains the source of truth until the approved transaction is broadcast and confirmed by receipt/readback.
+storage: not assessed unless a separate production persistence/readback check was run.
 ```
 
 ## 5. Existing thesis anchor rebuild
@@ -159,6 +162,7 @@ Safe result language:
 prepared: anchor transaction payload rebuilt for thesis_abc123.
 
 this is calldata only. it does not publish, revise, broadcast, or confirm anything by itself.
+storage: not assessed by this calldata rebuild.
 ```
 
 ## 6. Blocked identity handoff
@@ -198,3 +202,5 @@ Before reporting the result, place it on the permission ladder:
 - `published/live`: public publish path completed and receipt/readback matches the prepared thesis or revision.
 
 MCP alone never reaches the `submitted` or `published/live` rungs.
+
+Storage note: MCP alone also never proves production write durability. Use `storage not assessed` for local/dry-run preparation, `storage readiness blocked` when production readiness does not expose durable write-path evidence, and `storage verified` only after an approved readiness/readback check proves persisted thesis state.

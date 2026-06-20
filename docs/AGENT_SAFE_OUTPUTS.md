@@ -102,6 +102,19 @@ I did not broadcast, publish, or mark anything live.
 - "transaction submitted" needs a tx hash from the broadcaster.
 - "anchored" or "confirmed" needs a receipt or contract readback matching the thesis/revision.
 - "public article/blog published" is out of current MCP scope unless a separate approved public publish path returns its own URL/evidence.
+- "storage verified" needs an approved readiness endpoint, API readback, or storage-mode check proving thesis/revision state persisted in the intended production store.
+
+## Storage Readiness Language
+
+MCP preparation does not prove production storage durability. Add one concise storage line when the handoff could be interpreted as launch/readiness evidence:
+
+| Evidence | Safe wording | Do not say |
+|---|---|---|
+| Local MCP/dry-run output only | "storage: not assessed by this MCP call" | "production write path is durable" |
+| Generic `/health` without write-store/readiness detail | "storage: readiness blocked / not exposed" | "health is green, so writes are safe" |
+| Approved persistence/readback or readiness check | "storage: verified by <check>" | "verified" without naming the check |
+
+If the task is explicitly about launch readiness and storage evidence is absent, report `blocked:` with the missing readiness/readback proof. Do not upgrade a prepared draft, anchor payload, or generic health check into durable-production evidence.
 
 ## Removed-Scope Guardrail
 

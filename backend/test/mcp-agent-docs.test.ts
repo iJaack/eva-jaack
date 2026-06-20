@@ -72,4 +72,25 @@ describe("Eva MCP agent docs", () => {
 
     expect(docs).toContain("MCP alone never reaches the `submitted` or `published/live` rungs");
   });
+
+  it("keeps storage durability separate from MCP draft preparation", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("docs/MCP_AGENT_ERROR_HANDLING.md"),
+      readRepoFile("docs/MCP_AGENT_HANDOFF_TEMPLATE.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+      readRepoFile("skills/eva-thesis/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of ["storage not assessed", "storage readiness blocked", "storage verified"]) {
+      expect(docs, `agent docs should include storage state ${phrase}`).toContain(phrase);
+    }
+
+    expect(docs).toContain("MCP draft prep is not durable-production proof");
+    expect(docs).toContain("a generic `/health`");
+    expect(docs).toContain("approved readiness/readback check");
+  });
 });
