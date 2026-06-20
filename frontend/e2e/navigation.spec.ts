@@ -102,3 +102,29 @@ test("launch truth status page carries transparent campaign CTAs", async ({ page
   await expect(page.getByText("what @evapredicts will not hand-wave.")).toBeVisible();
   await expect(page.locator("blockquote").getByText(/utm_content=status_post/)).toBeVisible();
 });
+
+test("source quality sprint page carries measurable campaign CTAs", async ({ page }) => {
+  await page.goto("/campaigns/source-quality-sprint");
+
+  await expect(page.getByRole("heading", { name: "prediction feeds need source quality, not louder calls." })).toBeVisible();
+  await expect(page.getByText("source-quality framing will create higher-intent clicks than generic launch copy.")).toBeVisible();
+
+  await expect(page.getByRole("link", { name: "Inspect proof thesis" })).toHaveAttribute(
+    "href",
+    /utm_campaign=source_quality_sprint.*utm_content=read_spacex_source_record/,
+  );
+  await expect(page.getByRole("link", { name: "Inspect sources" })).toHaveAttribute(
+    "href",
+    /utm_campaign=source_quality_sprint.*utm_content=inspect_source_library/,
+  );
+  await expect(page.getByRole("link", { name: "Follow @evapredicts" })).toHaveAttribute(
+    "href",
+    /https:\/\/x\.com\/evapredicts.*utm_campaign=source_quality_sprint/,
+  );
+  await expect(page.getByRole("link", { name: "Draft sourced thesis" })).toHaveAttribute(
+    "href",
+    /utm_campaign=source_quality_sprint.*utm_content=draft_source_quality_thesis/,
+  );
+  await expect(page.getByText("make source quality the public ask.")).toBeVisible();
+  await expect(page.locator("blockquote").getByText(/utm_content=source_quality_post/)).toBeVisible();
+});
