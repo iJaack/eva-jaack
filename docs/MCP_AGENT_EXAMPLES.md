@@ -204,6 +204,29 @@ missing evidence:
 I did not prepare calldata, broadcast a transaction, publish a thesis, or change identity fields.
 ```
 
+## 7. Blocked publish or launch-readiness request
+
+Use this when the request asks the agent to publish, anchor, make a thesis live, or prove production launch readiness but the available evidence is only MCP draft prep.
+
+```text
+blocked: MCP can prepare drafts and anchor calldata, but it cannot by itself publish, broadcast, or prove production storage readiness.
+
+safe current state:
+- prepared state available: <none | draft prepared | anchor calldata prepared>
+- storage: <not assessed | readiness blocked: missing durable write-path proof>
+
+missing before stronger claim:
+- explicit approval for the signer/network and transaction payload
+- broadcaster or approved publish path
+- transaction hash
+- receipt or contract readback matching the thesis/revision
+- durable-storage readiness/readback check if launch readiness is part of the request
+
+I did not broadcast a transaction, publish a thesis, mark a revision live, or claim production storage is durable.
+```
+
+If a separate approved path exists outside MCP, report that path by name and include its receipt/readback evidence. Otherwise keep the handoff at `draft prepared` / `anchor prepared` or `blocked`.
+
 ## Quick validation checklist
 
 Before running a draft-prep tool:

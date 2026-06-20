@@ -111,6 +111,27 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("teaches agents to downgrade over-strong publish/storage claims", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Common Prompt Routing Cards",
+      "Claim Downgrade Pattern",
+      "Blocked publish or launch-readiness request",
+      "prepared for review; not published",
+      "anchor calldata prepared for approval",
+      "revision draft prepared; current public revision unchanged",
+      "missing before stronger claim",
+      "durable-storage readiness/readback check",
+    ]) {
+      expect(docs, `agent docs should include over-strong claim downgrade phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents the local MCP stdio client configuration", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_GUIDE.md"),
