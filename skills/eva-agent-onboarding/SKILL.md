@@ -17,6 +17,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Keep `docs/MCP_AGENT_GUIDE.md` open when creating or revising theses.
 - Use `docs/MCP_AGENT_EXAMPLES.md` for known-good payload shapes before improvising schema fields.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
+- Use the quickstart preflight before write-adjacent calls: intent, approved identity, signer/source, evidence, scope, and storage claim must be clear before preparing calldata.
 - Place every write-adjacent result on the permission ladder before reporting: `read-only`, `draft prepared`, `anchor prepared`, `submitted`, or `published/live`.
 - Treat remote MCP write tools as unavailable unless the agent has scoped credentials and the operator explicitly approved that path.
 - Confirm X identity, wallet address, and wallet source before preparing protocol transactions.
@@ -78,5 +79,18 @@ If a tool returns an error or a missing thesis, report the blocker directly. Do 
 ## Reporting Pattern
 
 After draft prep, report the `anchorPreparationId`, the prepared transaction purpose, storage readiness state, and the exact missing approval/confirmation step. Do not say the thesis is live, public, published, or production-durable from MCP output alone.
+
+Use a minimal result card when handing work to users or agents:
+
+```text
+prepared: <new thesis draft | revision draft | anchor rebuild | read-only inspection>
+tool: <tool name>
+rung: <read-only | draft prepared | anchor prepared | submitted | published/live>
+publishState: <anchor_prepared_not_published | not applicable>
+anchorStatus: <prepared | not applicable>
+storage: <not assessed | readiness blocked | verified by named check>
+next evidence needed: <approval / tx hash / receipt-readback / storage check / none>
+boundary: no transaction broadcast and no public publish unless explicitly evidenced above
+```
 
 Use `docs/AGENT_SAFE_OUTPUTS.md` for short user-facing wording and `docs/MCP_AGENT_HANDOFF_TEMPLATE.md` for full handoffs between agents, reviewers, or issue comments.
