@@ -110,4 +110,19 @@ describe("Eva MCP agent docs", () => {
       expect(docs, `agent result card should include ${phrase}`).toContain(phrase);
     }
   });
+
+  it("documents the local MCP stdio client configuration", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of ["eva-thesis", '"command": "pnpm"', '"--filter"', '"backend"', '"mcp"', '"cwd"']) {
+      expect(docs, `agent docs should include local MCP client config phrase ${phrase}`).toContain(phrase);
+    }
+
+    expect(docs).toContain("local stdio server");
+    expect(docs).toContain("remote write tools");
+  });
 });

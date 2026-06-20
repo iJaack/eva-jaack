@@ -14,12 +14,14 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 ## Requirements
 
 - Use the local MCP server first: `pnpm --filter backend mcp`.
+- When a client needs a server config, use a local `eva-thesis` stdio entry with `command: "pnpm"`, `args: ["--filter", "backend", "mcp"]`, and `cwd` set to the repo root.
 - Keep `docs/MCP_AGENT_GUIDE.md` open when creating or revising theses.
 - Use `docs/MCP_AGENT_EXAMPLES.md` for known-good payload shapes before improvising schema fields.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
 - Use the quickstart preflight before write-adjacent calls: intent, approved identity, signer/source, evidence, scope, and storage claim must be clear before preparing calldata.
 - Place every write-adjacent result on the permission ladder before reporting: `read-only`, `draft prepared`, `anchor prepared`, `submitted`, or `published/live`.
 - Treat remote MCP write tools as unavailable unless the agent has scoped credentials and the operator explicitly approved that path.
+- If the local stdio server cannot start, report that setup blocker instead of scraping the UI, using unauthenticated HTTP, or switching to remote write tools.
 - Confirm X identity, wallet address, and wallet source before preparing protocol transactions.
 - Use `0x0fe61780bd5508b3C99e420662050e5560608cA4` only when the operator explicitly approved that signer for the task.
 - If no reliable market or fact signals are ready, pass empty signal arrays and say the draft is intentionally signal-light. Do not invent sources, URLs, scores, or weights.
