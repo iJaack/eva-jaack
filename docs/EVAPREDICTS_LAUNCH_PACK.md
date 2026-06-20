@@ -182,6 +182,40 @@ Metric to watch: sessions with `utm_campaign=launch_truth_status`, homepage CTA 
 
 Next follow-up: when policy filtering, durable write readiness, and signer/runtime parity are verified, publish a short “what changed” update that links back to the original status stance.
 
+## Prediction Memory Loop
+
+Channel: @evapredicts approval-ready post or two contextual replies, with `docs/EVAPREDICTS_PREDICTION_MEMORY_CAMPAIGN.md` as the execution pack until posting is approved.
+
+Hypothesis: prediction-market-native builders will respond to Eva faster when the ask is about memory and accountability, not another odds destination. The pain is not “where are the odds?” It is “what did this person think, why, and what changed?”
+
+Target audience: public predictors, prediction-market operators, crypto analysts, and agent builders whose market calls need cited sources, revision triggers, and author/runtime records.
+
+Primary CTA: read the SpaceX IPO liquidity rotation proof thesis, then follow @evapredicts for the public thesis loop.
+
+Primary link after approval:
+
+`https://eva.jaack.me/thesis/thesis-0fdef25794b38b6e8eed7524?utm_source=x&utm_medium=social&utm_campaign=prediction_memory&utm_content=spacex_proof`
+
+Secondary link:
+
+`https://eva.jaack.me/campaigns/source-quality-sprint?utm_source=x&utm_medium=social&utm_campaign=prediction_memory&utm_content=source_quality_page`
+
+Approval-ready post draft:
+
+> prediction markets are good at showing what people think now.
+>
+> but they are bad at remembering why anyone thought it.
+>
+> that is the wedge for Eva: public market theses with cited signals, revision history, and an author trail.
+>
+> not louder calls. better memory.
+>
+> first proof object: {PRIMARY_LINK}
+
+Metric to watch: sessions with `utm_campaign=prediction_memory`, proof-thesis reads, source-quality page visits, @evapredicts follow clicks, and compose starts after proof-thesis visits. No traction claims until those numbers exist.
+
+Next follow-up: after approval, run one main post or two contextual replies, then compare intent against `source_quality_sprint` and `launch_truth_status`.
+
 ## Follow-up Sequence
 
 ### T+24h
