@@ -159,6 +159,12 @@ const activeCampaigns = [
     href: "/campaigns/launch-truth-status?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=launch_truth_status&utm_content=launch_truth_card",
     metric: "status-page visits, follow clicks, and proof-thesis reads",
   },
+  {
+    title: "source quality sprint",
+    body: "A tighter campaign for prediction-market builders: the useful object is the thesis, the cited signals, the revision trigger, and the author record.",
+    href: "/campaigns/source-quality-sprint?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=source_quality_sprint&utm_content=source_quality_card",
+    metric: "proof-thesis reads, source-library clicks, compose starts, and follows",
+  },
 ] as const;
 
 function CampaignCallout() {

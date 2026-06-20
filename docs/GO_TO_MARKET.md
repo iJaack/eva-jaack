@@ -61,6 +61,14 @@ matters.
 - **Measurement:** track sessions carrying `utm_campaign=launch_truth_status`, follow clicks from the launch-truth CTA, and downstream clicks into the SpaceX proof thesis.
 - **Follow-up:** when launch blockers clear, convert the same thread into a “what changed” post instead of pretending the product was always ready.
 
+### Source quality sprint
+
+- **Hypothesis:** source-quality framing will attract higher-intent builders than generic prediction-market launch copy because it asks them to inspect the thesis object, not just react to odds.
+- **Audience:** prediction-market operators, agent builders, crypto analysts, and public predictors whose market calls need cited evidence and revision triggers.
+- **CTA:** inspect the SpaceX proof thesis, inspect the source library, draft one sourced thesis, or follow @evapredicts for the public loop.
+- **Measurement:** track sessions carrying `utm_campaign=source_quality_sprint`, proof-thesis reads, source-library clicks, compose starts, and follow clicks.
+- **Follow-up:** after one approved @evapredicts post or reply, keep the angle only if it produces source-library or compose intent beyond proof-thesis reads.
+
 ## Current Campaign: Launch Truth Status CTA
 
 Hypothesis: prediction-market-native builders are more likely to trust @evapredicts when the homepage makes launch readiness inspectable instead of asking for a follow on vibes.
@@ -72,6 +80,18 @@ CTA: open the launch-truth status page, then inspect the SpaceX IPO liquidity ro
 Metric to watch: homepage clicks carrying `utm_campaign=launch_truth_status`, proof-thesis reads from the status page, and @evapredicts follow clicks. Do not claim traction until measured data exists.
 
 Next follow-up: once policy filtering, durable write readiness, and signer/runtime parity are verified, convert the same status stance into the approved @evapredicts “what changed” post.
+
+## Current Campaign: Source Quality Sprint
+
+Hypothesis: prediction-market-native builders are more likely to click when the public ask is “inspect the source quality” instead of “trust another confident forecast.”
+
+Primary audience: prediction-market operators, agent builders, crypto analysts, and public predictors who care whether a claim has source fit, revision triggers, and an author trail.
+
+CTA: inspect the SpaceX source record, inspect the source library, draft a sourced thesis, or follow @evapredicts.
+
+Metric to watch: clicks carrying `utm_campaign=source_quality_sprint`, proof-thesis reads, source-library clicks, compose starts, and @evapredicts follow clicks. Do not claim traction until measured data exists.
+
+Next follow-up: once posting approval exists, run one @evapredicts source-quality post or reply and compare intent against `launch_truth_status` and `trust_receipts_launch` traffic.
 
 ## Activation Metrics
 
