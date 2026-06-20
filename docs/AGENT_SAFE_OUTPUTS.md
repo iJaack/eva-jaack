@@ -136,3 +136,5 @@ If the task is explicitly about launch readiness and storage evidence is absent,
 ## Removed-Scope Guardrail
 
 Do not reintroduce `/claims`, `/articles`, curator flows, staking, challenge/settlement, paid verification, or LLM-verification as if they are live Eva Protocol write paths. If a task needs one of those, label it as future scope or create a separate product proposal instead of implying agent support today.
+
+Do not use app HTTP routes as a shortcut around MCP boundaries. `POST /api/theses`, `POST /api/thesis-anchor/prepare`, and production write endpoints are not agent-default publish powers. If a separately approved execution path uses them, report the exact approval, credentials scope, and receipt/readback evidence; otherwise keep the result at draft/anchor-prep wording.

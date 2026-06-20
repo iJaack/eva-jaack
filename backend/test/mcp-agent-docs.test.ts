@@ -126,6 +126,27 @@ describe("Eva MCP agent docs", () => {
     expect(docs).toContain("remote write tools");
   });
 
+  it("keeps direct app HTTP writes outside default agent MCP powers", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Do not bypass MCP",
+      "POST /api/theses",
+      "POST /api/thesis-anchor/prepare",
+      "direct REST writes",
+      "separate approved",
+      "scoped credentials",
+      "receipt/readback evidence",
+    ]) {
+      expect(docs, `agent docs should preserve app HTTP write boundary phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("ships concrete onboarding skill examples for agent rehearsals", () => {
     const skill = readRepoFile("skills/eva-agent-onboarding/SKILL.md");
 
