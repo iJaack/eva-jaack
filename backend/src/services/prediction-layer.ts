@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { get as getBlob, put as putBlob } from "@vercel/blob";
+import { get as getBlob, list as listBlob, put as putBlob } from "@vercel/blob";
 import { config } from "../config.js";
 import type {
   ClaimVerdict,
@@ -145,6 +145,18 @@ export interface PredictionStorageReadiness {
   storageDirConfigured: boolean;
   blobTokenConfigured: boolean;
 }
+
+export interface PredictionStorageProbe {
+  checked: boolean;
+  ok: boolean;
+  kind: "not_ready" | "vercel_blob_list" | "local_filesystem_config";
+  checkedAt: string;
+  reason: string;
+}
+
+export type PredictionStorageReadinessWithProbe = PredictionStorageReadiness & {
+  probe: PredictionStorageProbe;
+};
 
 function isServerlessEnv(env: Record<string, string | undefined>): boolean {
   return Boolean(env.VERCEL || env.AWS_LAMBDA_FUNCTION_NAME || env.NETLIFY);
@@ -1028,6 +1040,68 @@ export class LocalPredictionLayerService {
     return {
       ...this.storage,
       writePath: this.indexPath,
+    };
+  }
+
+  async getStorageReadinessWithProbe(): Promise<PredictionStorageReadinessWithProbe> {
+    const storage = this.getStorageReadiness();
+    const checkedAt = new Date().toISOString();
+
+    if (!storage.ready || !storage.durable) {
+      return {
+        ...storage,
+        ready: false,
+        probe: {
+          checked: true,
+          ok: false,
+          kind: "not_ready",
+          checkedAt,
+          reason: storage.reason,
+        },
+      };
+    }
+
+    if (storage.mode === "vercel_blob") {
+      try {
+        await listBlob({
+          limit: 1,
+          prefix: storage.writePath.split("/").slice(0, -1).join("/"),
+          token: config.blobReadWriteToken,
+        });
+        return {
+          ...storage,
+          probe: {
+            checked: true,
+            ok: true,
+            kind: "vercel_blob_list",
+            checkedAt,
+            reason: "Vercel Blob accepted an authenticated read-write token check for the thesis storage prefix.",
+          },
+        };
+      } catch (error) {
+        return {
+          ...storage,
+          ready: false,
+          probe: {
+            checked: true,
+            ok: false,
+            kind: "vercel_blob_list",
+            checkedAt,
+            reason: error instanceof Error ? error.message : String(error),
+          },
+        };
+      }
+    }
+
+    return {
+      ...storage,
+      probe: {
+        checked: true,
+        ok: true,
+        kind: "local_filesystem_config",
+        checkedAt,
+        reason: storage.reason,
+      },
     };
   }
 

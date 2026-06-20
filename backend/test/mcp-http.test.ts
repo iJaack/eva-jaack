@@ -26,6 +26,24 @@ describe("MCP HTTP endpoint", () => {
     });
   });
 
+  it("runs a non-mutating storage readiness probe", async () => {
+    const app = createApp();
+
+    const response = await fetchJson(app, "/api/storage-readiness?probe=1");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      ready: true,
+      durable: true,
+      mode: "local_filesystem",
+      probe: {
+        checked: true,
+        ok: true,
+        kind: "local_filesystem_config",
+      },
+    });
+  });
+
   it("serves discovery metadata for plain GET health checks", async () => {
     const app = createApp();
 

@@ -60,7 +60,12 @@ export function createApp() {
     return c.json({ status: 'ok', service: protocol.app.name, agentId: config.evaAgentId, version: '0.2.0', storage });
   });
 
-  app.get('/api/storage-readiness', (c) => c.json(getPredictionLayerService().getStorageReadiness()));
+  app.get('/api/storage-readiness', async (c) => {
+    const service = getPredictionLayerService();
+    const probe = c.req.query('probe');
+    if (probe === '1' || probe === 'true') return c.json(await service.getStorageReadinessWithProbe());
+    return c.json(service.getStorageReadiness());
+  });
 
   app.get('/.well-known/agent.json', (c) => c.json(agentManifest()));
 

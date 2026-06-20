@@ -43,6 +43,18 @@ const checks = [
       }
     },
   },
+  {
+    name: "storage readiness probe",
+    method: "GET",
+    path: "/api/storage-readiness?probe=1",
+    validate: async (response) => {
+      if (!requireDurableStorage) return;
+      const body = await response.json();
+      if (body?.ready !== true || body?.durable !== true || body?.probe?.ok !== true) {
+        throw new Error(`storage probe failed: ${body?.probe?.reason ?? body?.reason ?? "missing readiness probe"}`);
+      }
+    },
+  },
   { name: "agent manifest", method: "GET", path: protocol.app.agentManifestPath },
   { name: "mcp discovery", method: "GET", path: `${protocol.app.apiBasePath}/mcp` },
   {
