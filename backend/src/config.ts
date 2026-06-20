@@ -15,4 +15,6 @@ export const config = {
   evaSovereignWallet: env('EVA_SOVEREIGN_WALLET', protocol.agents.eva.wallet) as `0x${string}`,
 
   storageDir: env('EVA_STORAGE_DIR'),
+  predictionBlobPath: env('EVA_PREDICTION_BLOB_PATH', 'eva-predictions/index.json'),
+  blobReadWriteToken: env('BLOB_READ_WRITE_TOKEN'),
 } as const;

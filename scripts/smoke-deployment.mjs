@@ -12,6 +12,7 @@ const vercelBypassSecret = (
   ""
 ).trim();
 const allowProtectedSkip = process.env.SMOKE_ALLOW_PROTECTED_SKIP === "true";
+const requireDurableStorage = process.env.SMOKE_REQUIRE_DURABLE_STORAGE !== "false";
 
 if (!baseUrl) {
   console.error("Missing SMOKE_BASE_URL or CLI base URL argument.");
@@ -30,7 +31,30 @@ const checks = [
   { name: "market detail API", method: "GET", path: `${protocol.app.apiBasePath}/markets/${marketId}` },
   { name: "predictors API", method: "GET", path: `${protocol.app.apiBasePath}/predictors` },
   { name: "predictor detail API", method: "GET", path: `${protocol.app.apiBasePath}/predictors/${predictorId}` },
-  { name: "health", method: "GET", path: protocol.app.healthPath },
+  {
+    name: "health",
+    method: "GET",
+    path: protocol.app.healthPath,
+    validate: async (response) => {
+      if (!requireDurableStorage) return;
+      const body = await response.json();
+      if (body?.storage?.ready !== true || body?.storage?.durable !== true) {
+        throw new Error(`storage not durable: ${body?.storage?.reason ?? "missing storage readiness"}`);
+      }
+    },
+  },
+  {
+    name: "storage readiness probe",
+    method: "GET",
+    path: "/api/storage-readiness?probe=1",
+    validate: async (response) => {
+      if (!requireDurableStorage) return;
+      const body = await response.json();
+      if (body?.ready !== true || body?.durable !== true || body?.probe?.ok !== true) {
+        throw new Error(`storage probe failed: ${body?.probe?.reason ?? body?.reason ?? "missing readiness probe"}`);
+      }
+    },
+  },
   { name: "agent manifest", method: "GET", path: protocol.app.agentManifestPath },
   { name: "mcp discovery", method: "GET", path: `${protocol.app.apiBasePath}/mcp` },
   {
@@ -133,6 +157,17 @@ for (const check of checks) {
     });
     console.error(`FAIL ${check.name}: ${response.status} ${url} (${elapsedMs}ms)`);
     continue;
+  }
+
+  if (check.validate) {
+    try {
+      await check.validate(response);
+    } catch (error) {
+      failures += 1;
+      failedChecks.push({ name: check.name, protectedByVercel: false });
+      console.error(`FAIL ${check.name}: ${error instanceof Error ? error.message : String(error)} for ${url} (${elapsedMs}ms)`);
+      continue;
+    }
   }
 
   if (check.maxMs && elapsedMs > check.maxMs) {

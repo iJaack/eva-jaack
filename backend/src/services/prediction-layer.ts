@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { get as getBlob, list as listBlob, put as putBlob } from "@vercel/blob";
 import { config } from "../config.js";
 import type {
   ClaimVerdict,
@@ -131,6 +132,97 @@ const localPredictionIndexPath = resolve(
   dirname(fileURLToPath(import.meta.url)),
   "../../../.data/eva-predictions/index.json",
 );
+
+type PredictionStorageMode = "local_filesystem" | "serverless_tmp" | "vercel_blob";
+
+export interface PredictionStorageReadiness {
+  mode: PredictionStorageMode;
+  ready: boolean;
+  durable: boolean;
+  writePath: string;
+  reason: string;
+  serverless: boolean;
+  storageDirConfigured: boolean;
+  blobTokenConfigured: boolean;
+}
+
+export interface PredictionStorageProbe {
+  checked: boolean;
+  ok: boolean;
+  kind: "not_ready" | "vercel_blob_list" | "local_filesystem_config";
+  checkedAt: string;
+  reason: string;
+}
+
+export type PredictionStorageReadinessWithProbe = PredictionStorageReadiness & {
+  probe: PredictionStorageProbe;
+};
+
+function isServerlessEnv(env: Record<string, string | undefined>): boolean {
+  return Boolean(env.VERCEL || env.AWS_LAMBDA_FUNCTION_NAME || env.NETLIFY);
+}
+
+export function resolvePredictionStorageReadiness(
+  storageDir = config.storageDir,
+  env: Record<string, string | undefined> = process.env,
+): PredictionStorageReadiness {
+  const serverless = isServerlessEnv(env);
+  const blobTokenConfigured = Boolean(env.BLOB_READ_WRITE_TOKEN);
+  const storageDirConfigured = Boolean(storageDir);
+
+  if (blobTokenConfigured) {
+    return {
+      mode: "vercel_blob",
+      ready: true,
+      durable: true,
+      writePath: env.EVA_PREDICTION_BLOB_PATH ?? config.predictionBlobPath,
+      reason: "Vercel Blob token configured; thesis writes use durable object storage.",
+      serverless,
+      storageDirConfigured,
+      blobTokenConfigured,
+    };
+  }
+
+  if (storageDirConfigured) {
+    const durable = !serverless;
+    return {
+      mode: durable ? "local_filesystem" : "serverless_tmp",
+      ready: durable,
+      durable,
+      writePath: resolve(storageDir, "predictions.json"),
+      reason: durable
+        ? "EVA_STORAGE_DIR is configured on a non-serverless host."
+        : "EVA_STORAGE_DIR is configured, but the host is serverless so filesystem writes are not durable.",
+      serverless,
+      storageDirConfigured,
+      blobTokenConfigured,
+    };
+  }
+
+  if (serverless) {
+    return {
+      mode: "serverless_tmp",
+      ready: false,
+      durable: false,
+      writePath: resolve(tmpdir(), "eva-predictions/index.json"),
+      reason: "No durable storage backend configured; serverless writes fall back to tmpdir().",
+      serverless,
+      storageDirConfigured,
+      blobTokenConfigured,
+    };
+  }
+
+  return {
+    mode: "local_filesystem",
+    ready: true,
+    durable: true,
+    writePath: localPredictionIndexPath,
+    reason: "Local filesystem storage is durable for the current non-serverless host.",
+    serverless,
+    storageDirConfigured,
+    blobTokenConfigured,
+  };
+}
 
 export function resolvePredictionIndexPath(
   storageDir = config.storageDir,
@@ -935,12 +1027,83 @@ function avgOddsEdgeFor(theses: ThesisDto[]): number | null {
 
 export class LocalPredictionLayerService {
   private liveMarketCache: { loadedAt: number; markets: PredictionMarketDto[] } | null = null;
+  private readonly storage = resolvePredictionStorageReadiness();
 
   constructor(
     private readonly indexPath = resolvePredictionIndexPath(),
     private readonly registeredIdentityLoader: () => Promise<PredictorIdentityDto[]> = async () => [],
     private readonly liveMarketLoader: LiveMarketLoader = loadProviderMarkets,
   ) {}
+
+  getStorageReadiness(): PredictionStorageReadiness {
+    if (this.storage.mode === "vercel_blob") return this.storage;
+    return {
+      ...this.storage,
+      writePath: this.indexPath,
+    };
+  }
+
+  async getStorageReadinessWithProbe(): Promise<PredictionStorageReadinessWithProbe> {
+    const storage = this.getStorageReadiness();
+    const checkedAt = new Date().toISOString();
+
+    if (!storage.ready || !storage.durable) {
+      return {
+        ...storage,
+        ready: false,
+        probe: {
+          checked: true,
+          ok: false,
+          kind: "not_ready",
+          checkedAt,
+          reason: storage.reason,
+        },
+      };
+    }
+
+    if (storage.mode === "vercel_blob") {
+      try {
+        await listBlob({
+          limit: 1,
+          prefix: storage.writePath.split("/").slice(0, -1).join("/"),
+          token: config.blobReadWriteToken,
+        });
+        return {
+          ...storage,
+          probe: {
+            checked: true,
+            ok: true,
+            kind: "vercel_blob_list",
+            checkedAt,
+            reason: "Vercel Blob accepted an authenticated read-write token check for the thesis storage prefix.",
+          },
+        };
+      } catch (error) {
+        return {
+          ...storage,
+          ready: false,
+          probe: {
+            checked: true,
+            ok: false,
+            kind: "vercel_blob_list",
+            checkedAt,
+            reason: error instanceof Error ? error.message : String(error),
+          },
+        };
+      }
+    }
+
+    return {
+      ...storage,
+      probe: {
+        checked: true,
+        ok: true,
+        kind: "local_filesystem_config",
+        checkedAt,
+        reason: storage.reason,
+      },
+    };
+  }
 
   async getSummary(): Promise<PredictionNetworkSummaryResponse> {
     const [store, predictors] = await Promise.all([this.readStore(), this.listPredictors()]);
@@ -1358,7 +1521,8 @@ export class LocalPredictionLayerService {
 
   private async readStore(): Promise<PredictionStore> {
     try {
-      const raw = await readFile(this.indexPath, "utf8");
+      const raw = await this.readStoreRaw();
+      if (!raw) return mergeProviderMarkets(seedStore(), await this.loadLiveMarkets());
       const parsed = JSON.parse(raw) as Partial<PredictionStore>;
       const store = {
         markets: Array.isArray(parsed.markets) ? applyV1MarketPolicy(mergeSeedMarkets(parsed.markets)) : seedStore().markets,
@@ -1369,6 +1533,16 @@ export class LocalPredictionLayerService {
     } catch {
       return mergeProviderMarkets(seedStore(), await this.loadLiveMarkets());
     }
+  }
+
+  private async readStoreRaw(): Promise<string | null> {
+    const storage = this.getStorageReadiness();
+    if (storage.mode === "vercel_blob") {
+      const blob = await getBlob(storage.writePath, { access: "private", token: config.blobReadWriteToken, useCache: false });
+      if (!blob || blob.statusCode === 304 || !blob.stream) return null;
+      return new Response(blob.stream).text();
+    }
+    return readFile(this.indexPath, "utf8");
   }
 
   private async loadLiveMarkets(): Promise<PredictionMarketDto[]> {
@@ -1385,6 +1559,16 @@ export class LocalPredictionLayerService {
   }
 
   private async writeStore(store: PredictionStore): Promise<void> {
+    const storage = this.getStorageReadiness();
+    if (storage.mode === "vercel_blob") {
+      await putBlob(storage.writePath, JSON.stringify(store, null, 2), {
+        access: "private",
+        allowOverwrite: true,
+        contentType: "application/json",
+        token: config.blobReadWriteToken,
+      });
+      return;
+    }
     await mkdir(dirname(this.indexPath), { recursive: true });
     await writeFile(this.indexPath, JSON.stringify(store, null, 2), "utf8");
   }
