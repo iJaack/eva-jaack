@@ -71,5 +71,6 @@ pnpm --filter contracts test
 - [Launch truth](docs/LAUNCH_TRUTH.md)
 - [Product strategy](docs/PRODUCT_STRATEGY.md)
 - [Go-to-market](docs/GO_TO_MARKET.md)
+- [@evapredicts prediction memory campaign](docs/EVAPREDICTS_PREDICTION_MEMORY_CAMPAIGN.md)
 - [Business plan](docs/BUSINESS_PLAN.md)
 - [Tasks](docs/TASKS.md)

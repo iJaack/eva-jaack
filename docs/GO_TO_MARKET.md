@@ -69,6 +69,15 @@ matters.
 - **Measurement:** track sessions carrying `utm_campaign=source_quality_sprint`, proof-thesis reads, source-library clicks, compose starts, and follow clicks.
 - **Follow-up:** after one approved @evapredicts post or reply, keep the angle only if it produces source-library or compose intent beyond proof-thesis reads.
 
+### Prediction memory
+
+- **Hypothesis:** prediction-market-native builders will respond to Eva faster when the public ask is about memory and accountability, not another odds destination.
+- **Audience:** public predictors, prediction-market operators, crypto analysts, and agent builders whose calls need cited sources, revision triggers, and author/runtime records.
+- **CTA:** read the SpaceX IPO liquidity rotation proof thesis, then follow @evapredicts for the public thesis loop.
+- **Measurement:** track sessions carrying `utm_campaign=prediction_memory`, proof-thesis reads, source-quality page visits, @evapredicts follow clicks, and compose starts after proof-thesis visits.
+- **Follow-up:** after explicit @evapredicts posting approval, run one main post or two contextual replies and compare intent against `source_quality_sprint` and `launch_truth_status`.
+- **Execution pack:** `docs/EVAPREDICTS_PREDICTION_MEMORY_CAMPAIGN.md`
+
 ## Current Campaign: Launch Truth Status CTA
 
 Hypothesis: prediction-market-native builders are more likely to trust @evapredicts when the homepage makes launch readiness inspectable instead of asking for a follow on vibes.
@@ -92,6 +101,18 @@ CTA: inspect the SpaceX source record, inspect the source library, draft a sourc
 Metric to watch: clicks carrying `utm_campaign=source_quality_sprint`, proof-thesis reads, source-library clicks, compose starts, and @evapredicts follow clicks. Do not claim traction until measured data exists.
 
 Next follow-up: once posting approval exists, run one @evapredicts source-quality post or reply and compare intent against `launch_truth_status` and `trust_receipts_launch` traffic.
+
+## Current Campaign: Prediction Memory
+
+Hypothesis: prediction-market-native builders are more likely to engage when Eva is framed as the memory layer for public predictions: claim, cited signals, revision trigger, and author trail.
+
+Primary audience: public predictors, prediction-market operators, crypto analysts, and agent builders who need forecast records that survive the feed.
+
+CTA: read the SpaceX IPO liquidity rotation proof thesis, then follow @evapredicts for the public thesis loop.
+
+Metric to watch: clicks carrying `utm_campaign=prediction_memory`, proof-thesis reads, source-quality page visits, compose starts after proof-thesis visits, and follow clicks. Do not claim traction until measured data exists.
+
+Next follow-up: after explicit @evapredicts approval, run one post or two contextual replies from `docs/EVAPREDICTS_PREDICTION_MEMORY_CAMPAIGN.md`, then compare intent against `source_quality_sprint` and `launch_truth_status`.
 
 ## Activation Metrics
 
