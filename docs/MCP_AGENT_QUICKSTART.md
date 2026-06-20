@@ -8,6 +8,21 @@ This quickstart is expected to match the live MCP server allowlist and Zod schem
 
 Eva MCP is draft-and-anchor-prep only.
 
+## No-Guesswork Preflight
+
+Before any write-adjacent MCP call, fill this out mentally or in the handoff. If any row is unclear, stop before preparing calldata.
+
+| Check | Required answer before continuing | If missing |
+|---|---|---|
+| Intent | `read-only`, `new draft`, `revision`, or `anchor rebuild` | Ask for the exact operation. |
+| Identity | operator-approved `xHandle` and `walletAddress` | Block; do not substitute Eva's wallet or a remembered address. |
+| Signer/source | `walletSource` when the live tool accepts it | Use `external` only when that is the approved signer source. |
+| Evidence | real market/source URLs, or an explicit signal-light choice | Use empty arrays and say signal-light; do not invent evidence. |
+| Scope | no request for publish, broadcast, claims, articles/blog, staking, custody, settlement, or LLM verification | Stop unless a separate approved path and evidence exist. |
+| Storage claim | `storage not assessed`, `storage readiness blocked`, or `storage verified by <check>` | Default to `storage not assessed` for local MCP prep. |
+
+This preflight is part of the safety boundary. It is better to return `blocked:` with one missing field than to prepare the wrong identity, imply publication, or turn a storage unknown into launch readiness.
+
 Use this permission ladder before and after every write-adjacent call:
 
 | Rung | Evidence required | Safe language |
@@ -103,6 +118,18 @@ Expected result markers:
 - `anchorPreparationId`
 - `transactions`
 - `nextStep` requiring user approval before publish/broadcast
+
+Copy this result card into user or agent handoffs so the next step is obvious:
+
+```text
+prepared: <new thesis draft | revision draft | anchor rebuild>
+tool: <create_thesis_draft | prepare_revision_draft | prepare_anchor_transaction>
+rung: draft prepared / anchor prepared only
+publishState: anchor_prepared_not_published
+anchorStatus: prepared
+storage: <not assessed | readiness blocked | verified by named check>
+next evidence needed: explicit approval, transaction hash, and receipt/readback before any live/published claim
+```
 
 Safe user wording:
 

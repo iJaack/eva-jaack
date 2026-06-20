@@ -93,4 +93,21 @@ describe("Eva MCP agent docs", () => {
     expect(docs).toContain("a generic `/health`");
     expect(docs).toContain("approved readiness/readback check");
   });
+
+  it("documents a preflight and result card for write-adjacent handoffs", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of ["intent", "approved identity", "signer/source", "evidence", "scope", "storage claim"]) {
+      expect(docs, `agent preflight should include ${phrase}`).toContain(phrase);
+    }
+
+    for (const phrase of ["prepared:", "tool:", "rung:", "publishState:", "anchorStatus:", "storage:", "next evidence needed:"]) {
+      expect(docs, `agent result card should include ${phrase}`).toContain(phrase);
+    }
+  });
 });

@@ -11,6 +11,30 @@ Use alongside:
 - `docs/AGENT_SAFE_OUTPUTS.md` for user-facing wording
 - `docs/MCP_AGENT_HANDOFF_TEMPLATE.md` for handoffs after preparation
 
+## 0. Pick the smallest safe tool first
+
+| Intent | First tool | Continue only if |
+|---|---|---|
+| Find evidence candidates | `search_markets` | The user asked for research or signal discovery. |
+| Revise a thesis | `get_thesis` | The thesis id, author wallet, and X handle match the approved identity. |
+| Prepare a new thesis | `create_thesis_draft` | The operator-approved identity is present and signals are real or intentionally empty. |
+| Rebuild calldata | `prepare_anchor_transaction` | The thesis already exists and no text change is requested. |
+| Publish/broadcast/article/claim/stake/settle/verify | none via MCP | A separate approved path and evidence exist. |
+
+If the task asks for more than the selected tool can safely prove, report the missing evidence instead of upgrading the claim.
+
+Result-card pattern for every write-adjacent example below:
+
+```text
+prepared: <new thesis draft | revision draft | anchor rebuild>
+tool: <tool name>
+rung: draft prepared / anchor prepared only
+publishState: anchor_prepared_not_published
+anchorStatus: prepared
+storage: not assessed unless a named readiness/readback check was run
+next evidence needed: explicit approval, transaction hash, and receipt/readback before live/published wording
+```
+
 ## 1. Read-only market search
 
 Tool: `search_markets`

@@ -8,6 +8,23 @@ A prepared draft, revision, or anchor transaction is not a public publish event.
 
 Agents may describe prepared content and transaction calldata. Agents must not claim a thesis is live, anchored, revised, or publicly published until there is explicit user approval plus a submitted transaction hash and confirmed receipt or contract readback.
 
+## Minimal Result Card
+
+Use this compact card whenever another agent, reviewer, or user might otherwise confuse preparation with publication:
+
+```text
+prepared: <new thesis draft | revision draft | anchor rebuild | read-only inspection>
+tool: <tool name>
+rung: <read-only | draft prepared | anchor prepared | submitted | published/live>
+publishState: <anchor_prepared_not_published | not applicable>
+anchorStatus: <prepared | not applicable>
+storage: <not assessed | readiness blocked | verified by named check>
+next evidence needed: <approval / tx hash / receipt-readback / storage check / none>
+boundary: no transaction broadcast and no public publish unless explicitly evidenced above
+```
+
+Keep `published/live` out of this card unless the public publish path completed and a receipt or contract readback matches the thesis/revision. If storage is not directly proven by a named readiness or readback check, use `storage: not assessed` or `storage: readiness blocked`.
+
 ## Permission Ladder
 
 Use the lowest rung supported by direct evidence:
