@@ -29,8 +29,9 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
 const evaPredictsUrl = "https://x.com/evapredicts";
 const launchThesisId = "thesis-0fdef25794b38b6e8eed7524";
 const homepageProofCampaign = "homepage_spacex_proof";
+const launchTruthCampaign = "launch_truth_status";
 const launchThesisHref = `/thesis/${launchThesisId}?utm_source=homepage&utm_medium=proof_cta&utm_campaign=${homepageProofCampaign}&utm_content=launch_thesis`;
-const campaignPageHref = `/campaigns/trust-receipts?utm_source=homepage&utm_medium=proof_cta&utm_campaign=${homepageProofCampaign}&utm_content=campaign_page`;
+const launchTruthHref = `/campaigns/launch-truth-status?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${launchTruthCampaign}&utm_content=launch_truth_status`;
 
 function formatUsd(value: number | null): string {
   if (value === null) return "—";
@@ -122,9 +123,9 @@ const participationQuests = [
 ] as const;
 
 const campaignProofPoints = [
-  "watch one public thesis move over time",
-  "inspect every market and fact signal attached to it",
-  "copy the format when you have a broader market call",
+  "see what is live before the launch push widens",
+  "inspect the SpaceX proof thesis without fake traction claims",
+  "track the exact gates @evapredicts will not hand-wave",
 ] as const;
 
 const activeCampaigns = [
@@ -165,10 +166,10 @@ function CampaignCallout() {
     <section className="prediction-section campaign-callout" aria-label="Current Eva Protocol campaign">
       <div className="campaign-callout-copy">
         <p className="section-kicker">@evapredicts campaign</p>
-        <h2 className="section-title section-title-sm">follow the thesis, not just the odds.</h2>
+        <h2 className="section-title section-title-sm">trust starts with the launch truth.</h2>
         <p>
-          The launch wedge is simple: pull public predictors from one-off market takes into a thesis page with
-          cited signals, revision history, and a shareable record they can point back to later.
+          The current growth wedge is not a hype post. It is a transparent status loop: what is live, what stays gated,
+          and why @evapredicts will only widen the public thesis campaign once the receipts are clean.
         </p>
       </div>
       <div className="campaign-proof-grid" aria-label="Campaign proof points">
@@ -180,18 +181,18 @@ function CampaignCallout() {
         ))}
       </div>
       <div className="campaign-action-row">
-        <Link href={launchThesisHref} className="mobile-action mobile-action-primary">
-          Read the proof record
+        <Link href={launchTruthHref} className="mobile-action mobile-action-primary">
+          Open launch status
         </Link>
-        <Link href={campaignPageHref} className="mobile-action">
-          Open campaign page
+        <Link href={launchThesisHref} className="mobile-action">
+          Read the proof record
         </Link>
         <Link href={evaPredictsUrl} className="mobile-action" target="_blank" rel="noreferrer">
           Follow @evapredicts
         </Link>
       </div>
       <p className="inline-note">
-        Metric to watch: utm_campaign=homepage_spacex_proof clicks into the SpaceX thesis and campaign page before any broader launch push.
+        Metric to watch: utm_campaign=launch_truth_status clicks into the status page, then proof-thesis reads and follow clicks before any broader launch push.
       </p>
     </section>
   );
@@ -368,11 +369,11 @@ export default function HomePage() {
             anchor the first version, and keep every update readable over time.
           </p>
           <div className="mobile-hero-actions">
-            <Link href={launchThesisHref} className="mobile-action mobile-action-primary">
-              Read launch thesis
+            <Link href={launchTruthHref} className="mobile-action mobile-action-primary">
+              Open launch status
             </Link>
-            <Link href={campaignPageHref} className="mobile-action">
-              Open campaign page
+            <Link href={launchThesisHref} className="mobile-action">
+              Read proof thesis
             </Link>
             <Link href={evaPredictsUrl} className="mobile-action" target="_blank" rel="noreferrer">
               Follow @evapredicts

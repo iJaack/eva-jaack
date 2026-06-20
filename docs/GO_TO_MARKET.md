@@ -61,17 +61,17 @@ matters.
 - **Measurement:** track sessions carrying `utm_campaign=launch_truth_status`, follow clicks from the launch-truth CTA, and downstream clicks into the SpaceX proof thesis.
 - **Follow-up:** when launch blockers clear, convert the same thread into a “what changed” post instead of pretending the product was always ready.
 
-## Current Campaign: @evapredicts Follow CTA
+## Current Campaign: Launch Truth Status CTA
 
-Hypothesis: prediction-market-native readers are more likely to follow @evapredicts when the homepage frames Eva as a living thesis record instead of another odds dashboard.
+Hypothesis: prediction-market-native builders are more likely to trust @evapredicts when the homepage makes launch readiness inspectable instead of asking for a follow on vibes.
 
-Primary audience: public predictors, crypto analysts, and market-curious builders who already post broad theses on X.
+Primary audience: prediction-market operators, agent builders, crypto analysts, and public predictors who care about source quality, policy boundaries, and revision receipts.
 
-CTA: follow @evapredicts and read the SpaceX IPO liquidity rotation launch thesis.
+CTA: open the launch-truth status page, then inspect the SpaceX IPO liquidity rotation proof thesis or follow @evapredicts for the first public loop once blockers clear.
 
-Metric to watch: clicks from the homepage CTA to @evapredicts and the launch thesis before the broader public push.
+Metric to watch: homepage clicks carrying `utm_campaign=launch_truth_status`, proof-thesis reads from the status page, and @evapredicts follow clicks. Do not claim traction until measured data exists.
 
-Next follow-up: if CTA clicks show intent, turn the SpaceX thesis into the first approved @evapredicts thread and reply sequence.
+Next follow-up: once policy filtering, durable write readiness, and signer/runtime parity are verified, convert the same status stance into the approved @evapredicts “what changed” post.
 
 ## Activation Metrics
 
