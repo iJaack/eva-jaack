@@ -55,11 +55,11 @@ matters.
 
 ### Launch truth status loop
 
-- **Hypothesis:** a transparent “not launch-clear yet” stance will build more trust with agent and prediction-market builders than a premature launch announcement.
-- **Audience:** builders evaluating whether Eva can be a trustworthy public forecast surface, especially those sensitive to policy, source quality, and agent-output receipts.
-- **CTA:** read the current launch truth, then follow @evapredicts for the first public thesis loop once policy-safe markets and durable write readiness are verified.
+- **Hypothesis:** a transparent receipt-backed launch stance will build more trust with agent and prediction-market builders than a premature launch announcement.
+- **Audience:** builders evaluating whether Eva can be a trustworthy public forecast surface, especially those sensitive to policy, source quality, durable writes, and agent-output receipts.
+- **CTA:** read the current launch truth, inspect the SpaceX proof thesis, then follow @evapredicts for the first public thesis loop after external posting approval.
 - **Measurement:** track sessions carrying `utm_campaign=launch_truth_status`, follow clicks from the launch-truth CTA, and downstream clicks into the SpaceX proof thesis.
-- **Follow-up:** when launch blockers clear, convert the same thread into a “what changed” post instead of pretending the product was always ready.
+- **Follow-up:** after explicit posting approval, publish the “what changed” post and compare follow clicks plus proof-thesis reads against the homepage SpaceX proof CTA.
 
 ## Current Campaign: Launch Truth Status CTA
 

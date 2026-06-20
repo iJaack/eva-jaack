@@ -17,14 +17,14 @@ const xPostHref = `${campaignUrl}?utm_source=x&utm_medium=social&utm_campaign=${
 export const metadata: Metadata = {
   title: "Launch truth status · Eva",
   description:
-    "A transparent Eva Protocol campaign page for launch-readiness status, current proof, and the @evapredicts follow CTA before the public thesis loop widens.",
+    "A transparent Eva Protocol campaign page for launch-readiness status, visible readiness receipts, and the @evapredicts follow CTA before external posting approval.",
   alternates: {
     canonical: campaignPath,
   },
   openGraph: {
     title: "Eva launch truth status",
     description:
-      "What is live, what stays gated, and what @evapredicts will measure before broadening the public prediction campaign.",
+      "What is live, what is now receipt-backed, and what @evapredicts will measure before broadening the public prediction campaign.",
     url: campaignUrl,
     siteName: "Eva Protocol",
     type: "website",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Eva launch truth status",
     description:
-      "Transparent launch-readiness status for Eva's thesis record before the public @evapredicts push widens.",
+      "Transparent launch-readiness receipts for Eva's thesis record before the public @evapredicts push widens.",
   },
 };
 
@@ -47,38 +47,42 @@ const liveProof = [
     body: "Eva's deployed Avalanche thesis protocol and agent identity are visible in the product source of truth.",
   },
   {
-    label: "campaign routes",
-    body: "Trust receipts, agent receipts, reply sprint, policy-safe theses, and launch-truth status pages already carry measurable UTMs.",
+    label: "policy filter",
+    body: "The V1 source policy excludes prohibited market classes before provider markets reach the public API or compose selector.",
+  },
+  {
+    label: "write readiness",
+    body: "Health and storage-readiness probes now expose whether thesis writes are backed by durable storage before a public push widens.",
   },
 ] as const;
 
 const currentBlockers = [
   {
-    label: "market policy filter",
-    body: "The public source basket still needs production proof that V1-prohibited political, religious, war, sports, and tragedy-adjacent prompts stay out of the launch surface.",
+    label: "external posting approval",
+    body: "The @evapredicts status post remains approval-ready, not published. The page is the measurable destination until explicit approval lands.",
   },
   {
-    label: "durable thesis writes",
-    body: "The write path needs an observable readiness signal before @evapredicts asks people to rely on persisted thesis updates.",
+    label: "deployment smoke parity",
+    body: "Do not widen the loop unless the deployed smoke check keeps durable storage readiness green in the target environment.",
   },
   {
-    label: "signer and runtime parity",
-    body: "Production identity and environment assumptions need to match the repo source of truth before the launch thread widens.",
+    label: "measured traction",
+    body: "No users, revenue, accuracy, testimonials, or demand claims until UTMs show real sessions, follows, or thesis actions.",
   },
 ] as const;
 
 const guardedGates = [
-  "do not widen the public @evapredicts push until prohibited-market filtering is verified in production",
-  "do not pretend thesis writes are launch-clear until durable write/readiness proof is observable",
+  "do not publish the @evapredicts status post externally without explicit approval",
+  "do not widen beyond the first thesis loop unless deployment smoke keeps durable storage readiness green",
   "do not claim users, revenue, accuracy, testimonials, or native trading without measured evidence",
 ] as const;
 
 const statusPost = [
-  "prediction products get trust from restraint, not from pretending every market is launch-safe.",
-  "Eva's public push stays gated until the source basket is policy-safe and thesis writes are durable enough to defend.",
-  "what is live: cited theses, revisions, author records, Avalanche thesis protocol.",
-  "what is not getting hand-waved: prohibited-market filtering and write-readiness proof.",
-  `follow @evapredicts for the first public thesis loop when the receipts are clean: ${xPostHref}`,
+  "prediction products get trust from receipts, not from pretending every market is launch-safe.",
+  "what changed: Eva now has the V1 market-policy filter, a durable thesis-write readiness probe, and one public SpaceX thesis record to inspect.",
+  "what stays gated: no external @evapredicts push without approval, no traction claims before UTM data, no native trading claims.",
+  "the first public loop is simple: read the proof thesis, follow @evapredicts, and tell us which signal is missing.",
+  `launch truth receipt: ${xPostHref}`,
 ] as const;
 
 export default function LaunchTruthStatusCampaignPage() {
@@ -91,8 +95,8 @@ export default function LaunchTruthStatusCampaignPage() {
           <h1>launch status should be a receipt, not a vibe.</h1>
           <p>
             Eva can already show the thesis object: a public argument with cited market signals, fact signals, revisions,
-            and an author trail. The growth move now is sharper than hype: route qualified builders to a launch-truth
-            receipt first, then let them inspect the proof thesis once the boundary feels honest.
+            and an author trail. The growth move now is sharper than hype: route qualified builders to the proof record,
+            show which readiness receipts are live, and keep external posting approval explicit.
           </p>
           <div className="hero-actions">
             <Link href={proofHref} className="btn btn-primary">
@@ -109,10 +113,10 @@ export default function LaunchTruthStatusCampaignPage() {
 
         <section className="paper-section" aria-label="Campaign hypothesis">
           <p className="section-kicker">Campaign hypothesis</p>
-          <h2>transparent launch gates will convert better than premature certainty.</h2>
+          <h2>receipt-backed launch status will convert better than premature certainty.</h2>
           <p>
             Prediction-market operators and agent builders are allergic to fake confidence. A public launch-truth page
-            gives them the current proof object, the current restraints, and one measurable follow CTA before the wider
+            gives them the current proof object, the readiness receipts, and one measurable follow CTA before the wider
             @evapredicts reply sprint asks for more attention.
           </p>
         </section>
@@ -173,7 +177,7 @@ export default function LaunchTruthStatusCampaignPage() {
           <h2>one status post before widening the public loop.</h2>
           <p>
             External posting still needs explicit approval. Until then, this page is the measurable destination for the
-            status angle and the clean source for an approval-ready @evapredicts post.
+            status angle and the clean source for an approval-ready “what changed” @evapredicts post.
           </p>
           <blockquote>
             {statusPost.map((line) => (

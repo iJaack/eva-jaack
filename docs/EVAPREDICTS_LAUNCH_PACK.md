@@ -148,13 +148,13 @@ Next follow-up: if the proof CTA gets traffic but no follow intent, tighten the 
 
 ## Launch Truth Status Loop
 
-Channel: @evapredicts approval-ready X post, with the repo docs as the current source of truth until posting is approved.
+Channel: `/campaigns/launch-truth-status` plus an @evapredicts approval-ready X post. External posting is still approval-gated.
 
-Hypothesis: builders who care about trustworthy agent output will respond better to a visible launch-readiness standard than to a premature hype post. “Here is what is live, here is what is not launch-clear yet” is the trust wedge.
+Hypothesis: builders who care about trustworthy agent output will respond better to visible launch-readiness receipts than to premature hype. “Here is what is live, here is what is receipt-backed, here is what still needs approval” is the trust wedge.
 
-Target audience: prediction-market operators, agent builders, and crypto analysts who care about source quality, market-policy boundaries, and revision receipts.
+Target audience: prediction-market operators, agent builders, and crypto analysts who care about source quality, market-policy boundaries, durable writes, and revision receipts.
 
-Primary CTA: follow @evapredicts for the first public thesis loop once launch blockers clear.
+Primary CTA: follow @evapredicts and inspect the SpaceX proof thesis before the first public thesis loop widens.
 
 Primary link after approval:
 
@@ -166,21 +166,19 @@ Secondary proof link:
 
 Approval-ready post draft:
 
-> prediction products get trust from restraint, not from pretending every market is launch-safe.
+> prediction products get trust from receipts, not from pretending every market is launch-safe.
 >
-> Eva’s public push stays gated until the V1 source basket is policy-safe and thesis writes are durable enough to defend.
+> what changed: Eva now has the V1 market-policy filter, a durable thesis-write readiness probe, and one public SpaceX thesis record to inspect.
 >
-> what is live: cited theses, revisions, author records, Avalanche thesis protocol.
+> what stays gated: no external @evapredicts push without approval, no traction claims before UTM data, no native trading claims.
 >
-> what is not getting hand-waved: prohibited-market filtering and write-readiness proof.
->
-> follow @evapredicts if you want the first public thesis loop when the receipts are clean.
+> the first public loop is simple: read the proof thesis, follow @evapredicts, and tell us which signal is missing.
 >
 > {PRIMARY_LINK}
 
 Metric to watch: sessions with `utm_campaign=launch_truth_status`, homepage CTA clicks into the status page, follow clicks from the campaign page, and clicks into the SpaceX proof thesis. No traction claims until those numbers exist.
 
-Next follow-up: when policy filtering, durable write readiness, and signer/runtime parity are verified, publish a short “what changed” update that links back to the original status stance.
+Next follow-up: after explicit posting approval and green deployment smoke, publish the “what changed” status post, then compare follow clicks and proof-thesis reads against the homepage SpaceX proof CTA.
 
 ## Follow-up Sequence
 

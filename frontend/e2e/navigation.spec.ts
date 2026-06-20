@@ -85,7 +85,7 @@ test("launch truth status page carries transparent campaign CTAs", async ({ page
   await page.goto("/campaigns/launch-truth-status");
 
   await expect(page.getByRole("heading", { name: "launch status should be a receipt, not a vibe." })).toBeVisible();
-  await expect(page.getByText("transparent launch gates will convert better than premature certainty.")).toBeVisible();
+  await expect(page.getByText("receipt-backed launch status will convert better than premature certainty.")).toBeVisible();
 
   await expect(page.getByRole("link", { name: "Read proof thesis" })).toHaveAttribute(
     "href",
@@ -100,5 +100,7 @@ test("launch truth status page carries transparent campaign CTAs", async ({ page
     /https:\/\/x\.com\/evapredicts.*utm_campaign=launch_truth_status/,
   );
   await expect(page.getByText("what @evapredicts will not hand-wave.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "write readiness" })).toBeVisible();
+  await expect(page.locator("blockquote").getByText(/durable thesis-write readiness probe/)).toBeVisible();
   await expect(page.locator("blockquote").getByText(/utm_content=status_post/)).toBeVisible();
 });
