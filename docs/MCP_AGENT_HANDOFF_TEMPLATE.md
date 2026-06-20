@@ -28,6 +28,7 @@ When handing a prepared draft back to a user or another agent, include:
 - whether the action is a new thesis, revision, or anchor rebuild,
 - wallet address and wallet source used for preparation,
 - signal counts and any high-risk assumptions,
+- storage readiness state (`storage not assessed`, `storage readiness blocked`, or `storage verified` with the check name),
 - the exact next approval needed,
 - the negative boundary: no transaction has been broadcast and no public publish is implied.
 
@@ -40,13 +41,14 @@ Thesis: <title or thesisId>
 Wallet: <walletAddress> (<walletSource>)
 Signals: <N prediction signals>, <N fact signals>
 Anchor preparation: <anchorPreparationId or "calldata prepared">
+Storage: <not assessed | readiness blocked: missing durable write-path proof | verified by check/readback>
 
 Needs approval before any broadcast/public publish:
 - approve the signer and network
 - approve the transaction payload/calldata
 - confirm who will broadcast
 
-Boundary: no transaction was broadcast, no receipt was confirmed, and this is not a live/public thesis yet.
+Boundary: no transaction was broadcast, no receipt was confirmed, storage durability is not implied unless explicitly verified above, and this is not a live/public thesis yet.
 ```
 
 ## Bad Phrases To Avoid

@@ -40,9 +40,11 @@ Do not create a replacement thesis because `get_thesis` failed. Missing thesis i
 - MCP draft/anchor-prep output means `publishState: "anchor_prepared_not_published"` and `anchorStatus: "prepared"`; it is not public publish support.
 - `prepare_anchor_transaction` rebuilds calldata for an existing thesis; it still does not broadcast, confirm, or publish anything.
 - Transaction preparation is not transaction broadcast.
+- Transaction preparation is not storage durability proof.
 - Broadcasts require explicit user approval at action time.
 - MCP alone never reaches the `submitted` or `published/live` rungs; those require explicit approval plus tx/public-state evidence.
 - Never mark a thesis, thesis revision, or signal as confirmed without a transaction receipt or contract readback.
+- Never mark production thesis writes as durable from MCP output alone. Use `storage not assessed` for local/dry-run prep, `storage readiness blocked` when production readiness does not expose durable write-path evidence, and `storage verified` only after an approved readiness/readback check proves persisted thesis state.
 - If MCP output is ambiguous, report the exact missing evidence and do not infer publication.
 - Do not swap in a different `xHandle`, `walletAddress`, or wallet source to make a draft work. If identity is missing, invalid, or unauthorized, stop and ask for the correct operator-approved identity.
 - Do not expand agent powers into trades, custody, staking, claims markets, articles, or blog publishing.
@@ -75,6 +77,6 @@ If a tool returns an error or a missing thesis, report the blocker directly. Do 
 
 ## Reporting Pattern
 
-After draft prep, report the `anchorPreparationId`, the prepared transaction purpose, and the exact missing approval/confirmation step. Do not say the thesis is live, public, or published from MCP output alone.
+After draft prep, report the `anchorPreparationId`, the prepared transaction purpose, storage readiness state, and the exact missing approval/confirmation step. Do not say the thesis is live, public, published, or production-durable from MCP output alone.
 
 Use `docs/AGENT_SAFE_OUTPUTS.md` for short user-facing wording and `docs/MCP_AGENT_HANDOFF_TEMPLATE.md` for full handoffs between agents, reviewers, or issue comments.

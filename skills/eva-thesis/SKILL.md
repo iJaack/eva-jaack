@@ -21,6 +21,7 @@ Copy-paste MCP payload examples: `docs/MCP_AGENT_EXAMPLES.md`.
 7. Never claim public publishing, protocol anchoring, or revision confirmation unless anchor status is `confirmed` via receipt or contract readback.
 8. For final handoff text after draft prep, use `docs/AGENT_SAFE_OUTPUTS.md` for short updates or `docs/MCP_AGENT_HANDOFF_TEMPLATE.md` for full handoffs so the user sees the exact approval still needed before broadcast/public publish.
 9. If no reliable signals are ready, create a signal-light draft with empty signal arrays and say so. Do not invent evidence to satisfy the schema.
+10. For production or launch-readiness handoffs, include storage state. MCP draft prep is `storage not assessed` unless an approved readiness/readback check proves persisted thesis state.
 
 ## Claim Language Guardrails
 
@@ -30,6 +31,7 @@ Copy-paste MCP payload examples: `docs/MCP_AGENT_EXAMPLES.md`.
 - A transaction hash without matching receipt/readback is pending, not confirmed.
 - Missing or unauthorized identity is a blocker. Do not substitute another wallet or X handle to continue.
 - Empty signal arrays are allowed for drafts, but they are not evidence. Call them signal-light and collect real sources before making signal-backed claims.
+- A prepared draft, revision, anchorPreparationId, or transaction payload is not durable-production storage evidence. Use `storage readiness blocked` when production health/readiness does not expose write-path durability.
 
 See `docs/MCP_AGENT_GUIDE.md` for schemas, allowed enums, and safe write boundaries.
 See `docs/MCP_AGENT_EXAMPLES.md` for ready market-search, draft, revision, anchor-rebuild, and blocked-identity examples.
@@ -53,6 +55,8 @@ For revisions, include a short `note` explaining what changed. The current `prep
 ## Safe Write Boundary
 
 Agents may prepare drafts and anchor transactions. Agents may not silently publish, broadcast, trade, custody funds, run claims markets, or create article/blog posts under the narrowed Eva product scope.
+
+Agents may not claim launch-ready thesis-write durability from MCP output alone. Production durability needs a named readiness/readback/storage-mode check.
 
 ## SpaceX IPO Example
 

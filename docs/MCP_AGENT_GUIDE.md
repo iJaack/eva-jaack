@@ -30,6 +30,22 @@ Prefer the local server for agent work. Treat remote MCP write tools as unavaila
 
 Every write-adjacent MCP tool (`create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`) returns `publishState: "anchor_prepared_not_published"`. That is the boundary. A prepared anchor is not a published thesis, not a confirmed revision, and not evidence of an onchain record.
 
+### Storage Durability Boundary
+
+Agent MCP output is a preparation artifact, not proof that production thesis writes are durable.
+
+Do not treat any of these as storage-readiness evidence:
+
+- `publishState: "anchor_prepared_not_published"`
+- `anchorStatus: "prepared"`
+- `anchorPreparationId`
+- returned transaction calldata
+- a generic green `/health` response that does not name the write store or readiness mode
+
+For local agent onboarding, report storage as `storage not assessed` unless you also performed an approved persistence/readback check. For production launch or ops handoff work, report `storage readiness blocked` when the public health/readiness surface does not prove durable thesis/revision storage. Only say `storage verified` when an approved readiness endpoint, API readback, or storage-mode check proves the prepared thesis/revision state persisted in the intended production store.
+
+Current known adjacent blocker: EVA-249 tracks durable production storage/readiness for thesis writes. Reference it when a task asks for launch readiness, but do not use it as permission to expand MCP write powers or claim publication.
+
 ### Permission Ladder
 
 Use this ladder to choose both the tool and the words you report back. Do not skip rungs.

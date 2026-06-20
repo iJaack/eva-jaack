@@ -24,6 +24,7 @@ If a client, prompt, old note, or autocomplete suggests any other write tool, tr
 | Draft or revision prep returns transactions | Treat the result as anchor preparation only. Summarize it for approval. | Claim public publish, broadcast, or confirmed anchoring from prepared calldata. |
 | Anchor prep output lacks `publishState` on an older build | Still apply the same boundary: prepared transaction data is not publication or confirmation. | Treat legacy output shape as extra authority. |
 | Remote MCP credentials are absent | Use the local MCP server or report the credential blocker. | Scrape the UI or try unauthenticated write paths. |
+| Production storage/readiness is not observable | Report `storage readiness blocked` and ask for an approved readiness/readback check or durable-store evidence. | Treat a generic `/health`, `anchorPreparationId`, or calldata as proof that thesis writes persist across production restarts/deploys. |
 
 ## Minimum preflight before any draft-prep call
 
@@ -32,6 +33,7 @@ If a client, prompt, old note, or autocomplete suggests any other write tool, tr
 3. Keep all material source URLs, signal weights, roles, and revision notes.
 4. For revisions, call `get_thesis` first and verify the wallet matches the thesis author.
 5. Tell the user the output will be `anchor_prepared_not_published` before asking for broadcast approval.
+6. For production or launch-readiness tasks, confirm what proves durable thesis/revision storage. If there is no approved readiness/readback check, mark storage as `not assessed` or `readiness blocked`.
 
 ## Output language for agents
 
@@ -42,5 +44,7 @@ Use precise status words:
 - `submitted` means a transaction hash exists.
 - `confirmed` means a receipt or contract readback confirms the thesis or revision anchor.
 - `published` requires the public publish path plus confirmed anchoring evidence.
+- `storage verified` requires an approved readiness endpoint, API readback, or storage-mode check proving persisted thesis/revision state.
 
 Anything less than a receipt or contract readback is not confirmed protocol state.
+Anything less than a named persistence/readback check is not production storage-readiness evidence.

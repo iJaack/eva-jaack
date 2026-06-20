@@ -30,6 +30,18 @@ Agents may:
 
 Agents must not claim MCP has published, broadcast, anchored, revised, or made a thesis public. Those claims require a separate approved publish/broadcast path plus transaction evidence.
 
+## Storage Durability Boundary
+
+MCP draft prep is not durable-production proof. A successful `create_thesis_draft`, `prepare_revision_draft`, or `prepare_anchor_transaction` response only proves the current tool call produced a preview and calldata. It does not prove the prepared state survived a deployment, serverless cold start, process restart, or production storage failover.
+
+For local onboarding, this is fine: treat the result as a rehearsal artifact. For production handoffs, include one of these states explicitly:
+
+- `storage not assessed` — local/dry-run preparation only.
+- `storage readiness blocked` — production health/readiness does not expose durable write-path evidence.
+- `storage verified` — an approved readback or readiness check proves the thesis/revision state is persisted in the intended production store.
+
+Do not use prepared anchor calldata, an `anchorPreparationId`, or a green generic `/health` response as proof that production thesis writes are durable. If durability matters, block on an ops-safe readiness/readback check instead of implying launch readiness.
+
 ## Start The Local MCP Server
 
 From the repo root:
