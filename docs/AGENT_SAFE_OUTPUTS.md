@@ -25,6 +25,24 @@ boundary: no transaction broadcast and no public publish unless explicitly evide
 
 Keep `published/live` out of this card unless the public publish path completed and a receipt or contract readback matches the thesis/revision. If storage is not directly proven by a named readiness or readback check, use `storage: not assessed` or `storage: readiness blocked`.
 
+## Claim Downgrade Pattern
+
+When a user, issue, or agent handoff asks for stronger wording than the evidence supports, keep the action on the safe rung and name the missing proof.
+
+| Requested wording | If evidence is only MCP prep, say | Missing proof before stronger claim |
+|---|---|---|
+| "published" / "live" | "prepared for review; not published" | approved public publish path plus receipt/readback or URL evidence |
+| "anchored" | "anchor calldata prepared for approval" | explicit approval, broadcast tx hash, and receipt/contract readback |
+| "revision applied" | "revision draft prepared; current public revision unchanged" | approved revision transaction plus confirmation/readback |
+| "storage verified" | "storage not assessed" or "storage readiness blocked" | named durable-storage readiness endpoint, API readback, or storage-mode check |
+| "signal-backed" | "signal-light" when arrays are empty or URLs are missing | real market/source URLs, weights, roles, and source notes |
+
+Use this shape for the final sentence when downgrading a claim:
+
+```text
+boundary: <safe current state>. missing before <stronger claim>: <approval / tx hash / receipt-readback / storage check / real source URLs>.
+```
+
 ## Permission Ladder
 
 Use the lowest rung supported by direct evidence:

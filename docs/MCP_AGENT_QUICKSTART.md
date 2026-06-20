@@ -103,6 +103,21 @@ If a prompt, client, or autocomplete shows any other write tool, stop and treat 
 
 For copy-paste payloads that match these tools, use `docs/MCP_AGENT_EXAMPLES.md`.
 
+## Common Prompt Routing Cards
+
+Use these cards when an agent prompt mixes a safe MCP action with an unsafe stronger claim. Pick the lowest tool that matches the direct evidence you can produce.
+
+| User asks | MCP action | Safe response state | Stop / escalate when |
+|---|---|---|---|
+| "Find markets for this thesis." | `search_markets` | `read-only` | The user asks you to create or publish from weak evidence without approving identity. |
+| "Draft a new Eva thesis." | `create_thesis_draft` after preflight | `draft prepared` / `anchor prepared` only | `xHandle`, `walletAddress`, signer source, or evidence policy is missing. |
+| "Revise this thesis." | `get_thesis`, then `prepare_revision_draft` | revision draft prepared, previous public state unchanged | `thesisId` is missing/not found or the wallet/X handle does not match the approved author identity. |
+| "Rebuild the anchor transaction." | `prepare_anchor_transaction` | calldata rebuilt only | The user expects a text change, broadcast, or confirmed onchain state. |
+| "Publish / anchor / make it live." | none through MCP alone | blocked until a separate approved path exists | Approval, broadcaster, tx hash, receipt/readback, or public publish evidence is missing. |
+| "Prove launch readiness." | none through draft prep alone | `storage not assessed` or `storage readiness blocked` | No approved durable-storage readiness/readback check is available. |
+
+If the requested verb is stronger than the evidence, downgrade the wording, not the safety boundary. Example: "I can prepare the draft and calldata for approval; I cannot call it live without approval, broadcast, and receipt/readback evidence."
+
 ## Pick The Right Operation
 
 Use this decision path before touching a write-adjacent tool:
