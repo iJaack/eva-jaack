@@ -9,6 +9,23 @@ const mcpHeaders = {
 };
 
 describe("MCP HTTP endpoint", () => {
+  it("exposes storage readiness on health checks", async () => {
+    const app = createApp();
+
+    const response = await fetchJson(app, "/health");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      status: "ok",
+      service: "Eva Protocol",
+      storage: {
+        ready: true,
+        durable: true,
+        mode: "local_filesystem",
+      },
+    });
+  });
+
   it("serves discovery metadata for plain GET health checks", async () => {
     const app = createApp();
 

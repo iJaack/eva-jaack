@@ -7,6 +7,7 @@ import { config } from './config.js';
 import { createEvaMcpServer, evaMcpToolNames } from './mcp-server.js';
 import { protocol } from './protocol.js';
 import { predictionRoutes } from './routes/predictions.js';
+import { getPredictionLayerService } from './services/prediction-layer.js';
 
 function agentManifest() {
   return {
@@ -54,9 +55,12 @@ export function createApp() {
     }),
   );
 
-  app.get('/health', (c) =>
-    c.json({ status: 'ok', service: protocol.app.name, agentId: config.evaAgentId, version: '0.2.0' }),
-  );
+  app.get('/health', (c) => {
+    const storage = getPredictionLayerService().getStorageReadiness();
+    return c.json({ status: 'ok', service: protocol.app.name, agentId: config.evaAgentId, version: '0.2.0', storage });
+  });
+
+  app.get('/api/storage-readiness', (c) => c.json(getPredictionLayerService().getStorageReadiness()));
 
   app.get('/.well-known/agent.json', (c) => c.json(agentManifest()));
 

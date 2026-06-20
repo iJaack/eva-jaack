@@ -2,7 +2,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { LocalPredictionLayerService, resolvePredictionIndexPath } from "../src/services/prediction-layer.js";
+import { LocalPredictionLayerService, resolvePredictionIndexPath, resolvePredictionStorageReadiness } from "../src/services/prediction-layer.js";
 import { samplePredictorIdentity } from "./fixtures.js";
 
 const cleanupDirs: string[] = [];
@@ -27,6 +27,28 @@ describe("prediction layer service", () => {
     expect(resolvePredictionIndexPath("/var/eva", { VERCEL: "1" })).toBe(join("/var/eva", "predictions.json"));
     expect(resolvePredictionIndexPath("", { VERCEL: "1" })).toBe(join(tmpdir(), "eva-predictions/index.json"));
     expect(resolvePredictionIndexPath("", { AWS_LAMBDA_FUNCTION_NAME: "eva-api" })).toBe(join(tmpdir(), "eva-predictions/index.json"));
+  });
+
+  it("reports whether thesis write storage is production-durable", () => {
+    expect(resolvePredictionStorageReadiness("", { VERCEL: "1" })).toMatchObject({
+      mode: "serverless_tmp",
+      ready: false,
+      durable: false,
+      blobTokenConfigured: false,
+    });
+    expect(resolvePredictionStorageReadiness("", { VERCEL: "1", BLOB_READ_WRITE_TOKEN: "token" })).toMatchObject({
+      mode: "vercel_blob",
+      ready: true,
+      durable: true,
+      writePath: "eva-predictions/index.json",
+      blobTokenConfigured: true,
+    });
+    expect(resolvePredictionStorageReadiness("/var/eva", {})).toMatchObject({
+      mode: "local_filesystem",
+      ready: true,
+      durable: true,
+      writePath: join("/var/eva", "predictions.json"),
+    });
   });
 
   it("creates a multi-signal evolving thesis with weighted market and fact scores", async () => {
