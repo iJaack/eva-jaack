@@ -18,6 +18,22 @@ pnpm --filter backend mcp
 
 Prefer the local server for agent work. Treat remote MCP write tools as unavailable unless the agent has scoped credentials for the task and the operator explicitly approved that path.
 
+For MCP clients that need an explicit local server entry, configure the stdio server with the repo root as `cwd`:
+
+```json
+{
+  "mcpServers": {
+    "eva-thesis": {
+      "command": "pnpm",
+      "args": ["--filter", "backend", "mcp"],
+      "cwd": "/absolute/path/to/eva-jaack"
+    }
+  }
+}
+```
+
+If that local stdio command fails, stop and report the setup blocker. Do not replace it with UI scraping, direct unauthenticated HTTP calls, or a remote write path unless the operator supplied scoped credentials and explicitly approved that remote path.
+
 ## Live Tools
 
 | Tool | Safe use | Mutates stored thesis state? |

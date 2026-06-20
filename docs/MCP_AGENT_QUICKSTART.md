@@ -67,6 +67,24 @@ pnpm --filter backend mcp
 
 Prefer local MCP for agent work. Treat remote MCP writes as unavailable unless the operator supplied scoped credentials and explicitly approved that remote path.
 
+## Connect A Local MCP Client
+
+If your agent runtime asks for an MCP server definition, use the repo root as `cwd` and keep the command narrow:
+
+```json
+{
+  "mcpServers": {
+    "eva-thesis": {
+      "command": "pnpm",
+      "args": ["--filter", "backend", "mcp"],
+      "cwd": "/absolute/path/to/eva-jaack"
+    }
+  }
+}
+```
+
+Do not point agents at a remote MCP endpoint for write-adjacent tools just because local setup is inconvenient. Remote draft prep needs scoped credentials plus explicit operator approval. If the client cannot start the local stdio server, report the local setup blocker instead of scraping the UI or using an unauthenticated HTTP path.
+
 ## Live Tool Names
 
 Only these MCP tools are live for agent thesis work:
