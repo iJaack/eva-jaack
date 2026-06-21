@@ -103,6 +103,22 @@ If a prompt, client, or autocomplete shows any other write tool, stop and treat 
 
 For copy-paste payloads that match these tools, use `docs/MCP_AGENT_EXAMPLES.md`.
 
+## Parse The MCP Result Envelope
+
+Most MCP clients return Eva tool results as a text envelope, not as top-level JSON fields. Read the first text part, then parse it before interpreting status markers:
+
+```json
+{
+  "content": [
+    { "type": "text", "text": "{ ...json result... }" }
+  ]
+}
+```
+
+For successful write-adjacent tools, parse `content[0].text` as JSON and then read `publishState`, `anchorStatus`, `anchorPreparationId`, `transactions`, and `nextStep` from the parsed object. For `search_markets`, the parsed value is an array. For `get_thesis`, the parsed value is the thesis detail object.
+
+If the tool result has `isError: true`, has no text part, or `content[0].text` is not valid JSON when JSON was expected, stop at `blocked:` and quote the missing or invalid field. Do not infer publish, anchor, submission, confirmation, or storage durability from the envelope alone.
+
 ## Common Prompt Routing Cards
 
 Use these cards when an agent prompt mixes a safe MCP action with an unsafe stronger claim. Pick the lowest tool that matches the direct evidence you can produce.
