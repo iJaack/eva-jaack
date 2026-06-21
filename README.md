@@ -72,5 +72,6 @@ pnpm --filter contracts test
 - [Product strategy](docs/PRODUCT_STRATEGY.md)
 - [Go-to-market](docs/GO_TO_MARKET.md)
 - [@evapredicts prediction memory campaign](docs/EVAPREDICTS_PREDICTION_MEMORY_CAMPAIGN.md)
+- [@evapredicts AI forecast receipts campaign](docs/EVAPREDICTS_AI_FORECAST_RECEIPTS_CAMPAIGN.md)
 - [Business plan](docs/BUSINESS_PLAN.md)
 - [Tasks](docs/TASKS.md)
