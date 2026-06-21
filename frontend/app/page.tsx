@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { CampaignLink, CampaignViewTracker } from "@/components/CampaignTelemetry";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import {
@@ -182,6 +183,7 @@ const activeCampaigns = [
 function CampaignCallout() {
   return (
     <section className="prediction-section campaign-callout" aria-label="Current Eva Protocol campaign">
+      <CampaignViewTracker campaign={aiForecastCampaign} channel="homepage_campaign_callout" />
       <div className="campaign-callout-copy">
         <p className="section-kicker">@evapredicts campaign</p>
         <h2 className="section-title section-title-sm">AI forecasts need receipts before they need reach.</h2>
@@ -199,15 +201,15 @@ function CampaignCallout() {
         ))}
       </div>
       <div className="campaign-action-row">
-        <Link href={aiForecastHref} className="mobile-action mobile-action-primary">
+        <CampaignLink href={aiForecastHref} campaign={aiForecastCampaign} cta="open_receipts_campaign" channel="homepage_campaign_callout" className="mobile-action mobile-action-primary">
           Open receipts campaign
-        </Link>
-        <Link href={launchThesisHref} className="mobile-action">
+        </CampaignLink>
+        <CampaignLink href={launchThesisHref} campaign={aiForecastCampaign} cta="read_proof_record" channel="homepage_campaign_callout" className="mobile-action">
           Read the proof record
-        </Link>
-        <Link href={evaPredictsUrl} className="mobile-action" target="_blank" rel="noreferrer">
+        </CampaignLink>
+        <CampaignLink href={evaPredictsUrl} campaign={aiForecastCampaign} cta="follow_evapredicts" channel="homepage_campaign_callout" className="mobile-action" target="_blank" rel="noreferrer" external>
           Follow @evapredicts
-        </Link>
+        </CampaignLink>
       </div>
       <p className="inline-note">
         Metric to watch: utm_campaign=ai_forecast_receipts clicks into the campaign page, then proof-thesis reads, market-signal clicks, compose starts, and follow clicks before any broader launch push.

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CampaignLink, CampaignViewTracker } from "@/components/CampaignTelemetry";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import { protocol } from "@/lib/protocol";
@@ -77,6 +78,7 @@ export default function AiForecastReceiptsCampaignPage() {
     <>
       <Nav />
       <main id="main-content" className="page-shell">
+        <CampaignViewTracker campaign={campaign} />
         <section className="hero">
           <p className="eyebrow">@evapredicts campaign · AI forecast receipts</p>
           <h1>AI forecasts need receipts before they need reach.</h1>
@@ -86,15 +88,15 @@ export default function AiForecastReceiptsCampaignPage() {
             and author context readers can revisit.
           </p>
           <div className="hero-actions">
-            <Link href={proofHref} className="btn btn-primary">
+            <CampaignLink href={proofHref} campaign={campaign} cta="read_proof_thesis" className="btn btn-primary">
               Read proof thesis
-            </Link>
-            <Link href={composeHref} className="btn">
+            </CampaignLink>
+            <CampaignLink href={composeHref} campaign={campaign} cta="draft_receipted_forecast" className="btn">
               Draft a receipted forecast
-            </Link>
-            <a href={followHref} className="btn" target="_blank" rel="noreferrer">
+            </CampaignLink>
+            <CampaignLink href={followHref} campaign={campaign} cta="follow_evapredicts" className="btn" target="_blank" rel="noreferrer" external>
               Follow @evapredicts
-            </a>
+            </CampaignLink>
           </div>
         </section>
 
@@ -149,12 +151,12 @@ export default function AiForecastReceiptsCampaignPage() {
             ))}
           </ul>
           <div className="route-actions">
-            <Link href={proofHref} className="mobile-action mobile-action-primary">
+            <CampaignLink href={proofHref} campaign={campaign} cta="inspect_proof_record" channel="campaign_sequence" className="mobile-action mobile-action-primary">
               Inspect proof record
-            </Link>
-            <Link href={composeHref} className="mobile-action">
+            </CampaignLink>
+            <CampaignLink href={composeHref} campaign={campaign} cta="start_receipted_forecast" channel="campaign_sequence" className="mobile-action">
               Start a receipted forecast
-            </Link>
+            </CampaignLink>
           </div>
         </section>
 
