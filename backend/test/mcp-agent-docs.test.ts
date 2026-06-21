@@ -111,6 +111,28 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("ships safe-start triage cards for mixed MCP prompts", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Safe-start triage",
+      "requested verb",
+      "smallest live MCP tool",
+      "safe rung after call",
+      "stop condition",
+      "draft and publish",
+      "revise this thesis",
+      "anchor it",
+      "prove launch readiness",
+    ]) {
+      expect(docs, `agent safe-start triage should include ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents result evidence inventory so agents do not infer publish state", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_GUIDE.md"),

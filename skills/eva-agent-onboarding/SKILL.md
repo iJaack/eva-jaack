@@ -19,6 +19,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Use `docs/MCP_AGENT_EXAMPLES.md` for known-good payload shapes before improvising schema fields.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
 - Use the quickstart preflight before write-adjacent calls: intent, approved identity, signer/source, evidence, scope, and storage claim must be clear before preparing calldata.
+- For mixed prompts, fill the quickstart safe-start triage card before tools: requested verb, approved identity, smallest live MCP tool, safe rung after call, storage wording, and stop condition.
 - Parse Eva MCP result envelopes before reporting: successful tools usually put JSON in `content[0].text`; if `isError: true`, the text part is missing, or the text is not parseable JSON, report `blocked:` and do not infer status markers.
 - Place every write-adjacent result on the permission ladder before reporting: `read-only`, `draft prepared`, `anchor prepared`, `submitted`, or `published/live`.
 - Capture an evidence inventory before reporting: tool, intent, identity, `publishState`, `anchorStatus`, `anchorPreparationId`, transaction count, tx hash/receipt/readback state, content identifiers, signal/source gaps, and storage state. Mark missing fields as `not returned`; do not infer them.
@@ -36,6 +37,13 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - New thesis preview: use `create_thesis_draft`.
 - Existing thesis calldata rebuild with no text change: use `prepare_anchor_transaction`.
 - Publish, broadcast, direct REST writes, article/blog output, claims, staking, challenge/settlement, paid verification, or LLM verification: stop unless a separate approved path and evidence exist.
+
+Mixed prompt shortcut:
+
+- `draft and publish` means `create_thesis_draft` only through MCP, followed by a publish blocker until approval, tx hash, and receipt/readback exist.
+- `revise this thesis` means `get_thesis` first; missing thesis id or mismatched identity is a blocker, not permission to create a replacement.
+- `anchor it` means `prepare_anchor_transaction` for calldata only; no broadcast or confirmation is implied.
+- `prove launch readiness` means no MCP draft-prep tool can prove storage durability; use `storage readiness blocked` unless a named readiness/readback check exists.
 
 Do not create a replacement thesis because `get_thesis` failed. Missing thesis id, mismatched identity, or unauthorized wallet authority is a blocker.
 
