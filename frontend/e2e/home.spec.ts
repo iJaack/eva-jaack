@@ -143,9 +143,9 @@ test("homepage leads with the prediction workbench layout", async ({ page }) => 
 
   await expect(page.getByRole("heading", { name: "Turn market odds into a public thesis." })).toBeVisible();
   await expect(page.getByText("Eva lets predictors write an interactive post")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Open launch status" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Open receipts campaign" }).first()).toHaveAttribute(
     "href",
-    /utm_campaign=launch_truth_status.*utm_content=launch_truth_status/,
+    /utm_campaign=ai_forecast_receipts.*utm_content=forecast_receipts/,
   );
   await expect(page.getByRole("link", { name: "Read the proof record" })).toHaveAttribute(
     "href",
@@ -172,6 +172,10 @@ test("homepage leads with the prediction workbench layout", async ({ page }) => 
   await expect(page.getByRole("link", { name: /source quality sprint/i })).toHaveAttribute(
     "href",
     /utm_campaign=source_quality_sprint.*utm_content=source_quality_card/,
+  );
+  await expect(page.getByRole("link", { name: /AI forecast receipts/i })).toHaveAttribute(
+    "href",
+    /utm_campaign=ai_forecast_receipts.*utm_content=forecast_receipts_card/,
   );
   await expect(page.getByRole("heading", { name: "From idea to public record" })).toBeVisible();
   await expect(page.getByRole("link", { name: /01 Start the argument/i })).toBeVisible();
