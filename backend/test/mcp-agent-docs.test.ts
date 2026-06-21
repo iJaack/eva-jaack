@@ -253,6 +253,28 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents schema repair cards so agents normalize inputs without guessing", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_ERROR_HANDLING.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Schema repair cards",
+      "36%",
+      "0.36",
+      "source URL gap",
+      "verifierScore: 50",
+      "full replacement body",
+      "task-time `xHandle`, `walletAddress`, and signer/source approval",
+      "safe boundary: I did not prepare calldata",
+      "Repair only directly evidenced values",
+    ]) {
+      expect(docs, `agent schema repair docs should include ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("ships concrete onboarding skill examples for agent rehearsals", () => {
     const skill = readRepoFile("skills/eva-agent-onboarding/SKILL.md");
 

@@ -18,6 +18,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Keep `docs/MCP_AGENT_GUIDE.md` open when creating or revising theses.
 - Use `docs/MCP_AGENT_EXAMPLES.md` for known-good payload shapes before improvising schema fields.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
+- Use the schema repair cards in `docs/MCP_AGENT_ERROR_HANDLING.md` when an input is almost valid but has malformed odds, URLs, weights, verifier fields, revision-body shape, identity authority, or direct REST-write requests.
 - Use the quickstart preflight before write-adjacent calls: intent, approved identity, signer/source, evidence, scope, and storage claim must be clear before preparing calldata.
 - For mixed prompts, fill the quickstart safe-start triage card before tools: requested verb, approved identity, smallest live MCP tool, safe rung after call, storage wording, and stop condition.
 - Parse Eva MCP result envelopes before reporting: successful tools usually put JSON in `content[0].text`; if `isError: true`, the text part is missing, or the text is not parseable JSON, report `blocked:` and do not infer status markers.
@@ -152,6 +153,8 @@ Current live schema note: `prepare_revision_draft` accepts `thesisId`, `body`, `
 Current market status enum: `open`, `closed`, `resolved`, `cancelled`. Treat `cancelled` as a source-market state only; it is not a thesis publish state and does not imply an Eva draft or anchor was cancelled.
 
 Schema defaults exist for low-risk draft prep, but evidence-bearing fields should be explicit when known. Use valid URLs only; omit unknown source URLs and report the gap in the handoff.
+
+Repair malformed schema fields only when the prompt or approved context directly supports the repair. Examples: convert `36%` to `0.36` only when percent meaning is explicit; omit an optional malformed URL and report the source URL gap only when the signal remains auditable; use exploratory verifier defaults only for exploratory drafts. If the value would change meaning, affect identity authority, or require inventing a full revision body, report `blocked:` instead of guessing.
 
 Fact signals may include optional `reportUri` and `reportHash` evidence pointers. Include them only when they already exist; do not fabricate verifier reports, hashes, or storage URIs.
 
