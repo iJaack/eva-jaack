@@ -26,6 +26,39 @@ If a client, prompt, old note, or autocomplete suggests any other write tool, tr
 | Remote MCP credentials are absent | Use the local MCP server or report the credential blocker. | Scrape the UI or try unauthenticated write paths. |
 | Production storage/readiness is not observable | Report `storage readiness blocked` and ask for an approved readiness/readback check or durable-store evidence. | Treat a generic `/health`, `anchorPreparationId`, or calldata as proof that thesis writes persist across production restarts/deploys. |
 
+## Schema repair cards
+
+Use these cards when a prompt is close to valid but unsafe to submit as-is. Repair only what is directly supported by the prompt or previous approved context; otherwise stop at `blocked:` and name the missing field.
+
+| Problem input | Safe repair | Block instead when |
+|---|---|---|
+| Odds are written as `36%` or `36` | Convert to `0.36` only when the percent meaning is explicit. | The number could be probability, price, basis points, or a score. |
+| Source URL is missing, malformed, or a placeholder | Omit optional `marketUrl` / `sourceUrl`, keep the signal only if the claim is still auditable, and report a source URL gap. | The URL is the only evidence for a material claim. |
+| Signal weight is missing | Use the schema default only for low-risk drafts; otherwise ask for weight or explain the default in the handoff. | Weight changes the thesis interpretation or ranking. |
+| Fact verifier data is missing | Use `verifierVerdict: "unverifiable_yet"` and `verifierScore: 50` only when the draft is explicitly exploratory. | The user asked for a verified or signal-backed thesis. |
+| Revision prompt gives a patch, diff, or extra paragraph | Ask for or construct a full replacement body from approved source text, then use `note` for the delta. | You cannot reconstruct the intended full body without inventing content. |
+| Identity is remembered from another task but not approved here | Block and ask for task-time `xHandle`, `walletAddress`, and signer/source approval. | Always. Do not import identity authority from stale comments. |
+| Prompt asks for direct REST write because MCP is inconvenient | Block direct REST and use local MCP if possible. | There is no separate approved execution path with scoped credentials and readback evidence. |
+
+Copy-paste blocked shape:
+
+```text
+blocked: the MCP input is not safe to submit yet.
+
+missing or ambiguous:
+- <field>: <why it matters>
+
+safe boundary: I did not prepare calldata, call direct REST write routes, broadcast a transaction, or publish a thesis.
+```
+
+Copy-paste repaired-shape note:
+
+```text
+repair applied: <field> was normalized or omitted.
+reason: <direct evidence from prompt/context>.
+handoff gap: <source URL gap | default weight | exploratory verifier state | storage not assessed>.
+```
+
 ## Minimum preflight before any draft-prep call
 
 1. Confirm the operator-approved X handle and wallet address.

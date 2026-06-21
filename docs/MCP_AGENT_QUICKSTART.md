@@ -25,6 +25,8 @@ Before any write-adjacent MCP call, fill this out mentally or in the handoff. If
 
 This preflight is part of the safety boundary. It is better to return `blocked:` with one missing field than to prepare the wrong identity, imply publication, or turn a storage unknown into launch readiness.
 
+If the prompt is almost valid but one schema field is malformed or ambiguous, use the schema repair cards in `docs/MCP_AGENT_ERROR_HANDLING.md` before calling a tool. Repair only directly evidenced values, such as an explicit `36%` becoming `0.36`. Otherwise block instead of guessing URLs, signer authority, verifier scores, weights, or full revision bodies.
+
 ### Safe-start triage card
 
 Use this compact card when a prompt mixes safe MCP work with stronger verbs like publish, anchor, revise, launch, or prove readiness. Fill it before calling tools, then keep the final wording on the same rung.
