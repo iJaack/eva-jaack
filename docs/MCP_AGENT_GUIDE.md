@@ -220,6 +220,8 @@ Use this before revising. Do not infer current revision state from old comments,
 
 ### `prepare_revision_draft`
 
+Revision prep uses a **full replacement body**. The `body` field is the complete next thesis text, not a patch, diff, append-only note, or partial paragraph. Use `note` for the concise delta explanation, and call `get_thesis` first so you can preserve any current text that should remain in the replacement body.
+
 ```json
 {
   "thesisId": "thesis_abc123",

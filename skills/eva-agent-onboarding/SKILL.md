@@ -133,7 +133,7 @@ boundary: no transaction broadcast and no public publish happened
 When an agent revises an existing thesis:
 
 1. Start with `get_thesis`; do not trust stale comments or old draft JSON.
-2. Use `prepare_revision_draft` with a concise `note` that explains the delta.
+2. Use `prepare_revision_draft` with a full replacement `body`, not a patch, diff, append-only note, or partial paragraph. Use a concise `note` to explain the delta.
 3. Report the state as "draft prepared" until the approved transaction is submitted and confirmed.
 4. Only say "revision live" after a receipt or contract readback matches the prepared revision.
 

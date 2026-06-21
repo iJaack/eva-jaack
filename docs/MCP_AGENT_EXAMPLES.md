@@ -139,6 +139,8 @@ Tools: `get_thesis`, then `prepare_revision_draft`
 
 Use this when an existing thesis changes. Always inspect the thesis first.
 
+`prepare_revision_draft.body` is a full replacement body. Do not send a patch, diff, append-only note, or partial paragraph as `body`; put the delta summary in `note`.
+
 First call `get_thesis`:
 
 ```json

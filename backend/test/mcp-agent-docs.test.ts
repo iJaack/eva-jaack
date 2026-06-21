@@ -132,6 +132,26 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents that revision drafts require full replacement bodies", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "full replacement body",
+      "not a patch",
+      "append-only note",
+      "partial paragraph",
+      "note",
+    ]) {
+      expect(docs, `revision docs should include full replacement body phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents the local MCP stdio client configuration", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_GUIDE.md"),
