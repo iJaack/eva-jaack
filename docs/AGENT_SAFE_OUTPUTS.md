@@ -103,6 +103,7 @@ prepared: revision draft is ready for review and anchor approval.
 What changed:
 - thesis: <thesisId>
 - revision note: <note>
+- body: full replacement body prepared, not a patch or append-only note
 - anchor status: prepared, not published
 
 Next step: approve the revision anchor transaction. Until confirmation, the previous public thesis state is still the source of truth.

@@ -219,7 +219,7 @@ Use real source URLs and explicit weights when signals are material.
 
 1. Call `get_thesis` with the canonical `thesisId`.
 2. Verify the current title, revision version, X handle, and wallet before changing anything.
-3. Call `prepare_revision_draft` with the full replacement `body` and a short `note` explaining the delta.
+3. Call `prepare_revision_draft` with the full replacement `body` and a short `note` explaining the delta. The `body` is not a patch, diff, append-only note, or partial paragraph; preserve any current text that should remain.
 4. Report it as a prepared revision only.
 5. Wait for explicit broadcast approval and confirm by receipt/readback before saying the revision is live.
 
