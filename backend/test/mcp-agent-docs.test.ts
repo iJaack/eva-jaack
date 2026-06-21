@@ -134,6 +134,26 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents the MCP text result envelope so agents parse returned JSON before reporting", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "content[0].text",
+      "parseable JSON",
+      "isError: true",
+      "MCP result envelope",
+      "Do not infer",
+    ]) {
+      expect(docs, `agent docs should include MCP result envelope phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("teaches agents to downgrade over-strong publish/storage claims", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),

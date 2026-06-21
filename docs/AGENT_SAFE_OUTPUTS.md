@@ -29,6 +29,8 @@ Keep `published/live` out of this card unless the public publish path completed 
 
 Before sending a result card, copy only evidence the MCP response or named follow-up check actually returned. Do not infer hidden state from a familiar tool name.
 
+MCP clients usually wrap Eva results in a text envelope. Parse `content[0].text` as JSON before filling the inventory. If `isError: true`, the text part is missing, or the text is not parseable JSON when JSON was expected, report `blocked:` instead of inventing marker values.
+
 Minimum inventory for write-adjacent results:
 
 - operation evidence: tool name, requested intent, and approved `xHandle` / `walletAddress`,

@@ -23,6 +23,20 @@ Use alongside:
 
 If the task asks for more than the selected tool can safely prove, report the missing evidence instead of upgrading the claim.
 
+## 0.1 Parse the MCP result envelope
+
+Eva MCP responses are usually wrapped as SDK text content. The safe markers are inside the JSON string at `content[0].text`:
+
+```json
+{
+  "content": [
+    { "type": "text", "text": "{\"publishState\":\"anchor_prepared_not_published\",\"anchorStatus\":\"prepared\"}" }
+  ]
+}
+```
+
+Parse the text before reading `publishState`, `anchorStatus`, `anchorPreparationId`, `transactions`, or `nextStep`. If `isError: true`, the text part is absent, or the text is not valid JSON for the expected tool, use the blocked template instead of claiming draft, anchor, publish, submission, confirmation, or storage state.
+
 Result-card pattern for every write-adjacent example below:
 
 ```text

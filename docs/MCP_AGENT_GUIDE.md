@@ -198,6 +198,31 @@ Use this matrix when summarizing MCP results back to a user or another agent:
 
 If the result contains an error, missing thesis, or mismatched identity, stop and report the blocker. Do not retry with a different wallet, X handle, or public publish path unless the operator explicitly approves that change.
 
+### MCP Result Envelope
+
+Eva MCP tools return SDK-style text content. In most clients, the fields you need are inside `content[0].text`, not beside `content` at the top level:
+
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"publishState\":\"anchor_prepared_not_published\",\"anchorStatus\":\"prepared\"}"
+    }
+  ]
+}
+```
+
+Agent handling rule:
+
+1. If `isError: true`, treat the call as blocked and do not parse it into a partial success.
+2. Find the first `content` item with `type: "text"`.
+3. For `search_markets`, parse that text as a JSON array.
+4. For `get_thesis`, parse that text as a thesis detail object.
+5. For `create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`, parse that text as the prepared anchor object, then read `publishState`, `anchorStatus`, `anchorPreparationId`, `transactions`, and `nextStep` from the parsed object.
+
+If the text part is missing or cannot be parsed, report `blocked: MCP result envelope did not contain parseable JSON`. Do not treat an envelope without `isError` as evidence that a transaction was submitted, confirmed, published, or stored durably.
+
 ### Evidence Inventory Before Reporting
 
 For every write-adjacent MCP result, capture the evidence before writing the handoff. This keeps agents from turning familiar markers into stronger claims.
