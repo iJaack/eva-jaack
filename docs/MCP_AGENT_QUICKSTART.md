@@ -154,6 +154,16 @@ Expected result markers:
 - `transactions`
 - `nextStep` requiring user approval before publish/broadcast
 
+Evidence inventory to capture before reporting:
+
+- `publishState`, `anchorStatus`, and `anchorPreparationId` exactly as returned,
+- transaction count and purpose, but no tx hash unless a separate broadcaster returned one,
+- thesis title or `thesisId`, plus market/fact signal counts,
+- any missing source URLs or intentionally empty signal arrays,
+- storage state, using `storage not assessed` unless a named readiness/readback check was run.
+
+If any expected marker is absent, say `not returned` or report `blocked:`. Do not fill the gap by assuming draft prep implies storage durability, broadcast, or public publication.
+
 Copy this result card into user or agent handoffs so the next step is obvious:
 
 ```text

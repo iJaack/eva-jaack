@@ -198,6 +198,19 @@ Use this matrix when summarizing MCP results back to a user or another agent:
 
 If the result contains an error, missing thesis, or mismatched identity, stop and report the blocker. Do not retry with a different wallet, X handle, or public publish path unless the operator explicitly approves that change.
 
+### Evidence Inventory Before Reporting
+
+For every write-adjacent MCP result, capture the evidence before writing the handoff. This keeps agents from turning familiar markers into stronger claims.
+
+- Tool and intent: the live tool name plus whether this was a new draft, revision draft, or anchor rebuild.
+- Identity: the approved `xHandle`, `walletAddress`, and `walletSource` where the live schema supports it.
+- Output markers: `publishState`, `anchorStatus`, `anchorPreparationId`, `nextStep`, and transaction payload count exactly as returned.
+- Transaction state: tx hash, receipt, and contract readback are `not returned` unless a separate approved broadcaster or verifier returned them.
+- Content state: thesis title or `thesisId`, current revision/version if returned, signal counts, and any missing source URLs.
+- Storage state: `storage not assessed` unless a named readiness/readback check proves otherwise.
+
+If the inventory cannot distinguish draft prep from a public publish, stop at `blocked:`. Missing output is not evidence of publication, anchoring, revision, or durable storage.
+
 ### Schema Gotchas For Agents
 
 - A `cancelled` prediction market is valid input. Use it when a market was removed/cancelled by the source, and explain why it still matters in `rationale`.
