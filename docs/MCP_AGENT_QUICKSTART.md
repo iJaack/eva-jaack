@@ -10,6 +10,19 @@ Eva MCP is draft-and-anchor-prep only.
 
 The broader app has HTTP routes for thesis creation and anchor preparation, but those are not agent-default publish powers. Do not call `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or production write endpoints as a workaround for MCP limits. Direct REST writes require a separate approved path, scoped credentials, and receipt/readback evidence before any stronger claim.
 
+If a task really does arrive with a separate approved execution path, capture the approval and receipt evidence before using stronger language:
+
+```text
+approved execution path: <route/tool/broadcaster name>
+approval evidence: <who approved, exact scope, signer/network, payload or route>
+credential scope: <local/dev/staging/production and allowed action>
+write receipt: <response id | tx hash | public URL | API readback id>
+readback evidence: <endpoint/contract/public URL checked and matching field>
+safe claim after execution: <submitted | confirmed | published/live | storage verified>
+```
+
+If any row is missing, stay on the MCP rung (`draft prepared` / `anchor prepared`) and say what is missing. Do not treat possession of a route URL, bearer token, wallet address, or returned calldata as approval to publish or broadcast.
+
 ## No-Guesswork Preflight
 
 Before any write-adjacent MCP call, fill this out mentally or in the handoff. If any row is unclear, stop before preparing calldata.

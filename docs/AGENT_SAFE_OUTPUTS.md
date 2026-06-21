@@ -156,6 +156,21 @@ I did not broadcast, publish, or mark anything live.
 - "public article/blog published" is out of current MCP scope unless a separate approved public publish path returns its own URL/evidence.
 - "storage verified" needs an approved readiness endpoint, API readback, or storage-mode check proving thesis/revision state persisted in the intended production store.
 
+## Separate Approved Execution Path Receipt Card
+
+Use this only when the operator supplied a non-MCP execution path and approval. It prevents agents from upgrading a draft-prep result just because a route or credential exists.
+
+```text
+approved execution path: <route/tool/broadcaster name>
+approval evidence: <who approved, exact scope, signer/network, payload or route>
+credential scope: <local/dev/staging/production and allowed action>
+write receipt: <response id | tx hash | public URL | API readback id>
+readback evidence: <endpoint/contract/public URL checked and matching field>
+safe claim after execution: <submitted | confirmed | published/live | storage verified>
+```
+
+If the card cannot be filled from direct evidence, do not claim `submitted`, `confirmed`, `published/live`, or `storage verified`. Report the current MCP state and the missing approval/receipt/readback instead.
+
 ## Storage Readiness Language
 
 MCP preparation does not prove production storage durability. Add one concise storage line when the handoff could be interpreted as launch/readiness evidence:
