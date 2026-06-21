@@ -20,6 +20,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
 - Use the quickstart preflight before write-adjacent calls: intent, approved identity, signer/source, evidence, scope, and storage claim must be clear before preparing calldata.
 - Place every write-adjacent result on the permission ladder before reporting: `read-only`, `draft prepared`, `anchor prepared`, `submitted`, or `published/live`.
+- Capture an evidence inventory before reporting: tool, intent, identity, `publishState`, `anchorStatus`, `anchorPreparationId`, transaction count, tx hash/receipt/readback state, content identifiers, signal/source gaps, and storage state. Mark missing fields as `not returned`; do not infer them.
 - Treat remote MCP write tools as unavailable unless the agent has scoped credentials and the operator explicitly approved that path.
 - If the local stdio server cannot start, report that setup blocker instead of scraping the UI, using unauthenticated HTTP, or switching to remote write tools.
 - Do not bypass MCP by calling app HTTP routes such as `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or production write endpoints. Direct REST writes require a separate approved execution path, scoped credentials, and receipt/readback evidence.
@@ -157,6 +158,8 @@ If a tool returns an error or a missing thesis, report the blocker directly. Do 
 ## Reporting Pattern
 
 After draft prep, report the `anchorPreparationId`, the prepared transaction purpose, storage readiness state, and the exact missing approval/confirmation step. Do not say the thesis is live, public, published, or production-durable from MCP output alone.
+
+If a needed marker is absent, write `not returned` or `blocked:` rather than upgrading the claim. Missing tx hash means not submitted. Missing receipt/readback means not confirmed. Missing readiness/readback evidence means storage not assessed.
 
 Use a minimal result card when handing work to users or agents:
 

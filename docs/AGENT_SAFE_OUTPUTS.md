@@ -25,6 +25,20 @@ boundary: no transaction broadcast and no public publish unless explicitly evide
 
 Keep `published/live` out of this card unless the public publish path completed and a receipt or contract readback matches the thesis/revision. If storage is not directly proven by a named readiness or readback check, use `storage: not assessed` or `storage: readiness blocked`.
 
+## Evidence Inventory For Handoffs
+
+Before sending a result card, copy only evidence the MCP response or named follow-up check actually returned. Do not infer hidden state from a familiar tool name.
+
+Minimum inventory for write-adjacent results:
+
+- operation evidence: tool name, requested intent, and approved `xHandle` / `walletAddress`,
+- output markers: `publishState`, `anchorStatus`, and `anchorPreparationId` when present,
+- transaction evidence: transaction count, network/chain if returned, target contract/function if returned, and whether a tx hash exists,
+- content evidence: thesis title or `thesisId`, revision version if returned, signal counts, and any source URL gaps,
+- storage evidence: `not assessed`, `readiness blocked`, or `verified by <named check>`.
+
+If a field is absent, write `not returned` or omit it. Never upgrade an absent tx hash into submission, an absent receipt into confirmation, or an absent storage check into launch readiness.
+
 ## Claim Downgrade Pattern
 
 When a user, issue, or agent handoff asks for stronger wording than the evidence supports, keep the action on the safe rung and name the missing proof.

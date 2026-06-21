@@ -253,3 +253,23 @@ Before reporting the result, place it on the permission ladder:
 MCP alone never reaches the `submitted` or `published/live` rungs.
 
 Storage note: MCP alone also never proves production write durability. Use `storage not assessed` for local/dry-run preparation, `storage readiness blocked` when production readiness does not expose durable write-path evidence, and `storage verified` only after an approved readiness/readback check proves persisted thesis state.
+
+## Result evidence inventory
+
+Use this compact inventory after any `create_thesis_draft`, `prepare_revision_draft`, or `prepare_anchor_transaction` response. Fill it from returned fields only:
+
+```text
+tool: <tool name>
+intent: <new draft | revision draft | anchor rebuild>
+identity: <xHandle> / <walletAddress> / <walletSource or not accepted by tool>
+publishState: <returned value or not returned>
+anchorStatus: <returned value or not returned>
+anchorPreparationId: <returned value or not returned>
+transactions: <count and purpose, or not returned>
+tx hash / receipt / readback: not returned unless separately verified
+content: <title or thesisId>, <signal counts>, <source URL gaps>
+storage: <not assessed | readiness blocked | verified by named check>
+safe rung: <draft prepared | anchor prepared | blocked>
+```
+
+If the inventory says `not returned` for the marker needed by the requested claim, downgrade the claim or block. Do not replace missing evidence with guesses from previous comments, UI state, or a generic health check.
