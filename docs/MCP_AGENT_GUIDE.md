@@ -20,6 +20,17 @@ Prefer the local server for agent work. Treat remote MCP write tools as unavaila
 
 Do not bypass MCP by calling app HTTP routes directly. Routes such as `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or any production write endpoint are app/runtime surfaces, not agent-default publish powers. An agent may use MCP to prepare draft/anchor payloads; direct REST writes need a separate approved execution path, scoped credentials, and their own receipt/readback evidence.
 
+When a separate approved execution path exists, record it explicitly before making any stronger claim:
+
+- approved execution path: route, tool, or broadcaster name,
+- approval evidence: who approved it, exact action scope, signer/network, and payload or route,
+- credential scope: local/dev/staging/production plus the allowed action,
+- write receipt: response id, transaction hash, public URL, or API readback id,
+- readback evidence: endpoint, contract readback, or public URL checked plus the matching field,
+- safe claim after execution: `submitted`, `confirmed`, `published/live`, or `storage verified`.
+
+If any of those fields is missing, stay at `draft prepared` / `anchor prepared` and report the missing evidence. A route URL, bearer token, wallet address, prepared calldata, or `anchorPreparationId` is not by itself publish/broadcast approval.
+
 For MCP clients that need an explicit local server entry, configure the stdio server with the repo root as `cwd`:
 
 ```json

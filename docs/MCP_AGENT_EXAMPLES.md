@@ -243,6 +243,32 @@ I did not broadcast a transaction, publish a thesis, mark a revision live, or cl
 
 If a separate approved path exists outside MCP, report that path by name and include its receipt/readback evidence. Otherwise keep the handoff at `draft prepared` / `anchor prepared` or `blocked`.
 
+## 7.1 Separate approved execution path receipt
+
+Use this only when the operator explicitly approved a non-MCP route, broadcaster, or production write path. This is not a default MCP capability.
+
+```text
+approved execution path: <route/tool/broadcaster name>
+approval evidence: <who approved, exact scope, signer/network, payload or route>
+credential scope: <local/dev/staging/production and allowed action>
+write receipt: <response id | tx hash | public URL | API readback id>
+readback evidence: <endpoint/contract/public URL checked and matching field>
+safe claim after execution: <submitted | confirmed | published/live | storage verified>
+```
+
+Example downgrade:
+
+```text
+blocked: I have prepared calldata, but the approved execution path receipt is incomplete.
+
+missing:
+- approval evidence for broadcast scope
+- tx hash or write receipt
+- receipt/readback matching the thesis
+
+safe current claim: anchor prepared only, not submitted or published.
+```
+
 ## 8. Safe-start triage cards for mixed prompts
 
 Use these cards before tools when a prompt asks for more than MCP can prove. The point is to select the smallest live MCP tool and downgrade the final claim before the agent accidentally overstates the result.

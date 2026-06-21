@@ -27,6 +27,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Treat remote MCP write tools as unavailable unless the agent has scoped credentials and the operator explicitly approved that path.
 - If the local stdio server cannot start, report that setup blocker instead of scraping the UI, using unauthenticated HTTP, or switching to remote write tools.
 - Do not bypass MCP by calling app HTTP routes such as `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or production write endpoints. Direct REST writes require a separate approved execution path, scoped credentials, and receipt/readback evidence.
+- If a separate approved execution path is supplied, fill the receipt card from `docs/AGENT_SAFE_OUTPUTS.md`: approved execution path, approval evidence, credential scope, write receipt, readback evidence, and safe claim after execution. Missing rows mean stay at `draft prepared` / `anchor prepared`.
 - Confirm X identity, wallet address, and wallet source before preparing protocol transactions.
 - Use `0x0fe61780bd5508b3C99e420662050e5560608cA4` only when the operator explicitly approved that signer for the task.
 - If no reliable market or fact signals are ready, pass empty signal arrays and say the draft is intentionally signal-light. Do not invent sources, URLs, scores, or weights.

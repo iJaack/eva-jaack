@@ -253,6 +253,29 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents receipt requirements for separately approved non-MCP execution paths", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "approved execution path",
+      "approval evidence",
+      "credential scope",
+      "write receipt",
+      "readback evidence",
+      "safe claim after execution",
+      "route URL, bearer token, wallet address",
+      "stay at `draft prepared` / `anchor prepared`",
+    ]) {
+      expect(docs, `agent docs should include approved execution receipt phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents schema repair cards so agents normalize inputs without guessing", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_ERROR_HANDLING.md"),
