@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Nav from "@/components/Nav";
+import { CampaignLink, CampaignViewTracker } from "@/components/CampaignTelemetry";
 import SiteFooter from "@/components/SiteFooter";
 import { protocol } from "@/lib/protocol";
 
@@ -77,6 +77,7 @@ export default function PredictionMemoryCampaignPage() {
     <>
       <Nav />
       <main id="main-content" className="page-shell">
+        <CampaignViewTracker campaign={campaign} channel="prediction_memory_page" />
         <section className="hero">
           <p className="eyebrow">@evapredicts campaign · prediction memory</p>
           <h1>prediction markets price the moment. Eva remembers the thesis.</h1>
@@ -86,15 +87,36 @@ export default function PredictionMemoryCampaignPage() {
             timeline moves on.
           </p>
           <div className="hero-actions">
-            <Link href={proofHref} className="btn btn-primary">
+            <CampaignLink
+              href={proofHref}
+              campaign={campaign}
+              cta="read_proof_thesis"
+              channel="prediction_memory_hero"
+              className="btn btn-primary"
+            >
               Read proof thesis
-            </Link>
-            <Link href={sourceQualityHref} className="btn">
+            </CampaignLink>
+            <CampaignLink
+              href={sourceQualityHref}
+              campaign={campaign}
+              cta="inspect_source_quality_loop"
+              channel="prediction_memory_hero"
+              className="btn"
+            >
               Inspect source-quality loop
-            </Link>
-            <a href={followHref} className="btn" target="_blank" rel="noreferrer">
+            </CampaignLink>
+            <CampaignLink
+              href={followHref}
+              campaign={campaign}
+              cta="follow_evapredicts"
+              channel="prediction_memory_hero"
+              className="btn"
+              target="_blank"
+              rel="noreferrer"
+              external
+            >
               Follow @evapredicts
-            </a>
+            </CampaignLink>
           </div>
         </section>
 
@@ -126,9 +148,15 @@ export default function PredictionMemoryCampaignPage() {
               <p className="section-kicker">target audience</p>
               <h2 className="section-title section-title-sm">people whose predictions need to survive the feed.</h2>
             </div>
-            <Link href={composeHref} className="section-link">
+            <CampaignLink
+              href={composeHref}
+              campaign={campaign}
+              cta="draft_memory_backed_thesis"
+              channel="prediction_memory_audience"
+              className="section-link"
+            >
               Draft memory-backed thesis
-            </Link>
+            </CampaignLink>
           </div>
           <div className="product-module-grid">
             {targetAudiences.map((audience) => (
@@ -149,12 +177,24 @@ export default function PredictionMemoryCampaignPage() {
             ))}
           </ul>
           <div className="route-actions">
-            <Link href={proofHref} className="mobile-action mobile-action-primary">
+            <CampaignLink
+              href={proofHref}
+              campaign={campaign}
+              cta="inspect_proof_record"
+              channel="prediction_memory_sequence"
+              className="mobile-action mobile-action-primary"
+            >
               Inspect proof record
-            </Link>
-            <Link href={composeHref} className="mobile-action">
+            </CampaignLink>
+            <CampaignLink
+              href={composeHref}
+              campaign={campaign}
+              cta="start_thesis_record"
+              channel="prediction_memory_sequence"
+              className="mobile-action"
+            >
               Start a thesis record
-            </Link>
+            </CampaignLink>
           </div>
         </section>
 

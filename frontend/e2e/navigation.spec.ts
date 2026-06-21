@@ -128,3 +128,51 @@ test("source quality sprint page carries measurable campaign CTAs", async ({ pag
   await expect(page.getByText("make source quality the public ask.")).toBeVisible();
   await expect(page.locator("blockquote").getByText(/utm_content=source_quality_post/)).toBeVisible();
 });
+
+test("prediction memory page tracks the campaign view and CTA clicks", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.addEventListener("eva:campaign", (event) => {
+      const campaignEvent = event as CustomEvent;
+      ((window as Window & { __evaCampaignEvents?: unknown[] }).__evaCampaignEvents ??= []).push(
+        campaignEvent.detail,
+      );
+    });
+  });
+
+  await page.goto("/campaigns/prediction-memory");
+
+  await expect(
+    page.getByRole("heading", { name: "prediction markets price the moment. Eva remembers the thesis." }),
+  ).toBeVisible();
+
+  await page.waitForFunction(() =>
+    (window as Window & { __evaCampaignEvents?: Array<{ name?: string; campaign?: string; channel?: string }> })
+      .__evaCampaignEvents?.some(
+        (event) =>
+          event.name === "campaign_view" &&
+          event.campaign === "prediction_memory" &&
+          event.channel === "prediction_memory_page",
+      ),
+  );
+
+  await expect(page.getByRole("link", { name: "Read proof thesis" })).toHaveAttribute(
+    "data-campaign-cta",
+    "read_proof_thesis",
+  );
+  await expect(page.getByRole("link", { name: "Read proof thesis" })).toHaveAttribute(
+    "href",
+    /utm_campaign=prediction_memory.*utm_content=spacex_proof/,
+  );
+  await expect(page.getByRole("link", { name: "Follow @evapredicts" })).toHaveAttribute(
+    "data-campaign-channel",
+    "prediction_memory_hero",
+  );
+  await expect(page.getByRole("link", { name: "Follow @evapredicts" })).toHaveAttribute(
+    "href",
+    /https:\/\/x\.com\/evapredicts.*utm_campaign=prediction_memory/,
+  );
+  await expect(page.getByRole("link", { name: "Start a thesis record" })).toHaveAttribute(
+    "data-campaign-cta",
+    "start_thesis_record",
+  );
+});
