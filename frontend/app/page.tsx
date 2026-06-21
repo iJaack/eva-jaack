@@ -29,11 +29,9 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
 const evaPredictsUrl = "https://x.com/evapredicts";
 const launchThesisId = "thesis-0fdef25794b38b6e8eed7524";
 const homepageProofCampaign = "homepage_spacex_proof";
-const launchTruthCampaign = "launch_truth_status";
-const predictionMemoryCampaign = "prediction_memory";
+const aiForecastCampaign = "ai_forecast_receipts";
 const launchThesisHref = `/thesis/${launchThesisId}?utm_source=homepage&utm_medium=proof_cta&utm_campaign=${homepageProofCampaign}&utm_content=launch_thesis`;
-const launchTruthHref = `/campaigns/launch-truth-status?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${launchTruthCampaign}&utm_content=launch_truth_status`;
-const predictionMemoryHref = `/campaigns/prediction-memory?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${predictionMemoryCampaign}&utm_content=prediction_memory`;
+const aiForecastHref = `/campaigns/ai-forecast-receipts?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${aiForecastCampaign}&utm_content=forecast_receipts`;
 
 function formatUsd(value: number | null): string {
   if (value === null) return "—";
@@ -125,9 +123,9 @@ const participationQuests = [
 ] as const;
 
 const campaignProofPoints = [
-  "inspect the SpaceX proof thesis as a memory object, not an odds screenshot",
-  "see the cited signals, revision trail, and author record in one shareable artifact",
-  "measure prediction-memory clicks before widening the @evapredicts push",
+  "inspect one AI-assisted forecast as a thesis record with sources attached",
+  "show the revision trigger before asking readers to trust the output",
+  "measure receipt-framed clicks before widening the @evapredicts push",
 ] as const;
 
 const activeCampaigns = [
@@ -173,6 +171,12 @@ const activeCampaigns = [
     href: "/campaigns/prediction-memory?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=prediction_memory&utm_content=prediction_memory_card",
     metric: "prediction-memory sessions, proof-thesis reads, compose starts, and follows",
   },
+  {
+    title: "AI forecast receipts",
+    body: "A campaign for agent builders and prediction-market people: AI forecasts should carry source fit, revision triggers, and author/runtime trails before amplification.",
+    href: "/campaigns/ai-forecast-receipts?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=ai_forecast_receipts&utm_content=forecast_receipts_card",
+    metric: "receipt-page visits, proof-thesis reads, market-signal clicks, compose starts, and follows",
+  },
 ] as const;
 
 function CampaignCallout() {
@@ -180,10 +184,10 @@ function CampaignCallout() {
     <section className="prediction-section campaign-callout" aria-label="Current Eva Protocol campaign">
       <div className="campaign-callout-copy">
         <p className="section-kicker">@evapredicts campaign</p>
-        <h2 className="section-title section-title-sm">prediction markets price the moment. Eva remembers the thesis.</h2>
+        <h2 className="section-title section-title-sm">AI forecasts need receipts before they need reach.</h2>
         <p>
-          The current growth wedge is prediction memory: public market theses with cited signals, visible revisions, and
-          an author trail that survives after the timeline moves on.
+          The current growth wedge is forecast receipts: source fit, revision triggers, and an author/runtime trail that
+          makes public AI-assisted forecasts inspectable after the timeline moves on.
         </p>
       </div>
       <div className="campaign-proof-grid" aria-label="Campaign proof points">
@@ -195,8 +199,8 @@ function CampaignCallout() {
         ))}
       </div>
       <div className="campaign-action-row">
-        <Link href={predictionMemoryHref} className="mobile-action mobile-action-primary">
-          Open memory campaign
+        <Link href={aiForecastHref} className="mobile-action mobile-action-primary">
+          Open receipts campaign
         </Link>
         <Link href={launchThesisHref} className="mobile-action">
           Read the proof record
@@ -206,7 +210,7 @@ function CampaignCallout() {
         </Link>
       </div>
       <p className="inline-note">
-        Metric to watch: utm_campaign=prediction_memory clicks into the campaign page, then proof-thesis reads, compose starts, and follow clicks before any broader launch push.
+        Metric to watch: utm_campaign=ai_forecast_receipts clicks into the campaign page, then proof-thesis reads, market-signal clicks, compose starts, and follow clicks before any broader launch push.
       </p>
     </section>
   );
@@ -383,8 +387,8 @@ export default function HomePage() {
             anchor the first version, and keep every update readable over time.
           </p>
           <div className="mobile-hero-actions">
-            <Link href={launchTruthHref} className="mobile-action mobile-action-primary">
-              Open launch status
+            <Link href={aiForecastHref} className="mobile-action mobile-action-primary">
+              Open receipts campaign
             </Link>
             <Link href={launchThesisHref} className="mobile-action">
               Read proof thesis
