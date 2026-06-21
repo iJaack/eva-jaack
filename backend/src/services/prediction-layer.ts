@@ -319,6 +319,9 @@ const v1ProhibitedMarketPatterns = [
   /\b(jesus christ|messiah|rapture|second coming)\b/i,
   /\b(criminal|indict(?:ed|ment)?|convict(?:ed|ion)?|arrest(?:ed)?|prison|jail|trial|investigation|charged with)\b/i,
   /\b(tweet|tweets|post on x|post on twitter|instagram|tiktok|youtube|say on (?:x|twitter)|mention on (?:x|twitter)|endorse(?:s|d|ment)?)\b/i,
+  /\b(gta\s*(?:vi|6)|grand theft auto)\b/i,
+  /\b(james bond|next bond)\b/i,
+  /\b(new\s+[^?]{1,80}\s+album|album\s+(?:before|released?|drops?|drop|by))\b/i,
 ];
 
 function isAllowedV1Market(market: PredictionMarketDto): boolean {

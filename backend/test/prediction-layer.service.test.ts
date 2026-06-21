@@ -497,6 +497,101 @@ describe("prediction layer service", () => {
           updatedAt: new Date().toISOString(),
         },
         {
+          marketId: "polymarket-bitcoin-before-gta",
+          provider: "polymarket",
+          externalId: "entertainment-gta-1",
+          url: "https://polymarket.com/event/will-bitcoin-hit-1m-before-gta-vi",
+          title: "Will bitcoin hit $1m before GTA VI?",
+          category: "Crypto",
+          status: "open",
+          volumeUsd: 1_000_000,
+          liquidityUsd: 500_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.05 },
+            { outcomeId: "no", label: "No", price: 0.95 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-rihanna-album-before-gta",
+          provider: "polymarket",
+          externalId: "entertainment-album-1",
+          url: "https://polymarket.com/event/new-rihanna-album-before-gta-vi",
+          title: "New Rihanna Album before GTA VI?",
+          category: "Culture",
+          status: "open",
+          volumeUsd: 1_000_000,
+          liquidityUsd: 500_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.4 },
+            { outcomeId: "no", label: "No", price: 0.6 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-carti-album-before-gta",
+          provider: "polymarket",
+          externalId: "entertainment-album-2",
+          url: "https://polymarket.com/event/new-playboi-carti-album-before-gta-vi",
+          title: "New Playboi Carti Album before GTA VI?",
+          category: "Culture",
+          status: "open",
+          volumeUsd: 1_000_000,
+          liquidityUsd: 500_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.35 },
+            { outcomeId: "no", label: "No", price: 0.65 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-gpt6-before-gta",
+          provider: "polymarket",
+          externalId: "entertainment-gta-2",
+          url: "https://polymarket.com/event/will-gpt-6-be-released-before-gta-vi",
+          title: "Will GPT-6 be released before GTA VI?",
+          category: "Technology",
+          status: "open",
+          volumeUsd: 1_000_000,
+          liquidityUsd: 500_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.3 },
+            { outcomeId: "no", label: "No", price: 0.7 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "polymarket-next-james-bond",
+          provider: "polymarket",
+          externalId: "entertainment-casting-1",
+          url: "https://polymarket.com/event/will-example-be-announced-as-next-james-bond",
+          title: "Will Example be announced as next James Bond?",
+          category: "Culture",
+          status: "open",
+          volumeUsd: 1_000_000,
+          liquidityUsd: 500_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.2 },
+            { outcomeId: "no", label: "No", price: 0.8 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
           marketId: "polymarket-starmer-out",
           provider: "polymarket",
           externalId: "politics-4",
@@ -606,6 +701,11 @@ describe("prediction layer service", () => {
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-taylor-pregnant");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("kalshi-scotus-sports-contract");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-jesus-gta");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-bitcoin-before-gta");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-rihanna-album-before-gta");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-carti-album-before-gta");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-gpt6-before-gta");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-next-james-bond");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-starmer-out");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-balance-of-power-other");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-erdogan-out");
