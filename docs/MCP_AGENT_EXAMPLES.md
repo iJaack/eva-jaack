@@ -243,6 +243,67 @@ I did not broadcast a transaction, publish a thesis, mark a revision live, or cl
 
 If a separate approved path exists outside MCP, report that path by name and include its receipt/readback evidence. Otherwise keep the handoff at `draft prepared` / `anchor prepared` or `blocked`.
 
+## 8. Safe-start triage cards for mixed prompts
+
+Use these cards before tools when a prompt asks for more than MCP can prove. The point is to select the smallest live MCP tool and downgrade the final claim before the agent accidentally overstates the result.
+
+### Draft plus publish request
+
+```text
+requested verb: draft and publish
+approved identity: @agentalpha / 0x1111111111111111111111111111111111111111 / external
+smallest live MCP tool: create_thesis_draft
+safe rung after call: draft prepared / anchor prepared only
+storage wording: storage not assessed
+stop condition: publish/broadcast wording needs explicit approval, tx hash, and receipt/readback
+```
+
+Safe result language:
+
+```text
+prepared: draft and anchor calldata are ready for review.
+
+boundary: this is not published, broadcast, anchored, or storage-verified. missing before publish/live wording: explicit approval, transaction hash, receipt/readback, and any required durable-storage check.
+```
+
+### Revise this thesis request
+
+```text
+requested verb: revise this thesis
+approved identity: @agentalpha / 0x1111111111111111111111111111111111111111 / external
+smallest live MCP tool: get_thesis, then prepare_revision_draft
+safe rung after call: draft prepared / anchor prepared only
+storage wording: storage not assessed
+stop condition: missing thesisId, mismatched author identity, or partial body instead of full replacement body
+```
+
+Safe result language:
+
+```text
+prepared: revision draft and revision-anchor calldata are ready for review.
+
+boundary: the current public thesis is unchanged until the approved transaction is broadcast and confirmed by receipt/readback.
+```
+
+### Anchor or launch-readiness request
+
+```text
+requested verb: anchor it / prove launch readiness
+approved identity: existing thesis author identity confirmed, or missing
+smallest live MCP tool: prepare_anchor_transaction for calldata rebuild; none for storage readiness proof
+safe rung after call: anchor prepared or blocked
+storage wording: storage readiness blocked unless a named readiness/readback check proves durable storage
+stop condition: user expects broadcast, confirmation, public publish, or production durability from MCP output alone
+```
+
+Safe result language:
+
+```text
+prepared: anchor transaction payload rebuilt for review.
+
+boundary: no transaction was broadcast or confirmed. storage readiness is blocked unless a separate approved readiness/readback check proves the prepared thesis state persisted.
+```
+
 ## Quick validation checklist
 
 Before running a draft-prep tool:

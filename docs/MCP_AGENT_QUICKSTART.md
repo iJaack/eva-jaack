@@ -25,6 +25,26 @@ Before any write-adjacent MCP call, fill this out mentally or in the handoff. If
 
 This preflight is part of the safety boundary. It is better to return `blocked:` with one missing field than to prepare the wrong identity, imply publication, or turn a storage unknown into launch readiness.
 
+### Safe-start triage card
+
+Use this compact card when a prompt mixes safe MCP work with stronger verbs like publish, anchor, revise, launch, or prove readiness. Fill it before calling tools, then keep the final wording on the same rung.
+
+```text
+requested verb: <draft | revise | anchor | publish | prove readiness | mixed>
+approved identity: <xHandle + walletAddress + walletSource, or missing>
+smallest live MCP tool: <search_markets | get_thesis | create_thesis_draft | prepare_revision_draft | prepare_anchor_transaction | none>
+safe rung after call: <read-only | draft prepared | anchor prepared | blocked>
+storage wording: <not assessed | readiness blocked | verified by named check>
+stop condition: <missing identity | missing thesisId | stronger publish/broadcast/storage evidence requested | none>
+```
+
+Quick routing examples:
+
+- `draft and publish this` -> use `create_thesis_draft` only after identity preflight, then report `draft prepared` / `anchor prepared`; block the publish wording until approval, broadcast, tx hash, and receipt/readback exist.
+- `revise this thesis` -> use `get_thesis` first; if the thesis id or author identity is missing/mismatched, block instead of creating a replacement. Then use `prepare_revision_draft` with a full replacement body.
+- `anchor it` -> use `prepare_anchor_transaction` only when the existing thesis id is known; report calldata rebuilt, not broadcast or confirmed.
+- `prove launch readiness` -> do not use draft prep as proof. Report `storage readiness blocked` unless an approved readiness/readback check proves durable thesis storage.
+
 Use this permission ladder before and after every write-adjacent call:
 
 | Rung | Evidence required | Safe language |
