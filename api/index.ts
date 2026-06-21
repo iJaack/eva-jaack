@@ -18,26 +18,33 @@ function readBody(req: IncomingMessage): Promise<Uint8Array> {
   });
 }
 
-function resolveOriginalPath(req: IncomingMessage): string {
-  const host = req.headers.host ?? 'localhost';
-  const incoming = new URL(req.url ?? '/', `https://${host}`);
-
+export function resolveOriginalPathFromUrl(rawUrl = '/', host = 'localhost'): string {
+  const incoming = new URL(rawUrl, `https://${host}`);
   const route = incoming.searchParams.get('route');
   const path = incoming.searchParams.get('path');
+  const passthroughSearchParams = new URLSearchParams(incoming.searchParams);
+  passthroughSearchParams.delete('route');
+  passthroughSearchParams.delete('path');
+  const passthroughSearch = passthroughSearchParams.toString();
+  const suffix = passthroughSearch ? `?${passthroughSearch}` : '';
 
   if (route === 'api') {
-    return path ? `/api/${path}` : '/api';
+    return `${path ? `/api/${path}` : '/api'}${suffix}`;
   }
 
   if (route === 'well-known') {
-    return path ? `/.well-known/${path}` : '/.well-known';
+    return `${path ? `/.well-known/${path}` : '/.well-known'}${suffix}`;
   }
 
   if (route === 'health') {
-    return '/health';
+    return `/health${suffix}`;
   }
 
   return `${incoming.pathname}${incoming.search}`;
+}
+
+function resolveOriginalPath(req: IncomingMessage): string {
+  return resolveOriginalPathFromUrl(req.url ?? '/', req.headers.host ?? 'localhost');
 }
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
