@@ -13,6 +13,7 @@ Exclude markets whose title, category, or provider URL indicates:
 - religious prophecy / novelty prompts that are not usable macro, crypto, company, liquidity, or technology thesis signals
 - criminal investigations, arrests, indictments, convictions, prison, or trial outcomes
 - easily manipulable social/action prompts such as whether someone tweets, posts, says, or mentions a word on a social platform
+- easily manipulable entertainment / pop-culture prompts, including celebrity album releases, video-game release comparisons, or performer / actor casting questions such as the next James Bond
 
 ## Enforcement
 
