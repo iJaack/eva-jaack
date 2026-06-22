@@ -17,10 +17,13 @@ afterEach(async () => {
   await Promise.all(cleanupDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
 });
 
-async function makeApp(options: { confirmedTxHashes?: string[]; wrongCalldataTxHashes?: string[] } = {}) {
+async function makeService() {
   const dir = await mkdtemp(join(tmpdir(), "eva-prediction-routes-"));
   cleanupDirs.push(dir);
-  const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => [], async () => []);
+  return new LocalPredictionLayerService(join(dir, "index.json"), async () => [], async () => []);
+}
+
+function makeRoutedApp(service: LocalPredictionLayerService, options: { confirmedTxHashes?: string[]; wrongCalldataTxHashes?: string[] } = {}) {
   const confirmedTxHashes = new Set(options.confirmedTxHashes ?? [draftAnchorTxHash, revisionAnchorTxHash]);
   const wrongCalldataTxHashes = new Set(options.wrongCalldataTxHashes ?? []);
   const anchorVerifier = {
@@ -38,6 +41,10 @@ async function makeApp(options: { confirmedTxHashes?: string[]; wrongCalldataTxH
   const deps = { predictions: service, anchorVerifier };
   app.route("/api", createPredictionRoutes(deps));
   return app;
+}
+
+async function makeApp(options: { confirmedTxHashes?: string[]; wrongCalldataTxHashes?: string[] } = {}) {
+  return makeRoutedApp(await makeService(), options);
 }
 
 function identityPayload() {
@@ -179,6 +186,70 @@ describe("prediction routes", () => {
       thesis: {
         currentRevision: { version: 2, anchor: { status: "confirmed", txHash: revisionAnchorTxHash, confirmedAt: "2026-06-06T21:30:00.000Z" } },
         timeline: expect.arrayContaining([expect.objectContaining({ action: "revised", scoreBefore: 70 })]),
+      },
+    });
+  });
+
+  it("persists anchor preparations across route instance resets", async () => {
+    const service = await makeService();
+    const prepareApp = makeRoutedApp(service);
+    const publishApp = makeRoutedApp(service);
+    const reviseApp = makeRoutedApp(service);
+    const payload = thesisCreatePayload();
+
+    const prepared = await fetchJson(prepareApp, "/api/thesis-drafts/protocol/prepare-anchor", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    expect(prepared.status).toBe(200);
+
+    const created = await fetchJson(publishApp, "/api/theses", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...payload,
+        anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
+        anchorTxHash: draftAnchorTxHash,
+      }),
+    });
+
+    expect(created.status).toBe(201);
+    const thesisId = (created.body as { thesis: { thesisId: string; signals: Array<{ signalId: string }> } }).thesis.thesisId;
+    const signalId = (created.body as { thesis: { signals: Array<{ signalId: string }> } }).thesis.signals[0]!.signalId;
+    const revisionPayload = {
+      ...identityPayload(),
+      body: "Runtime reset did not lose the prepared revision.",
+      note: "Prepared in another runtime instance.",
+      signalUpdates: [{ signalId, currentOdds: 0.45 }],
+    };
+
+    const preparedRevision = await fetchJson(publishApp, `/api/theses/${thesisId}/revision-drafts/protocol/prepare-anchor`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(revisionPayload),
+    });
+
+    expect(preparedRevision.status).toBe(200);
+
+    const revised = await fetchJson(reviseApp, `/api/theses/${thesisId}/revisions`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...revisionPayload,
+        anchorPreparationId: (preparedRevision.body as { anchorPreparationId: string }).anchorPreparationId,
+        anchorTxHash: revisionAnchorTxHash,
+      }),
+    });
+
+    expect(revised.status).toBe(200);
+    expect(revised.body).toMatchObject({
+      thesis: {
+        currentRevision: {
+          version: 2,
+          anchor: { status: "confirmed", txHash: revisionAnchorTxHash },
+        },
       },
     });
   });
