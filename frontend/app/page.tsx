@@ -30,9 +30,9 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
 const evaPredictsUrl = "https://x.com/evapredicts";
 const launchThesisId = "thesis-0fdef25794b38b6e8eed7524";
 const homepageProofCampaign = "homepage_spacex_proof";
-const aiForecastCampaign = "ai_forecast_receipts";
+const protocolProofCampaign = "protocol_proof";
 const launchThesisHref = `/thesis/${launchThesisId}?utm_source=homepage&utm_medium=proof_cta&utm_campaign=${homepageProofCampaign}&utm_content=launch_thesis`;
-const aiForecastHref = `/campaigns/ai-forecast-receipts?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${aiForecastCampaign}&utm_content=forecast_receipts`;
+const protocolProofHref = `/campaigns/protocol-proof?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${protocolProofCampaign}&utm_content=protocol_proof`;
 
 function formatUsd(value: number | null): string {
   if (value === null) return "—";
@@ -124,9 +124,9 @@ const participationQuests = [
 ] as const;
 
 const campaignProofPoints = [
-  "inspect one AI-assisted forecast as a thesis record with sources attached",
-  "show the revision trigger before asking readers to trust the output",
-  "measure receipt-framed clicks before widening the @evapredicts push",
+  "send homepage traffic to one proof-backed thesis before asking readers to trust the protocol claim",
+  "make cited signals, visible revisions, author identity, and anchorability the primary conversion promise",
+  "measure protocol-proof clicks against the softer receipt framing before widening the @evapredicts push",
 ] as const;
 
 const activeCampaigns = [
@@ -189,13 +189,13 @@ const activeCampaigns = [
 function CampaignCallout() {
   return (
     <section className="prediction-section campaign-callout" aria-label="Current Eva Protocol campaign">
-      <CampaignViewTracker campaign={aiForecastCampaign} channel="homepage_campaign_callout" />
+      <CampaignViewTracker campaign={protocolProofCampaign} channel="homepage_campaign_callout" />
       <div className="campaign-callout-copy">
         <p className="section-kicker">@evapredicts campaign</p>
-        <h2 className="section-title section-title-sm">AI forecasts need receipts before they need reach.</h2>
+        <h2 className="section-title section-title-sm">public predictions need protocol proof before they need louder claims.</h2>
         <p>
-          The current growth wedge is forecast receipts: source fit, revision triggers, and an author/runtime trail that
-          makes public AI-assisted forecasts inspectable after the timeline moves on.
+          The current growth wedge is protocol proof: cited signals, visible revisions, author identity, and an
+          anchorable record that makes public predictions inspectable after the timeline moves on.
         </p>
       </div>
       <div className="campaign-proof-grid" aria-label="Campaign proof points">
@@ -207,18 +207,18 @@ function CampaignCallout() {
         ))}
       </div>
       <div className="campaign-action-row">
-        <CampaignLink href={aiForecastHref} campaign={aiForecastCampaign} cta="open_receipts_campaign" channel="homepage_campaign_callout" className="mobile-action mobile-action-primary">
-          Open receipts campaign
+        <CampaignLink href={protocolProofHref} campaign={protocolProofCampaign} cta="open_protocol_proof_campaign" channel="homepage_campaign_callout" className="mobile-action mobile-action-primary">
+          Open protocol-proof campaign
         </CampaignLink>
-        <CampaignLink href={launchThesisHref} campaign={aiForecastCampaign} cta="read_proof_record" channel="homepage_campaign_callout" className="mobile-action">
+        <CampaignLink href={launchThesisHref} campaign={protocolProofCampaign} cta="read_proof_record" channel="homepage_campaign_callout" className="mobile-action">
           Read the proof record
         </CampaignLink>
-        <CampaignLink href={evaPredictsUrl} campaign={aiForecastCampaign} cta="follow_evapredicts" channel="homepage_campaign_callout" className="mobile-action" target="_blank" rel="noreferrer" external>
+        <CampaignLink href={evaPredictsUrl} campaign={protocolProofCampaign} cta="follow_evapredicts" channel="homepage_campaign_callout" className="mobile-action" target="_blank" rel="noreferrer" external>
           Follow @evapredicts
         </CampaignLink>
       </div>
       <p className="inline-note">
-        Metric to watch: utm_campaign=ai_forecast_receipts clicks into the campaign page, then proof-thesis reads, market-signal clicks, compose starts, and follow clicks before any broader launch push.
+        Metric to watch: utm_campaign=protocol_proof clicks into the campaign page, then proof-record reads, signal-library clicks, author-record clicks, compose starts, and follow clicks before any broader launch push.
       </p>
     </section>
   );
@@ -395,8 +395,8 @@ export default function HomePage() {
             anchor the first version, and keep every update readable over time.
           </p>
           <div className="mobile-hero-actions">
-            <Link href={aiForecastHref} className="mobile-action mobile-action-primary">
-              Open receipts campaign
+            <Link href={protocolProofHref} className="mobile-action mobile-action-primary">
+              Open protocol-proof campaign
             </Link>
             <Link href={launchThesisHref} className="mobile-action">
               Read proof thesis
