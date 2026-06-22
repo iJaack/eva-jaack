@@ -198,6 +198,31 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents MCP tool annotations without treating them as approval evidence", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Tool annotations",
+      "routing hints",
+      "readOnlyHint: true",
+      "readOnlyHint: false",
+      "destructiveHint: false",
+      "idempotentHint: true",
+      "openWorldHint: false",
+      "not approval",
+      "not publication",
+      "storage-readiness evidence",
+    ]) {
+      expect(docs, `agent docs should include tool annotation boundary phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("teaches agents to downgrade over-strong publish/storage claims", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),

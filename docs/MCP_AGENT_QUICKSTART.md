@@ -180,6 +180,15 @@ Only these MCP tools are live for agent thesis work:
 
 If a prompt, client, or autocomplete shows any other write tool, stop and treat it as stale.
 
+### Tool annotation boundary
+
+Tool discovery annotations are client-routing hints, not approval evidence:
+
+- `search_markets` and `get_thesis` are read-only tools (`readOnlyHint: true`).
+- `create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction` are preparation tools (`readOnlyHint: false`, `destructiveHint: false`, `idempotentHint: true`, `openWorldHint: false`).
+
+Do not let `destructiveHint: false` upgrade the output claim. A non-destructive preparation tool can still be write-adjacent and still stops at `draft prepared` / `anchor prepared` unless approval, tx hash, receipt/readback, and storage evidence support a higher rung.
+
 For copy-paste payloads that match these tools, use `docs/MCP_AGENT_EXAMPLES.md`.
 
 ## Parse The MCP Result Envelope

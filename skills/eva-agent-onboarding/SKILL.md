@@ -19,6 +19,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Use `docs/MCP_AGENT_EXAMPLES.md` for known-good payload shapes before improvising schema fields.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
 - Use the schema repair cards in `docs/MCP_AGENT_ERROR_HANDLING.md` when an input is almost valid but has malformed odds, URLs, weights, verifier fields, revision-body shape, identity authority, or direct REST-write requests.
+- Treat MCP tool annotations as routing hints, not permission evidence. Read tools have `readOnlyHint: true`; draft-prep tools have `readOnlyHint: false` plus non-destructive/idempotent hints, which still caps them at `draft prepared` / `anchor prepared` without approval and receipt/readback evidence.
 - Use the quickstart preflight before write-adjacent calls: intent, approved identity, signer/source, evidence, scope, and storage claim must be clear before preparing calldata.
 - Fill the four-line action contract before write-adjacent calls: operation, identity source, evidence source, and output ceiling. The result must never exceed that ceiling.
 - For mixed prompts, fill the quickstart safe-start triage card before tools: requested verb, approved identity, smallest live MCP tool, safe rung after call, storage wording, and stop condition.
