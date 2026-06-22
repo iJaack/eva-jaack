@@ -184,6 +184,12 @@ const activeCampaigns = [
     href: "/campaigns/protocol-proof?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=protocol_proof&utm_content=protocol_proof_card",
     metric: "proof-record reads, source-library clicks, author-record clicks, compose starts, and follows",
   },
+  {
+    title: "forecast QA checklist",
+    body: "A checklist wedge for AI forecast and market-thesis builders: source fit, break conditions, revision triggers, and author trail before amplification.",
+    href: "/campaigns/forecast-qa-checklist?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=forecast_qa_checklist&utm_content=forecast_qa_card",
+    metric: "proof-record reads, market-signal clicks, compose starts, author-record clicks, and follows",
+  },
 ] as const;
 
 function CampaignCallout() {
