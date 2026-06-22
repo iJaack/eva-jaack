@@ -23,6 +23,8 @@ Use alongside:
 
 If the task asks for more than the selected tool can safely prove, report the missing evidence instead of upgrading the claim.
 
+Annotation reminder: `search_markets` and `get_thesis` are read-only. Draft-prep tools are explicitly not read-only even though they are non-destructive and idempotent. Treat tool annotations as routing hints, not approval, tx submission, publication, or storage-readiness evidence.
+
 ## 0.1 Parse the MCP result envelope
 
 Eva MCP responses are usually wrapped as SDK text content. The safe markers are inside the JSON string at `content[0].text`:

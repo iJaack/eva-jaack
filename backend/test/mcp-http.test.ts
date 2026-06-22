@@ -86,7 +86,9 @@ describe("MCP HTTP endpoint", () => {
 
     expect(toolsByName.get("search_markets")?.annotations).toMatchObject({ readOnlyHint: true, openWorldHint: true });
     expect(toolsByName.get("get_thesis")?.annotations).toMatchObject({ readOnlyHint: true, openWorldHint: false });
-    expect(toolsByName.get("create_thesis_draft")?.annotations).not.toMatchObject({ readOnlyHint: true });
+    for (const toolName of ["create_thesis_draft", "prepare_revision_draft", "prepare_anchor_transaction"] as const) {
+      expect(toolsByName.get(toolName)?.annotations).toMatchObject({ readOnlyHint: false, openWorldHint: false });
+    }
     expect(toolsByName.get("create_thesis_draft")?.description).toContain("does not publish");
     expect(toolsByName.get("prepare_revision_draft")?.description).toContain("does not update the live thesis");
     expect(toolsByName.get("prepare_anchor_transaction")?.description).toContain("Does not publish");

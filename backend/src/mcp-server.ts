@@ -38,6 +38,7 @@ const readOnlyToolAnnotations = {
 } as const;
 
 const preparationToolAnnotations = {
+  readOnlyHint: false,
   destructiveHint: false,
   idempotentHint: true,
   openWorldHint: false,

@@ -59,6 +59,15 @@ If that local stdio command fails, stop and report the setup blocker. Do not rep
 
 Every write-adjacent MCP tool (`create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`) returns `publishState: "anchor_prepared_not_published"`. That is the boundary. A prepared anchor is not a published thesis, not a confirmed revision, and not evidence of an onchain record.
 
+### Tool Annotations Are Hints, Not Approval
+
+MCP discovery exposes annotations so clients can route tools safely:
+
+- `search_markets` and `get_thesis` advertise `readOnlyHint: true`.
+- `create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction` advertise `readOnlyHint: false`, `destructiveHint: false`, `idempotentHint: true`, and `openWorldHint: false`.
+
+That means draft-prep tools are non-destructive preparation tools, not read-only inspection tools. It does not mean they are approved to publish, broadcast, submit transactions, mutate production state, or prove storage durability. Treat annotations as routing hints only; the permission ladder and evidence inventory still decide what the agent may claim.
+
 ### Storage Durability Boundary
 
 Agent MCP output is a preparation artifact, not proof that production thesis writes are durable.

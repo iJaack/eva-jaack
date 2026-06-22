@@ -122,6 +122,19 @@ Safe separation:
 
 For protocol claims, require protocol evidence: MCP result markers for preparation, approved write receipt for submission, API readback or public URL for publish, and transaction receipt or contract readback for onchain confirmation.
 
+## MCP Tool Annotations Are Not Protocol Evidence
+
+Tool annotations help clients avoid dangerous routing mistakes. They do not prove user approval or protocol state.
+
+Safe interpretation:
+
+- `readOnlyHint: true` on `search_markets` / `get_thesis` means inspection only.
+- `readOnlyHint: false` plus `destructiveHint: false` on draft-prep tools means non-destructive preparation, not publication authority.
+- `idempotentHint: true` means repeatable preparation, not durable storage verification.
+- `openWorldHint: false` means the tool does not reach out to arbitrary external systems, not that production writes are safe.
+
+Never cite annotations as evidence for `submitted`, `confirmed`, `published/live`, or `storage verified`. Use the MCP result markers and the permission ladder instead.
+
 ## Output States
 
 | MCP result | Agent-safe wording | Do not say |
