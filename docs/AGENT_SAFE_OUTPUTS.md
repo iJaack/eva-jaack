@@ -25,6 +25,27 @@ boundary: no transaction broadcast and no public publish unless explicitly evide
 
 Keep `published/live` out of this card unless the public publish path completed and a receipt or contract readback matches the thesis/revision. If storage is not directly proven by a named readiness or readback check, use `storage: not assessed` or `storage: readiness blocked`.
 
+## Output Ceiling Gate
+
+Before writing the final user-facing sentence, compare it to the action contract from the quickstart:
+
+```text
+operation: <read-only | new draft | revision | anchor rebuild>
+identity source: <task-time approval or blocked>
+evidence source: <real URLs | signal-light | named readiness/readback check | blocked>
+output ceiling: <read-only | draft prepared | anchor prepared | submitted | published/live>
+```
+
+The final sentence must stay at or below `output ceiling`:
+
+- `read-only` ceiling -> no draft, revision, calldata, anchor, publish, or storage claim.
+- `draft prepared` ceiling -> preview/revision prepared only; no broadcast or live wording.
+- `anchor prepared` ceiling -> calldata ready for approval only; no submitted/confirmed wording.
+- `submitted` ceiling -> tx hash exists, but no confirmed/live wording without receipt/readback.
+- `published/live` ceiling -> only with the separate approved execution path plus receipt/readback evidence.
+
+If the user's requested wording is above the ceiling, use the claim downgrade pattern below and name the missing evidence.
+
 ## Evidence Inventory For Handoffs
 
 Before sending a result card, copy only evidence the MCP response or named follow-up check actually returned. Do not infer hidden state from a familiar tool name.

@@ -20,6 +20,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
 - Use the schema repair cards in `docs/MCP_AGENT_ERROR_HANDLING.md` when an input is almost valid but has malformed odds, URLs, weights, verifier fields, revision-body shape, identity authority, or direct REST-write requests.
 - Use the quickstart preflight before write-adjacent calls: intent, approved identity, signer/source, evidence, scope, and storage claim must be clear before preparing calldata.
+- Fill the four-line action contract before write-adjacent calls: operation, identity source, evidence source, and output ceiling. The result must never exceed that ceiling.
 - For mixed prompts, fill the quickstart safe-start triage card before tools: requested verb, approved identity, smallest live MCP tool, safe rung after call, storage wording, and stop condition.
 - Parse Eva MCP result envelopes before reporting: successful tools usually put JSON in `content[0].text`; if `isError: true`, the text part is missing, or the text is not parseable JSON, report `blocked:` and do not infer status markers.
 - Place every write-adjacent result on the permission ladder before reporting: `read-only`, `draft prepared`, `anchor prepared`, `submitted`, or `published/live`.
@@ -69,6 +70,13 @@ Use this drill for a new agent before it touches a real user-requested thesis. I
 
 2. Read/search first. Use the SpaceX proof object unless the operator gave a different scope:
 
+```text
+operation: read-only
+identity source: not required for search_markets
+evidence source: market search query only
+output ceiling: read-only
+```
+
 ```json
 {
   "tool": "search_markets",
@@ -78,6 +86,13 @@ Use this drill for a new agent before it touches a real user-requested thesis. I
 ```
 
 3. Prepare a signal-light draft only when the operator-approved identity is known. This example uses Eva's wallet as a rehearsal identity; do not swap it into live work without task-time approval:
+
+```text
+operation: new draft
+identity source: onboarding rehearsal approval for @evajaack + Eva wallet + external walletSource
+evidence source: explicitly signal-light; no market or fact URLs claimed
+output ceiling: draft prepared / anchor prepared
+```
 
 ```json
 {
@@ -97,6 +112,13 @@ Use this drill for a new agent before it touches a real user-requested thesis. I
 ```
 
 4. Prepare a revision only after `get_thesis` confirms the exact thesis and identity. Use a short delta note:
+
+```text
+operation: revision
+identity source: `get_thesis` readback plus task-time approval for xHandle and walletAddress
+evidence source: full replacement body from approved source text; note summarizes the delta
+output ceiling: draft prepared / anchor prepared
+```
 
 ```json
 {

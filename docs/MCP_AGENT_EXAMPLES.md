@@ -51,6 +51,17 @@ next evidence needed: explicit approval, transaction hash, and receipt/readback 
 
 Default-handling rule: schema defaults are not approval. If `walletSource`, signal weights, roles, status, verifier verdicts, or verifier scores are filled by defaults instead of task evidence, label them as defaulted or signal-light in the handoff. Do not use defaulted signal fields to claim the draft is signal-backed, verified, published, broadcast, or storage-ready.
 
+Quick action contract to copy before any write-adjacent example:
+
+```text
+operation: <new draft | revision | anchor rebuild>
+identity source: <task-time approval for xHandle + walletAddress + walletSource, or blocked>
+evidence source: <real URLs | explicitly signal-light | named readiness/readback check | blocked>
+output ceiling: <draft prepared | anchor prepared>
+```
+
+Do not let the payload outrun that contract. If the contract says signal-light, use empty arrays or label defaulted signal metadata. If the contract says `anchor prepared`, the result card must not say submitted, confirmed, published/live, or storage verified.
+
 ## 1. Read-only market search
 
 Tool: `search_markets`
