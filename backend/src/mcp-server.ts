@@ -17,6 +17,32 @@ export const evaMcpToolNames = [
   "prepare_anchor_transaction",
 ] as const;
 
+type EvaMcpToolName = typeof evaMcpToolNames[number];
+
+export const evaMcpToolDescriptions = {
+  search_markets: "Read-only search for candidate prediction-market signals. Does not draft, publish, broadcast, or mutate Eva thesis state.",
+  create_thesis_draft:
+    "Prepare a new thesis preview and anchor calldata only. Returns anchor_prepared_not_published; does not publish, broadcast, call REST writes, or prove storage durability.",
+  get_thesis: "Read-only inspection of an existing Eva thesis by thesisId. Does not revise, publish, broadcast, or mutate state.",
+  prepare_revision_draft:
+    "Prepare a full-body revision preview and revision-anchor calldata only. Returns anchor_prepared_not_published; does not update the live thesis, publish, or broadcast.",
+  prepare_anchor_transaction:
+    "Rebuild anchor calldata for an existing thesis only. Does not publish, revise, broadcast, confirm onchain state, or prove storage durability.",
+} satisfies Record<EvaMcpToolName, string>;
+
+const readOnlyToolAnnotations = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+} as const;
+
+const preparationToolAnnotations = {
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+} as const;
+
 export function createEvaMcpServer() {
   const server = new McpServer({
     name: "eva-thesis",
@@ -26,13 +52,21 @@ export function createEvaMcpServer() {
   const predictions = getPredictionLayerService();
   const handlers = createEvaMcpToolHandlers(predictions);
 
-  server.tool("search_markets", searchMarketsToolSchema, async ({ query }) => {
+  server.registerTool("search_markets", {
+    description: evaMcpToolDescriptions.search_markets,
+    inputSchema: searchMarketsToolSchema,
+    annotations: { ...readOnlyToolAnnotations, openWorldHint: true },
+  }, async ({ query }) => {
     return handlers.searchMarkets({ query });
   });
 
-  server.tool(
+  server.registerTool(
     "create_thesis_draft",
-    createThesisDraftToolSchema,
+    {
+      description: evaMcpToolDescriptions.create_thesis_draft,
+      inputSchema: createThesisDraftToolSchema,
+      annotations: preparationToolAnnotations,
+    },
     async ({ title, body, xHandle, walletAddress, walletSource, predictionSignals, factSignals }) => {
       return handlers.createThesisDraft({
         title,
@@ -46,17 +80,25 @@ export function createEvaMcpServer() {
     },
   );
 
-  server.tool(
+  server.registerTool(
     "get_thesis",
-    getThesisToolSchema,
+    {
+      description: evaMcpToolDescriptions.get_thesis,
+      inputSchema: getThesisToolSchema,
+      annotations: readOnlyToolAnnotations,
+    },
     async ({ thesisId }) => {
       return handlers.getThesis({ thesisId });
     },
   );
 
-  server.tool(
+  server.registerTool(
     "prepare_revision_draft",
-    prepareRevisionDraftToolSchema,
+    {
+      description: evaMcpToolDescriptions.prepare_revision_draft,
+      inputSchema: prepareRevisionDraftToolSchema,
+      annotations: preparationToolAnnotations,
+    },
     async ({ thesisId, body, note, xHandle, walletAddress }) => {
       return handlers.prepareRevisionDraft({
         thesisId,
@@ -68,9 +110,13 @@ export function createEvaMcpServer() {
     },
   );
 
-  server.tool(
+  server.registerTool(
     "prepare_anchor_transaction",
-    prepareAnchorTransactionToolSchema,
+    {
+      description: evaMcpToolDescriptions.prepare_anchor_transaction,
+      inputSchema: prepareAnchorTransactionToolSchema,
+      annotations: preparationToolAnnotations,
+    },
     async ({ thesisId }) => {
       return handlers.prepareExistingThesisAnchorTransaction({ thesisId });
     },
