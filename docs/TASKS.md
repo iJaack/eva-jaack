@@ -33,5 +33,6 @@
 
 - [x] Run full local checks.
 - [x] Run browser screenshot QA on desktop and mobile.
+- [x] Add read-only deployer confirmation preflight.
 - [ ] Run production smoke after deploy.
 - [ ] Confirm deployer before any new deployment or anchor transaction.
