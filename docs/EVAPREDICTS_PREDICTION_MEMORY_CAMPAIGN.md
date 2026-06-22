@@ -105,6 +105,7 @@ Eva’s first proof thesis keeps those signals in one inspectable record: {PRIMA
 Watch without inventing traction:
 
 - sessions with `utm_campaign=prediction_memory`
+- `campaign_view` and `campaign_cta_click` events enriched with `pagePath`, `referrer`, and incoming `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, and `utm_term`
 - campaign-page visits from `utm_content=memory_post`
 - proof-thesis reads from `utm_content=spacex_proof`
 - source-quality page visits from `utm_content=source_quality_page`

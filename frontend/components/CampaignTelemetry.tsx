@@ -9,6 +9,13 @@ type CampaignTelemetryPayload = {
   cta: string;
   channel?: string;
   destination?: string;
+  pagePath?: string;
+  referrer?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  utmContent?: string;
+  utmTerm?: string;
 };
 
 declare global {
@@ -21,9 +28,21 @@ declare global {
 function trackCampaignEvent(name: string, payload: CampaignTelemetryPayload) {
   if (typeof window === "undefined") return;
 
-  window.va?.("event", name, payload);
-  window.dataLayer?.push({ event: name, ...payload });
-  window.dispatchEvent(new CustomEvent("eva:campaign", { detail: { name, ...payload } }));
+  const searchParams = new URLSearchParams(window.location.search);
+  const enrichedPayload: CampaignTelemetryPayload = {
+    ...payload,
+    pagePath: window.location.pathname,
+    referrer: document.referrer || undefined,
+    utmSource: searchParams.get("utm_source") ?? undefined,
+    utmMedium: searchParams.get("utm_medium") ?? undefined,
+    utmCampaign: searchParams.get("utm_campaign") ?? undefined,
+    utmContent: searchParams.get("utm_content") ?? undefined,
+    utmTerm: searchParams.get("utm_term") ?? undefined,
+  };
+
+  window.va?.("event", name, enrichedPayload);
+  window.dataLayer?.push({ event: name, ...enrichedPayload });
+  window.dispatchEvent(new CustomEvent("eva:campaign", { detail: { name, ...enrichedPayload } }));
 }
 
 export function CampaignViewTracker({ campaign, channel = "campaign_page" }: { campaign: string; channel?: string }) {
