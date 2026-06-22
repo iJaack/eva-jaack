@@ -276,6 +276,29 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("keeps platform coordination status separate from protocol state", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Platform status is not protocol status",
+      "coordination signals",
+      "Multica issue",
+      "PR merged",
+      "deployment green",
+      "prior agent comments",
+      "MCP output",
+      "approved write receipts",
+      "API readback",
+      "onchain receipt/readback",
+    ]) {
+      expect(docs, `agent docs should separate platform status from protocol state phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents schema repair cards so agents normalize inputs without guessing", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_ERROR_HANDLING.md"),

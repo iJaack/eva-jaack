@@ -86,6 +86,21 @@ Use the lowest rung supported by direct evidence:
 
 MCP alone never reaches the `submitted` or `published/live` rungs. If the output is ambiguous, stay on the lower rung and say what evidence is missing.
 
+## Platform Status Is Not Protocol Status
+
+Do not use task-management state as proof of thesis state. A Multica issue, PR, deployment, or agent comment can prove coordination progress; it cannot prove a thesis was published, anchored, revised, submitted, confirmed, or stored durably.
+
+Safe separation:
+
+| Platform evidence | Safe use | Unsafe upgrade |
+|---|---|---|
+| issue `done` / `in_review` | work delivered or awaiting review | "thesis is live" |
+| PR merged / checks green | code/docs changed and tests passed | "production thesis write happened" |
+| deployment green | app is reachable | "prepared state is durable" |
+| prior issue comment or old draft JSON | historical handoff context | "current revision confirmed" |
+
+For protocol claims, require protocol evidence: MCP result markers for preparation, approved write receipt for submission, API readback or public URL for publish, and transaction receipt or contract readback for onchain confirmation.
+
 ## Output States
 
 | MCP result | Agent-safe wording | Do not say |
