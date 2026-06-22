@@ -29,10 +29,9 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
 
 const evaPredictsUrl = "https://x.com/evapredicts";
 const launchThesisId = "thesis-0fdef25794b38b6e8eed7524";
-const homepageProofCampaign = "homepage_spacex_proof";
-const predictionMemoryCampaign = "prediction_memory";
-const launchThesisHref = `/thesis/${launchThesisId}?utm_source=homepage&utm_medium=proof_cta&utm_campaign=${homepageProofCampaign}&utm_content=launch_thesis`;
-const predictionMemoryHref = `/campaigns/prediction-memory?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${predictionMemoryCampaign}&utm_content=prediction_memory`;
+const featuredCampaign = "forecast_qa_checklist";
+const launchThesisHref = `/thesis/${launchThesisId}?utm_source=homepage&utm_medium=proof_cta&utm_campaign=${featuredCampaign}&utm_content=spacex_proof_record`;
+const featuredCampaignHref = `/campaigns/forecast-qa-checklist?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${featuredCampaign}&utm_content=homepage_callout`;
 
 function formatUsd(value: number | null): string {
   if (value === null) return "—";
@@ -124,9 +123,9 @@ const participationQuests = [
 ] as const;
 
 const campaignProofPoints = [
-  "make the memory gap concrete before asking readers to care about a new prediction surface",
-  "send homepage traffic to one proof-backed thesis where sources, revisions, and author trail are inspectable",
-  "measure prediction-memory clicks against broader protocol-proof and receipt framing before widening the @evapredicts push",
+  "make source fit explicit before a forecast earns distribution",
+  "force one break condition and revision trigger into the record before the timeline moves",
+  "measure checklist clicks against proof-record reads, author-record clicks, compose starts, and follows",
 ] as const;
 
 const activeCampaigns = [
@@ -195,36 +194,36 @@ const activeCampaigns = [
 function CampaignCallout() {
   return (
     <section className="prediction-section campaign-callout" aria-label="Current Eva Protocol campaign">
-      <CampaignViewTracker campaign={predictionMemoryCampaign} channel="homepage_campaign_callout" />
+      <CampaignViewTracker campaign={featuredCampaign} channel="homepage_campaign_callout" />
       <div className="campaign-callout-copy">
         <p className="section-kicker">@evapredicts campaign</p>
-        <h2 className="section-title section-title-sm">prediction markets price the moment. Eva remembers the thesis.</h2>
+        <h2 className="section-title section-title-sm">forecasts need QA before they deserve distribution.</h2>
         <p>
-          The current growth wedge is prediction memory: cited signals, visible revisions, and an author trail that
-          keep the original market call inspectable after the timeline moves on.
+          The current homepage wedge is forecast QA: source fit, break conditions, revision triggers, and an author
+          trail before the market call gets amplified.
         </p>
       </div>
       <div className="campaign-proof-grid" aria-label="Campaign proof points">
         {campaignProofPoints.map((point) => (
           <div key={point}>
-            <span>memory</span>
+            <span>qa</span>
             <strong>{point}</strong>
           </div>
         ))}
       </div>
       <div className="campaign-action-row">
-        <CampaignLink href={predictionMemoryHref} campaign={predictionMemoryCampaign} cta="open_prediction_memory_campaign" channel="homepage_campaign_callout" className="mobile-action mobile-action-primary">
-          Open prediction-memory campaign
+        <CampaignLink href={featuredCampaignHref} campaign={featuredCampaign} cta="open_forecast_qa_checklist" channel="homepage_campaign_callout" className="mobile-action mobile-action-primary">
+          Run the forecast QA checklist
         </CampaignLink>
-        <CampaignLink href={launchThesisHref} campaign={predictionMemoryCampaign} cta="read_proof_record" channel="homepage_campaign_callout" className="mobile-action">
+        <CampaignLink href={launchThesisHref} campaign={featuredCampaign} cta="read_proof_record" channel="homepage_campaign_callout" className="mobile-action">
           Read the proof record
         </CampaignLink>
-        <CampaignLink href={evaPredictsUrl} campaign={predictionMemoryCampaign} cta="follow_evapredicts" channel="homepage_campaign_callout" className="mobile-action" target="_blank" rel="noreferrer" external>
+        <CampaignLink href={evaPredictsUrl} campaign={featuredCampaign} cta="follow_evapredicts" channel="homepage_campaign_callout" className="mobile-action" target="_blank" rel="noreferrer" external>
           Follow @evapredicts
         </CampaignLink>
       </div>
       <p className="inline-note">
-        Metric to watch: utm_campaign=prediction_memory clicks into the campaign page, then proof-thesis reads, source-quality page visits, compose starts, and follow clicks before any broader launch push.
+        Metric to watch: utm_campaign=forecast_qa_checklist clicks into the checklist, then proof-record reads, market-signal clicks, author-record clicks, compose starts, and follow clicks. No traction claims until measured data exists.
       </p>
     </section>
   );
@@ -401,8 +400,8 @@ export default function HomePage() {
             anchor the first version, and keep every update readable over time.
           </p>
           <div className="mobile-hero-actions">
-            <Link href={predictionMemoryHref} className="mobile-action mobile-action-primary">
-              Open prediction-memory campaign
+            <Link href={featuredCampaignHref} className="mobile-action mobile-action-primary">
+              Run forecast QA
             </Link>
             <Link href={launchThesisHref} className="mobile-action">
               Read proof thesis
