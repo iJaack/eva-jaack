@@ -156,6 +156,28 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents the action contract that caps write-adjacent result claims", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Four-line action contract",
+      "operation:",
+      "identity source:",
+      "evidence source:",
+      "output ceiling:",
+      "result must never exceed that ceiling",
+      "If `identity source` is blocked",
+      "If `evidence source` is signal-light",
+    ]) {
+      expect(docs, `agent docs should include action contract phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents the MCP text result envelope so agents parse returned JSON before reporting", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_GUIDE.md"),

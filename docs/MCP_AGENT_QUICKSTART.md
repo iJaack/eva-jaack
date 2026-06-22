@@ -38,6 +38,24 @@ Before any write-adjacent MCP call, fill this out mentally or in the handoff. If
 
 This preflight is part of the safety boundary. It is better to return `blocked:` with one missing field than to prepare the wrong identity, imply publication, or turn a storage unknown into launch readiness.
 
+### Four-line action contract
+
+Before a write-adjacent call, write this tiny contract in your notes or handoff. It keeps identity, evidence, and final wording tied to the same permission rung:
+
+```text
+operation: <read-only | new draft | revision | anchor rebuild>
+identity source: <task-time approval for xHandle + walletAddress + walletSource, or blocked>
+evidence source: <real market/source URLs | explicitly signal-light | storage/readback check name | blocked>
+output ceiling: <read-only | draft prepared | anchor prepared | submitted | published/live>
+```
+
+Rules:
+
+- If `identity source` is blocked, do not call `create_thesis_draft`, `prepare_revision_draft`, or `prepare_anchor_transaction`.
+- If `evidence source` is signal-light, do not call the result signal-backed or verified.
+- If no approved broadcast/readback evidence exists, `output ceiling` cannot exceed `anchor prepared`.
+- If no approved durable-storage readiness/readback check exists, storage wording stays `storage not assessed` or `storage readiness blocked`.
+
 ### Defaults are validation helpers, not evidence
 
 The live schemas may fill defaults such as `walletSource: "external"`, `selectedOutcomeLabel: "Yes"`, `weight: 50`, `role`, `status: "open"`, `verifierVerdict: "unverifiable_yet"`, or `verifierScore: 50`. Treat those as schema defaults, not task approval or sourced facts.
