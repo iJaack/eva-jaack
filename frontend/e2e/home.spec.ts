@@ -143,9 +143,9 @@ test("homepage leads with the prediction workbench layout", async ({ page }) => 
 
   await expect(page.getByRole("heading", { name: "Turn market odds into a public thesis." })).toBeVisible();
   await expect(page.getByText("Eva lets predictors write an interactive post")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Open receipts campaign" }).first()).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Open protocol-proof campaign" }).first()).toHaveAttribute(
     "href",
-    /utm_campaign=ai_forecast_receipts.*utm_content=forecast_receipts/,
+    /utm_campaign=protocol_proof.*utm_content=protocol_proof/,
   );
   await expect(page.getByRole("link", { name: "Read the proof record" })).toHaveAttribute(
     "href",
