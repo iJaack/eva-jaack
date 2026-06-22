@@ -52,6 +52,8 @@ Before sending a result card, copy only evidence the MCP response or named follo
 
 MCP clients usually wrap Eva results in a text envelope. Parse `content[0].text` as JSON before filling the inventory. If `isError: true`, the text part is missing, or the text is not parseable JSON when JSON was expected, report `blocked:` instead of inventing marker values.
 
+MCP text parser rule: extract the first text part once, parse that JSON, and fill the inventory only from the parsed object. If the parser cannot produce JSON, the safe result is `blocked`, not a guessed partial success. Do not use the tool name, request intent, or SDK envelope as a substitute for returned `publishState`, `anchorStatus`, tx hash, receipt/readback, storage readiness, or public/live evidence.
+
 Minimum inventory for write-adjacent results:
 
 - operation evidence: tool name, requested intent, and approved `xHandle` / `walletAddress`,

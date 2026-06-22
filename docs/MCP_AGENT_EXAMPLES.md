@@ -39,6 +39,18 @@ Eva MCP responses are usually wrapped as SDK text content. The safe markers are 
 
 Parse the text before reading `publishState`, `anchorStatus`, `anchorPreparationId`, `transactions`, or `nextStep`. If `isError: true`, the text part is absent, or the text is not valid JSON for the expected tool, use the blocked template instead of claiming draft, anchor, publish, submission, confirmation, or storage state.
 
+MCP text parser pattern:
+
+```ts
+const text = result.content?.find((part) => part.type === "text")?.text;
+if (!text || result.isError) {
+  throw new Error("blocked: missing successful MCP text JSON envelope");
+}
+const parsed = JSON.parse(text);
+```
+
+Only copy values from `parsed` into a handoff. A tool name or SDK envelope alone is not evidence for `publishState`, `anchorStatus`, storage readiness, transaction submission, confirmation, or live/public state.
+
 Result-card pattern for every write-adjacent example below:
 
 ```text

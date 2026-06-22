@@ -193,6 +193,10 @@ describe("Eva MCP agent docs", () => {
       "isError: true",
       "MCP result envelope",
       "Do not infer",
+      "MCP text parser",
+      "parseEvaMcpTextResult",
+      "fill the evidence inventory only from the parsed object",
+      "A tool name",
     ]) {
       expect(docs, `agent docs should include MCP result envelope phrase ${phrase}`).toContain(phrase);
     }

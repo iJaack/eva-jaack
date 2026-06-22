@@ -254,6 +254,8 @@ Agent handling rule:
 
 If the text part is missing or cannot be parsed, report `blocked: MCP result envelope did not contain parseable JSON`. Do not treat an envelope without `isError` as evidence that a transaction was submitted, confirmed, published, or stored durably.
 
+Use one parser per tool result and fill the evidence inventory only from the parsed object. A tool name, request intent, or SDK envelope is not a fallback source for `publishState`, `anchorStatus`, storage readiness, tx hash, receipt, or public/live state.
+
 ### Evidence Inventory Before Reporting
 
 For every write-adjacent MCP result, capture the evidence before writing the handoff. This keeps agents from turning familiar markers into stronger claims.
