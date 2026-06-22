@@ -31,10 +31,6 @@ type PredictionRouteDeps = {
 
 type PredictionSignalInputItem = NonNullable<ThesisCreateInput["predictionSignals"]>[number];
 type FactSignalInputItem = NonNullable<ThesisCreateInput["factSignals"]>[number];
-type DraftAnchorPreparation = {
-  fingerprint: string;
-  preparedAt: string;
-};
 
 function normalizeString(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
@@ -138,8 +134,6 @@ export function createPredictionRoutes(
   },
 ) {
   const routes = new Hono();
-  const draftAnchors = new Map<string, DraftAnchorPreparation>();
-  const revisionAnchors = new Map<string, DraftAnchorPreparation>();
 
   routes.get("/prediction-summary", async (c) => {
     const response = await deps.predictions.getSummary();
@@ -180,7 +174,7 @@ export function createPredictionRoutes(
         return c.json({ error: "Prepare anchor before publishing thesis" }, 400);
       }
 
-      const prepared = draftAnchors.get(anchorPreparationId);
+      const prepared = await deps.predictions.getAnchorPreparation({ anchorPreparationId, kind: "draft" });
       if (!prepared) {
         return c.json({ error: "Prepare anchor before publishing thesis" }, 400);
       }
@@ -203,7 +197,7 @@ export function createPredictionRoutes(
 
       const response = await deps.predictions.createThesis(input);
       const anchored = await deps.predictions.markThesisAnchorConfirmed(response.thesis.thesisId, anchorTxHash, verification.confirmedAt);
-      if (response.created) draftAnchors.delete(anchorPreparationId);
+      if (response.created) await deps.predictions.deleteAnchorPreparation(anchorPreparationId);
       return c.json<ThesisCreateResponse>(
         {
           created: response.created,
@@ -228,7 +222,10 @@ export function createPredictionRoutes(
       const detail = await deps.predictions.previewThesis(input);
       const fingerprint = draftFingerprint(input);
       const anchorPreparationId = `draft-anchor-${fingerprint.slice(0, 24)}`;
-      draftAnchors.set(anchorPreparationId, {
+      await deps.predictions.saveAnchorPreparation({
+        anchorPreparationId,
+        kind: "draft",
+        thesisId: null,
         fingerprint,
         preparedAt: new Date().toISOString(),
       });
@@ -273,9 +270,12 @@ export function createPredictionRoutes(
       const detail = await deps.predictions.previewRevision(c.req.param("thesisId"), input);
       if (!detail) return c.json({ error: "Thesis not found" }, 404);
 
-      const fingerprint = draftFingerprint(input);
+      const fingerprint = draftFingerprint({ thesisId: detail.thesis.thesisId, input });
       const anchorPreparationId = `revision-anchor-${fingerprint.slice(0, 24)}`;
-      revisionAnchors.set(anchorPreparationId, {
+      await deps.predictions.saveAnchorPreparation({
+        anchorPreparationId,
+        kind: "revision",
+        thesisId: detail.thesis.thesisId,
         fingerprint,
         preparedAt: new Date().toISOString(),
       });
@@ -310,11 +310,11 @@ export function createPredictionRoutes(
         return c.json({ error: "Prepare anchor before publishing thesis update" }, 400);
       }
 
-      const prepared = revisionAnchors.get(anchorPreparationId);
+      const prepared = await deps.predictions.getAnchorPreparation({ anchorPreparationId, kind: "revision", thesisId: preview.thesis.thesisId });
       if (!prepared) {
         return c.json({ error: "Prepare anchor before publishing thesis update" }, 400);
       }
-      if (prepared.fingerprint !== draftFingerprint(input)) {
+      if (prepared.fingerprint !== draftFingerprint({ thesisId: preview.thesis.thesisId, input })) {
         return c.json({ error: "Prepared anchor does not match current thesis update" }, 400);
       }
 
@@ -334,7 +334,7 @@ export function createPredictionRoutes(
       const response = await deps.predictions.recordRevision(c.req.param("thesisId"), input);
       if (!response) return c.json({ error: "Thesis not found" }, 404);
       const anchored = await deps.predictions.markCurrentRevisionAnchorConfirmed(response.thesis.thesisId, anchorTxHash, verification.confirmedAt);
-      revisionAnchors.delete(anchorPreparationId);
+      await deps.predictions.deleteAnchorPreparation(anchorPreparationId);
       return c.json<ThesisDetailResponse>(anchored ?? response);
     } catch (error) {
       return c.json({ error: error instanceof Error ? error.message : "Failed to revise thesis" }, 400);

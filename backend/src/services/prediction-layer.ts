@@ -110,6 +110,17 @@ type PredictionStore = {
   markets: PredictionMarketDto[];
   theses: ThesisDto[];
   commands: XCommandDto[];
+  anchorPreparations: ThesisAnchorPreparationRecord[];
+};
+
+export type ThesisAnchorPreparationKind = "draft" | "revision";
+
+export type ThesisAnchorPreparationRecord = {
+  anchorPreparationId: string;
+  kind: ThesisAnchorPreparationKind;
+  thesisId: string | null;
+  fingerprint: string;
+  preparedAt: string;
 };
 
 type RegisteredIdentity = {
@@ -703,6 +714,7 @@ function seedStore(): PredictionStore {
     markets,
     theses: [seedSpaceXThesis(markets)],
     commands: [],
+    anchorPreparations: [],
   };
 }
 
@@ -1489,6 +1501,33 @@ export class LocalPredictionLayerService {
     return { accepted: true, command, thesis: null, markets: [] };
   }
 
+  async saveAnchorPreparation(record: ThesisAnchorPreparationRecord): Promise<void> {
+    const store = await this.readStore();
+    store.anchorPreparations = store.anchorPreparations.filter((entry) => entry.anchorPreparationId !== record.anchorPreparationId);
+    store.anchorPreparations.push(record);
+    await this.writeStore(store);
+  }
+
+  async getAnchorPreparation(input: {
+    anchorPreparationId: string;
+    kind: ThesisAnchorPreparationKind;
+    thesisId?: string | null;
+  }): Promise<ThesisAnchorPreparationRecord | null> {
+    const store = await this.readStore();
+    const record = store.anchorPreparations.find((entry) => entry.anchorPreparationId === input.anchorPreparationId && entry.kind === input.kind);
+    if (!record) return null;
+    if (input.thesisId && record.thesisId !== input.thesisId) return null;
+    return record;
+  }
+
+  async deleteAnchorPreparation(anchorPreparationId: string): Promise<void> {
+    const store = await this.readStore();
+    const nextPreparations = store.anchorPreparations.filter((entry) => entry.anchorPreparationId !== anchorPreparationId);
+    if (nextPreparations.length === store.anchorPreparations.length) return;
+    store.anchorPreparations = nextPreparations;
+    await this.writeStore(store);
+  }
+
   private marketsForThesis(markets: PredictionMarketDto[], thesis: ThesisDto): PredictionMarketDto[] {
     const ids = new Set(thesis.signals.flatMap((signal) => (signal.kind === "prediction_market" && signal.marketId ? [signal.marketId] : [])));
     return markets.filter((market) => ids.has(market.marketId));
@@ -1531,6 +1570,7 @@ export class LocalPredictionLayerService {
         markets: Array.isArray(parsed.markets) ? applyV1MarketPolicy(mergeSeedMarkets(parsed.markets)) : seedStore().markets,
         theses: Array.isArray(parsed.theses) ? mergeSeedTheses(parsed.theses) : seedStore().theses,
         commands: Array.isArray(parsed.commands) ? parsed.commands : [],
+        anchorPreparations: Array.isArray(parsed.anchorPreparations) ? parsed.anchorPreparations : [],
       };
       return mergeProviderMarkets(store, await this.loadLiveMarkets());
     } catch {
