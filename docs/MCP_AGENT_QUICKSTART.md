@@ -207,6 +207,24 @@ For successful write-adjacent tools, parse `content[0].text` as JSON and then re
 
 If the tool result has `isError: true`, has no text part, or `content[0].text` is not valid JSON when JSON was expected, stop at `blocked:` and quote the missing or invalid field. Do not infer publish, anchor, submission, confirmation, or storage durability from the envelope alone.
 
+Use one MCP text parser per result and make malformed envelopes a blocker instead of guessing:
+
+```ts
+function parseEvaMcpTextResult(result: unknown) {
+  const text = (result as { content?: Array<{ type?: string; text?: string }> }).content?.find(
+    (part) => part.type === "text",
+  )?.text;
+
+  if (!text || (result as { isError?: boolean }).isError) {
+    throw new Error("blocked: Eva MCP result did not return a successful text JSON envelope");
+  }
+
+  return JSON.parse(text) as Record<string, unknown>;
+}
+```
+
+After parsing, fill the result card only from returned fields. If parsing fails, the tool result is `blocked`; do not infer `publishState`, `anchorStatus`, storage readiness, tx hash, receipt, or public/live state from the tool name.
+
 ## Common Prompt Routing Cards
 
 Use these cards when an agent prompt mixes a safe MCP action with an unsafe stronger claim. Pick the lowest tool that matches the direct evidence you can produce.
