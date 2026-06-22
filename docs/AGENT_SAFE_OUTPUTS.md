@@ -41,6 +41,21 @@ Minimum inventory for write-adjacent results:
 
 If a field is absent, write `not returned` or omit it. Never upgrade an absent tx hash into submission, an absent receipt into confirmation, or an absent storage check into launch readiness.
 
+## Schema Defaults Are Not Approval
+
+Schema defaults can make a draft-prep payload valid, but they do not prove the operator approved the signer, that a signal is evidenced, or that a public action happened.
+
+Before reporting a write-adjacent result, separate explicit evidence from defaulted fields:
+
+| Defaulted field | Safe wording | Do not say |
+|---|---|---|
+| `walletSource: "external"` from schema default | "signer/source: defaulted; approval still required unless task evidence named it" | "external signer approved" |
+| signal defaults like `weight: 50`, `role`, `status: "open"`, `verifierVerdict: "unverifiable_yet"`, `verifierScore: 50` | "defaulted signal metadata" or "signal-light" | "weighted/verified from evidence" |
+| empty signal arrays | "0 signals; no sources were invented" | "signal-backed" |
+| missing tx hash, receipt, or readback | "not returned" / "not assessed" | "submitted", "confirmed", or "live" |
+
+If a default would affect identity authority, evidence quality, risk weighting, storage readiness, or public/live wording, report the missing explicit evidence instead of relying on the default.
+
 ## Claim Downgrade Pattern
 
 When a user, issue, or agent handoff asks for stronger wording than the evidence supports, keep the action on the safe rung and name the missing proof.

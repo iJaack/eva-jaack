@@ -111,6 +111,17 @@ All draft or revision preparation requires:
 
 Use Eva's sovereign wallet (`0x0fe61780bd5508b3C99e420662050e5560608cA4`) only when the operator explicitly approved that signer for the task. Transaction broadcast always needs explicit approval at action time.
 
+### Schema Defaults Are Not Approval
+
+Some live schemas have safe defaults so a local draft-prep rehearsal can validate without noisy boilerplate. Defaults are not authorization, evidence, or launch-readiness proof.
+
+- `create_thesis_draft.walletSource` defaults to `external`; still record the operator-approved signer/source before preparing calldata.
+- Signal defaults such as `selectedOutcomeLabel: "Yes"`, `weight: 50`, `role`, `status: "open"`, `verifierVerdict: "unverifiable_yet"`, and `verifierScore: 50` are schema fallbacks, not sourced evidence.
+- `predictionSignals: []` and `factSignals: []` are valid only when the handoff says the draft is intentionally signal-light.
+- `prepare_revision_draft` currently has no `walletSource` field; do not add one or infer signer authority from the new-draft schema.
+
+If a defaulted field affects identity, evidence quality, risk weighting, or user-facing claims, make it explicit from task-time evidence or report the gap. Do not turn a server default into approval to publish, broadcast, or claim a signal is verified.
+
 ## Tool Schemas
 
 ### `search_markets`

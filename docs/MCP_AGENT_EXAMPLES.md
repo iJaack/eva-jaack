@@ -49,6 +49,8 @@ storage: not assessed unless a named readiness/readback check was run
 next evidence needed: explicit approval, transaction hash, and receipt/readback before live/published wording
 ```
 
+Default-handling rule: schema defaults are not approval. If `walletSource`, signal weights, roles, status, verifier verdicts, or verifier scores are filled by defaults instead of task evidence, label them as defaulted or signal-light in the handoff. Do not use defaulted signal fields to claim the draft is signal-backed, verified, published, broadcast, or storage-ready.
+
 ## 1. Read-only market search
 
 Tool: `search_markets`
