@@ -60,6 +60,14 @@ pnpm --filter frontend test
 pnpm --filter contracts test
 ```
 
+Before any deployment or anchor transaction, run the read-only deployer preflight with the wallet the operator intends to use:
+
+```bash
+pnpm confirm:deployer -- --deployer 0x0fe61780bd5508b3C99e420662050e5560608cA4
+```
+
+It only compares wallet identity against `protocol.config.json`; it does not load keys, sign, deploy, call Eva APIs, or broadcast transactions.
+
 ## Docs
 
 - [Architecture](docs/ARCHITECTURE.md)
