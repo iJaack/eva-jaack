@@ -83,6 +83,21 @@ Use this permission ladder before and after every write-adjacent call:
 
 MCP alone never reaches the `submitted` or `published/live` rungs. Do not skip rungs when reporting status.
 
+### Platform status is not protocol status
+
+Issue comments, task status, PR status, and deployment status are coordination signals. They are not evidence that a thesis is published, anchored, revised, submitted, confirmed, or storage-verified.
+
+Before closing or handing off an agent task, keep these two states separate:
+
+| Coordination state | What it can prove | What it cannot prove |
+|---|---|---|
+| Multica issue `done` / `in_review` | agent work was delivered or is awaiting review | thesis is live, anchored, or durable |
+| PR merged / checks green | repo change passed review/tests | production thesis write occurred |
+| deployment green | app version is reachable | prepared thesis state survived storage/readback |
+| issue comment says "prepared" | an agent reported a result | current protocol state without MCP/API/onchain readback |
+
+Use platform status only for project coordination. Use MCP output, approved write receipts, API readback, or onchain receipt/readback for protocol claims.
+
 Agents may:
 
 - search markets,

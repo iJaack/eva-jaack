@@ -24,6 +24,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Parse Eva MCP result envelopes before reporting: successful tools usually put JSON in `content[0].text`; if `isError: true`, the text part is missing, or the text is not parseable JSON, report `blocked:` and do not infer status markers.
 - Place every write-adjacent result on the permission ladder before reporting: `read-only`, `draft prepared`, `anchor prepared`, `submitted`, or `published/live`.
 - Capture an evidence inventory before reporting: tool, intent, identity, `publishState`, `anchorStatus`, `anchorPreparationId`, transaction count, tx hash/receipt/readback state, content identifiers, signal/source gaps, and storage state. Mark missing fields as `not returned`; do not infer them.
+- Keep platform status separate from protocol status. Multica issue state, PR state, deployment state, or prior agent comments are coordination evidence only; use MCP markers, approved write receipts, API readback, or onchain receipt/readback before claiming a thesis is published, anchored, revised, submitted, confirmed, or storage-verified.
 - Treat remote MCP write tools as unavailable unless the agent has scoped credentials and the operator explicitly approved that path.
 - If the local stdio server cannot start, report that setup blocker instead of scraping the UI, using unauthenticated HTTP, or switching to remote write tools.
 - Do not bypass MCP by calling app HTTP routes such as `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or production write endpoints. Direct REST writes require a separate approved execution path, scoped credentials, and receipt/readback evidence.
@@ -135,6 +136,7 @@ boundary: no transaction broadcast and no public publish happened
 - Transaction preparation is not storage durability proof.
 - Broadcasts require explicit user approval at action time.
 - MCP alone never reaches the `submitted` or `published/live` rungs; those require explicit approval plus tx/public-state evidence.
+- Issue `done` / `in_review`, PR merged, deployment green, or old issue comments do not upgrade a protocol claim. They are not proof that a thesis is live, anchored, revised, submitted, confirmed, or storage-verified.
 - Never mark a thesis, thesis revision, or signal as confirmed without a transaction receipt or contract readback.
 - Never mark production thesis writes as durable from MCP output alone. Use `storage not assessed` for local/dry-run prep, `storage readiness blocked` when production readiness does not expose durable write-path evidence, and `storage verified` only after an approved readiness/readback check proves persisted thesis state.
 - If MCP output is ambiguous, report the exact missing evidence and do not infer publication.
