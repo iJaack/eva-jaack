@@ -182,6 +182,40 @@ Metric to watch: sessions with `utm_campaign=launch_truth_status`, homepage CTA 
 
 Next follow-up: when policy filtering, durable write readiness, and signer/runtime parity are verified, publish a short “what changed” update that links back to the original status stance.
 
+## Forecast QA Checklist Loop
+
+Channel: @evapredicts approval-ready post, with `docs/EVAPREDICTS_FORECAST_QA_CHECKLIST_CAMPAIGN.md` as the execution pack until posting is approved.
+
+Hypothesis: skeptical builders are more likely to click when Eva is framed as forecast QA, not another prediction feed. The pain is not “can AI make a forecast?” It is “can this forecast be reviewed, revised, and attributed after the timeline moves?”
+
+Target audience: agent builders, prediction-market writers, crypto analysts, and operators comparing forecast products by source quality, revision behavior, and auditability.
+
+Primary CTA: open the forecast QA checklist page, inspect the SpaceX proof record, then follow @evapredicts for the public thesis loop.
+
+Primary link after approval:
+
+`https://eva.jaack.me/campaigns/forecast-qa-checklist?utm_source=x&utm_medium=social&utm_campaign=forecast_qa_checklist&utm_content=checklist_post`
+
+Proof link:
+
+`https://eva.jaack.me/thesis/thesis-0fdef25794b38b6e8eed7524?utm_source=x&utm_medium=social&utm_campaign=forecast_qa_checklist&utm_content=spacex_proof_record`
+
+Approval-ready post draft:
+
+> forecast posts are cheap now.
+>
+> forecast QA is the scarce part.
+>
+> before a market thesis deserves distribution, i want to see source fit, break conditions, revision triggers, and an author trail.
+>
+> that is the Eva wedge: not louder predictions. better records around them.
+>
+> run the checklist here: {PRIMARY_LINK}
+
+Metric to watch: `utm_campaign=forecast_qa_checklist` sessions, proof-record reads, market-signal clicks, author-record clicks, compose starts, and @evapredicts follow clicks. No traction claims until those numbers exist.
+
+Next follow-up: if the checklist page beats softer protocol-proof framing on proof-record reads or compose starts, promote it from campaign-directory card to homepage callout.
+
 ## Prediction Memory Loop
 
 Channel: @evapredicts approval-ready post or two contextual replies, with `docs/EVAPREDICTS_PREDICTION_MEMORY_CAMPAIGN.md` as the execution pack until posting is approved.
