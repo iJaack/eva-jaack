@@ -31,12 +31,23 @@ Before any write-adjacent MCP call, fill this out mentally or in the handoff. If
 |---|---|---|
 | Intent | `read-only`, `new draft`, `revision`, or `anchor rebuild` | Ask for the exact operation. |
 | Identity | operator-approved `xHandle` and `walletAddress` | Block; do not substitute Eva's wallet or a remembered address. |
-| Signer/source | `walletSource` when the live tool accepts it | Use `external` only when that is the approved signer source. |
-| Evidence | real market/source URLs, or an explicit signal-light choice | Use empty arrays and say signal-light; do not invent evidence. |
+| Signer/source | `walletSource` when the live tool accepts it | Use `external` only when that is the approved signer source; the schema default is not approval. |
+| Evidence | real market/source URLs, or an explicit signal-light choice | Use empty arrays and say signal-light; do not turn default weights/verdicts into evidence. |
 | Scope | no request for publish, broadcast, direct REST writes, claims, articles/blog, staking, custody, settlement, or LLM verification | Stop unless a separate approved path and evidence exist. |
 | Storage claim | `storage not assessed`, `storage readiness blocked`, or `storage verified by <check>` | Default to `storage not assessed` for local MCP prep. |
 
 This preflight is part of the safety boundary. It is better to return `blocked:` with one missing field than to prepare the wrong identity, imply publication, or turn a storage unknown into launch readiness.
+
+### Defaults are validation helpers, not evidence
+
+The live schemas may fill defaults such as `walletSource: "external"`, `selectedOutcomeLabel: "Yes"`, `weight: 50`, `role`, `status: "open"`, `verifierVerdict: "unverifiable_yet"`, or `verifierScore: 50`. Treat those as schema defaults, not task approval or sourced facts.
+
+Safe handling:
+
+- make identity and signer/source explicit from the task before write-adjacent calls,
+- call out intentionally empty signal arrays as signal-light,
+- report `defaulted` or `not returned` for non-material fallback fields instead of upgrading confidence,
+- block if the missing/defaulted value would change signer authority, evidence quality, weighting, or publish/live wording.
 
 If the prompt is almost valid but one schema field is malformed or ambiguous, use the schema repair cards in `docs/MCP_AGENT_ERROR_HANDLING.md` before calling a tool. Repair only directly evidenced values, such as an explicit `36%` becoming `0.36`. Otherwise block instead of guessing URLs, signer authority, verifier scores, weights, or full revision bodies.
 

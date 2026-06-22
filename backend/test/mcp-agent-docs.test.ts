@@ -298,6 +298,28 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents that schema defaults are not approval or evidence", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Schema Defaults Are Not Approval",
+      "schema defaults are not approval",
+      'walletSource: "external"',
+      "defaulted signal",
+      "selectedOutcomeLabel",
+      "verifierScore: 50",
+      "not task approval or sourced facts",
+    ]) {
+      expect(docs, `agent docs should include schema-default boundary phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("ships concrete onboarding skill examples for agent rehearsals", () => {
     const skill = readRepoFile("skills/eva-agent-onboarding/SKILL.md");
 

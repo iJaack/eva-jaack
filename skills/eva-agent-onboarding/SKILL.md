@@ -29,6 +29,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Do not bypass MCP by calling app HTTP routes such as `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or production write endpoints. Direct REST writes require a separate approved execution path, scoped credentials, and receipt/readback evidence.
 - If a separate approved execution path is supplied, fill the receipt card from `docs/AGENT_SAFE_OUTPUTS.md`: approved execution path, approval evidence, credential scope, write receipt, readback evidence, and safe claim after execution. Missing rows mean stay at `draft prepared` / `anchor prepared`.
 - Confirm X identity, wallet address, and wallet source before preparing protocol transactions.
+- Treat schema defaults as validation helpers, not approval or evidence. A defaulted `walletSource`, signal weight, role, status, verifier verdict, or verifier score must be called out or backed by task-time evidence before it affects claims.
 - Use `0x0fe61780bd5508b3C99e420662050e5560608cA4` only when the operator explicitly approved that signer for the task.
 - If no reliable market or fact signals are ready, pass empty signal arrays and say the draft is intentionally signal-light. Do not invent sources, URLs, scores, or weights.
 
@@ -154,6 +155,8 @@ Current live schema note: `prepare_revision_draft` accepts `thesisId`, `body`, `
 Current market status enum: `open`, `closed`, `resolved`, `cancelled`. Treat `cancelled` as a source-market state only; it is not a thesis publish state and does not imply an Eva draft or anchor was cancelled.
 
 Schema defaults exist for low-risk draft prep, but evidence-bearing fields should be explicit when known. Use valid URLs only; omit unknown source URLs and report the gap in the handoff.
+
+Schema defaults are not approval: `create_thesis_draft.walletSource` may default to `external`, but signer/source authority still needs task-time approval. Defaulted signal fields such as `selectedOutcomeLabel`, `weight`, `role`, `status`, `verifierVerdict`, and `verifierScore` are fallbacks, not proof that evidence exists or that the signal is weighted/verified from sources.
 
 Repair malformed schema fields only when the prompt or approved context directly supports the repair. Examples: convert `36%` to `0.36` only when percent meaning is explicit; omit an optional malformed URL and report the source URL gap only when the signal remains auditable; use exploratory verifier defaults only for exploratory drafts. If the value would change meaning, affect identity authority, or require inventing a full revision body, report `blocked:` instead of guessing.
 
