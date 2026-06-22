@@ -178,6 +178,12 @@ const activeCampaigns = [
     href: "/campaigns/ai-forecast-receipts?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=ai_forecast_receipts&utm_content=forecast_receipts_card",
     metric: "receipt-page visits, proof-thesis reads, market-signal clicks, compose starts, and follows",
   },
+  {
+    title: "protocol proof",
+    body: "The infra-native wedge: public predictions need cited signals, visible revisions, author identity, and anchorable proof objects before bigger claims.",
+    href: "/campaigns/protocol-proof?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=protocol_proof&utm_content=protocol_proof_card",
+    metric: "proof-record reads, source-library clicks, author-record clicks, compose starts, and follows",
+  },
 ] as const;
 
 function CampaignCallout() {
