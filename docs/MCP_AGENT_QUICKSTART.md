@@ -127,6 +127,26 @@ Before reusing a prior agent comment, issue metadata key, screenshot, saved draf
 
 Do not use an old handoff as permission to revise, publish, anchor, or mark storage verified. Fresh readback beats comment archaeology.
 
+### Pre-send audit checklist
+
+Before the final user-facing update or agent handoff, run this quick audit. If any answer is unclear, downgrade the claim or return `blocked:` instead of shipping ambiguous wording.
+
+| Audit question | Safe answer |
+|---|---|
+| Did I parse the MCP text JSON envelope instead of reading top-level SDK fields? | Yes, or the result is blocked. |
+| Did I separate coordination status from protocol status? | Issue/PR/deploy state is not thesis publish, anchor, revision, confirmation, or storage evidence. |
+| Does my final verb match the permission ladder rung? | `inspected`, `prepared`, `calldata ready`, `submitted`, or `published/live` only with matching evidence. |
+| Did I name storage honestly? | `storage not assessed`, `storage readiness blocked`, or `storage verified by <named check>`. |
+| Did I avoid adding powers MCP does not have? | No direct REST write, broadcast, public publish, claims, staking, custody, settlement, paid verification, or LLM-verification claim unless separately approved and evidenced. |
+
+Safe final sentence shape:
+
+```text
+result: <inspected | prepared | calldata ready | submitted | published/live with evidence>.
+boundary: <what did not happen>.
+missing before stronger claim: <approval | tx hash | receipt/readback | storage check | source URLs | none>.
+```
+
 Agents may:
 
 - search markets,

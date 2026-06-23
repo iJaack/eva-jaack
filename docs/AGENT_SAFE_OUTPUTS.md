@@ -8,6 +8,19 @@ A prepared draft, revision, or anchor transaction is not a public publish event.
 
 Agents may describe prepared content and transaction calldata. Agents must not claim a thesis is live, anchored, revised, or publicly published until there is explicit user approval plus a submitted transaction hash and confirmed receipt or contract readback.
 
+## Pre-send Audit Checklist
+
+Run this immediately before sending any user-facing MCP result. The goal is to catch over-strong verbs before they leave the agent.
+
+- MCP envelope parsed: status markers came from parsed `content[0].text` JSON, not from the tool name or SDK wrapper.
+- Coordination/protocol split preserved: Multica issue state, PR state, deployment state, or comments are not protocol evidence.
+- Final verb fits evidence: use `inspected`, `prepared`, `calldata ready`, `submitted`, or `published/live` only at the matching permission ladder rung.
+- Storage wording is explicit: `storage not assessed`, `storage readiness blocked`, or `storage verified by <named check>`.
+- Boundary named: say what did not happen (`no transaction broadcast`, `no public publish`, `current public revision unchanged`) when the user might otherwise infer it.
+- Stronger-claim gap named: approval, tx hash, receipt/readback, durable storage check, or real source URLs.
+
+If any line fails, downgrade the claim or use `blocked:`. Do not rely on optimistic phrasing, old handoffs, or platform status to fill missing protocol evidence.
+
 ## Minimal Result Card
 
 Use this compact card whenever another agent, reviewer, or user might otherwise confuse preparation with publication:

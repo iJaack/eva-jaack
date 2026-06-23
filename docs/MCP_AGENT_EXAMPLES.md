@@ -76,6 +76,32 @@ output ceiling: <draft prepared | anchor prepared>
 
 Do not let the payload outrun that contract. If the contract says signal-light, use empty arrays or label defaulted signal metadata. If the contract says `anchor prepared`, the result card must not say submitted, confirmed, published/live, or storage verified.
 
+## 0.2 Pre-send audit checklist
+
+Use this just before a final answer, comment, or handoff. It is intentionally repetitive because most unsafe outputs happen after the tool call, not during schema validation.
+
+```text
+pre-send audit:
+- parsed MCP text JSON envelope: <yes | blocked>
+- coordination/protocol split: <issue/PR/deploy is not protocol evidence | named protocol evidence>
+- final verb: <inspected | prepared | calldata ready | submitted | published/live>
+- storage wording: <not assessed | readiness blocked | verified by named check>
+- boundary named: <no broadcast | no public publish | previous revision unchanged | none because fully evidenced>
+- missing before stronger claim: <approval | tx hash | receipt/readback | storage check | source URLs | none>
+```
+
+Safe completed example:
+
+```text
+pre-send audit:
+- parsed MCP text JSON envelope: yes
+- coordination/protocol split: issue status only proves handoff delivery, not publication
+- final verb: prepared
+- storage wording: not assessed
+- boundary named: no transaction broadcast and no public publish happened
+- missing before stronger claim: explicit approval, tx hash, receipt/readback, and durable storage check
+```
+
 ## 1. Read-only market search
 
 Tool: `search_markets`
