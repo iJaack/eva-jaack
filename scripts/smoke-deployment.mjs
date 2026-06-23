@@ -98,13 +98,41 @@ const sharedHeaders = vercelBypassSecret
     }
   : {};
 
-function isVercelProtectedResponse(response) {
+async function isVercelProtectedResponse(response) {
   const setCookie = response.headers.get("set-cookie") ?? "";
   const server = response.headers.get("server") ?? "";
-  return (
+  if (
     (response.status === 401 || response.status === 403) &&
     server.toLowerCase().includes("vercel") &&
     setCookie.includes("_vercel_sso_nonce")
+  ) {
+    return true;
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.toLowerCase().includes("text/html")) return false;
+
+  let body = "";
+  try {
+    body = await response.clone().text();
+  } catch {
+    return false;
+  }
+
+  const snippet = body.slice(0, 4096).toLowerCase();
+  return (
+    snippet.includes("authentication required") &&
+    (snippet.includes("vercel") ||
+      snippet.includes("x-vercel-protection-bypass") ||
+      snippet.includes("_vercel_sso_nonce") ||
+      snippet.includes("this page requires vercel authentication"))
+  );
+}
+
+function warnVercelProtectionSkip() {
+  console.warn(
+    "SKIP deployment smoke: Vercel Deployment Protection blocked the deployment URL. " +
+      "Configure the GitHub secret VERCEL_AUTOMATION_BYPASS_SECRET to run deployed-url smoke checks."
   );
 }
 
@@ -116,11 +144,8 @@ if (!vercelBypassSecret && allowProtectedSkip) {
       signal: AbortSignal.timeout(requestTimeoutMs),
     });
 
-    if (isVercelProtectedResponse(response)) {
-      console.warn(
-        "SKIP deployment smoke: Vercel Deployment Protection blocked the deployment URL. " +
-          "Configure the GitHub secret VERCEL_AUTOMATION_BYPASS_SECRET to run deployed-url smoke checks."
-      );
+    if (await isVercelProtectedResponse(response)) {
+      warnVercelProtectionSkip();
       process.exit(0);
     }
   } catch {
@@ -147,13 +172,19 @@ for (const check of checks) {
     continue;
   }
 
+  const protectedByVercel = await isVercelProtectedResponse(response);
+  if (protectedByVercel && !vercelBypassSecret && allowProtectedSkip) {
+    warnVercelProtectionSkip();
+    process.exit(0);
+  }
+
   const elapsedMs = Math.round(performance.now() - startedAt);
 
   if (!response.ok) {
     failures += 1;
     failedChecks.push({
       name: check.name,
-      protectedByVercel: isVercelProtectedResponse(response),
+      protectedByVercel,
     });
     console.error(`FAIL ${check.name}: ${response.status} ${url} (${elapsedMs}ms)`);
     continue;
@@ -190,10 +221,7 @@ if (failures > 0) {
     successes === 0 && failedChecks.length > 0 && failedChecks.every((check) => check.protectedByVercel);
 
   if (onlyVercelProtectionFailures && !vercelBypassSecret && allowProtectedSkip) {
-    console.warn(
-      "SKIP deployment smoke: Vercel Deployment Protection blocked every smoke request. " +
-        "Configure the GitHub secret VERCEL_AUTOMATION_BYPASS_SECRET to run deployed-url smoke checks."
-    );
+    warnVercelProtectionSkip();
     process.exit(0);
   }
 
