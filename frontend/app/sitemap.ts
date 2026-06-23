@@ -96,6 +96,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.85
+    },
+    {
+      url: `${base}/campaigns/forecast-trust-loop`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.85
     }
   ];
 }

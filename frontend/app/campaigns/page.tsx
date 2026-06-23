@@ -42,6 +42,13 @@ const campaignRoutes = [
     metric: "checklist opens, proof-record reads, market-signal clicks, compose starts, author-record clicks, follows",
   },
   {
+    title: "forecast trust loop",
+    status: "proof CTA route",
+    body: "For skeptical builders who need one repeatable behavior: source the claim, state the break condition, revise visibly, and keep the receipt.",
+    href: `/campaigns/forecast-trust-loop?utm_source=campaign_hub&utm_medium=campaign_directory&utm_campaign=${campaign}&utm_content=trust_loop_card`,
+    metric: "trust-loop visits, proof-record reads, market-signal clicks, compose starts, author-record clicks, follows",
+  },
+  {
     title: "prediction memory",
     status: "posting approval blocked",
     body: "For prediction-market-native readers: markets price the moment, but Eva keeps the thesis, sources, revisions, and author trail inspectable.",

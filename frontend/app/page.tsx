@@ -189,6 +189,12 @@ const activeCampaigns = [
     href: "/campaigns/forecast-qa-checklist?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=forecast_qa_checklist&utm_content=forecast_qa_card",
     metric: "proof-record reads, market-signal clicks, compose starts, author-record clicks, and follows",
   },
+  {
+    title: "forecast trust loop",
+    body: "A proof CTA route for skeptical builders: source the claim, state what would break it, revise visibly, and keep the receipt inspectable.",
+    href: "/campaigns/forecast-trust-loop?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=forecast_trust_loop&utm_content=trust_loop_card",
+    metric: "proof-record reads, market-signal clicks, compose starts, author-record clicks, and follows",
+  },
 ] as const;
 
 function CampaignCallout() {
