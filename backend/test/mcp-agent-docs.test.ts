@@ -3,7 +3,18 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { evaMcpToolNames } from "../src/mcp-server.js";
-import { claimVerdictValues, predictionMarketStatusValues, thesisSignalRoleValues } from "../src/mcp-schemas.js";
+import {
+  claimVerdictValues,
+  createThesisDraftToolSchema,
+  factSignalInputSchema,
+  getThesisToolSchema,
+  predictionMarketStatusValues,
+  predictionSignalInputSchema,
+  prepareAnchorTransactionToolSchema,
+  prepareRevisionDraftToolSchema,
+  searchMarketsToolSchema,
+  thesisSignalRoleValues,
+} from "../src/mcp-schemas.js";
 
 const testDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(testDir, "../..");
@@ -39,6 +50,51 @@ describe("Eva MCP agent docs", () => {
 
     for (const value of [...thesisSignalRoleValues, ...predictionMarketStatusValues, ...claimVerdictValues]) {
       expect(docs, `agent docs should mention schema enum value ${value}`).toContain(value);
+    }
+  });
+
+  it("documents live MCP input field placement so agents do not invent payload fields", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    expect(docs).toContain("Live input field matrix");
+    expect(docs).toContain("Live input field checklist");
+
+    const toolFieldSets = {
+      search_markets: Object.keys(searchMarketsToolSchema),
+      get_thesis: Object.keys(getThesisToolSchema),
+      create_thesis_draft: Object.keys(createThesisDraftToolSchema),
+      prepare_revision_draft: Object.keys(prepareRevisionDraftToolSchema),
+      prepare_anchor_transaction: Object.keys(prepareAnchorTransactionToolSchema),
+    };
+
+    for (const [toolName, fields] of Object.entries(toolFieldSets)) {
+      expect(docs, `agent docs should include schema field matrix row for ${toolName}`).toContain(toolName);
+      for (const field of fields) {
+        expect(docs, `agent docs should document live input field ${toolName}.${field}`).toContain(field);
+      }
+    }
+
+    for (const field of Object.keys(predictionSignalInputSchema.shape)) {
+      expect(docs, `agent docs should document prediction signal field ${field}`).toContain(field);
+    }
+
+    for (const field of Object.keys(factSignalInputSchema.shape)) {
+      expect(docs, `agent docs should document fact signal field ${field}`).toContain(field);
+    }
+
+    for (const phrase of [
+      "walletSource` is a `create_thesis_draft` field only",
+      "`note` belongs to `prepare_revision_draft` only",
+      "Returned or handoff-only concepts",
+      "result or handoff fields, not inputs",
+      "Omit unknown URLs and report the source URL gap",
+    ]) {
+      expect(docs, `agent docs should include field placement guardrail ${phrase}`).toContain(phrase);
     }
   });
 

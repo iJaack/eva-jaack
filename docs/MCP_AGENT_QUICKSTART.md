@@ -211,6 +211,22 @@ Only these MCP tools are live for agent thesis work:
 
 If a prompt, client, or autocomplete shows any other write tool, stop and treat it as stale.
 
+### Live input field checklist
+
+Copy only the fields the live tool accepts. Returned status markers and receipt evidence are not input fields.
+
+| Tool | Required input | Optional/defaulted input | Common unsafe extra fields |
+|---|---|---|---|
+| `search_markets` | none | `query` | identity, thesis body, publish/broadcast fields |
+| `get_thesis` | `thesisId` | none | `walletSource`, signals, revision body |
+| `create_thesis_draft` | `title`, `body`, `xHandle`, `walletAddress` | `walletSource`, `predictionSignals`, `factSignals` | `thesisId`, `note`, tx hash, receipt, storage proof |
+| `prepare_revision_draft` | `thesisId`, full replacement `body`, `xHandle`, `walletAddress` | `note` | `walletSource`, patch-only body, publish/live flags |
+| `prepare_anchor_transaction` | `thesisId` | none | body changes, signals, identity swaps, broadcast fields |
+
+Nested signal fields stay inside signal arrays: `predictionSignals` may include `marketId`, `marketTitle`, `marketUrl`, `selectedOutcomeLabel`, `oddsAtAdd`, `currentOdds`, `weight`, `role`, `rationale`, and `status`; `factSignals` may include `claimText`, `sourceUrl`, `verifierVerdict`, `verifierScore`, `reportUri`, `reportHash`, `weight`, `role`, and `rationale`.
+
+If a field belongs to the result card (`publishState`, `anchorStatus`, `anchorPreparationId`, `transactions`, tx hash, receipt/readback, or storage wording), do not send it as input. Capture it after parsing the MCP text JSON envelope.
+
 ### Tool annotation boundary
 
 Tool discovery annotations are client-routing hints, not approval evidence:
