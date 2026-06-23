@@ -98,6 +98,23 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents operation-specific walletSource handoff handling", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_HANDOFF_TEMPLATE.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Signer / Wallet Source Handling",
+      "walletSource not accepted by prepare_revision_draft",
+      "signer/source approval missing before broadcast",
+      "Do not add walletSource to revision or anchor-rebuild payloads",
+    ]) {
+      expect(docs, `agent handoff docs should include walletSource boundary phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("preserves the safe draft/anchor-prep boundary in agent docs", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_GUIDE.md"),
