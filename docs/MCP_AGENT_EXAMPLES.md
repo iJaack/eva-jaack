@@ -78,10 +78,13 @@ Quick action contract to copy before any write-adjacent example:
 operation: <new draft | revision | anchor rebuild>
 identity source: <task-time approval for xHandle + walletAddress + walletSource, or blocked>
 evidence source: <real URLs | explicitly signal-light | named readiness/readback check | blocked>
+market policy: <MCP-filtered | screened against docs/MARKET_POLICY.md | signal-light because off-policy markets were excluded>
 output ceiling: <draft prepared | anchor prepared>
 ```
 
 Do not let the payload outrun that contract. If the contract says signal-light, use empty arrays or label defaulted signal metadata. If the contract says `anchor prepared`, the result card must not say submitted, confirmed, published/live, or storage verified.
+
+Market policy reminder: only use prediction markets that survive `docs/MARKET_POLICY.md`. MCP `search_markets` is the preferred source because it uses the app-filtered market universe. External/stale/manual markets must be screened before they enter `predictionSignals`; sports, elections/political offices, active geopolitics/armed conflict, personal tragedy/private life, criminal trials, easily manipulated social/action prompts, and entertainment/pop-culture novelty markets should be excluded rather than dressed up as thesis evidence.
 
 ## 0.2 Pre-send audit checklist
 
@@ -124,8 +127,10 @@ Use this before drafting when the thesis needs prediction-market evidence.
 Safe result language:
 
 ```text
-found candidate markets for review. no draft, transaction, or public publish happened.
+found MCP-filtered candidate markets for review. no draft, transaction, or public publish happened.
 ```
+
+If you add market evidence from outside `search_markets`, screen it against `docs/MARKET_POLICY.md` before using it in a draft. If the only available markets are off-policy, use a signal-light draft or block for acceptable evidence instead.
 
 ## 2. Signal-light new thesis draft
 

@@ -25,6 +25,7 @@ If a client, prompt, old note, or autocomplete suggests any other write tool, tr
 | Anchor prep output lacks `publishState` on an older build | Still apply the same boundary: prepared transaction data is not publication or confirmation. | Treat legacy output shape as extra authority. |
 | Remote MCP credentials are absent | Use the local MCP server or report the credential blocker. | Scrape the UI or try unauthenticated write paths. |
 | Production storage/readiness is not observable | Report `storage readiness blocked` and ask for an approved readiness/readback check or durable-store evidence. | Treat a generic `/health`, `anchorPreparationId`, or calldata as proof that thesis writes persist across production restarts/deploys. |
+| A market is supplied from outside MCP or looks off-policy | Screen it against `docs/MARKET_POLICY.md`; omit prohibited markets and downgrade to signal-light or block for acceptable evidence. | Use sports, elections/political offices, active geopolitics/armed conflict, personal tragedy/private life, criminal trials, social/action prompts, or entertainment novelty markets as Eva thesis signals. |
 
 ## Schema repair cards
 
@@ -34,6 +35,7 @@ Use these cards when a prompt is close to valid but unsafe to submit as-is. Repa
 |---|---|---|
 | Odds are written as `36%` or `36` | Convert to `0.36` only when the percent meaning is explicit. | The number could be probability, price, basis points, or a score. |
 | Source URL is missing, malformed, or a placeholder | Omit optional `marketUrl` / `sourceUrl`, keep the signal only if the claim is still auditable, and report a source URL gap. | The URL is the only evidence for a material claim. |
+| Market is manually pasted, stale, or externally discovered | Keep it only if it passes `docs/MARKET_POLICY.md`; otherwise remove it and report `market policy screened: excluded`. | The thesis depends on the excluded market and no acceptable replacement evidence exists. |
 | Signal weight is missing | Use the schema default only for low-risk drafts; otherwise ask for weight or explain the default in the handoff. | Weight changes the thesis interpretation or ranking. |
 | Fact verifier data is missing | Use `verifierVerdict: "unverifiable_yet"` and `verifierScore: 50` only when the draft is explicitly exploratory. | The user asked for a verified or signal-backed thesis. |
 | Revision prompt gives a patch, diff, or extra paragraph | Ask for or construct a full replacement body from approved source text, then use `note` for the delta. | You cannot reconstruct the intended full body without inventing content. |
@@ -64,9 +66,10 @@ handoff gap: <source URL gap | default weight | exploratory verifier state | sto
 1. Confirm the operator-approved X handle and wallet address.
 2. Confirm whether the signer is external or embedded when the tool accepts `walletSource`.
 3. Keep all material source URLs, signal weights, roles, and revision notes.
-4. For revisions, call `get_thesis` first and verify the wallet matches the thesis author.
-5. Tell the user the output will be `anchor_prepared_not_published` before asking for broadcast approval.
-6. For production or launch-readiness tasks, confirm what proves durable thesis/revision storage. If there is no approved readiness/readback check, mark storage as `not assessed` or `readiness blocked`.
+4. Screen externally supplied, stale, or manual prediction markets against `docs/MARKET_POLICY.md`; omit prohibited market categories instead of forcing them into `predictionSignals`.
+5. For revisions, call `get_thesis` first and verify the wallet matches the thesis author.
+6. Tell the user the output will be `anchor_prepared_not_published` before asking for broadcast approval.
+7. For production or launch-readiness tasks, confirm what proves durable thesis/revision storage. If there is no approved readiness/readback check, mark storage as `not assessed` or `readiness blocked`.
 
 ## Output language for agents
 
