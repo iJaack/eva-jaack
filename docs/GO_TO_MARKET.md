@@ -78,6 +78,15 @@ matters.
 - **Follow-up:** after explicit @evapredicts posting approval, run one main post or two contextual replies and compare intent against `source_quality_sprint` and `launch_truth_status`.
 - **Execution pack:** `docs/EVAPREDICTS_PREDICTION_MEMORY_CAMPAIGN.md`
 
+### Forecast QA checklist
+
+- **Hypothesis:** skeptical builders will click when Eva is framed as forecast QA rather than another prediction feed, because the pain is reviewability after the timeline moves.
+- **Audience:** agent builders, prediction-market writers, crypto analysts, and operators comparing forecast surfaces by source fit, revision behavior, and author trail.
+- **CTA:** run the checklist on the SpaceX proof thesis, then follow @evapredicts for the public thesis loop.
+- **Measurement:** track homepage and campaign-page sessions carrying `utm_campaign=forecast_qa_checklist`, proof-record reads, market-signal clicks, author-record clicks, compose starts, and follow clicks.
+- **Follow-up:** compare homepage callout intent against `prediction_memory`, `source_quality_sprint`, and `protocol_proof` before approving broader @evapredicts distribution.
+- **Execution pack:** `docs/EVAPREDICTS_FORECAST_QA_CHECKLIST_CAMPAIGN.md`
+
 ## Current Campaign: Launch Truth Status CTA
 
 Hypothesis: prediction-market-native builders are more likely to trust @evapredicts when the homepage makes launch readiness inspectable instead of asking for a follow on vibes.
@@ -113,6 +122,18 @@ CTA: read the SpaceX IPO liquidity rotation proof thesis, then follow @evapredic
 Metric to watch: clicks carrying `utm_campaign=prediction_memory`, proof-thesis reads, source-quality page visits, compose starts after proof-thesis visits, and follow clicks. Do not claim traction until measured data exists.
 
 Next follow-up: after explicit @evapredicts approval, run one post or two contextual replies from `docs/EVAPREDICTS_PREDICTION_MEMORY_CAMPAIGN.md`, then compare intent against `source_quality_sprint` and `launch_truth_status`.
+
+## Current Campaign: Forecast QA Checklist
+
+Hypothesis: agent builders and prediction-market writers are more likely to click a checklist than broad launch copy because it makes the review burden concrete: source fit, break conditions, revision triggers, and author trail.
+
+Primary audience: agent builders shipping public forecast agents, prediction-market writers, crypto analysts, and operators comparing forecast products by auditability.
+
+CTA: run the forecast QA checklist, inspect the SpaceX IPO liquidity rotation proof record, then follow @evapredicts.
+
+Metric to watch: homepage clicks and campaign sessions carrying `utm_campaign=forecast_qa_checklist`, proof-record reads, market-signal clicks, author-record clicks, compose starts, and follow clicks. Do not claim traction until measured data exists.
+
+Next follow-up: compare this homepage callout against `prediction_memory`, `source_quality_sprint`, and `protocol_proof`; keep the checklist as the hero wedge only if it produces higher-intent proof-record or compose behavior.
 
 ## Activation Metrics
 
