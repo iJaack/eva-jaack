@@ -17,6 +17,7 @@ test("primary navigation stays focused on the thesis product", async ({ page }) 
   await expect(header.getByRole("link", { name: "Markets" })).toBeVisible();
   await expect(header.getByRole("link", { name: "Compose" })).toBeVisible();
   await expect(header.getByRole("link", { name: "Predictors" })).toBeVisible();
+  await expect(header.getByRole("link", { name: "Campaigns" })).toBeVisible();
   await expect(header.getByRole("link", { name: "Evidence" })).toHaveCount(0);
   await expect(header.getByRole("link", { name: "Claims" })).toHaveCount(0);
   await expect(header.getByRole("link", { name: "Register" })).toHaveCount(0);
@@ -175,4 +176,30 @@ test("prediction memory page tracks the campaign view and CTA clicks", async ({ 
     "data-campaign-cta",
     "start_thesis_record",
   );
+});
+
+test("campaign hub routes active campaign traffic with measurable CTAs", async ({ page }) => {
+  await page.goto("/campaigns");
+
+  await expect(page.getByRole("heading", { name: "one public prediction angle, one proof path, one metric." })).toBeVisible();
+  await expect(page.getByText("campaign choice should be judged by proof-path intent, not impressions.")).toBeVisible();
+
+  await expect(page.getByRole("link", { name: "Run forecast QA" })).toHaveAttribute(
+    "data-campaign-cta",
+    "open_current_wedge",
+  );
+  await expect(page.getByRole("link", { name: "Run forecast QA" })).toHaveAttribute(
+    "href",
+    /utm_campaign=campaign_hub.*utm_content=forecast_qa_card/,
+  );
+  await expect(page.getByRole("link", { name: "Read proof record" })).toHaveAttribute(
+    "href",
+    /utm_campaign=campaign_hub.*utm_content=spacex_proof_record/,
+  );
+  await expect(page.getByRole("link", { name: "Follow @evapredicts" })).toHaveAttribute(
+    "data-campaign-channel",
+    "campaign_hub_hero",
+  );
+  await expect(page.getByText("posting approval blocked")).toBeVisible();
+  await expect(page.getByText("no fake launch certainty.")).toBeVisible();
 });
