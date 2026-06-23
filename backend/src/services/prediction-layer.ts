@@ -144,7 +144,7 @@ const localPredictionIndexPath = resolve(
   "../../../.data/eva-predictions/index.json",
 );
 
-type PredictionStorageMode = "local_filesystem" | "serverless_tmp" | "vercel_blob";
+type PredictionStorageMode = "local_filesystem" | "serverless_tmp" | "upstash_redis" | "vercel_blob";
 
 export interface PredictionStorageReadiness {
   mode: PredictionStorageMode;
@@ -155,12 +155,13 @@ export interface PredictionStorageReadiness {
   serverless: boolean;
   storageDirConfigured: boolean;
   blobTokenConfigured: boolean;
+  kvConfigured: boolean;
 }
 
 export interface PredictionStorageProbe {
   checked: boolean;
   ok: boolean;
-  kind: "not_ready" | "vercel_blob_list" | "local_filesystem_config";
+  kind: "not_ready" | "upstash_redis_get" | "vercel_blob_list" | "local_filesystem_config";
   checkedAt: string;
   reason: string;
 }
@@ -173,15 +174,51 @@ function isServerlessEnv(env: Record<string, string | undefined>): boolean {
   return Boolean(env.VERCEL || env.AWS_LAMBDA_FUNCTION_NAME || env.NETLIFY);
 }
 
+function requestedStorageBackend(env: Record<string, string | undefined>): string {
+  return (env.EVA_PREDICTION_STORAGE_BACKEND ?? config.predictionStorageBackend).trim().toLowerCase();
+}
+
+function resolveKvConfig(env: Record<string, string | undefined>) {
+  return {
+    url: env.KV_REST_API_URL ?? env.UPSTASH_REDIS_REST_URL ?? config.kvRestApiUrl,
+    token: env.KV_REST_API_TOKEN ?? env.UPSTASH_REDIS_REST_TOKEN ?? config.kvRestApiToken,
+    key: env.EVA_PREDICTION_KV_KEY ?? config.predictionKvKey,
+  };
+}
+
+async function runUpstashRedisCommand<T>(command: unknown[]): Promise<T> {
+  const { url, token } = resolveKvConfig(process.env);
+  if (!url || !token) throw new Error("Upstash Redis REST URL/token are not configured.");
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${token}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(command),
+  });
+  const body = (await response.json().catch(() => null)) as { result?: T; error?: string } | null;
+  if (!response.ok || body?.error) {
+    throw new Error(body?.error ?? `Upstash Redis REST request failed with HTTP ${response.status}`);
+  }
+  return body?.result as T;
+}
+
 export function resolvePredictionStorageReadiness(
   storageDir = config.storageDir,
   env: Record<string, string | undefined> = process.env,
 ): PredictionStorageReadiness {
   const serverless = isServerlessEnv(env);
   const blobTokenConfigured = Boolean(env.BLOB_READ_WRITE_TOKEN);
+  const kv = resolveKvConfig(env);
+  const kvConfigured = Boolean(kv.url && kv.token);
   const storageDirConfigured = Boolean(storageDir);
+  const requestedBackend = requestedStorageBackend(env);
+  const preferBlob = requestedBackend === "auto" || requestedBackend === "" || requestedBackend === "blob" || requestedBackend === "vercel_blob";
+  const preferKv = requestedBackend === "auto" || requestedBackend === "" || requestedBackend === "kv" || requestedBackend === "redis" || requestedBackend === "upstash_redis";
 
-  if (blobTokenConfigured) {
+  if (blobTokenConfigured && preferBlob) {
     return {
       mode: "vercel_blob",
       ready: true,
@@ -191,6 +228,21 @@ export function resolvePredictionStorageReadiness(
       serverless,
       storageDirConfigured,
       blobTokenConfigured,
+      kvConfigured,
+    };
+  }
+
+  if (kvConfigured && preferKv) {
+    return {
+      mode: "upstash_redis",
+      ready: true,
+      durable: true,
+      writePath: kv.key,
+      reason: "Upstash/Vercel KV REST credentials configured; thesis writes use durable Redis storage.",
+      serverless,
+      storageDirConfigured,
+      blobTokenConfigured,
+      kvConfigured,
     };
   }
 
@@ -207,6 +259,7 @@ export function resolvePredictionStorageReadiness(
       serverless,
       storageDirConfigured,
       blobTokenConfigured,
+      kvConfigured,
     };
   }
 
@@ -220,6 +273,7 @@ export function resolvePredictionStorageReadiness(
       serverless,
       storageDirConfigured,
       blobTokenConfigured,
+      kvConfigured,
     };
   }
 
@@ -232,6 +286,7 @@ export function resolvePredictionStorageReadiness(
     serverless,
     storageDirConfigured,
     blobTokenConfigured,
+    kvConfigured,
   };
 }
 
@@ -1108,6 +1163,34 @@ export class LocalPredictionLayerService {
       }
     }
 
+    if (storage.mode === "upstash_redis") {
+      try {
+        await runUpstashRedisCommand<string | null>(["GET", storage.writePath]);
+        return {
+          ...storage,
+          probe: {
+            checked: true,
+            ok: true,
+            kind: "upstash_redis_get",
+            checkedAt,
+            reason: "Upstash/Vercel KV accepted an authenticated non-mutating GET for the thesis storage key.",
+          },
+        };
+      } catch (error) {
+        return {
+          ...storage,
+          ready: false,
+          probe: {
+            checked: true,
+            ok: false,
+            kind: "upstash_redis_get",
+            checkedAt,
+            reason: error instanceof Error ? error.message : String(error),
+          },
+        };
+      }
+    }
+
     return {
       ...storage,
       probe: {
@@ -1585,6 +1668,7 @@ export class LocalPredictionLayerService {
       if (!blob || blob.statusCode === 304 || !blob.stream) return null;
       return new Response(blob.stream).text();
     }
+    if (storage.mode === "upstash_redis") return runUpstashRedisCommand<string | null>(["GET", storage.writePath]);
     return readFile(this.indexPath, "utf8");
   }
 
@@ -1610,6 +1694,10 @@ export class LocalPredictionLayerService {
         contentType: "application/json",
         token: config.blobReadWriteToken,
       });
+      return;
+    }
+    if (storage.mode === "upstash_redis") {
+      await runUpstashRedisCommand<string>(["SET", storage.writePath, JSON.stringify(store, null, 2)]);
       return;
     }
     await mkdir(dirname(this.indexPath), { recursive: true });
