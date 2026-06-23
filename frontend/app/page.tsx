@@ -237,8 +237,8 @@ function CampaignDirectory() {
           <p className="section-kicker">campaign directory</p>
           <h2 className="section-title section-title-sm">send curious predictors to one clean next step.</h2>
         </div>
-        <Link href="/campaigns/trust-receipts?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=trust_receipts_launch&utm_content=section_link" className="section-link">
-          Open launch page
+        <Link href="/campaigns?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=campaign_hub&utm_content=section_link" className="section-link">
+          Open campaign hub
         </Link>
       </div>
       <div className="product-module-grid">

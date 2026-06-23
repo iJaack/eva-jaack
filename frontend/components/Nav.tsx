@@ -10,6 +10,7 @@ const navItems: readonly { href: string; label: string; exact?: boolean; highlig
   { href: "/markets", label: "Markets" },
   { href: "/compose", label: "Compose" },
   { href: "/predictors", label: "Predictors" },
+  { href: "/campaigns", label: "Campaigns" },
 ];
 
 const loopItems = [
@@ -35,6 +36,7 @@ function routeCta(pathname: string): { href: string; label: string } {
   if (pathname.startsWith("/compose")) return { href: "/markets", label: "Add signals" };
   if (pathname.startsWith("/thesis")) return { href: "/compose", label: "Draft response" };
   if (pathname.startsWith("/predictors")) return { href: "/markets", label: "Find signals" };
+  if (pathname.startsWith("/campaigns")) return { href: "/campaigns/forecast-qa-checklist", label: "Run campaign" };
   return { href: "/markets", label: "Start thesis" };
 }
 
