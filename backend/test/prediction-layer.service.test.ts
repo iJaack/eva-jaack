@@ -43,6 +43,36 @@ describe("prediction layer service", () => {
       writePath: "eva-predictions/index.json",
       blobTokenConfigured: true,
     });
+    expect(
+      resolvePredictionStorageReadiness("", {
+        VERCEL: "1",
+        KV_REST_API_URL: "https://example.upstash.io",
+        KV_REST_API_TOKEN: "token",
+      }),
+    ).toMatchObject({
+      mode: "upstash_redis",
+      ready: true,
+      durable: true,
+      writePath: "eva-predictions:index",
+      kvConfigured: true,
+    });
+    expect(
+      resolvePredictionStorageReadiness("", {
+        VERCEL: "1",
+        EVA_PREDICTION_STORAGE_BACKEND: "upstash_redis",
+        BLOB_READ_WRITE_TOKEN: "blob-token",
+        KV_REST_API_URL: "https://example.upstash.io",
+        KV_REST_API_TOKEN: "kv-token",
+        EVA_PREDICTION_KV_KEY: "eva:test:index",
+      }),
+    ).toMatchObject({
+      mode: "upstash_redis",
+      ready: true,
+      durable: true,
+      writePath: "eva:test:index",
+      blobTokenConfigured: true,
+      kvConfigured: true,
+    });
     expect(resolvePredictionStorageReadiness("/var/eva", {})).toMatchObject({
       mode: "local_filesystem",
       ready: true,
