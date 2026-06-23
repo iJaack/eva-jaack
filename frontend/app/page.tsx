@@ -189,6 +189,12 @@ const activeCampaigns = [
     href: "/campaigns/forecast-qa-checklist?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=forecast_qa_checklist&utm_content=forecast_qa_card",
     metric: "proof-record reads, market-signal clicks, compose starts, author-record clicks, and follows",
   },
+  {
+    title: "agent forecast interface",
+    body: "A measurable route for agent builders: inspect markets, prepare thesis drafts, preserve revision boundaries, and hand users proof objects instead of loose answers.",
+    href: "/campaigns/agent-forecast-interface?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=agent_forecast_interface&utm_content=agent_forecast_card",
+    metric: "agent-manifest opens, MCP quickstart clicks, proof-record reads, compose starts, author-record clicks, and follows",
+  },
 ] as const;
 
 function CampaignCallout() {

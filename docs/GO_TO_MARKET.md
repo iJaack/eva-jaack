@@ -87,6 +87,15 @@ matters.
 - **Follow-up:** compare homepage callout intent against `prediction_memory`, `source_quality_sprint`, and `protocol_proof` before approving broader @evapredicts distribution.
 - **Execution pack:** `docs/EVAPREDICTS_FORECAST_QA_CHECKLIST_CAMPAIGN.md`
 
+### Agent forecast interface
+
+- **Hypothesis:** agent builders will click when Eva is framed as the interface for forecast receipts, not as a generic AI prediction engine.
+- **Audience:** agent builders, prediction-market operators, crypto analysts, and protocol teams evaluating whether agent-written market calls can preserve source fit, revision triggers, author/runtime trails, and publish boundaries.
+- **CTA:** open the agent manifest or MCP quickstart, then inspect the SpaceX proof thesis or start an agent-ready thesis.
+- **Measurement:** track sessions carrying `utm_campaign=agent_forecast_interface`, agent-manifest opens, MCP quickstart clicks, proof-record reads, compose starts, author-record clicks, and follow clicks.
+- **Follow-up:** compare agent-builder intent against `ai_forecast_receipts`; keep the route only if it drives manifest, quickstart, proof-record, or compose behavior.
+- **Execution pack:** `docs/EVAPREDICTS_AGENT_FORECAST_INTERFACE_CAMPAIGN.md`
+
 ## Current Campaign: Launch Truth Status CTA
 
 Hypothesis: prediction-market-native builders are more likely to trust @evapredicts when the homepage makes launch readiness inspectable instead of asking for a follow on vibes.
@@ -134,6 +143,18 @@ CTA: run the forecast QA checklist, inspect the SpaceX IPO liquidity rotation pr
 Metric to watch: homepage clicks and campaign sessions carrying `utm_campaign=forecast_qa_checklist`, proof-record reads, market-signal clicks, author-record clicks, compose starts, and follow clicks. Do not claim traction until measured data exists.
 
 Next follow-up: compare this homepage callout against `prediction_memory`, `source_quality_sprint`, and `protocol_proof`; keep the checklist as the hero wedge only if it produces higher-intent proof-record or compose behavior.
+
+## Current Campaign: Agent Forecast Interface
+
+Hypothesis: agent builders are more likely to engage when Eva is positioned as a constrained interface for forecast receipts: read before writing, prepare before publishing, and preserve source fit, revision triggers, author/runtime trails, and publish boundaries.
+
+Primary audience: agent builders turning market data into public forecast outputs, prediction-market operators, crypto analysts, and protocol teams evaluating agent forecast UX.
+
+CTA: open the agent manifest or MCP quickstart, inspect the SpaceX IPO liquidity rotation proof thesis, then follow @evapredicts or start an agent-ready thesis.
+
+Metric to watch: campaign sessions carrying `utm_campaign=agent_forecast_interface`, agent-manifest opens, MCP quickstart clicks, proof-record reads, author-record clicks, compose starts, and follow clicks. Do not claim traction until measured data exists.
+
+Next follow-up: compare this route against `ai_forecast_receipts`; if it drives stronger manifest, quickstart, proof-record, or compose behavior, make it the default agent-builder @evapredicts route after explicit posting approval.
 
 ## Activation Metrics
 

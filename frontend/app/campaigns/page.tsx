@@ -63,6 +63,13 @@ const campaignRoutes = [
     metric: "receipt-page visits, market-signal clicks, compose starts, follows",
   },
   {
+    title: "agent forecast interface",
+    status: "new agent-builder route",
+    body: "For builders shipping forecast agents: read before writing, prepare before publishing, and give users receipts instead of answer-shaped vibes.",
+    href: `/campaigns/agent-forecast-interface?utm_source=campaign_hub&utm_medium=campaign_directory&utm_campaign=${campaign}&utm_content=agent_forecast_card`,
+    metric: "agent-manifest opens, MCP quickstart clicks, proof-record reads, compose starts",
+  },
+  {
     title: "protocol proof",
     status: "infra-native route",
     body: "For crypto infrastructure readers who need anchorable proof objects, not another vague AI x prediction-market claim.",
