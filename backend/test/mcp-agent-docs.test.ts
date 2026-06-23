@@ -350,6 +350,29 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents the handoff freshness gate before reusing old protocol claims", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Handoff Freshness Gate",
+      "old `anchorPreparationId`",
+      "get_thesis",
+      "API readback",
+      "public URL evidence",
+      "onchain receipt/readback",
+      "named readiness/readback check",
+      "Fresh readback beats comment archaeology",
+      "do not use an old handoff as permission",
+    ]) {
+      expect(docs, `agent docs should include handoff freshness phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents schema repair cards so agents normalize inputs without guessing", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_ERROR_HANDLING.md"),

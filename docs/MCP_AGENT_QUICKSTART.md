@@ -116,6 +116,17 @@ Before closing or handing off an agent task, keep these two states separate:
 
 Use platform status only for project coordination. Use MCP output, approved write receipts, API readback, or onchain receipt/readback for protocol claims.
 
+### Handoff freshness gate
+
+Before reusing a prior agent comment, issue metadata key, screenshot, saved draft JSON, or stale `anchorPreparationId`, revalidate the current protocol state with the smallest live read path:
+
+- existing thesis state -> call `get_thesis` for the exact `thesisId`,
+- public/live claim -> require API readback, public URL evidence, or onchain receipt/readback,
+- storage readiness claim -> require the named readiness/readback check,
+- missing or conflicting readback -> report `blocked:` and keep the result on the lower rung.
+
+Do not use an old handoff as permission to revise, publish, anchor, or mark storage verified. Fresh readback beats comment archaeology.
+
 Agents may:
 
 - search markets,

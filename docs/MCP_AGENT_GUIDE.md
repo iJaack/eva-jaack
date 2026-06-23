@@ -269,6 +269,17 @@ For every write-adjacent MCP result, capture the evidence before writing the han
 
 If the inventory cannot distinguish draft prep from a public publish, stop at `blocked:`. Missing output is not evidence of publication, anchoring, revision, or durable storage.
 
+### Handoff Freshness Gate
+
+Treat prior agent comments, issue metadata, screenshots, saved draft JSON, and old `anchorPreparationId` values as leads, not current protocol evidence. Before acting on a handoff or closing a protocol-state claim, revalidate with the smallest live read path:
+
+- `get_thesis` for existing thesis state or any revision workflow,
+- API readback, public URL evidence, or onchain receipt/readback before claiming public/live state,
+- a named readiness/readback check before claiming durable storage,
+- `blocked:` if live readback is missing, stale, or conflicts with the handoff.
+
+Fresh readback beats comment archaeology. Do not use an old handoff as permission to revise, publish, anchor, or mark storage verified.
+
 ### Schema Gotchas For Agents
 
 - A `cancelled` prediction market is valid input. Use it when a market was removed/cancelled by the source, and explain why it still matters in `rationale`.
