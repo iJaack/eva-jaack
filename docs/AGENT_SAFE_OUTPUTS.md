@@ -124,6 +124,19 @@ Safe separation:
 
 For protocol claims, require protocol evidence: MCP result markers for preparation, approved write receipt for submission, API readback or public URL for publish, and transaction receipt or contract readback for onchain confirmation.
 
+## Handoff Freshness Gate
+
+Old handoffs are coordination context, not current protocol evidence. Before reusing a prior agent comment, issue metadata value, screenshot, saved draft JSON, or old `anchorPreparationId`, revalidate with the smallest live read path.
+
+| Prior handoff says | Fresh evidence needed before repeating it | Safe fallback |
+|---|---|---|
+| thesis exists / current revision is X | `get_thesis` readback for the exact `thesisId` | "historical handoff only; current thesis state not revalidated" |
+| draft or anchor was prepared | parsed MCP result or regenerated preparation output | "not returned / not revalidated" |
+| thesis is live, public, revised, anchored, or confirmed | API readback, public URL evidence, or onchain receipt/readback | `blocked:` with missing readback |
+| storage is durable / launch-ready | named readiness/readback check | `storage readiness blocked` |
+
+Fresh readback beats comment archaeology. Do not use an old handoff as permission to revise, publish, anchor, or mark storage verified.
+
 ## MCP Tool Annotations Are Not Protocol Evidence
 
 Tool annotations help clients avoid dangerous routing mistakes. They do not prove user approval or protocol state.
