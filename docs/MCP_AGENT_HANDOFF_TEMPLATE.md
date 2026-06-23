@@ -28,6 +28,7 @@ When handing a prepared draft back to a user or another agent, include:
 - whether the action is a new thesis, revision, or anchor rebuild,
 - wallet address and wallet source used for preparation,
 - signal counts and any high-risk assumptions,
+- market policy state (`MCP-filtered`, `screened against docs/MARKET_POLICY.md`, or `off-policy market omitted`),
 - storage readiness state (`storage not assessed`, `storage readiness blocked`, or `storage verified` with the check name),
 - the exact next approval needed,
 - the negative boundary: no transaction has been broadcast and no public publish is implied.
@@ -40,6 +41,7 @@ Status: anchor prepared only, not published
 Thesis: <title or thesisId>
 Wallet: <walletAddress> (<walletSource>)
 Signals: <N prediction signals>, <N fact signals>
+Market policy: <MCP-filtered | screened against docs/MARKET_POLICY.md | off-policy market omitted / signal-light>
 Anchor preparation: <anchorPreparationId or "calldata prepared">
 Storage: <not assessed | readiness blocked: missing durable write-path proof | verified by check/readback>
 

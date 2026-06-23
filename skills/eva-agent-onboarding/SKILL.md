@@ -22,6 +22,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Use the schema repair cards in `docs/MCP_AGENT_ERROR_HANDLING.md` when an input is almost valid but has malformed odds, URLs, weights, verifier fields, revision-body shape, identity authority, or direct REST-write requests.
 - Treat MCP tool annotations as routing hints, not permission evidence. Read tools have `readOnlyHint: true`; draft-prep tools have `readOnlyHint: false` plus non-destructive/idempotent hints, which still caps them at `draft prepared` / `anchor prepared` without approval and receipt/readback evidence.
 - Use the quickstart preflight before write-adjacent calls: intent, approved identity, signer/source, evidence, scope, and storage claim must be clear before preparing calldata.
+- Screen prediction-market evidence against `docs/MARKET_POLICY.md` before it enters `predictionSignals`. MCP `search_markets` is preferred because it uses the app-filtered market universe; external, stale, manual, or screenshot-sourced markets must be screened. Exclude sports, elections/political offices, active geopolitics/armed conflict, personal tragedy/private life, criminal trials, easily manipulated social/action prompts, and entertainment/pop-culture novelty markets instead of using them as Eva thesis signals.
 - Fill the four-line action contract before write-adjacent calls: operation, identity source, evidence source, and output ceiling. The result must never exceed that ceiling.
 - For mixed prompts, fill the quickstart safe-start triage card before tools: requested verb, approved identity, smallest live MCP tool, safe rung after call, storage wording, and stop condition.
 - Run the pre-send audit checklist before final user-facing MCP results: parse evidence from the MCP text JSON envelope, separate coordination status from protocol status, match the final verb to the permission ladder, name storage state, name the boundary, and name missing evidence before any stronger claim.
@@ -79,6 +80,7 @@ Use this drill for a new agent before it touches a real user-requested thesis. I
 operation: read-only
 identity source: not required for search_markets
 evidence source: market search query only
+market policy: MCP-filtered result set
 output ceiling: read-only
 ```
 
@@ -96,6 +98,7 @@ output ceiling: read-only
 operation: new draft
 identity source: onboarding rehearsal approval for @evajaack + Eva wallet + external walletSource
 evidence source: explicitly signal-light; no market or fact URLs claimed
+market policy: signal-light because no prediction markets are attached
 output ceiling: draft prepared / anchor prepared
 ```
 
@@ -122,6 +125,7 @@ output ceiling: draft prepared / anchor prepared
 operation: revision
 identity source: `get_thesis` readback plus task-time approval for xHandle and walletAddress
 evidence source: full replacement body from approved source text; note summarizes the delta
+market policy: preserve existing accepted markets or screen any new markets against docs/MARKET_POLICY.md
 output ceiling: draft prepared / anchor prepared
 ```
 
@@ -165,6 +169,7 @@ boundary: no transaction broadcast and no public publish happened
 - MCP alone never reaches the `submitted` or `published/live` rungs; those require explicit approval plus tx/public-state evidence.
 - Issue `done` / `in_review`, PR merged, deployment green, or old issue comments do not upgrade a protocol claim. They are not proof that a thesis is live, anchored, revised, submitted, confirmed, or storage-verified.
 - Fresh readback beats comment archaeology: do not use an old handoff as permission to revise, publish, anchor, or mark storage verified.
+- Market policy beats opportunistic signal collection: do not use off-policy markets as Eva thesis signals just because they exist in a prompt, screenshot, stale comment, or external search result.
 - Never mark a thesis, thesis revision, or signal as confirmed without a transaction receipt or contract readback.
 - Never mark production thesis writes as durable from MCP output alone. Use `storage not assessed` for local/dry-run prep, `storage readiness blocked` when production readiness does not expose durable write-path evidence, and `storage verified` only after an approved readiness/readback check proves persisted thesis state.
 - If MCP output is ambiguous, report the exact missing evidence and do not infer publication.

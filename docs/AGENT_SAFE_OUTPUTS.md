@@ -16,6 +16,7 @@ Run this immediately before sending any user-facing MCP result. The goal is to c
 - Coordination/protocol split preserved: Multica issue state, PR state, deployment state, or comments are not protocol evidence.
 - Final verb fits evidence: use `inspected`, `prepared`, `calldata ready`, `submitted`, or `published/live` only at the matching permission ladder rung.
 - Storage wording is explicit: `storage not assessed`, `storage readiness blocked`, or `storage verified by <named check>`.
+- Market policy is honest: any external/stale/manual prediction market was screened against `docs/MARKET_POLICY.md`, or omitted and reported as signal-light/off-policy.
 - Boundary named: say what did not happen (`no transaction broadcast`, `no public publish`, `current public revision unchanged`) when the user might otherwise infer it.
 - Stronger-claim gap named: approval, tx hash, receipt/readback, durable storage check, or real source URLs.
 
@@ -73,6 +74,7 @@ Minimum inventory for write-adjacent results:
 - output markers: `publishState`, `anchorStatus`, and `anchorPreparationId` when present,
 - transaction evidence: transaction count, network/chain if returned, target contract/function if returned, and whether a tx hash exists,
 - content evidence: thesis title or `thesisId`, revision version if returned, signal counts, and any source URL gaps,
+- market policy evidence: `MCP-filtered`, `screened against docs/MARKET_POLICY.md`, or `off-policy market omitted`,
 - storage evidence: `not assessed`, `readiness blocked`, or `verified by <named check>`.
 
 If a field is absent, write `not returned` or omit it. Never upgrade an absent tx hash into submission, an absent receipt into confirmation, or an absent storage check into launch readiness.
@@ -103,6 +105,7 @@ When a user, issue, or agent handoff asks for stronger wording than the evidence
 | "revision applied" | "revision draft prepared; current public revision unchanged" | approved revision transaction plus confirmation/readback |
 | "storage verified" | "storage not assessed" or "storage readiness blocked" | named durable-storage readiness endpoint, API readback, or storage-mode check |
 | "signal-backed" | "signal-light" when arrays are empty or URLs are missing | real market/source URLs, weights, roles, and source notes |
+| "market-backed" from a prohibited or unscreened market | "market omitted; signal-light/off-policy" | an acceptable market that passes `docs/MARKET_POLICY.md` |
 
 Use this shape for the final sentence when downgrading a claim:
 

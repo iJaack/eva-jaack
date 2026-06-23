@@ -110,6 +110,19 @@ Before calling a draft-prep tool, choose the smallest live operation that matche
 
 Do not work around a failed revision lookup by creating a replacement thesis. A missing `thesisId`, mismatched wallet, or unauthorized X handle is a blocker, not permission to change identity or scope.
 
+### Market Policy Screen
+
+Prediction markets are thesis signals, not permission to pull any market into an Eva draft. Before using a market returned by `search_markets` or supplied in a handoff, apply `docs/MARKET_POLICY.md`.
+
+Safe handling:
+
+- Prefer the MCP `search_markets` result set because it uses the same filtered market universe as the app market selector.
+- If a market comes from an external search, stale comment, screenshot, or manually supplied URL, screen the title/category/provider URL against `docs/MARKET_POLICY.md` before adding it to `predictionSignals`.
+- Exclude prohibited categories such as sports, elections/political offices, active geopolitics/armed conflict, personal tragedy/private life, criminal trial outcomes, easily manipulable social/action prompts, and entertainment/pop-culture novelty markets.
+- When a useful thesis has only prohibited or off-policy markets available, prepare it as signal-light or block for better evidence. Do not smuggle an off-policy market into `predictionSignals` just because the schema accepts a `marketId` and `marketUrl`.
+
+Safe claim after filtering: `market policy screened`. Unsafe claim: `signal-backed` when the only market evidence was removed or never screened.
+
 ## Identity Requirements
 
 All draft or revision preparation requires:

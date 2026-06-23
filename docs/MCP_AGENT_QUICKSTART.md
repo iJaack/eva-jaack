@@ -33,6 +33,7 @@ Before any write-adjacent MCP call, fill this out mentally or in the handoff. If
 | Identity | operator-approved `xHandle` and `walletAddress` | Block; do not substitute Eva's wallet or a remembered address. |
 | Signer/source | `walletSource` when the live tool accepts it | Use `external` only when that is the approved signer source; the schema default is not approval. |
 | Evidence | real market/source URLs, or an explicit signal-light choice | Use empty arrays and say signal-light; do not turn default weights/verdicts into evidence. |
+| Market policy | prediction markets screened against `docs/MARKET_POLICY.md` when they come from external/stale/manual sources | Remove off-policy markets; use signal-light or block if the thesis would otherwise depend on them. |
 | Scope | no request for publish, broadcast, direct REST writes, claims, articles/blog, staking, custody, settlement, or LLM verification | Stop unless a separate approved path and evidence exist. |
 | Storage claim | `storage not assessed`, `storage readiness blocked`, or `storage verified by <check>` | Default to `storage not assessed` for local MCP prep. |
 
@@ -68,6 +69,12 @@ Safe handling:
 - block if the missing/defaulted value would change signer authority, evidence quality, weighting, or publish/live wording.
 
 If the prompt is almost valid but one schema field is malformed or ambiguous, use the schema repair cards in `docs/MCP_AGENT_ERROR_HANDLING.md` before calling a tool. Repair only directly evidenced values, such as an explicit `36%` becoming `0.36`. Otherwise block instead of guessing URLs, signer authority, verifier scores, weights, or full revision bodies.
+
+### Market policy screen
+
+`search_markets` should be the default market source because it reads the app-filtered market universe. If a market is pasted from outside MCP, copied from an old issue comment, or discovered by a web search, screen it against `docs/MARKET_POLICY.md` before using it as a prediction signal.
+
+Do not include markets about sports, elections/political offices, active geopolitics or armed conflict, personal tragedy/private life, criminal trial outcomes, easily manipulated social/action prompts, or entertainment/pop-culture novelty as Eva V1 thesis signals. If filtering removes the only market evidence, downgrade the draft to signal-light or return `blocked:` with the missing acceptable evidence source.
 
 ### Safe-start triage card
 

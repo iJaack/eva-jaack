@@ -511,4 +511,32 @@ describe("Eva MCP agent docs", () => {
       expect(skill, `onboarding skill should include rehearsal phrase ${phrase}`).toContain(phrase);
     }
   });
+
+  it("documents the market-policy screen for prediction signals", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("docs/MCP_AGENT_ERROR_HANDLING.md"),
+      readRepoFile("docs/MCP_AGENT_HANDOFF_TEMPLATE.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "docs/MARKET_POLICY.md",
+      "market policy",
+      "MCP-filtered",
+      "off-policy",
+      "sports",
+      "elections/political offices",
+      "active geopolitics/armed conflict",
+      "personal tragedy/private life",
+      "easily manipulated social/action prompts",
+      "entertainment/pop-culture novelty",
+      "signal-light",
+    ]) {
+      expect(docs, `agent docs should include market-policy screen phrase ${phrase}`).toContain(phrase);
+    }
+  });
 });
