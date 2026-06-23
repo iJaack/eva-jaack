@@ -65,3 +65,26 @@ test("deployment smoke skips 200 HTML Vercel protection pages", async () => {
     server.close();
   }
 });
+
+test("deployment smoke skips 401 Vercel protection pages", async () => {
+  const protectionPage = `<!doctype html><html lang="en"><meta charset=utf-8><title>Authentication Required</title>
+    <script type="text/llms.txt">## Note to agents accessing this page:\nThis page requires Vercel authentication.</script>`;
+
+  const server = createServer((_req, res) => {
+    res.writeHead(401, {
+      "content-type": "text/html; charset=utf-8",
+      server: "Vercel",
+    });
+    res.end(protectionPage);
+  });
+
+  const port = await listen(server);
+  try {
+    const result = await runSmoke(`http://127.0.0.1:${port}`);
+    assert.equal(result.code, 0);
+    assert.match(result.stderr, /SKIP deployment smoke: Vercel Deployment Protection blocked the deployment URL/);
+    assert.doesNotMatch(result.stderr, /FAIL health/);
+  } finally {
+    server.close();
+  }
+});

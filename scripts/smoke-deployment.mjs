@@ -172,13 +172,13 @@ for (const check of checks) {
     continue;
   }
 
+  const elapsedMs = Math.round(performance.now() - startedAt);
   const protectedByVercel = await isVercelProtectedResponse(response);
+
   if (protectedByVercel && !vercelBypassSecret && allowProtectedSkip) {
     warnVercelProtectionSkip();
     process.exit(0);
   }
-
-  const elapsedMs = Math.round(performance.now() - startedAt);
 
   if (!response.ok) {
     failures += 1;
