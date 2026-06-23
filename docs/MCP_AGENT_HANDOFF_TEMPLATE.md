@@ -33,13 +33,25 @@ When handing a prepared draft back to a user or another agent, include:
 - the exact next approval needed,
 - the negative boundary: no transaction has been broadcast and no public publish is implied.
 
+## Signer / Wallet Source Handling
+
+Do not force every handoff into the `create_thesis_draft` shape. The live tools expose signer fields differently:
+
+| Operation | Handoff signer wording | Do not invent |
+|---|---|---|
+| New thesis draft | `Wallet: <walletAddress> (<walletSource>)` when `walletSource` was supplied or defaulted. | Do not call a defaulted `external` value approval unless the task named it. |
+| Revision draft | `Wallet: <walletAddress>; walletSource: not accepted by prepare_revision_draft` plus the task-time signer/source approval in notes. | Do not add `walletSource` to the revision payload or imply it was returned. |
+| Anchor rebuild | `Thesis: <thesisId>; signer/source approval: <named approval or not required for calldata rebuild>` when no wallet fields were accepted by the tool. | Do not attach a different wallet identity just to make the handoff look complete. |
+
+If signer/source approval was not explicit, say `signer/source approval: missing before broadcast`. A prepared payload can still be summarized, but it cannot become transaction approval, broadcast authority, or publish/live evidence.
+
 ## Copy-Paste Template
 
 ```md
 Prepared: <new thesis | revision | anchor rebuild>
 Status: anchor prepared only, not published
 Thesis: <title or thesisId>
-Wallet: <walletAddress> (<walletSource>)
+Wallet / signer source: <walletAddress + walletSource | walletAddress; walletSource not accepted by this tool | signer/source approval missing before broadcast>
 Signals: <N prediction signals>, <N fact signals>
 Market policy: <MCP-filtered | screened against docs/MARKET_POLICY.md | off-policy market omitted / signal-light>
 Anchor preparation: <anchorPreparationId or "calldata prepared">

@@ -71,6 +71,7 @@ MCP text parser rule: extract the first text part once, parse that JSON, and fil
 Minimum inventory for write-adjacent results:
 
 - operation evidence: tool name, requested intent, and approved `xHandle` / `walletAddress`,
+- signer/source evidence: `walletSource` only when the tool accepts or returns it; otherwise write `walletSource not accepted by this tool` or `signer/source approval missing before broadcast`,
 - output markers: `publishState`, `anchorStatus`, and `anchorPreparationId` when present,
 - transaction evidence: transaction count, network/chain if returned, target contract/function if returned, and whether a tx hash exists,
 - content evidence: thesis title or `thesisId`, revision version if returned, signal counts, and any source URL gaps,
@@ -78,6 +79,8 @@ Minimum inventory for write-adjacent results:
 - storage evidence: `not assessed`, `readiness blocked`, or `verified by <named check>`.
 
 If a field is absent, write `not returned` or omit it. Never upgrade an absent tx hash into submission, an absent receipt into confirmation, or an absent storage check into launch readiness.
+
+Signer/source caveat: `walletSource` is an input for `create_thesis_draft`, not a universal handoff field. For `prepare_revision_draft`, report the approved wallet address and note that walletSource is not accepted by the live revision tool. For `prepare_anchor_transaction`, report the `thesisId` and signer/source approval status only when approval matters for a later broadcast. Do not add walletSource to revision or anchor-rebuild payloads, and do not imply a defaulted or missing source grants broadcast authority.
 
 ## Schema Defaults Are Not Approval
 
