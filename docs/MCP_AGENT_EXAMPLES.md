@@ -51,6 +51,13 @@ const parsed = JSON.parse(text);
 
 Only copy values from `parsed` into a handoff. A tool name or SDK envelope alone is not evidence for `publishState`, `anchorStatus`, storage readiness, transaction submission, confirmation, or live/public state.
 
+Field-placement reminder before copy-pasting payloads:
+
+- `walletSource` appears only in `create_thesis_draft` inputs.
+- `note` appears only in `prepare_revision_draft` inputs and never replaces the full revision `body`.
+- `publishState`, `anchorStatus`, `anchorPreparationId`, `transactions`, tx hash, receipt/readback, and storage wording are result or handoff fields, not inputs.
+- `marketUrl` and `sourceUrl` are optional but must be valid URLs when present. Omit unknown URLs and report the source URL gap instead of inventing one.
+
 Result-card pattern for every write-adjacent example below:
 
 ```text

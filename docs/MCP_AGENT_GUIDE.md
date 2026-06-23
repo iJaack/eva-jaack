@@ -133,6 +133,28 @@ If a defaulted field affects identity, evidence quality, risk weighting, or user
 
 ## Tool Schemas
 
+### Live input field matrix
+
+Use this matrix as the source-of-truth checklist before composing payloads. Do not add fields just because another tool accepts them, and do not omit required identity fields on write-adjacent calls.
+
+| Tool | Required fields | Optional/defaulted fields | Fields agents must not add |
+|---|---|---|---|
+| `search_markets` | none | `query` | thesis text, identity, wallet, publish, broadcast, or storage fields |
+| `get_thesis` | `thesisId` | none | `xHandle`, `walletAddress`, `walletSource`, body, signals, publish, or broadcast fields |
+| `create_thesis_draft` | `title`, `body`, `xHandle`, `walletAddress` | `walletSource` (`external` default), `predictionSignals` (`[]` default), `factSignals` (`[]` default) | `thesisId`, revision `note`, transaction hash, receipt, publish/live flags, or storage-readiness claims |
+| `prepare_revision_draft` | `thesisId`, full replacement `body`, `xHandle`, `walletAddress` | `note` | `walletSource`, patch/diff-only body, partial paragraph, transaction hash, receipt, publish/live flags, or storage-readiness claims |
+| `prepare_anchor_transaction` | `thesisId` | none | body changes, identity swaps, signals, transaction hash, receipt, publish/live flags, or storage-readiness claims |
+
+Signal fields are nested under `predictionSignals` and `factSignals` only. Prediction signals accept `marketId`, `marketTitle`, `marketUrl`, `selectedOutcomeLabel`, `oddsAtAdd`, `currentOdds`, `weight`, `role`, `rationale`, and `status`. Fact signals accept `claimText`, `sourceUrl`, `verifierVerdict`, `verifierScore`, `reportUri`, `reportHash`, `weight`, `role`, and `rationale`.
+
+Payload hygiene rules:
+
+- `walletSource` is a `create_thesis_draft` field only. Do not send it to `prepare_revision_draft`; record signer/source approval in the handoff instead.
+- `note` belongs to `prepare_revision_draft` only. It explains the delta; it is not the revision body.
+- `body` for a revision is always the full replacement body, not a patch, append-only note, or partial paragraph.
+- Optional URLs (`marketUrl`, `sourceUrl`) must be valid URLs when present. If the source is unknown or malformed, omit the URL and report the source URL gap instead of fabricating one.
+- Returned or handoff-only concepts (`publishState`, `anchorStatus`, `anchorPreparationId`, `transactions`, tx hash, receipt, readback, storage state) are not input fields.
+
 ### `search_markets`
 
 ```json
