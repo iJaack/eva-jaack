@@ -118,3 +118,31 @@ test("deployment smoke skips when only backend JSON routes are protected", async
     server.close();
   }
 });
+
+test("deployment smoke skips Vercel dashboard HTML on backend JSON routes without Vercel headers", async () => {
+  const vercelDashboardShell = `<!DOCTYPE html><html data-dpl-id="dpl_test" class="geist dash" lang="en-US"><head>
+    <link rel="stylesheet" href="/_next/static/immutable/chunks/test.css" />
+    <title>Vercel</title></head><body>Preview route requires access.</body></html>`;
+
+  const server = createServer((req, res) => {
+    if (req.url?.startsWith("/health") || req.url?.startsWith("/api/storage-readiness")) {
+      res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+      res.end(vercelDashboardShell);
+      return;
+    }
+
+    res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+    res.end(JSON.stringify({ ok: true }));
+  });
+
+  const port = await listen(server);
+  try {
+    const result = await runSmoke(`http://127.0.0.1:${port}`);
+    assert.equal(result.code, 0);
+    assert.match(result.stderr, /SKIP deployment smoke: Vercel Deployment Protection blocked the deployment URL/);
+    assert.match(result.stdout, /PASS predictors API/);
+    assert.doesNotMatch(result.stderr, /Unexpected token/);
+  } finally {
+    server.close();
+  }
+});

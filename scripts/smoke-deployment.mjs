@@ -149,13 +149,30 @@ function isVercelHtmlResponse(response) {
   return contentType.toLowerCase().includes("text/html") && (server.toLowerCase().includes("vercel") || Boolean(vercelId));
 }
 
-function shouldSkipLikelyProtectedJsonRoute(response, check) {
+async function isLikelyVercelHtmlShell(response) {
+  if (isVercelHtmlResponse(response)) return true;
+
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.toLowerCase().includes("text/html")) return false;
+
+  let body = "";
+  try {
+    body = await response.clone().text();
+  } catch {
+    return false;
+  }
+
+  const snippet = body.slice(0, 8192).toLowerCase();
   return (
-    Boolean(check.validate) &&
-    !vercelBypassSecret &&
-    allowProtectedSkip &&
-    isVercelHtmlResponse(response)
+    (snippet.includes("data-dpl-id=") && (snippet.includes("vercel") || snippet.includes(" dash"))) ||
+    (snippet.includes("/_next/static/immutable/") && snippet.includes("vercel")) ||
+    snippet.includes("_v-anonymous-id") ||
+    snippet.includes("x-vercel-protection-bypass")
   );
+}
+
+async function shouldSkipLikelyProtectedJsonRoute(response, check) {
+  return Boolean(check.validate) && !vercelBypassSecret && allowProtectedSkip && (await isLikelyVercelHtmlShell(response));
 }
 
 if (!vercelBypassSecret && allowProtectedSkip) {
@@ -202,7 +219,7 @@ for (const check of checks) {
     process.exit(0);
   }
 
-  if (shouldSkipLikelyProtectedJsonRoute(response, check)) {
+  if (await shouldSkipLikelyProtectedJsonRoute(response, check)) {
     warnVercelProtectionSkip();
     process.exit(0);
   }
