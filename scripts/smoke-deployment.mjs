@@ -142,6 +142,22 @@ function warnVercelProtectionSkip() {
   );
 }
 
+function isVercelHtmlResponse(response) {
+  const contentType = response.headers.get("content-type") ?? "";
+  const server = response.headers.get("server") ?? "";
+  const vercelId = response.headers.get("x-vercel-id") ?? "";
+  return contentType.toLowerCase().includes("text/html") && (server.toLowerCase().includes("vercel") || Boolean(vercelId));
+}
+
+function shouldSkipLikelyProtectedJsonRoute(response, check) {
+  return (
+    Boolean(check.validate) &&
+    !vercelBypassSecret &&
+    allowProtectedSkip &&
+    isVercelHtmlResponse(response)
+  );
+}
+
 if (!vercelBypassSecret && allowProtectedSkip) {
   try {
     const response = await fetch(`${baseUrl}/`, {
@@ -182,6 +198,11 @@ for (const check of checks) {
   const protectedByVercel = await isVercelProtectedResponse(response);
 
   if (protectedByVercel && !vercelBypassSecret && allowProtectedSkip) {
+    warnVercelProtectionSkip();
+    process.exit(0);
+  }
+
+  if (shouldSkipLikelyProtectedJsonRoute(response, check)) {
     warnVercelProtectionSkip();
     process.exit(0);
   }

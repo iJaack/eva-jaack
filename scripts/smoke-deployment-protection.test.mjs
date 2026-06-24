@@ -90,6 +90,8 @@ test("deployment smoke skips 401 Vercel protection pages", async () => {
 });
 
 test("deployment smoke skips when only backend JSON routes are protected", async () => {
+  const genericVercelHtml = `<!doctype html><html lang="en"><head><title>Vercel</title></head><body>Preview route requires access.</body></html>`;
+
   const server = createServer((req, res) => {
     if (req.url?.startsWith("/health") || req.url?.startsWith("/api/storage-readiness")) {
       res.writeHead(200, {
@@ -97,7 +99,7 @@ test("deployment smoke skips when only backend JSON routes are protected", async
         server: "Vercel",
         "x-vercel-id": "fra1::test",
       });
-      res.end(protectionPage);
+      res.end(genericVercelHtml);
       return;
     }
 
