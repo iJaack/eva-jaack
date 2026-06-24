@@ -12,6 +12,7 @@
     "lint": "pnpm --filter frontend lint",
     "typecheck": "pnpm --filter frontend typecheck",
     "test:backend": "pnpm --filter backend test",
+    "test:smoke": "node --test scripts/*.test.mjs",
     "test:e2e": "pnpm --filter frontend test:e2e",
     "qa:screenshots": "pnpm --filter frontend qa:screenshots",
     "smoke:deploy": "node scripts/smoke-deployment.mjs",
