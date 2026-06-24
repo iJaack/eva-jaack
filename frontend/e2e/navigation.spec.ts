@@ -184,13 +184,13 @@ test("campaign hub routes active campaign traffic with measurable CTAs", async (
   await expect(page.getByRole("heading", { name: "one public prediction angle, one proof path, one metric." })).toBeVisible();
   await expect(page.getByText("campaign choice should be judged by proof-path intent, not impressions.")).toBeVisible();
 
-  await expect(page.getByRole("link", { name: "Run forecast QA" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Run trust loop" })).toHaveAttribute(
     "data-campaign-cta",
     "open_current_wedge",
   );
-  await expect(page.getByRole("link", { name: "Run forecast QA" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Run trust loop" })).toHaveAttribute(
     "href",
-    /utm_campaign=campaign_hub.*utm_content=forecast_qa_card/,
+    /utm_campaign=campaign_hub.*utm_content=trust_loop_card/,
   );
   await expect(page.getByRole("link", { name: "Read proof record" })).toHaveAttribute(
     "href",

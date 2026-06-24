@@ -407,7 +407,7 @@ export default function HomePage() {
           </p>
           <div className="mobile-hero-actions">
             <Link href={featuredCampaignHref} className="mobile-action mobile-action-primary">
-              Run forecast QA
+              Run trust loop
             </Link>
             <Link href={launchThesisHref} className="mobile-action">
               Read proof thesis

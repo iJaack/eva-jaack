@@ -143,18 +143,18 @@ test("homepage leads with the prediction workbench layout", async ({ page }) => 
 
   await expect(page.getByRole("heading", { name: "Turn market odds into a public thesis." })).toBeVisible();
   await expect(page.getByText("Eva lets predictors write an interactive post")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Run forecast QA" }).first()).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Run trust loop" }).first()).toHaveAttribute(
     "href",
-    /utm_campaign=forecast_qa_checklist.*utm_content=homepage_callout/,
+    /utm_campaign=forecast_trust_loop.*utm_content=homepage_callout/,
   );
   await expect(page.getByRole("link", { name: "Read the proof record" })).toHaveAttribute(
     "href",
-    /utm_campaign=forecast_qa_checklist.*utm_content=spacex_proof_record/,
+    /utm_campaign=forecast_trust_loop.*utm_content=spacex_proof_record/,
   );
   await expect(page.getByRole("heading", { name: "SpaceX IPO liquidity rotation" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Read the proof record" })).toHaveAttribute(
     "href",
-    /utm_campaign=forecast_qa_checklist.*utm_content=spacex_proof_record/,
+    /utm_campaign=forecast_trust_loop.*utm_content=spacex_proof_record/,
   );
   await expect(page.getByRole("heading", { name: "send curious predictors to one clean next step." })).toBeVisible();
   await expect(page.getByRole("link", { name: /trust receipts/i })).toHaveAttribute(
