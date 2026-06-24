@@ -515,6 +515,29 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents safe lower-rung fallbacks for MCP failures", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_ERROR_HANDLING.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "No silent fallback ladder",
+      "client setup failure",
+      "live allowlist drift",
+      "input schema mismatch",
+      "missing thesis/identity readback",
+      "protocol readback gap",
+      "approved non-MCP execution gap",
+      "Fallback ceiling",
+      "UI scraping",
+      "direct REST writes",
+      "old `anchorPreparationId`",
+    ]) {
+      expect(docs, `agent fallback docs should include ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents that schema defaults are not approval or evidence", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_GUIDE.md"),
