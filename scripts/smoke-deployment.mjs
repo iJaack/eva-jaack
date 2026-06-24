@@ -98,13 +98,63 @@ const sharedHeaders = vercelBypassSecret
     }
   : {};
 
-function isVercelProtectedResponse(response) {
+async function isVercelProtectedResponse(response) {
   const setCookie = response.headers.get("set-cookie") ?? "";
   const server = response.headers.get("server") ?? "";
-  return (
+  const vercelId = response.headers.get("x-vercel-id") ?? "";
+
+  if (
     (response.status === 401 || response.status === 403) &&
     server.toLowerCase().includes("vercel") &&
     setCookie.includes("_vercel_sso_nonce")
+  ) {
+    return true;
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.toLowerCase().includes("text/html")) return false;
+
+  let body = "";
+  try {
+    body = await response.clone().text();
+  } catch {
+    return false;
+  }
+
+  const snippet = body.slice(0, 8192).toLowerCase();
+  const htmlLooksProtected =
+    snippet.includes("authentication required") ||
+    snippet.includes("vercel authentication") ||
+    snippet.includes("this page requires vercel authentication") ||
+    snippet.includes("x-vercel-protection-bypass") ||
+    snippet.includes("_vercel_sso_nonce") ||
+    snippet.includes("vercel.com/sso-api") ||
+    snippet.includes("vercel.com/security");
+  const responseLooksVercel = server.toLowerCase().includes("vercel") || Boolean(vercelId) || snippet.includes("vercel");
+
+  return htmlLooksProtected && responseLooksVercel;
+}
+
+function warnVercelProtectionSkip() {
+  console.warn(
+    "SKIP deployment smoke: Vercel Deployment Protection blocked the deployment URL. " +
+      "Configure the GitHub secret VERCEL_AUTOMATION_BYPASS_SECRET to run deployed-url smoke checks."
+  );
+}
+
+function isVercelHtmlResponse(response) {
+  const contentType = response.headers.get("content-type") ?? "";
+  const server = response.headers.get("server") ?? "";
+  const vercelId = response.headers.get("x-vercel-id") ?? "";
+  return contentType.toLowerCase().includes("text/html") && (server.toLowerCase().includes("vercel") || Boolean(vercelId));
+}
+
+function shouldSkipLikelyProtectedJsonRoute(response, check) {
+  return (
+    Boolean(check.validate) &&
+    !vercelBypassSecret &&
+    allowProtectedSkip &&
+    isVercelHtmlResponse(response)
   );
 }
 
@@ -116,11 +166,8 @@ if (!vercelBypassSecret && allowProtectedSkip) {
       signal: AbortSignal.timeout(requestTimeoutMs),
     });
 
-    if (isVercelProtectedResponse(response)) {
-      console.warn(
-        "SKIP deployment smoke: Vercel Deployment Protection blocked the deployment URL. " +
-          "Configure the GitHub secret VERCEL_AUTOMATION_BYPASS_SECRET to run deployed-url smoke checks."
-      );
+    if (await isVercelProtectedResponse(response)) {
+      warnVercelProtectionSkip();
       process.exit(0);
     }
   } catch {
@@ -148,12 +195,23 @@ for (const check of checks) {
   }
 
   const elapsedMs = Math.round(performance.now() - startedAt);
+  const protectedByVercel = await isVercelProtectedResponse(response);
+
+  if (protectedByVercel && !vercelBypassSecret && allowProtectedSkip) {
+    warnVercelProtectionSkip();
+    process.exit(0);
+  }
+
+  if (shouldSkipLikelyProtectedJsonRoute(response, check)) {
+    warnVercelProtectionSkip();
+    process.exit(0);
+  }
 
   if (!response.ok) {
     failures += 1;
     failedChecks.push({
       name: check.name,
-      protectedByVercel: isVercelProtectedResponse(response),
+      protectedByVercel,
     });
     console.error(`FAIL ${check.name}: ${response.status} ${url} (${elapsedMs}ms)`);
     continue;
@@ -190,10 +248,7 @@ if (failures > 0) {
     successes === 0 && failedChecks.length > 0 && failedChecks.every((check) => check.protectedByVercel);
 
   if (onlyVercelProtectionFailures && !vercelBypassSecret && allowProtectedSkip) {
-    console.warn(
-      "SKIP deployment smoke: Vercel Deployment Protection blocked every smoke request. " +
-        "Configure the GitHub secret VERCEL_AUTOMATION_BYPASS_SECRET to run deployed-url smoke checks."
-    );
+    warnVercelProtectionSkip();
     process.exit(0);
   }
 
