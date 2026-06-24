@@ -14,6 +14,21 @@ The live MCP server exposes only these agent-facing tools:
 
 If a client, prompt, old note, or autocomplete suggests any other write tool, treat it as stale. Do not call or recreate removed tools such as `record_revision`, `/claims`, `/articles`, curator, staking, challenge, settlement, paid-verification, or LLM-verification flows.
 
+## No silent fallback ladder
+
+When MCP work fails, classify the failure before choosing a fallback. A fallback is only safe when it stays on the same or lower permission rung and does not add write powers.
+
+| Failure class | Smallest safe fallback | Fallback ceiling |
+|---|---|---|
+| Client setup failure | Restart or reconfigure the local `eva-thesis` stdio server from the repo root. | `blocked` until the local server starts. |
+| Live allowlist drift | Re-read the allowlist above and choose only one of the five live tools. | `read-only` unless a matching draft-prep tool exists. |
+| Input schema mismatch | Repair only directly evidenced fields with the schema repair cards below. | Same requested rung, or `blocked` if repair would guess. |
+| Missing thesis or identity readback | Ask for the canonical `thesisId`, task-time `xHandle`, wallet address, and signer/source approval. | `blocked`; do not create a replacement thesis. |
+| Protocol readback gap | Use `get_thesis`, approved API/public URL evidence, or onchain receipt/readback. | Historical handoff only; no live/confirmed wording. |
+| Approved non-MCP execution gap | Fill the separate execution receipt card before using REST, broadcaster, or transaction claims. | `draft prepared` / `anchor prepared` until approval, receipt, and readback exist. |
+
+Unsafe fallbacks are still unsafe even if they are technically possible: UI scraping, direct REST writes, unauthenticated production calls, guessed wallets, stale issue metadata, or reusing an old `anchorPreparationId` do not repair a failed MCP path.
+
 ## Safe recovery rules
 
 | Symptom | Safe response | Do not do |
