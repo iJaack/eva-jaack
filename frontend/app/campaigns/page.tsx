@@ -35,18 +35,18 @@ export const metadata: Metadata = {
 
 const campaignRoutes = [
   {
-    title: "forecast QA checklist",
-    status: "current wedge",
-    body: "For AI forecast and market-thesis builders who need source fit, break conditions, revision triggers, and author trail before amplification.",
-    href: `/campaigns/forecast-qa-checklist?utm_source=campaign_hub&utm_medium=campaign_directory&utm_campaign=${campaign}&utm_content=forecast_qa_card`,
-    metric: "checklist opens, proof-record reads, market-signal clicks, compose starts, author-record clicks, follows",
-  },
-  {
     title: "forecast trust loop",
-    status: "proof CTA route",
+    status: "current wedge",
     body: "For skeptical builders who need one repeatable behavior: source the claim, state the break condition, revise visibly, and keep the receipt.",
     href: `/campaigns/forecast-trust-loop?utm_source=campaign_hub&utm_medium=campaign_directory&utm_campaign=${campaign}&utm_content=trust_loop_card`,
     metric: "trust-loop visits, proof-record reads, market-signal clicks, compose starts, author-record clicks, follows",
+  },
+  {
+    title: "forecast QA checklist",
+    status: "supporting route",
+    body: "For AI forecast and market-thesis builders who need source fit, break conditions, revision triggers, and author trail before amplification.",
+    href: `/campaigns/forecast-qa-checklist?utm_source=campaign_hub&utm_medium=campaign_directory&utm_campaign=${campaign}&utm_content=forecast_qa_card`,
+    metric: "checklist opens, proof-record reads, market-signal clicks, compose starts, author-record clicks, follows",
   },
   {
     title: "prediction memory",
@@ -86,7 +86,7 @@ const campaignRoutes = [
 ] as const;
 
 const operatingRules = [
-  "one public wedge at a time: current push is forecast QA, not every campaign at once",
+  "one public wedge at a time: current push is the forecast trust loop, not every campaign at once",
   "route cold readers into a proof object before asking them to compose or follow",
   "keep @evapredicts external posting approval-gated until Giacomo approves the exact copy",
   "measure campaign_view and campaign_cta_click events before claiming traction",
@@ -114,7 +114,7 @@ export default function CampaignHubPage() {
               channel="campaign_hub_hero"
               className="btn btn-primary"
             >
-              Run forecast QA
+              Run trust loop
             </CampaignLink>
             <CampaignLink
               href={proofHref}

@@ -29,9 +29,9 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
 
 const evaPredictsUrl = "https://x.com/evapredicts";
 const launchThesisId = "thesis-0fdef25794b38b6e8eed7524";
-const featuredCampaign = "forecast_qa_checklist";
+const featuredCampaign = "forecast_trust_loop";
 const launchThesisHref = `/thesis/${launchThesisId}?utm_source=homepage&utm_medium=proof_cta&utm_campaign=${featuredCampaign}&utm_content=spacex_proof_record`;
-const featuredCampaignHref = `/campaigns/forecast-qa-checklist?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${featuredCampaign}&utm_content=homepage_callout`;
+const featuredCampaignHref = `/campaigns/forecast-trust-loop?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${featuredCampaign}&utm_content=homepage_callout`;
 
 function formatUsd(value: number | null): string {
   if (value === null) return "—";
@@ -123,9 +123,9 @@ const participationQuests = [
 ] as const;
 
 const campaignProofPoints = [
-  "make source fit explicit before a forecast earns distribution",
-  "force one break condition and revision trigger into the record before the timeline moves",
-  "measure checklist clicks against proof-record reads, author-record clicks, compose starts, and follows",
+  "source the claim before it becomes a public prediction",
+  "state what would break it before the market forces the revision",
+  "keep the receipt inspectable after the timeline moves on",
 ] as const;
 
 const activeCampaigns = [
@@ -203,23 +203,23 @@ function CampaignCallout() {
       <CampaignViewTracker campaign={featuredCampaign} channel="homepage_campaign_callout" />
       <div className="campaign-callout-copy">
         <p className="section-kicker">@evapredicts campaign</p>
-        <h2 className="section-title section-title-sm">forecasts need QA before they deserve distribution.</h2>
+        <h2 className="section-title section-title-sm">a useful forecast is a trust loop, not a confident sentence.</h2>
         <p>
-          The current homepage wedge is forecast QA: source fit, break conditions, revision triggers, and an author
-          trail before the market call gets amplified.
+          The current homepage wedge is the forecast trust loop: source the claim, state what would break it, revise
+          visibly, and keep the receipt inspectable after the timeline moves on.
         </p>
       </div>
       <div className="campaign-proof-grid" aria-label="Campaign proof points">
         {campaignProofPoints.map((point) => (
           <div key={point}>
-            <span>qa</span>
+            <span>loop</span>
             <strong>{point}</strong>
           </div>
         ))}
       </div>
       <div className="campaign-action-row">
-        <CampaignLink href={featuredCampaignHref} campaign={featuredCampaign} cta="open_forecast_qa_checklist" channel="homepage_campaign_callout" className="mobile-action mobile-action-primary">
-          Run the forecast QA checklist
+        <CampaignLink href={featuredCampaignHref} campaign={featuredCampaign} cta="open_forecast_trust_loop" channel="homepage_campaign_callout" className="mobile-action mobile-action-primary">
+          Run the forecast trust loop
         </CampaignLink>
         <CampaignLink href={launchThesisHref} campaign={featuredCampaign} cta="read_proof_record" channel="homepage_campaign_callout" className="mobile-action">
           Read the proof record
@@ -229,7 +229,7 @@ function CampaignCallout() {
         </CampaignLink>
       </div>
       <p className="inline-note">
-        Metric to watch: utm_campaign=forecast_qa_checklist clicks into the checklist, then proof-record reads, market-signal clicks, author-record clicks, compose starts, and follow clicks. No traction claims until measured data exists.
+        Metric to watch: utm_campaign=forecast_trust_loop clicks into the loop, then proof-record reads, market-signal clicks, author-record clicks, compose starts, and follow clicks. No traction claims until measured data exists.
       </p>
     </section>
   );
