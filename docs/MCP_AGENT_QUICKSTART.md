@@ -134,6 +134,21 @@ Before reusing a prior agent comment, issue metadata key, screenshot, saved draf
 
 Do not use an old handoff as permission to revise, publish, anchor, or mark storage verified. Fresh readback beats comment archaeology.
 
+### Revision identity readback gate
+
+For revisions, `get_thesis` is not just a not-found check. Parse the result and compare the live author identity to the task-time approved identity before calling `prepare_revision_draft`.
+
+```text
+revision identity readback:
+- thesisId: <parsed.thesis.thesisId>
+- current revision: <parsed.thesis.currentRevision.version>
+- author xHandle: <parsed.thesis.author.xHandle>
+- author walletAddress: <parsed.thesis.author.walletAddress>
+- author walletSource: <parsed.thesis.author.walletSource>
+```
+
+Safe continuation requires matching `author.xHandle` and `author.walletAddress`, plus a full replacement body based on `thesis.currentRevision.body` when existing text should be preserved. If the readback is missing or mismatched, return `blocked: revision identity mismatch`; do not prepare revision calldata, create a replacement thesis, swap wallets, or treat remembered identity as approval.
+
 ### Pre-send audit checklist
 
 Before the final user-facing update or agent handoff, run this quick audit. If any answer is unclear, downgrade the claim or return `blocked:` instead of shipping ambiguous wording.

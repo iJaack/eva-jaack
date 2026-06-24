@@ -153,6 +153,24 @@ Old handoffs are coordination context, not current protocol evidence. Before reu
 
 Fresh readback beats comment archaeology. Do not use an old handoff as permission to revise, publish, anchor, or mark storage verified.
 
+### Revision identity readback gate
+
+For revision handoffs, the safe output must say whether the live thesis identity was checked. After `get_thesis`, compare `parsed.thesis.author.xHandle` and `parsed.thesis.author.walletAddress` to the task-time approved revision identity before reporting that a revision draft was prepared.
+
+Safe result wording:
+
+```text
+revision identity readback: matched <xHandle> / <walletAddress>; current revision v<version> was used as the base for the full replacement body.
+```
+
+Blocked wording:
+
+```text
+blocked: revision identity mismatch. I did not prepare revision calldata, create a replacement thesis, swap wallets, or publish anything.
+```
+
+Do not let an issue comment, PR, old draft JSON, or remembered wallet substitute for live `get_thesis` readback.
+
 ## MCP Tool Annotations Are Not Protocol Evidence
 
 Tool annotations help clients avoid dangerous routing mistakes. They do not prove user approval or protocol state.

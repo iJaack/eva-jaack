@@ -220,6 +220,20 @@ Use this when an existing thesis changes. Always inspect the thesis first.
 
 `prepare_revision_draft.body` is a full replacement body. Do not send a patch, diff, append-only note, or partial paragraph as `body`; put the delta summary in `note`.
 
+Before preparing the revision, parse the `get_thesis` text JSON and fill this identity readback:
+
+```text
+revision identity readback:
+- thesisId: <parsed.thesis.thesisId>
+- current title: <parsed.thesis.title>
+- current revision: <parsed.thesis.currentRevision.version>
+- author xHandle: <parsed.thesis.author.xHandle>
+- author walletAddress: <parsed.thesis.author.walletAddress>
+- author walletSource: <parsed.thesis.author.walletSource>
+```
+
+Only continue if the author handle and wallet match the task-time approved revision identity. Build the new `body` as the full replacement text, using `thesis.currentRevision.body` as the preservation base when appropriate. If identity or current body readback is missing, use the blocked template instead of guessing.
+
 First call `get_thesis`:
 
 ```json

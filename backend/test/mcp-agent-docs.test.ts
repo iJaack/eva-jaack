@@ -451,6 +451,31 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents revision identity readback before preparing revision drafts", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Revision identity readback gate",
+      "revision identity readback",
+      "parsed.thesis.author.xHandle",
+      "parsed.thesis.author.walletAddress",
+      "parsed.thesis.author.walletSource",
+      "thesis.currentRevision.body",
+      "full replacement body",
+      "blocked: revision identity mismatch",
+      "do not prepare revision calldata",
+      "creating a replacement thesis",
+    ]) {
+      expect(docs, `agent docs should include revision identity readback phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents schema repair cards so agents normalize inputs without guessing", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_ERROR_HANDLING.md"),
