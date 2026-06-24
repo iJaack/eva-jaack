@@ -335,6 +335,24 @@ Fresh readback beats comment archaeology. Do not use an old handoff as permissio
 
 Use this before revising. Do not infer current revision state from old comments, screenshots, or prior drafts.
 
+#### Revision identity readback gate
+
+Before preparing a revision, parse the `get_thesis` result and write down the live identity readback:
+
+```text
+revision identity readback:
+- thesisId: <parsed.thesis.thesisId>
+- current title: <parsed.thesis.title>
+- current revision: <parsed.thesis.currentRevision.version>
+- author xHandle: <parsed.thesis.author.xHandle>
+- author walletAddress: <parsed.thesis.author.walletAddress>
+- author walletSource: <parsed.thesis.author.walletSource>
+```
+
+Continue only when `author.xHandle` and `author.walletAddress` match the task-time approved identity for the revision. If either value is missing, stale, or mismatched, stop with `blocked: revision identity mismatch` and ask for the correct thesis id or approved identity. Do not prepare revision calldata, create a replacement thesis, or rely on remembered identity from a prior handoff.
+
+Use `thesis.currentRevision.body` as the base for the full replacement body when preserving existing text. Use `thesis.currentRevision.version` only as readback context; it is not an input field for `prepare_revision_draft`.
+
 ### `prepare_revision_draft`
 
 Revision prep uses a **full replacement body**. The `body` field is the complete next thesis text, not a patch, diff, append-only note, or partial paragraph. Use `note` for the concise delta explanation, and call `get_thesis` first so you can preserve any current text that should remain in the replacement body.

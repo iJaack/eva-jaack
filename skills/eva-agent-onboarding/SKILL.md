@@ -32,6 +32,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Capture an evidence inventory before reporting: tool, intent, identity, `publishState`, `anchorStatus`, `anchorPreparationId`, transaction count, tx hash/receipt/readback state, content identifiers, signal/source gaps, and storage state. Mark missing fields as `not returned`; do not infer them.
 - Keep platform status separate from protocol status. Multica issue state, PR state, deployment state, or prior agent comments are coordination evidence only; use MCP markers, approved write receipts, API readback, or onchain receipt/readback before claiming a thesis is published, anchored, revised, submitted, confirmed, or storage-verified.
 - Apply the handoff freshness gate before reusing old context: prior comments, issue metadata, screenshots, saved draft JSON, and old `anchorPreparationId` values are leads only. Revalidate with `get_thesis`, API/public URL evidence, onchain receipt/readback, or a named readiness/readback check before repeating protocol-state claims.
+- For revisions, apply the revision identity readback gate after `get_thesis`: compare `parsed.thesis.author.xHandle`, `parsed.thesis.author.walletAddress`, and `parsed.thesis.author.walletSource` with task-time approval before `prepare_revision_draft`; use `thesis.currentRevision.body` as the base for a full replacement body when preserving text, and block on any identity mismatch instead of creating a replacement thesis or swapping wallets.
 - Treat remote MCP write tools as unavailable unless the agent has scoped credentials and the operator explicitly approved that path.
 - If the local stdio server cannot start, report that setup blocker instead of scraping the UI, using unauthenticated HTTP, or switching to remote write tools.
 - Do not bypass MCP by calling app HTTP routes such as `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or production write endpoints. Direct REST writes require a separate approved execution path, scoped credentials, and receipt/readback evidence.
@@ -120,6 +121,17 @@ output ceiling: draft prepared / anchor prepared
 ```
 
 4. Prepare a revision only after `get_thesis` confirms the exact thesis and identity. Use a short delta note:
+
+```text
+revision identity readback:
+- thesisId: <parsed.thesis.thesisId>
+- current revision: <parsed.thesis.currentRevision.version>
+- author xHandle: <parsed.thesis.author.xHandle>
+- author walletAddress: <parsed.thesis.author.walletAddress>
+- author walletSource: <parsed.thesis.author.walletSource>
+```
+
+If the readback identity does not match task-time approval, stop at `blocked: revision identity mismatch` and do not prepare revision calldata.
 
 ```text
 operation: revision
