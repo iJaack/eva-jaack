@@ -201,6 +201,12 @@ const activeCampaigns = [
     href: "/campaigns/agent-forecast-interface?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=agent_forecast_interface&utm_content=agent_forecast_card",
     metric: "agent-manifest opens, MCP quickstart clicks, proof-record reads, compose starts, author-record clicks, and follows",
   },
+  {
+    title: "verifier adoption",
+    body: "A verifier-first route for agent platforms and market operators: every forecast should arrive with source fit, break conditions, revisions, author boundary, and proof links.",
+    href: "/campaigns/verifier-adoption?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=verifier_adoption&utm_content=verifier_adoption_card",
+    metric: "proof-record reads, agent-manifest opens, MCP quickstart clicks, source-library clicks, compose starts, and follows",
+  },
 ] as const;
 
 function CampaignCallout() {

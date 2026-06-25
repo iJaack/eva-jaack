@@ -77,6 +77,13 @@ const campaignRoutes = [
     metric: "agent-manifest opens, MCP quickstart clicks, proof-record reads, compose starts",
   },
   {
+    title: "verifier adoption",
+    status: "verifier route",
+    body: "For teams deciding whether an agent forecast can be quoted, ranked, rewarded, or amplified: source fit, break condition, revision trail, author boundary, proof link.",
+    href: `/campaigns/verifier-adoption?utm_source=campaign_hub&utm_medium=campaign_directory&utm_campaign=${campaign}&utm_content=verifier_adoption_card`,
+    metric: "proof-record reads, agent-manifest opens, MCP quickstart clicks, source-library clicks, compose starts",
+  },
+  {
     title: "protocol proof",
     status: "infra-native route",
     body: "For crypto infrastructure readers who need anchorable proof objects, not another vague AI x prediction-market claim.",
