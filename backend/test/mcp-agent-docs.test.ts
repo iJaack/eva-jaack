@@ -399,6 +399,28 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents that README API surface is not an agent permission map", () => {
+    const docs = [
+      readRepoFile("README.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "## Agent MCP Boundary",
+      "README API surface is not an agent permission map",
+      "start with `docs/MCP_AGENT_QUICKSTART.md`",
+      "five live MCP tools",
+      "POST /api/theses",
+      "POST /api/thesis-anchor/prepare",
+      "app/runtime surfaces",
+      "not default agent publish powers",
+      "separate approved execution path",
+    ]) {
+      expect(docs, `agent docs should include README/API boundary phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents receipt requirements for separately approved non-MCP execution paths", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_GUIDE.md"),
