@@ -80,6 +80,14 @@ pnpm confirm:deployer -- --deployer 0x0fe61780bd5508b3C99e420662050e5560608cA4
 
 It only compares wallet identity against `protocol.config.json`; it does not load keys, sign, deploy, call Eva APIs, or broadcast transactions.
 
+For final launch-authoring smoke, require Dynamic auth to be configured on `/compose`:
+
+```bash
+SMOKE_BASE_URL=https://eva.jaack.me SMOKE_REQUIRE_DYNAMIC_AUTH=true pnpm smoke:deploy
+```
+
+That strict mode fails if production is still serving the Dynamic configuration gate instead of the user-connect gate.
+
 ## Docs
 
 - [Architecture](docs/ARCHITECTURE.md)

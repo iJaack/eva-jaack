@@ -13,6 +13,7 @@ const vercelBypassSecret = (
 ).trim();
 const allowProtectedSkip = process.env.SMOKE_ALLOW_PROTECTED_SKIP === "true";
 const requireDurableStorage = process.env.SMOKE_REQUIRE_DURABLE_STORAGE !== "false";
+const requireDynamicAuth = process.env.SMOKE_REQUIRE_DYNAMIC_AUTH === "true";
 
 if (!baseUrl) {
   console.error("Missing SMOKE_BASE_URL or CLI base URL argument.");
@@ -56,6 +57,21 @@ const checks = [
     },
   },
   { name: "agent manifest", method: "GET", path: protocol.app.agentManifestPath },
+  ...(requireDynamicAuth
+    ? [
+        {
+          name: "runtime readiness API",
+          method: "GET",
+          path: `${protocol.app.apiBasePath}/runtime-readiness`,
+          validate: async (response) => {
+            const body = await response.json();
+            if (body?.dynamicAuth?.configured !== true) {
+              throw new Error(body?.dynamicAuth?.reason ?? "Dynamic auth not configured: missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID");
+            }
+          },
+        },
+      ]
+    : []),
   { name: "mcp discovery", method: "GET", path: `${protocol.app.apiBasePath}/mcp` },
   {
     name: "mcp initialize",
