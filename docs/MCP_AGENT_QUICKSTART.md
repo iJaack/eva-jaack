@@ -303,6 +303,18 @@ After parsing, fill the result card only from returned fields. If parsing fails,
 
 Use these cards when an agent prompt mixes a safe MCP action with an unsafe stronger claim. Pick the lowest tool that matches the direct evidence you can produce.
 
+### Boundary tripwire phrases
+
+If any of these phrases appear in a prompt, slow down and write the safe-start triage card before tools:
+
+- `publish now`, `make live`, `post it`, or `ship it` — MCP can prepare draft/anchor calldata only; require separate approval, tx hash, and receipt/readback before stronger wording.
+- `use this token/route/API key` — possession of credentials is not approval; fill the separate approved execution path receipt card before any non-MCP write claim.
+- `reuse the old anchorPreparationId` — old handoff values are stale leads; regenerate preparation or re-read with an approved live path before reporting protocol state.
+- `just use Eva's wallet` or any remembered wallet — task-time signer authority is required; schema defaults and memory do not approve identity.
+- `prove storage/launch readiness` — MCP draft prep cannot prove durability; name the readiness/readback check or report `storage readiness blocked`.
+
+Tripwire result rule: when a prompt contains one of those phrases and the missing evidence is not available, the final response must include `blocked:` or a downgraded `prepared/not published` result plus the exact missing evidence. Do not let urgency words upgrade the permission rung.
+
 | User asks | MCP action | Safe response state | Stop / escalate when |
 |---|---|---|---|
 | "Find markets for this thesis." | `search_markets` | `read-only` | The user asks you to create or publish from weak evidence without approving identity. |

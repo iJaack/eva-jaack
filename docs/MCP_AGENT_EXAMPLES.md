@@ -348,6 +348,64 @@ missing:
 safe current claim: anchor prepared only, not submitted or published.
 ```
 
+## 7.2 Boundary tripwire examples
+
+Use these when a prompt sounds operationally urgent but still lacks protocol evidence. Urgency does not change the MCP permission rung.
+
+### `publish now` after draft prep
+
+```text
+blocked: the draft/anchor payload is prepared, but publish/live wording is not supported yet.
+
+missing before publish/live:
+- explicit approval for signer, network, and exact calldata
+- broadcaster or approved execution path
+- tx hash
+- receipt/readback matching the thesis
+
+safe current claim: draft prepared / anchor prepared only. no transaction broadcast and no public publish happened.
+```
+
+### `use this API key` for a direct REST write
+
+```text
+blocked: a credential or route URL is not approval to bypass MCP.
+
+missing before non-MCP execution:
+- approved execution path name
+- approval evidence and exact action scope
+- credential scope
+- write receipt plan
+- readback evidence plan
+
+safe current claim: MCP can prepare draft/anchor calldata only until the receipt card is complete.
+```
+
+### `reuse the old anchorPreparationId`
+
+```text
+blocked: old anchorPreparationId values are historical handoff context, not fresh protocol evidence.
+
+safe recovery:
+- call get_thesis for existing state when a thesisId exists, or
+- regenerate draft/revision/anchor preparation through the live MCP tool
+
+safe current claim: historical handoff only; current publish, anchor, and storage state not revalidated.
+```
+
+### `just use Eva's wallet`
+
+```text
+blocked: signer authority is missing for this task.
+
+missing before write-adjacent prep:
+- task-time approval for xHandle
+- task-time approval for walletAddress
+- walletSource when the live tool accepts it
+
+safe current claim: no calldata prepared, no transaction broadcast, and no identity substituted.
+```
+
 ## 8. Safe-start triage cards for mixed prompts
 
 Use these cards before tools when a prompt asks for more than MCP can prove. The point is to select the smallest live MCP tool and downgrade the final claim before the agent accidentally overstates the result.
