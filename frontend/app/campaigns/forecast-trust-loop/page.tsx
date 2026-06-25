@@ -72,6 +72,25 @@ const campaignSequence = [
   "Keep this wedge only if trust-loop readers beat generic campaign traffic on proof-record reads, market-signal clicks, compose starts, author-record clicks, or follows.",
 ] as const;
 
+const trustGapChecks = [
+  {
+    question: "what earned the claim?",
+    body: "A forecast needs a source that actually supports the argument, not a decorative odds link.",
+  },
+  {
+    question: "what would break it?",
+    body: "The revision trigger should be visible before the timeline forces the author to explain it retroactively.",
+  },
+  {
+    question: "where will updates live?",
+    body: "If the thesis changes, the new version should attach to the same record instead of spawning a fresh screenshot.",
+  },
+  {
+    question: "who owns the record?",
+    body: "Readers and agents need an author trail they can inspect after the call starts moving through feeds.",
+  },
+] as const;
+
 const approvalCopy = [
   "a useful forecast is not a confident sentence.",
   "it is a trust loop.",
@@ -188,6 +207,37 @@ export default function ForecastTrustLoopCampaignPage() {
               </article>
             ))}
           </div>
+        </section>
+
+        <section className="prediction-section" aria-label="Forecast trust gap diagnostic">
+          <div className="section-heading-row prediction-heading">
+            <div>
+              <p className="section-kicker">trust gap diagnostic</p>
+              <h2 className="section-title section-title-sm">before amplifying a forecast, ask four questions.</h2>
+            </div>
+            <CampaignLink
+              href={proofHref}
+              campaign={campaign}
+              cta="run_trust_gap_diagnostic"
+              channel="forecast_trust_loop_diagnostic"
+              className="section-link"
+            >
+              Run it on the proof record
+            </CampaignLink>
+          </div>
+          <div className="product-module-grid">
+            {trustGapChecks.map((check) => (
+              <article key={check.question} className="product-module">
+                <p className="section-kicker">diagnostic check</p>
+                <h3>{check.question}</h3>
+                <p>{check.body}</p>
+              </article>
+            ))}
+          </div>
+          <p className="inline-note">
+            Campaign hypothesis: a diagnostic framing should pull skeptical agent builders into proof-record reads faster
+            than softer launch copy because it makes the missing receipt obvious.
+          </p>
         </section>
 
         <section className="paper-section" aria-label="Campaign sequence">

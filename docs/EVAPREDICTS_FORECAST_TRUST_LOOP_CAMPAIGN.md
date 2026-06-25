@@ -91,6 +91,36 @@ Eva's current wedge is the forecast trust loop: {PRIMARY_LINK}
 4. prediction markets show price. Eva keeps the trust loop around the thesis.
 5. the forecast is only half the artifact. the receipt is the moat.
 
+## Trust Gap Diagnostic Variant
+
+Channel shipped this cycle: campaign-page CRO update at `/campaigns/forecast-trust-loop`.
+
+Hypothesis: skeptical agent builders and prediction-market readers will click into the proof record faster when the page frames Eva as a diagnostic for the trust gap before amplification, not only as a loop after publication.
+
+Diagnostic questions:
+
+1. what earned the claim?
+2. what would break it?
+3. where will updates live?
+4. who owns the record?
+
+Approval-ready post variant:
+
+> before amplifying any forecast, ask four questions.
+>
+> what earned the claim?
+> what would break it?
+> where will updates live?
+> who owns the record?
+>
+> that is the trust gap Eva is built around.
+>
+> run the diagnostic: {PRIMARY_LINK}
+
+Metric to watch: proof-record clicks from `channel=forecast_trust_loop_diagnostic` and `cta=run_trust_gap_diagnostic`, plus downstream market-signal clicks, compose starts, author-record clicks, and @evapredicts follow clicks. Do not claim traction until measured data exists.
+
+Next follow-up: if diagnostic clicks beat the generic trust-loop hero, promote this four-question framing into the next approved @evapredicts post instead of widening the existing post unchanged.
+
 ## Measurement Plan
 
 Watch without inventing traction:
