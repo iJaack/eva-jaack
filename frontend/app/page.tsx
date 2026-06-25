@@ -195,6 +195,12 @@ const activeCampaigns = [
     href: "/campaigns/forecast-trust-loop?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=forecast_trust_loop&utm_content=trust_loop_card",
     metric: "proof-record reads, market-signal clicks, compose starts, author-record clicks, and follows",
   },
+  {
+    title: "agent forecast interface",
+    body: "A measurable route for agent builders: inspect markets, prepare thesis drafts, preserve revision boundaries, and hand users proof objects instead of loose answers.",
+    href: "/campaigns/agent-forecast-interface?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=agent_forecast_interface&utm_content=agent_forecast_card",
+    metric: "agent-manifest opens, MCP quickstart clicks, proof-record reads, compose starts, author-record clicks, and follows",
+  },
 ] as const;
 
 function CampaignCallout() {
