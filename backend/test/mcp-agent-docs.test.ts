@@ -98,6 +98,23 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents operation-specific walletSource handoff handling", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_HANDOFF_TEMPLATE.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Signer / Wallet Source Handling",
+      "walletSource not accepted by prepare_revision_draft",
+      "signer/source approval missing before broadcast",
+      "Do not add walletSource to revision or anchor-rebuild payloads",
+    ]) {
+      expect(docs, `agent handoff docs should include walletSource boundary phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("preserves the safe draft/anchor-prep boundary in agent docs", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_GUIDE.md"),
@@ -495,6 +512,29 @@ describe("Eva MCP agent docs", () => {
       "Repair only directly evidenced values",
     ]) {
       expect(docs, `agent schema repair docs should include ${phrase}`).toContain(phrase);
+    }
+  });
+
+  it("documents safe lower-rung fallbacks for MCP failures", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_ERROR_HANDLING.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "No silent fallback ladder",
+      "client setup failure",
+      "live allowlist drift",
+      "input schema mismatch",
+      "missing thesis/identity readback",
+      "protocol readback gap",
+      "approved non-MCP execution gap",
+      "Fallback ceiling",
+      "UI scraping",
+      "direct REST writes",
+      "old `anchorPreparationId`",
+    ]) {
+      expect(docs, `agent fallback docs should include ${phrase}`).toContain(phrase);
     }
   });
 
