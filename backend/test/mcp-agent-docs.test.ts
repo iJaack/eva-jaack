@@ -582,6 +582,31 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("ships boundary tripwire examples for urgent unsafe write prompts", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Boundary tripwire",
+      "publish now",
+      "make live",
+      "use this API key",
+      "reuse the old anchorPreparationId",
+      "just use Eva's wallet",
+      "prove storage",
+      "task-time identity",
+      "A credential",
+      "Urgency does not change the MCP permission rung",
+      "safe current claim: draft prepared / anchor prepared only",
+    ]) {
+      expect(docs, `agent docs should include boundary tripwire phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("ships concrete onboarding skill examples for agent rehearsals", () => {
     const skill = readRepoFile("skills/eva-agent-onboarding/SKILL.md");
 
