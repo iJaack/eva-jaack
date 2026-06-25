@@ -8,6 +8,11 @@ This quickstart is expected to match the live MCP server allowlist and Zod schem
 
 Eva MCP is draft-and-anchor-prep only.
 
+README API surface is not an agent permission map. If an agent starts from the repo README or an API
+route list, it must come back to this quickstart and the live tool matrix before composing payloads.
+Use only the five live MCP tools here unless a separate approved execution path is explicitly named
+and evidenced.
+
 The broader app has HTTP routes for thesis creation and anchor preparation, but those are not agent-default publish powers. Do not call `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or production write endpoints as a workaround for MCP limits. Direct REST writes require a separate approved path, scoped credentials, and receipt/readback evidence before any stronger claim.
 
 If a task really does arrive with a separate approved execution path, capture the approval and receipt evidence before using stronger language:

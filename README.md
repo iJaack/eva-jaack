@@ -41,6 +41,18 @@ intent, and anchors thesis state to Avalanche through `EvaThesisProtocol`.
 - `GET /.well-known/agent.json`
 - `GET /health`
 
+## Agent MCP Boundary
+
+README API surface is not an agent permission map. Agents that need to create or revise theses
+should start with `docs/MCP_AGENT_QUICKSTART.md`, then use only the five live MCP tools documented
+there: `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, and
+`prepare_anchor_transaction`.
+
+`POST /api/theses`, `POST /api/thesis-anchor/prepare`, and other production write routes are
+app/runtime surfaces, not default agent publish powers. Agent-safe MCP work stops at draft/revision
+preview and anchor calldata preparation unless a separate approved execution path returns approval,
+write receipt, and readback evidence.
+
 ## Quick Start
 
 ```bash

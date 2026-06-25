@@ -16,6 +16,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Use the local MCP server first: `pnpm --filter backend mcp`.
 - When a client needs a server config, use a local `eva-thesis` stdio entry with `command: "pnpm"`, `args: ["--filter", "backend", "mcp"]`, and `cwd` set to the repo root.
 - Keep `docs/MCP_AGENT_GUIDE.md` open when creating or revising theses.
+- If starting from the repo README or API surface, treat it as product/runtime context only, not an agent permission map. Jump to the README Agent MCP Boundary and this skill before calling tools.
 - Use `docs/MCP_AGENT_EXAMPLES.md` for known-good payload shapes before improvising schema fields.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
 - Use the no silent fallback ladder in `docs/MCP_AGENT_ERROR_HANDLING.md` when MCP work fails: classify client setup failure, live allowlist drift, input schema mismatch, missing thesis/identity readback, protocol readback gap, or approved non-MCP execution gap before choosing a lower-rung recovery.
@@ -38,6 +39,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Treat remote MCP write tools as unavailable unless the agent has scoped credentials and the operator explicitly approved that path.
 - If the local stdio server cannot start, report that setup blocker instead of scraping the UI, using unauthenticated HTTP, or switching to remote write tools.
 - Do not bypass MCP by calling app HTTP routes such as `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or production write endpoints. Direct REST writes require a separate approved execution path, scoped credentials, and receipt/readback evidence.
+- Treat README API entries and app/runtime surfaces as non-authorizing context. Only the five live MCP tools grant default agent-safe preparation scope.
 - If a separate approved execution path is supplied, fill the receipt card from `docs/AGENT_SAFE_OUTPUTS.md`: approved execution path, approval evidence, credential scope, write receipt, readback evidence, and safe claim after execution. Missing rows mean stay at `draft prepared` / `anchor prepared`.
 - Confirm X identity, wallet address, and wallet source before preparing protocol transactions.
 - Treat schema defaults as validation helpers, not approval or evidence. A defaulted `walletSource`, signal weight, role, status, verifier verdict, or verifier score must be called out or backed by task-time evidence before it affects claims.
