@@ -128,7 +128,7 @@ Safe claim after filtering: `market policy screened`. Unsafe claim: `signal-back
 All draft or revision preparation requires:
 
 - `xHandle`
-- `walletAddress`
+- `walletAddress` as a full `0x`-prefixed 40-hex-character EVM address (ENS, shortened addresses, and missing `0x` prefixes are rejected by the live schema)
 - wallet source where supported (`external` or `embedded`)
 
 Use Eva's sovereign wallet (`0x0fe61780bd5508b3C99e420662050e5560608cA4`) only when the operator explicitly approved that signer for the task. Transaction broadcast always needs explicit approval at action time.
@@ -173,8 +173,8 @@ Use this matrix as the source-of-truth checklist before composing payloads. Do n
 |---|---|---|---|
 | `search_markets` | none | `query` | thesis text, identity, wallet, publish, broadcast, or storage fields |
 | `get_thesis` | `thesisId` | none | `xHandle`, `walletAddress`, `walletSource`, body, signals, publish, or broadcast fields |
-| `create_thesis_draft` | `title`, `body`, `xHandle`, `walletAddress` | `walletSource` (`external` default), `predictionSignals` (`[]` default), `factSignals` (`[]` default) | `thesisId`, revision `note`, transaction hash, receipt, publish/live flags, or storage-readiness claims |
-| `prepare_revision_draft` | `thesisId`, full replacement `body`, `xHandle`, `walletAddress` | `note` | `walletSource`, patch/diff-only body, partial paragraph, transaction hash, receipt, publish/live flags, or storage-readiness claims |
+| `create_thesis_draft` | `title`, `body`, `xHandle`, `walletAddress` (`0x` + 40 hex chars) | `walletSource` (`external` default), `predictionSignals` (`[]` default), `factSignals` (`[]` default) | `thesisId`, revision `note`, transaction hash, receipt, publish/live flags, or storage-readiness claims |
+| `prepare_revision_draft` | `thesisId`, full replacement `body`, `xHandle`, `walletAddress` (`0x` + 40 hex chars) | `note` | `walletSource`, patch/diff-only body, partial paragraph, transaction hash, receipt, publish/live flags, or storage-readiness claims |
 | `prepare_anchor_transaction` | `thesisId` | none | body changes, identity swaps, signals, transaction hash, receipt, publish/live flags, or storage-readiness claims |
 
 Signal fields are nested under `predictionSignals` and `factSignals` only. Prediction signals accept `marketId`, `marketTitle`, `marketUrl`, `selectedOutcomeLabel`, `oddsAtAdd`, `currentOdds`, `weight`, `role`, `rationale`, and `status`. Fact signals accept `claimText`, `sourceUrl`, `verifierVerdict`, `verifierScore`, `reportUri`, `reportHash`, `weight`, `role`, and `rationale`.

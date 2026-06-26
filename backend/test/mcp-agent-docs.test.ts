@@ -623,6 +623,7 @@ describe("Eva MCP agent docs", () => {
       "Exact identity inputs",
       "task-time approval",
       "fresh `get_thesis` readback",
+      "full `0x`-prefixed 40-hex-character EVM address",
       "ENS",
       "shortened address",
       "private key",

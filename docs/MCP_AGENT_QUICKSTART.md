@@ -100,7 +100,7 @@ Identity fields are authority-bearing. Copy them from task-time approval or fres
 | `walletSource` | explicit `external` / `embedded` approval when the tool accepts it | schema default, wallet UI label, or inferred custody model |
 | `thesisId` | exact id from the task or `get_thesis`/approved readback | title, slug guess, screenshot text, `anchorPreparationId`, or stale metadata |
 
-Safe repair is narrow: trim surrounding whitespace and preserve address casing as supplied. Do not resolve ENS, expand shortened addresses, choose between two wallets, or swap in Eva's wallet to make the payload pass. If the exact identity is missing or mismatched, return `blocked: exact identity input missing` and do not prepare calldata.
+Safe repair is narrow: trim surrounding whitespace and preserve address casing as supplied. The live schema now rejects malformed `walletAddress` values; pass only a full `0x`-prefixed 40-hex-character EVM address. Do not resolve ENS, expand shortened addresses, choose between two wallets, or swap in Eva's wallet to make the payload pass. If the exact identity is missing or mismatched, return `blocked: exact identity input missing` and do not prepare calldata.
 
 ### Market policy screen
 
@@ -273,8 +273,8 @@ Copy only the fields the live tool accepts. Returned status markers and receipt 
 |---|---|---|---|
 | `search_markets` | none | `query` | identity, thesis body, publish/broadcast fields |
 | `get_thesis` | `thesisId` | none | `walletSource`, signals, revision body |
-| `create_thesis_draft` | `title`, `body`, `xHandle`, `walletAddress` | `walletSource`, `predictionSignals`, `factSignals` | `thesisId`, `note`, tx hash, receipt, storage proof |
-| `prepare_revision_draft` | `thesisId`, full replacement `body`, `xHandle`, `walletAddress` | `note` | `walletSource`, patch-only body, publish/live flags |
+| `create_thesis_draft` | `title`, `body`, `xHandle`, `walletAddress` (`0x` + 40 hex chars) | `walletSource`, `predictionSignals`, `factSignals` | `thesisId`, `note`, tx hash, receipt, storage proof |
+| `prepare_revision_draft` | `thesisId`, full replacement `body`, `xHandle`, `walletAddress` (`0x` + 40 hex chars) | `note` | `walletSource`, patch-only body, publish/live flags |
 | `prepare_anchor_transaction` | `thesisId` | none | body changes, signals, identity swaps, broadcast fields |
 
 Nested signal fields stay inside signal arrays: `predictionSignals` may include `marketId`, `marketTitle`, `marketUrl`, `selectedOutcomeLabel`, `oddsAtAdd`, `currentOdds`, `weight`, `role`, `rationale`, and `status`; `factSignals` may include `claimText`, `sourceUrl`, `verifierVerdict`, `verifierScore`, `reportUri`, `reportHash`, `weight`, `role`, and `rationale`.
