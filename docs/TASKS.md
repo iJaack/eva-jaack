@@ -35,4 +35,4 @@
 - [x] Run browser screenshot QA on desktop and mobile.
 - [x] Add read-only deployer confirmation preflight.
 - [x] Run production smoke after deploy.
-- [ ] Confirm deployer before any new deployment or anchor transaction.
+- [x] Confirm deployer before any new deployment or anchor transaction. Current evidence: `pnpm confirm:deployer -- --deployer 0x0fe61780bd5508b3C99e420662050e5560608cA4` returned `status: "ok"` with the read-only boundary on 2026-06-26.
