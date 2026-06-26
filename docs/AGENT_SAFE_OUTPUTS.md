@@ -97,6 +97,27 @@ Before reporting a write-adjacent result, separate explicit evidence from defaul
 
 If a default would affect identity authority, evidence quality, risk weighting, storage readiness, or public/live wording, report the missing explicit evidence instead of relying on the default.
 
+## Exact Identity Inputs Only
+
+Before reporting any write-adjacent result, verify that the authority inputs came from task-time approval or fresh readback:
+
+- `xHandle`: exact approved handle, not a display name or stale issue comment.
+- `walletAddress`: exact approved `0x...` address, not ENS, a shortened address, a remembered wallet, a private key, or "same as last time".
+- `walletSource`: explicit `external` / `embedded` approval when the live tool accepts it; a schema default is not signer approval.
+- `thesisId`: exact id from the task or approved readback, not a title, slug, screenshot, old metadata value, or `anchorPreparationId`.
+
+Safe wording when identity is incomplete:
+
+```text
+blocked: exact identity input missing. I did not prepare calldata, swap wallets, create a replacement thesis, broadcast a transaction, or publish anything.
+```
+
+Safe wording when revision readback disagrees:
+
+```text
+blocked: revision identity mismatch. Fresh get_thesis readback did not match the task-time xHandle/walletAddress, so I did not prepare revision calldata.
+```
+
 ## Claim Downgrade Pattern
 
 When a user, issue, or agent handoff asks for stronger wording than the evidence supports, keep the action on the safe rung and name the missing proof.

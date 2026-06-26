@@ -75,6 +75,19 @@ Safe handling:
 
 If the prompt is almost valid but one schema field is malformed or ambiguous, use the schema repair cards in `docs/MCP_AGENT_ERROR_HANDLING.md` before calling a tool. Repair only directly evidenced values, such as an explicit `36%` becoming `0.36`. Otherwise block instead of guessing URLs, signer authority, verifier scores, weights, or full revision bodies.
 
+### Exact identity inputs only
+
+Identity fields are authority-bearing. Copy them from task-time approval or fresh `get_thesis` readback; do not normalize or substitute them from memory.
+
+| Field | Safe source | Do not accept as a substitute |
+|---|---|---|
+| `xHandle` | explicit task-time handle, or matching live thesis author handle for revisions | display name, bio text, old issue comment, or guessed handle |
+| `walletAddress` | exact approved `0x...` EVM address, or matching live thesis author wallet for revisions | ENS/name, shortened address, remembered Eva wallet, deployer wallet, private key, seed phrase, or "same as last time" |
+| `walletSource` | explicit `external` / `embedded` approval when the tool accepts it | schema default, wallet UI label, or inferred custody model |
+| `thesisId` | exact id from the task or `get_thesis`/approved readback | title, slug guess, screenshot text, `anchorPreparationId`, or stale metadata |
+
+Safe repair is narrow: trim surrounding whitespace and preserve address casing as supplied. Do not resolve ENS, expand shortened addresses, choose between two wallets, or swap in Eva's wallet to make the payload pass. If the exact identity is missing or mismatched, return `blocked: exact identity input missing` and do not prepare calldata.
+
 ### Market policy screen
 
 `search_markets` should be the default market source because it reads the app-filtered market universe. If a market is pasted from outside MCP, copied from an old issue comment, or discovered by a web search, screen it against `docs/MARKET_POLICY.md` before using it as a prediction signal.
