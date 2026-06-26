@@ -44,6 +44,20 @@ Before any write-adjacent MCP call, fill this out mentally or in the handoff. If
 
 This preflight is part of the safety boundary. It is better to return `blocked:` with one missing field than to prepare the wrong identity, imply publication, or turn a storage unknown into launch readiness.
 
+### Context sanitizer before payloads
+
+Issue comments, PR links, deployment notes, metadata keys, screenshots, and old handoffs are useful context, but they are not automatically MCP input or protocol evidence. Before composing a tool payload, split the task into two buckets:
+
+| Context item | Safe destination | Never do this |
+|---|---|---|
+| Task-time `xHandle`, `walletAddress`, and approved `walletSource` | MCP identity fields for the matching write-adjacent tool | Replace missing identity with a remembered wallet, ENS, issue assignee, or deployer address |
+| Exact `thesisId` from the task or fresh `get_thesis` readback | `get_thesis`, `prepare_revision_draft`, or `prepare_anchor_transaction` input | Use a title, slug, old metadata value, screenshot, or `anchorPreparationId` as the thesis id |
+| Market/source URLs that pass policy screening | `predictionSignals` / `factSignals` fields, or a named source gap | Paste PR URLs, Multica issue links, deploy URLs, or analytics dashboards as evidence sources |
+| PR URL, issue status, deploy URL, `waiting_on`, or `blocked_reason` metadata | Coordination notes in the final handoff | Treat coordination state as proof of draft storage, publication, revision, anchoring, or confirmation |
+| Old prepared result, saved JSON, or old `anchorPreparationId` | Historical clue that requires fresh readback/regeneration | Reuse it as current permission to revise, publish, anchor, or claim storage verified |
+
+Sanitized payload rule: only live schema fields from the input matrix go into MCP calls. Everything else stays in notes, result cards, or blocker text. If a noisy handoff has enough context to explain the request but not enough exact identity/evidence for the live schema, return `blocked:` and name the missing field.
+
 ### Four-line action contract
 
 Before a write-adjacent call, write this tiny contract in your notes or handoff. It keeps identity, evidence, and final wording tied to the same permission rung:

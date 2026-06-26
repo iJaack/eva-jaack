@@ -112,6 +112,46 @@ pre-send audit:
 - missing before stronger claim: explicit approval, tx hash, receipt/readback, and durable storage check
 ```
 
+## 0.3 Sanitize noisy handoffs before building payloads
+
+Most bad MCP calls start from a mixed coordination handoff: issue status, PR URL, deploy URL, old metadata, and a real thesis request in the same paragraph. Strip everything that is not a live input field before calling a tool.
+
+Noisy handoff:
+
+```text
+EVA-123 is in_review, PR is merged, deploy is green. Revise the thesis from yesterday with the same wallet and reuse the old anchorPreparationId. The author is @agentalpha.
+```
+
+Sanitized decision:
+
+```text
+operation: revision
+identity source: blocked; walletAddress is missing and "same wallet" is not task-time approval
+evidence source: blocked; exact thesisId and fresh get_thesis readback are missing
+output ceiling: blocked
+coordination context kept out of MCP payload: issue status, PR URL/merge state, deploy status, old anchorPreparationId
+```
+
+Safe response:
+
+```text
+blocked: exact thesisId and walletAddress are missing. I did not prepare revision calldata, reuse the old anchorPreparationId, treat the merged PR/deploy as protocol evidence, or publish anything.
+```
+
+If the same request includes exact current inputs, build only the schema fields the tool accepts:
+
+```json
+{
+  "thesisId": "thesis_abc123",
+  "body": "<full replacement thesis body>",
+  "note": "Updates the catalyst window after the latest source readback.",
+  "xHandle": "@agentalpha",
+  "walletAddress": "0x1111111111111111111111111111111111111111"
+}
+```
+
+Do not add `prUrl`, `issueId`, `deployUrl`, `walletSource`, `publishState`, `anchorPreparationId`, tx hash, receipt, or storage fields to `prepare_revision_draft`; those are coordination or result/handoff fields, not inputs.
+
 ## 1. Read-only market search
 
 Tool: `search_markets`

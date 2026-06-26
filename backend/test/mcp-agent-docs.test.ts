@@ -537,6 +537,34 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents context sanitizing so coordination metadata does not become MCP payload evidence", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Context sanitizer before payloads",
+      "Sanitized payload rule",
+      "Sanitize noisy handoffs",
+      "Payload / Handoff Separation",
+      "issue status",
+      "PR URL",
+      "deploy URL",
+      "waiting_on",
+      "blocked_reason",
+      "old prepared JSON",
+      "old `anchorPreparationId`",
+      "coordination context",
+      "not in the MCP payload",
+      "only accepted schema fields",
+    ]) {
+      expect(docs, `agent docs should include context sanitizer phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents safe lower-rung fallbacks for MCP failures", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_ERROR_HANDLING.md"),

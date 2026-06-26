@@ -60,6 +60,21 @@ The final sentence must stay at or below `output ceiling`:
 
 If the user's requested wording is above the ceiling, use the claim downgrade pattern below and name the missing evidence.
 
+## Payload / Handoff Separation
+
+Before writing a result, make sure the payload evidence and coordination context stayed separate:
+
+- MCP payload fields came only from task-time approval, fresh readback, or screened source data that matches the live schema.
+- Coordination context (`issueId`, PR URL, deploy URL, issue status, `waiting_on`, `blocked_reason`, old `anchorPreparationId`) stayed in notes or blocker text, not in the MCP payload.
+- A merged PR, green deployment, or old issue comment was not upgraded into protocol evidence.
+- Any old prepared result was regenerated or revalidated before being repeated as current state.
+
+Safe wording when the handoff is noisy but underspecified:
+
+```text
+blocked: the coordination handoff did not include exact live inputs for this MCP action. I did not turn issue/PR/deploy status into protocol evidence or add non-schema fields to the payload.
+```
+
 ## Evidence Inventory For Handoffs
 
 Before sending a result card, copy only evidence the MCP response or named follow-up check actually returned. Do not infer hidden state from a familiar tool name.
