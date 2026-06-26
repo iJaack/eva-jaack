@@ -203,19 +203,44 @@ test("verifier adoption campaign page carries proof-first CTAs", async ({ page }
   await expect(page.locator("blockquote").getByText(/utm_content=verifier_post/)).toBeVisible();
 });
 
+test("forecast provenance campaign page carries provenance-first CTAs", async ({ page }) => {
+  await page.goto("/campaigns/forecast-provenance");
+
+  await expect(page.getByRole("heading", { name: "the missing field in AI forecasts is provenance." })).toBeVisible();
+  await expect(page.getByText("provenance converts better than generic AI prediction claims.")).toBeVisible();
+
+  await expect(page.getByRole("link", { name: "Inspect author records" })).toHaveAttribute(
+    "href",
+    /utm_campaign=forecast_provenance.*utm_content=inspect_author_records/,
+  );
+  await expect(page.getByRole("link", { name: "Read proof record" })).toHaveAttribute(
+    "href",
+    /utm_campaign=forecast_provenance.*utm_content=spacex_proof_record/,
+  );
+  await expect(page.getByRole("link", { name: "Open agent manifest" })).toHaveAttribute(
+    "href",
+    /utm_campaign=forecast_provenance.*utm_content=agent_manifest/,
+  );
+  await expect(page.getByRole("link", { name: "Start provenance thesis" }).first()).toHaveAttribute(
+    "href",
+    /utm_campaign=forecast_provenance.*utm_content=start_provenance_thesis/,
+  );
+  await expect(page.locator("blockquote").getByText(/utm_content=provenance_post/)).toBeVisible();
+});
+
 test("campaign hub routes active campaign traffic with measurable CTAs", async ({ page }) => {
   await page.goto("/campaigns");
 
-  await expect(page.getByRole("heading", { name: "one public prediction angle, one proof path, one metric." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "one provenance angle, one proof path, one metric." })).toBeVisible();
   await expect(page.getByText("campaign choice should be judged by proof-path intent, not impressions.")).toBeVisible();
 
-  await expect(page.getByRole("link", { name: "Open verifier route" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Open provenance route" })).toHaveAttribute(
     "data-campaign-cta",
     "open_current_wedge",
   );
-  await expect(page.getByRole("link", { name: "Open verifier route" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Open provenance route" })).toHaveAttribute(
     "href",
-    /utm_campaign=campaign_hub.*utm_content=verifier_adoption_card/,
+    /utm_campaign=campaign_hub.*utm_content=forecast_provenance_card/,
   );
   await expect(page.getByRole("link", { name: "Read proof record" })).toHaveAttribute(
     "href",
