@@ -144,6 +144,25 @@ Some live schemas have safe defaults so a local draft-prep rehearsal can validat
 
 If a defaulted field affects identity, evidence quality, risk weighting, or user-facing claims, make it explicit from task-time evidence or report the gap. Do not turn a server default into approval to publish, broadcast, or claim a signal is verified.
 
+### Exact Identity Inputs Only
+
+Treat `xHandle`, `walletAddress`, `walletSource`, and `thesisId` as exact authority inputs, not fuzzy lookup hints.
+
+Safe sources:
+
+- task-time approval that names the exact X handle and EVM wallet address,
+- fresh `get_thesis` readback when preparing a revision for the same author,
+- explicit signer/source approval for `external` or `embedded` when the live tool accepts `walletSource`,
+- canonical `thesisId` from the task or approved readback.
+
+Unsafe substitutions:
+
+- ENS/name resolution, shortened addresses, deployer wallets, saved wallets, private keys, seed phrases, or "same as last time",
+- display names, bios, screenshots, titles, slugs, stale issue metadata, or old `anchorPreparationId` values,
+- choosing between multiple possible wallets or signer sources without task-time approval.
+
+The only safe repair is to trim surrounding whitespace and preserve the supplied value. If identity is missing, ambiguous, malformed, or mismatched with `get_thesis` readback, block with `blocked: exact identity input missing` or `blocked: revision identity mismatch`. Do not prepare calldata, create a replacement thesis, or swap in Eva's wallet as a convenience fallback.
+
 ## Tool Schemas
 
 ### Live input field matrix

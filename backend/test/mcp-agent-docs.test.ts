@@ -582,6 +582,33 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents exact identity inputs so agents do not substitute signer or thesis authority", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("docs/MCP_AGENT_ERROR_HANDLING.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Exact identity inputs",
+      "task-time approval",
+      "fresh `get_thesis` readback",
+      "ENS",
+      "shortened address",
+      "private key",
+      "same as last time",
+      "old metadata",
+      "`anchorPreparationId`",
+      "blocked: exact identity input missing",
+      "do not prepare calldata",
+      "swap in Eva's wallet",
+    ]) {
+      expect(docs, `agent docs should include exact identity boundary phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("ships boundary tripwire examples for urgent unsafe write prompts", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),

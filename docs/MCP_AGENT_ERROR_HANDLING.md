@@ -55,6 +55,9 @@ Use these cards when a prompt is close to valid but unsafe to submit as-is. Repa
 | Fact verifier data is missing | Use `verifierVerdict: "unverifiable_yet"` and `verifierScore: 50` only when the draft is explicitly exploratory. | The user asked for a verified or signal-backed thesis. |
 | Revision prompt gives a patch, diff, or extra paragraph | Ask for or construct a full replacement body from approved source text, then use `note` for the delta. | You cannot reconstruct the intended full body without inventing content. |
 | Identity is remembered from another task but not approved here | Block and ask for task-time `xHandle`, `walletAddress`, and signer/source approval. | Always. Do not import identity authority from stale comments. |
+| Wallet is ENS, shortened, private-key-shaped, or "same as last time" | Block and ask for the exact approved `0x...` wallet address plus signer/source approval. | Always. Do not resolve, expand, reveal, or substitute wallet authority. |
+| Thesis identity is a title, slug, screenshot, old metadata value, or `anchorPreparationId` | Block and ask for the canonical `thesisId` or perform an approved readback path. | Always. Do not guess thesis ids or treat anchor-prep ids as thesis ids. |
+| X identity is a display name, bio, or stale handle from an old issue | Block and ask for the exact task-time `xHandle`, or compare against fresh `get_thesis` author readback for revisions. | Always. Do not infer author authority from social profile text. |
 | Prompt asks for direct REST write because MCP is inconvenient | Block direct REST and use local MCP if possible. | There is no separate approved execution path with scoped credentials and readback evidence. |
 
 Copy-paste blocked shape:
