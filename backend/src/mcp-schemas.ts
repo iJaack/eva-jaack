@@ -16,6 +16,9 @@ export const claimVerdictValues = [
 export const thesisSignalRoleSchema = z.enum(thesisSignalRoleValues);
 export const predictionMarketStatusSchema = z.enum(predictionMarketStatusValues);
 export const claimVerdictSchema = z.enum(claimVerdictValues);
+export const walletAddressSchema = z
+  .string()
+  .regex(/^0x[a-fA-F0-9]{40}$/, "walletAddress must be a full 0x-prefixed EVM address");
 
 export const searchMarketsToolSchema = {
   query: z.string().optional(),
@@ -50,7 +53,7 @@ export const createThesisDraftToolSchema = {
   title: z.string(),
   body: z.string(),
   xHandle: z.string(),
-  walletAddress: z.string(),
+  walletAddress: walletAddressSchema,
   walletSource: z.enum(["external", "embedded"]).default("external"),
   predictionSignals: z.array(predictionSignalInputSchema).default([]),
   factSignals: z.array(factSignalInputSchema).default([]),
@@ -65,7 +68,7 @@ export const prepareRevisionDraftToolSchema = {
   body: z.string(),
   note: z.string().optional(),
   xHandle: z.string(),
-  walletAddress: z.string(),
+  walletAddress: walletAddressSchema,
 } satisfies z.ZodRawShape;
 
 export const prepareAnchorTransactionToolSchema = {
