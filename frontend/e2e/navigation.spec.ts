@@ -178,19 +178,44 @@ test("prediction memory page tracks the campaign view and CTA clicks", async ({ 
   );
 });
 
+test("verifier adoption campaign page carries proof-first CTAs", async ({ page }) => {
+  await page.goto("/campaigns/verifier-adoption");
+
+  await expect(page.getByRole("heading", { name: "forecasts need verifiers before they need virality." })).toBeVisible();
+  await expect(page.getByText("verifier-minded builders will click proof before they click hype.")).toBeVisible();
+
+  await expect(page.getByRole("link", { name: "Read proof record" })).toHaveAttribute(
+    "href",
+    /utm_campaign=verifier_adoption.*utm_content=spacex_proof_record/,
+  );
+  await expect(page.getByRole("link", { name: "Inspect signals" })).toHaveAttribute(
+    "href",
+    /utm_campaign=verifier_adoption.*utm_content=inspect_market_signals/,
+  );
+  await expect(page.getByRole("link", { name: "Open agent manifest" })).toHaveAttribute(
+    "href",
+    /utm_campaign=verifier_adoption.*utm_content=agent_manifest/,
+  );
+  await expect(page.getByRole("link", { name: "Start verifiable thesis" }).first()).toHaveAttribute(
+    "href",
+    /utm_campaign=verifier_adoption.*utm_content=start_verifiable_thesis/,
+  );
+  await expect(page.locator("blockquote").getByText(/utm_content=verifier_post/)).toBeVisible();
+});
+
 test("campaign hub routes active campaign traffic with measurable CTAs", async ({ page }) => {
   await page.goto("/campaigns");
 
   await expect(page.getByRole("heading", { name: "one public prediction angle, one proof path, one metric." })).toBeVisible();
   await expect(page.getByText("campaign choice should be judged by proof-path intent, not impressions.")).toBeVisible();
 
-  await expect(page.getByRole("link", { name: "Run trust loop" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Open verifier route" })).toHaveAttribute(
     "data-campaign-cta",
     "open_current_wedge",
   );
-  await expect(page.getByRole("link", { name: "Run trust loop" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Open verifier route" })).toHaveAttribute(
     "href",
-    /utm_campaign=campaign_hub.*utm_content=trust_loop_card/,
+    /utm_campaign=campaign_hub.*utm_content=verifier_adoption_card/,
   );
   await expect(page.getByRole("link", { name: "Read proof record" })).toHaveAttribute(
     "href",

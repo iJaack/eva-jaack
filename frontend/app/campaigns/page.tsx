@@ -14,7 +14,7 @@ const followHref = `https://x.com/evapredicts?utm_source=eva_site&utm_medium=cam
 export const metadata: Metadata = {
   title: "Campaign hub · Eva",
   description:
-    "A measurable @evapredicts campaign hub for routing prediction-market builders into one proof path, one CTA, and one metric at a time.",
+    "A measurable @evapredicts campaign hub for routing verifier-minded builders into one proof path, one CTA, and one metric at a time.",
   alternates: {
     canonical: campaignPath,
   },
@@ -35,8 +35,15 @@ export const metadata: Metadata = {
 
 const campaignRoutes = [
   {
-    title: "forecast trust loop",
+    title: "verifier adoption",
     status: "current wedge",
+    body: "For builders who need forecasts to become verifiable artifacts: claim boundary, source fit, break condition, author trail, and visible revisions.",
+    href: `/campaigns/verifier-adoption?utm_source=campaign_hub&utm_medium=campaign_directory&utm_campaign=${campaign}&utm_content=verifier_adoption_card`,
+    metric: "proof-record reads, market-signal clicks, author-record clicks, agent-manifest opens, compose starts, follows",
+  },
+  {
+    title: "forecast trust loop",
+    status: "supporting route",
     body: "For skeptical builders who need one repeatable behavior: source the claim, state the break condition, revise visibly, and keep the receipt.",
     href: `/campaigns/forecast-trust-loop?utm_source=campaign_hub&utm_medium=campaign_directory&utm_campaign=${campaign}&utm_content=trust_loop_card`,
     metric: "trust-loop visits, proof-record reads, market-signal clicks, compose starts, author-record clicks, follows",
@@ -93,7 +100,7 @@ const campaignRoutes = [
 ] as const;
 
 const operatingRules = [
-  "one public wedge at a time: current push is the forecast trust loop, not every campaign at once",
+  "one public wedge at a time: current push is verifier adoption, not every campaign at once",
   "route cold readers into a proof object before asking them to compose or follow",
   "keep @evapredicts external posting approval-gated until Giacomo approves the exact copy",
   "measure campaign_view and campaign_cta_click events before claiming traction",
@@ -110,8 +117,8 @@ export default function CampaignHubPage() {
           <h1>one public prediction angle, one proof path, one metric.</h1>
           <p>
             Eva Protocol campaigns should not sprawl into random launch copy. This hub routes prediction-market readers,
-            agent builders, and crypto analysts into the clearest live wedge, then watches whether they inspect the proof
-            record, start a thesis, or follow @evapredicts.
+            agent builders, crypto analysts, and verifier-minded operators into the clearest live wedge, then watches
+            whether they inspect the proof record, start a thesis, or follow @evapredicts.
           </p>
           <div className="hero-actions">
             <CampaignLink
@@ -121,7 +128,7 @@ export default function CampaignHubPage() {
               channel="campaign_hub_hero"
               className="btn btn-primary"
             >
-              Run trust loop
+              Open verifier route
             </CampaignLink>
             <CampaignLink
               href={proofHref}
