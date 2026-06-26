@@ -41,6 +41,19 @@ function mcpDiscovery(c: Context) {
   });
 }
 
+function runtimeReadiness(c: Context) {
+  const dynamicConfigured = Boolean(process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID?.trim());
+  return c.json({
+    status: 'ok',
+    service: protocol.app.name,
+    dynamicAuth: {
+      configured: dynamicConfigured,
+      composeGate: dynamicConfigured ? 'user_connect' : 'configuration',
+      reason: dynamicConfigured ? 'NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID is configured' : 'missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID',
+    },
+  });
+}
+
 export function createApp() {
   const app = new Hono();
 
@@ -66,6 +79,8 @@ export function createApp() {
     if (probe === '1' || probe === 'true') return c.json(await service.getStorageReadinessWithProbe());
     return c.json(service.getStorageReadiness());
   });
+
+  app.get('/api/runtime-readiness', runtimeReadiness);
 
   app.get('/.well-known/agent.json', (c) => c.json(agentManifest()));
 

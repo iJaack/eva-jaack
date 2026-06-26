@@ -20,7 +20,7 @@ function listen(server) {
   });
 }
 
-function runSmoke(baseUrl) {
+function runSmoke(baseUrl, extraEnv = {}) {
   const child = spawn(process.execPath, ["scripts/smoke-deployment.mjs"], {
     cwd: process.cwd(),
     env: {
@@ -30,6 +30,7 @@ function runSmoke(baseUrl) {
       SMOKE_REQUIRE_DURABLE_STORAGE: "true",
       SMOKE_VERCEL_BYPASS_SECRET: "",
       VERCEL_AUTOMATION_BYPASS_SECRET: "",
+      ...extraEnv,
     },
   });
 
@@ -142,6 +143,72 @@ test("deployment smoke skips Vercel dashboard HTML on backend JSON routes withou
     assert.match(result.stderr, /SKIP deployment smoke: Vercel Deployment Protection blocked the deployment URL/);
     assert.match(result.stdout, /PASS predictors API/);
     assert.doesNotMatch(result.stderr, /Unexpected token/);
+  } finally {
+    server.close();
+  }
+});
+
+function createApplicationSmokeServer({ dynamicConfigured }) {
+  return createServer((req, res) => {
+    if (req.url === "/compose") {
+      res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+      res.end("<main>compose route loaded</main>");
+      return;
+    }
+
+    if (req.url?.startsWith("/api/runtime-readiness")) {
+      res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+      res.end(
+        JSON.stringify({
+          status: "ok",
+          dynamicAuth: {
+            configured: dynamicConfigured,
+            reason: dynamicConfigured ? "NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID is configured" : "missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID",
+          },
+        })
+      );
+      return;
+    }
+
+    if (req.url?.startsWith("/health")) {
+      res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify({ storage: { ready: true, durable: true } }));
+      return;
+    }
+
+    if (req.url?.startsWith("/api/storage-readiness")) {
+      res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify({ ready: true, durable: true, probe: { ok: true } }));
+      return;
+    }
+
+    res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+    res.end(JSON.stringify({ ok: true }));
+  });
+}
+
+test("deployment smoke fails strict Dynamic auth readiness when runtime env is missing", async () => {
+  const server = createApplicationSmokeServer({ dynamicConfigured: false });
+
+  const port = await listen(server);
+  try {
+    const result = await runSmoke(`http://127.0.0.1:${port}`, { SMOKE_REQUIRE_DYNAMIC_AUTH: "true" });
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID/);
+  } finally {
+    server.close();
+  }
+});
+
+test("deployment smoke passes strict Dynamic auth readiness when runtime env is configured", async () => {
+  const server = createApplicationSmokeServer({ dynamicConfigured: true });
+
+  const port = await listen(server);
+  try {
+    const result = await runSmoke(`http://127.0.0.1:${port}`, { SMOKE_REQUIRE_DYNAMIC_AUTH: "true" });
+    assert.equal(result.code, 0);
+    assert.match(result.stdout, /PASS runtime readiness API/);
+    assert.doesNotMatch(result.stderr, /missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID/);
   } finally {
     server.close();
   }

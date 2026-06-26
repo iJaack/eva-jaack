@@ -38,6 +38,7 @@ Eva should not claim:
 
 - Home, markets, compose, thesis detail, predictors, and health routes load.
 - `/compose` requires Dynamic identity before the mutable editor renders. If Dynamic is not configured, the route must show a read-only auth/configuration gate, not the seeded preview author, wallet, ready-to-publish state, source selector, or draft editor.
+- Final launch-authoring smoke must run with `SMOKE_REQUIRE_DYNAMIC_AUTH=true`; that mode fails when `/compose` still serves the Dynamic configuration gate and passes only once production serves the Dynamic user-connect gate.
 - `/verify`, `/claims`, `/curators`, `/blog`, and `/whitepaper` are absent.
 - SpaceX thesis page shows market signals, fact signals, revision history, and anchor status.
 - Agent manifest and MCP endpoint respond.

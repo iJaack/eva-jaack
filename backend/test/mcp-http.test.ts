@@ -44,6 +44,53 @@ describe("MCP HTTP endpoint", () => {
     });
   });
 
+  it("exposes Dynamic auth runtime readiness without leaking the environment id", async () => {
+    const previousDynamicEnv = process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
+    process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID = "test-dynamic-env";
+    try {
+      const app = createApp();
+
+      const response = await fetchJson(app, "/api/runtime-readiness");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchObject({
+        status: "ok",
+        service: "Eva Protocol",
+        dynamicAuth: {
+          configured: true,
+          composeGate: "user_connect",
+          reason: "NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID is configured",
+        },
+      });
+      expect(JSON.stringify(response.body)).not.toContain("test-dynamic-env");
+    } finally {
+      if (previousDynamicEnv === undefined) delete process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
+      else process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID = previousDynamicEnv;
+    }
+  });
+
+  it("reports missing Dynamic auth runtime readiness as a launch blocker", async () => {
+    const previousDynamicEnv = process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
+    delete process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
+    try {
+      const app = createApp();
+
+      const response = await fetchJson(app, "/api/runtime-readiness");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchObject({
+        dynamicAuth: {
+          configured: false,
+          composeGate: "configuration",
+          reason: "missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID",
+        },
+      });
+    } finally {
+      if (previousDynamicEnv === undefined) delete process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
+      else process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID = previousDynamicEnv;
+    }
+  });
+
   it("serves discovery metadata for plain GET health checks", async () => {
     const app = createApp();
 
