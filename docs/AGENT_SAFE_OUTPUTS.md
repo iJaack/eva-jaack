@@ -231,7 +231,8 @@ Safe interpretation:
 - `readOnlyHint: true` on `search_markets` / `get_thesis` means inspection only.
 - `readOnlyHint: false` plus `destructiveHint: false` on draft-prep tools means non-destructive preparation, not publication authority.
 - `idempotentHint: true` means repeatable preparation, not durable storage verification.
-- `openWorldHint: false` means the tool does not reach out to arbitrary external systems, not that production writes are safe.
+- `openWorldHint: true` on `search_markets` means the tool may read the configured market universe; it is still read-only and not approval for arbitrary external browsing, invented sources, publishing, broadcasting, or storage claims.
+- `openWorldHint: false` on `get_thesis` and draft-prep tools means the tool does not reach out to arbitrary external systems, not that production writes are safe.
 
 Never cite annotations as evidence for `submitted`, `confirmed`, `published/live`, or `storage verified`. Use the MCP result markers and the permission ladder instead.
 
