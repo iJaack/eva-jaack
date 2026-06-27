@@ -285,7 +285,8 @@ If a field belongs to the result card (`publishState`, `anchorStatus`, `anchorPr
 
 Tool discovery annotations are client-routing hints, not approval evidence:
 
-- `search_markets` and `get_thesis` are read-only tools (`readOnlyHint: true`).
+- `search_markets` is read-only inspection (`readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`, `openWorldHint: true`). The open-world hint only means the tool may read from the configured market universe; it is not approval to browse arbitrary sources, invent evidence, publish, broadcast, or claim storage readiness.
+- `get_thesis` is read-only inspection of Eva thesis state (`readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`, `openWorldHint: false`).
 - `create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction` are preparation tools (`readOnlyHint: false`, `destructiveHint: false`, `idempotentHint: true`, `openWorldHint: false`).
 
 Do not let `destructiveHint: false` upgrade the output claim. A non-destructive preparation tool can still be write-adjacent and still stops at `draft prepared` / `anchor prepared` unless approval, tx hash, receipt/readback, and storage evidence support a higher rung.

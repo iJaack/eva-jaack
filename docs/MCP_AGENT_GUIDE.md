@@ -63,10 +63,11 @@ Every write-adjacent MCP tool (`create_thesis_draft`, `prepare_revision_draft`, 
 
 MCP discovery exposes annotations so clients can route tools safely:
 
-- `search_markets` and `get_thesis` advertise `readOnlyHint: true`.
+- `search_markets` advertises `readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`, and `openWorldHint: true` because market search may query the configured market universe. It is still read-only inspection, not evidence approval.
+- `get_thesis` advertises `readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`, and `openWorldHint: false` because it only reads Eva thesis state by `thesisId`.
 - `create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction` advertise `readOnlyHint: false`, `destructiveHint: false`, `idempotentHint: true`, and `openWorldHint: false`.
 
-That means draft-prep tools are non-destructive preparation tools, not read-only inspection tools. It does not mean they are approved to publish, broadcast, submit transactions, mutate production state, or prove storage durability. Treat annotations as routing hints only; the permission ladder and evidence inventory still decide what the agent may claim.
+That means draft-prep tools are non-destructive preparation tools, not read-only inspection tools. `openWorldHint: true` on `search_markets` means the read may reach the configured market source; it does not approve external web research, source invention, publishing, broadcasting, or storage claims. Treat annotations as routing hints only; the permission ladder and evidence inventory still decide what the agent may claim.
 
 ### Storage Durability Boundary
 
