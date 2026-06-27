@@ -128,6 +128,11 @@ function timelineFilterCount(thesis: Thesis, filter: TimelineFilter): number {
   return thesis.timeline.filter((entry) => entry.action === filter).length;
 }
 
+function thesisShareText(thesis: Thesis): string {
+  const signalLabel = thesis.signals.length === 1 ? "signal" : "signals";
+  return `Tracking v${thesis.currentRevision.version} of "${thesis.title}" on Eva (score ${thesis.currentScore}, ${thesis.signals.length} ${signalLabel}, revision history visible).`;
+}
+
 export default function ThesisDetailClient() {
   const params = useParams();
   const thesisId = params.thesisId as string;
@@ -350,11 +355,11 @@ export default function ThesisDetailClient() {
                 </button>
                 <a
                   className="mobile-action"
-                  href={`https://x.com/intent/post?text=${encodeURIComponent(`Tracking this evolving thesis on Eva: ${detail.thesis.title}`)}&url=${encodeURIComponent(`${protocol.app.siteUrl}/thesis/${detail.thesis.thesisId}`)}`}
+                  href={`https://x.com/intent/post?text=${encodeURIComponent(thesisShareText(detail.thesis))}&url=${encodeURIComponent(`${protocol.app.siteUrl}/thesis/${detail.thesis.thesisId}`)}`}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Share on X
+                  Share current revision on X
                 </a>
               </div>
               {copyState ? <p className="inline-note">{copyState}</p> : null}
