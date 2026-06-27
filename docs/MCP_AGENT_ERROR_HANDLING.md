@@ -29,6 +29,26 @@ When MCP work fails, classify the failure before choosing a fallback. A fallback
 
 Unsafe fallbacks are still unsafe even if they are technically possible: UI scraping, direct REST writes, unauthenticated production calls, guessed wallets, stale issue metadata, or reusing an old `anchorPreparationId` do not repair a failed MCP path.
 
+## Retry budget and failure journal
+
+Do not retry write-adjacent MCP calls by mutating the payload until it passes. A retry is safe only when the same operation, same identity authority, and same evidence set are preserved.
+
+Before retrying, write a tiny failure journal in your notes or handoff:
+
+```text
+MCP failure journal:
+- tool: <tool name>
+- failure class: <client setup failure | live allowlist drift | input schema mismatch | missing thesis/identity readback | protocol readback gap | approved non-MCP execution gap>
+- unchanged authority: <xHandle / walletAddress / thesisId / walletSource, or not applicable>
+- payload changes allowed: <format-only repair | remove optional malformed URL | none>
+- retry budget: <0 | 1>
+- output ceiling after retry: <read-only | draft prepared | anchor prepared | blocked>
+```
+
+Retry at most once for format-only repairs such as trimming whitespace, converting an explicitly percent-labeled `36%` to `0.36`, or omitting an optional malformed URL while preserving the auditable signal. Do not retry by changing signer identity, swapping wallets, replacing a missing thesis id, inventing source URLs, lowering evidence quality without saying signal-light, changing a revision patch into guessed full body text, or switching to direct REST writes.
+
+If the same failure repeats after the one safe retry, stop at `blocked:` and include the failure class plus the exact missing evidence. More retries add risk without adding authority.
+
 ## Safe recovery rules
 
 | Symptom | Safe response | Do not do |

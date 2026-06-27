@@ -89,6 +89,22 @@ Safe handling:
 
 If the prompt is almost valid but one schema field is malformed or ambiguous, use the schema repair cards in `docs/MCP_AGENT_ERROR_HANDLING.md` before calling a tool. Repair only directly evidenced values, such as an explicit `36%` becoming `0.36`. Otherwise block instead of guessing URLs, signer authority, verifier scores, weights, or full revision bodies.
 
+### Retry budget for MCP failures
+
+If a write-adjacent MCP call fails, do not keep editing the payload until it passes. Classify the failure with `docs/MCP_AGENT_ERROR_HANDLING.md`, then fill the MCP failure journal before any retry:
+
+```text
+MCP failure journal:
+- tool: <tool name>
+- failure class: <client setup failure | live allowlist drift | input schema mismatch | missing thesis/identity readback | protocol readback gap | approved non-MCP execution gap>
+- unchanged authority: <xHandle / walletAddress / thesisId / walletSource, or not applicable>
+- payload changes allowed: <format-only repair | remove optional malformed URL | none>
+- retry budget: <0 | 1>
+- output ceiling after retry: <read-only | draft prepared | anchor prepared | blocked>
+```
+
+Safe retry budget: one attempt, and only for format-only repairs that preserve the same operation, identity authority, and evidence set. If fixing the error would require a new wallet, guessed thesis id, fabricated URL, unapproved direct REST path, or invented full replacement body, use `blocked:` instead of retrying.
+
 ### Exact identity inputs only
 
 Identity fields are authority-bearing. Copy them from task-time approval or fresh `get_thesis` readback; do not normalize or substitute them from memory.

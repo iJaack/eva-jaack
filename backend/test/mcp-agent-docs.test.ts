@@ -539,6 +539,31 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents a retry budget for failed write-adjacent MCP calls", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_ERROR_HANDLING.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Retry budget",
+      "MCP failure journal",
+      "failure class",
+      "unchanged authority",
+      "payload changes allowed",
+      "retry budget: <0 | 1>",
+      "format-only repair",
+      "same operation, identity authority, and evidence set",
+      "retry at most once",
+      "changing signer identity",
+      "guessing a thesis id",
+      "direct REST writes",
+    ]) {
+      expect(docs, `agent retry budget docs should include ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents context sanitizing so coordination metadata does not become MCP payload evidence", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
