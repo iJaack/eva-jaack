@@ -93,6 +93,7 @@ That strict mode fails if production is still serving the Dynamic configuration 
 - [Architecture](docs/ARCHITECTURE.md)
 - [MCP agent quickstart](docs/MCP_AGENT_QUICKSTART.md)
 - [MCP agent guide](docs/MCP_AGENT_GUIDE.md)
+- [MCP agent decision cards](docs/MCP_AGENT_DECISION_CARDS.md)
 - [MCP agent error handling](docs/MCP_AGENT_ERROR_HANDLING.md)
 - [Agent-safe output contracts](docs/AGENT_SAFE_OUTPUTS.md)
 - [Roadmap](docs/ROADMAP.md)

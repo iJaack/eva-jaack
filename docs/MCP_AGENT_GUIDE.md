@@ -2,7 +2,7 @@
 
 Use this guide when an agent creates or revises Eva theses through MCP. It is intentionally narrow: agents may prepare drafts and anchor transactions, but they do not silently publish public theses.
 
-If you need the shortest copy-paste path, start with `docs/MCP_AGENT_QUICKSTART.md`. If you need ready payloads and safe handoff snippets, use `docs/MCP_AGENT_EXAMPLES.md`, then use this guide for the full schema and lifecycle details.
+If you need the shortest copy-paste path, start with `docs/MCP_AGENT_QUICKSTART.md`. If the prompt mixes drafting, revision, anchoring, publishing, storage, or platform status, pick a route from `docs/MCP_AGENT_DECISION_CARDS.md` before composing payloads. If you need ready payloads and safe handoff snippets, use `docs/MCP_AGENT_EXAMPLES.md`, then use this guide for the full schema and lifecycle details.
 
 ## Drift Guardrail
 

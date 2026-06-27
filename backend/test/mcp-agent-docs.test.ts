@@ -28,6 +28,7 @@ describe("Eva MCP agent docs", () => {
     "docs/MCP_AGENT_GUIDE.md",
     "docs/MCP_AGENT_QUICKSTART.md",
     "docs/MCP_AGENT_EXAMPLES.md",
+    "docs/MCP_AGENT_DECISION_CARDS.md",
     "docs/MCP_AGENT_ERROR_HANDLING.md",
     "skills/eva-agent-onboarding/SKILL.md",
   ];
@@ -38,6 +39,38 @@ describe("Eva MCP agent docs", () => {
       for (const toolName of evaMcpToolNames) {
         expect(text, `${path} should mention live tool ${toolName}`).toContain(toolName);
       }
+    }
+  });
+
+  it("ships decision cards for mixed thesis prompts without expanding MCP powers", () => {
+    const docs = [
+      readRepoFile("README.md"),
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/MCP_AGENT_DECISION_CARDS.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "MCP_AGENT_DECISION_CARDS.md",
+      "card:",
+      "smallest safe tool",
+      "required before call",
+      "result ceiling",
+      "safe final verb",
+      "boundary line",
+      "draft and publish this",
+      "revise this thesis",
+      "anchor it",
+      "prove storage / launch readiness",
+      "same as last time",
+      "use this API key / route / token",
+      "turn this PR / issue / deploy into a thesis update",
+      "market-backed thesis from pasted market",
+      "platform coordination status is not protocol state",
+      "does not add new powers",
+    ]) {
+      expect(docs, `agent decision cards should include ${phrase}`).toContain(phrase);
     }
   });
 

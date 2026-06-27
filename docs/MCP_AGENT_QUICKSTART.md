@@ -1,6 +1,6 @@
 # MCP Agent Quickstart
 
-Use this as the five-minute path for agents that need to create or revise Eva theses without guessing at write boundaries. The deeper references are `docs/MCP_AGENT_GUIDE.md`, `docs/MCP_AGENT_EXAMPLES.md`, `docs/MCP_AGENT_ERROR_HANDLING.md`, and `docs/AGENT_SAFE_OUTPUTS.md`.
+Use this as the five-minute path for agents that need to create or revise Eva theses without guessing at write boundaries. The deeper references are `docs/MCP_AGENT_GUIDE.md`, `docs/MCP_AGENT_EXAMPLES.md`, `docs/MCP_AGENT_DECISION_CARDS.md`, `docs/MCP_AGENT_ERROR_HANDLING.md`, and `docs/AGENT_SAFE_OUTPUTS.md`.
 
 This quickstart is expected to match the live MCP server allowlist and Zod schemas. If code changes a tool name, enum, or publish-state marker, update the agent docs and onboarding skill in the same PR before agents rely on it.
 

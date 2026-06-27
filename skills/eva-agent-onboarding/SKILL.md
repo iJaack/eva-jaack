@@ -9,6 +9,7 @@ Use this when an agent needs to work with Eva Protocol safely.
 
 Canonical guide: `docs/MCP_AGENT_GUIDE.md`.
 Copy-paste payloads: `docs/MCP_AGENT_EXAMPLES.md`.
+Prompt routing cards: `docs/MCP_AGENT_DECISION_CARDS.md`.
 Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 
 ## Requirements
@@ -18,6 +19,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Keep `docs/MCP_AGENT_GUIDE.md` open when creating or revising theses.
 - If starting from the repo README or API surface, treat it as product/runtime context only, not an agent permission map. Jump to the README Agent MCP Boundary and this skill before calling tools.
 - Use `docs/MCP_AGENT_EXAMPLES.md` for known-good payload shapes before improvising schema fields.
+- Use `docs/MCP_AGENT_DECISION_CARDS.md` when a prompt mixes drafting, revision, anchoring, publishing, storage readiness, API routes, credentials, or platform coordination status.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
 - Use the no silent fallback ladder in `docs/MCP_AGENT_ERROR_HANDLING.md` when MCP work fails: classify client setup failure, live allowlist drift, input schema mismatch, missing thesis/identity readback, protocol readback gap, or approved non-MCP execution gap before choosing a lower-rung recovery.
 - Check the live input field matrix in `docs/MCP_AGENT_GUIDE.md` or `docs/MCP_AGENT_QUICKSTART.md` before composing payloads: `walletSource` is only accepted by `create_thesis_draft`, `note` is only accepted by `prepare_revision_draft`, and result markers such as `publishState`, `anchorStatus`, `anchorPreparationId`, tx hash, receipt/readback, and storage wording are never input fields.
