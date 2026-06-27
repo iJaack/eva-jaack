@@ -29,9 +29,9 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
 
 const evaPredictsUrl = "https://x.com/evapredicts";
 const launchThesisId = "thesis-0fdef25794b38b6e8eed7524";
-const featuredCampaign = "verifier_adoption";
+const featuredCampaign = "forecast_provenance";
 const launchThesisHref = `/thesis/${launchThesisId}?utm_source=homepage&utm_medium=proof_cta&utm_campaign=${featuredCampaign}&utm_content=spacex_proof_record`;
-const featuredCampaignHref = `/campaigns/verifier-adoption?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${featuredCampaign}&utm_content=homepage_callout`;
+const featuredCampaignHref = `/campaigns/forecast-provenance?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${featuredCampaign}&utm_content=homepage_callout`;
 
 function formatUsd(value: number | null): string {
   if (value === null) return "—";
@@ -123,15 +123,21 @@ const participationQuests = [
 ] as const;
 
 const campaignProofPoints = [
-  "make the claim boundary inspectable before asking for belief",
-  "show which sources support it and what would break it",
-  "keep the author trail and revision history visible after the feed moves on",
+  "show who made the call before asking anyone to trust it",
+  "preserve the source trail, market context, and revision trigger",
+  "make agent/runtime proof inspectable after the feed moves on",
 ] as const;
 
 const activeCampaigns = [
   {
+    title: "forecast provenance",
+    body: "The current @evapredicts wedge: who made the call, what it read, what would change it, and where the revision lives.",
+    href: "/campaigns/forecast-provenance?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=forecast_provenance&utm_content=forecast_provenance_card",
+    metric: "author-record clicks, agent-manifest opens, proof-record reads, market-context clicks, compose starts, and follows",
+  },
+  {
     title: "verifier adoption",
-    body: "The current verifier wedge: public forecasts need claim boundaries, source fit, break conditions, author trails, and visible revisions before amplification.",
+    body: "A supporting verifier route: public forecasts need claim boundaries, source fit, break conditions, author trails, and visible revisions before amplification.",
     href: "/campaigns/verifier-adoption?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=verifier_adoption&utm_content=verifier_adoption_card",
     metric: "proof-record reads, market-signal clicks, author-record clicks, agent-manifest opens, compose starts, and follows",
   },
@@ -215,23 +221,23 @@ function CampaignCallout() {
       <CampaignViewTracker campaign={featuredCampaign} channel="homepage_campaign_callout" />
       <div className="campaign-callout-copy">
         <p className="section-kicker">@evapredicts campaign</p>
-        <h2 className="section-title section-title-sm">forecasts need verifiers before they need virality.</h2>
+        <h2 className="section-title section-title-sm">the missing field in AI forecasts is provenance.</h2>
         <p>
-          The current homepage wedge is verifier adoption: turn a market call into a proof object with claim boundary,
-          source fit, break condition, author trail, and visible revisions.
+          The current homepage wedge is forecast provenance: route readers toward who made the call, what it read,
+          what would change it, and where the revision lives before asking them to trust the forecast.
         </p>
       </div>
       <div className="campaign-proof-grid" aria-label="Campaign proof points">
         {campaignProofPoints.map((point) => (
           <div key={point}>
-            <span>verify</span>
+            <span>prove</span>
             <strong>{point}</strong>
           </div>
         ))}
       </div>
       <div className="campaign-action-row">
-        <CampaignLink href={featuredCampaignHref} campaign={featuredCampaign} cta="open_verifier_adoption" channel="homepage_campaign_callout" className="mobile-action mobile-action-primary">
-          Open verifier route
+        <CampaignLink href={featuredCampaignHref} campaign={featuredCampaign} cta="open_forecast_provenance" channel="homepage_campaign_callout" className="mobile-action mobile-action-primary">
+          Open provenance route
         </CampaignLink>
         <CampaignLink href={launchThesisHref} campaign={featuredCampaign} cta="read_proof_record" channel="homepage_campaign_callout" className="mobile-action">
           Read the proof record
@@ -241,7 +247,7 @@ function CampaignCallout() {
         </CampaignLink>
       </div>
       <p className="inline-note">
-        Metric to watch: utm_campaign=verifier_adoption clicks into the verifier route, then proof-record reads, market-signal clicks, author-record clicks, agent-manifest opens, compose starts, and follow clicks. No traction claims until measured data exists.
+        Metric to watch: utm_campaign=forecast_provenance clicks into the provenance route, then author-record clicks, agent-manifest opens, proof-record reads, market-context clicks, compose starts, and follow clicks. No traction claims until measured data exists.
       </p>
     </section>
   );
@@ -411,22 +417,22 @@ export default function HomePage() {
       <Nav />
       <main id="main-content" className="mobile-shell prediction-home">
         <section className="mobile-hero home-command">
-          <p className="eyebrow">Public market theses · cited signals · revision history</p>
-          <h1>Turn market odds into a public thesis.</h1>
+          <p className="eyebrow">Forecast provenance · cited signals · revision history</p>
+          <h1>Turn forecasts into inspectable records.</h1>
           <p>
-            Eva lets predictors write an interactive post, cite prediction markets and facts inline,
-            anchor the first version, and keep every update readable over time.
+            Eva lets predictors publish a thesis with author trail, cited markets and facts, revision triggers,
+            and a readable history after the feed moves on.
           </p>
           <div className="mobile-hero-actions">
-            <Link href={featuredCampaignHref} className="mobile-action mobile-action-primary">
-              Open verifier route
-            </Link>
-            <Link href={launchThesisHref} className="mobile-action">
+            <CampaignLink href={featuredCampaignHref} campaign={featuredCampaign} cta="open_forecast_provenance" channel="homepage_hero" className="mobile-action mobile-action-primary">
+              Open provenance route
+            </CampaignLink>
+            <CampaignLink href={launchThesisHref} campaign={featuredCampaign} cta="read_proof_record" channel="homepage_hero" className="mobile-action">
               Read proof thesis
-            </Link>
-            <Link href={evaPredictsUrl} className="mobile-action" target="_blank" rel="noreferrer">
+            </CampaignLink>
+            <CampaignLink href={evaPredictsUrl} campaign={featuredCampaign} cta="follow_evapredicts" channel="homepage_hero" className="mobile-action" target="_blank" rel="noreferrer" external>
               Follow @evapredicts
-            </Link>
+            </CampaignLink>
           </div>
           <aside className="home-hero-artifact" aria-label="Example thesis artifact">
             <div className="artifact-header">
