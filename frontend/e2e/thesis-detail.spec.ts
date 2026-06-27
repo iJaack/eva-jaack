@@ -240,6 +240,11 @@ test("thesis detail reads as a public thesis with attached citation cards and re
   await expect(page.getByTestId("timeline-card")).toHaveCount(1);
   await expect(page.getByTestId("timeline-card").first()).toContainText("Thesis published with initial signal basket.");
   await expect(page.getByRole("heading", { name: "Append an update" })).toBeVisible();
+
+  const shareHref = await page.getByRole("link", { name: "Share current revision on X" }).getAttribute("href");
+  expect(shareHref).toContain("https://x.com/intent/post?");
+  expect(decodeURIComponent(shareHref ?? "")).toContain('Tracking v1 of "Fed hold liquidity thesis" on Eva (score 64, 2 signals, revision history visible).');
+  expect(decodeURIComponent(shareHref ?? "")).toContain("https://eva.jaack.me/thesis/thesis-fed-hold");
 });
 
 test("thesis detail shows resolved market outcomes and fact verdict context", async ({ page }) => {
