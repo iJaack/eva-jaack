@@ -137,7 +137,7 @@ async function expectNoHorizontalOverflow(page: Page) {
 }
 
 const qaTargets = [
-  { slug: "home", path: "/", heading: "Turn market odds into a public thesis." },
+  { slug: "home", path: "/", heading: "Turn forecasts into inspectable records." },
   { slug: "markets", path: "/markets", heading: "Markets are source material." },
   { slug: "market-detail", path: "/markets/spacex-ipo-before-2027", heading: "Will SpaceX IPO before 2027?" },
   { slug: "thesis-detail", path: "/thesis/thesis-0fdef25794b38b6e8eed7524", heading: "SpaceX IPO liquidity rotation" },
