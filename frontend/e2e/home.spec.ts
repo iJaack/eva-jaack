@@ -157,7 +157,7 @@ test("homepage leads with the prediction workbench layout", async ({ page }) => 
     /utm_campaign=launch_truth_status.*utm_content=spacex_proof_record/,
   );
   await expect(page.getByRole("heading", { name: "send curious predictors to one clean next step." })).toBeVisible();
-  await expect(page.getByRole("link", { name: /launch status/i })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: /launch truth status/i })).toHaveAttribute(
     "href",
     /utm_campaign=launch_truth_status.*utm_content=launch_truth_card/,
   );
