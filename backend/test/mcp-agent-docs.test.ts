@@ -384,6 +384,29 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents MCP discovery descriptions as agent permission boundaries", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "MCP Discovery Description Boundary",
+      "MCP discovery descriptions",
+      "tool name, description, and annotations",
+      "does not publish",
+      "does not broadcast",
+      "does not call direct REST writes",
+      "does not prove storage durability",
+      "first permission check",
+      "live allowlist drift",
+      "lower rung",
+    ]) {
+      expect(docs, `agent docs should include MCP discovery-description boundary phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("teaches agents to downgrade over-strong publish/storage claims", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
