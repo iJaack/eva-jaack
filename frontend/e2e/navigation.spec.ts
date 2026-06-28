@@ -231,16 +231,16 @@ test("forecast provenance campaign page carries provenance-first CTAs", async ({
 test("campaign hub routes active campaign traffic with measurable CTAs", async ({ page }) => {
   await page.goto("/campaigns");
 
-  await expect(page.getByRole("heading", { name: "one provenance angle, one proof path, one metric." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "one launch-truth angle, one proof path, one metric." })).toBeVisible();
   await expect(page.getByText("campaign choice should be judged by proof-path intent, not impressions.")).toBeVisible();
 
-  await expect(page.getByRole("link", { name: "Open provenance route" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Open launch status" })).toHaveAttribute(
     "data-campaign-cta",
     "open_current_wedge",
   );
-  await expect(page.getByRole("link", { name: "Open provenance route" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Open launch status" })).toHaveAttribute(
     "href",
-    /utm_campaign=campaign_hub.*utm_content=forecast_provenance_card/,
+    /utm_campaign=campaign_hub.*utm_content=launch_truth_card/,
   );
   await expect(page.getByRole("link", { name: "Read proof record" })).toHaveAttribute(
     "href",
