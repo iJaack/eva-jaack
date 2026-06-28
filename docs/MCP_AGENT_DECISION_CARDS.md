@@ -98,3 +98,11 @@ If any required field is missing, stop at `blocked:`. Do not swap wallets, guess
 - Result ceiling: `draft prepared` / `anchor prepared`; downgrade to signal-light or block if the market is off-policy or unauditable.
 - Safe final verb: `prepared signal-backed draft` only when source/market evidence is real and policy-screened.
 - Boundary line: off-policy, stale, malformed, or screenshot-only markets do not make a draft signal-backed.
+
+## Card 11: "patch / append / small edit this thesis"
+
+- Smallest safe tools: `get_thesis`, then `prepare_revision_draft` only after the full replacement body is known.
+- Required before revision call: exact `thesisId`, task-time `xHandle` and full wallet address, fresh `get_thesis` author readback matching that identity, the current body from readback, and an approved delta that can be merged without inventing missing text.
+- Result ceiling: `draft prepared` / `anchor prepared`, or `blocked` if the prompt only provides a patch and the current body cannot be read.
+- Safe final verb: `revision draft prepared` when a full replacement body was prepared; otherwise `blocked`.
+- Boundary line: `prepare_revision_draft` does not accept patch-only, diff-only, append-only, or paragraph-only bodies. The live public revision is unchanged until an approved transaction/public write receipt plus readback exists.
