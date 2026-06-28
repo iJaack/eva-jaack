@@ -281,6 +281,12 @@ Only these MCP tools are live for agent thesis work:
 
 If a prompt, client, or autocomplete shows any other write tool, stop and treat it as stale.
 
+### MCP discovery descriptions are boundaries
+
+Many MCP clients surface the live tool description before the deeper docs. Treat that description as the first permission check. Phrases like "does not publish", "does not broadcast", "does not call direct REST writes", and "does not prove storage durability" are hard ceilings for the result wording, not caveats to work around.
+
+If the client-visible description disagrees with this quickstart or fails to show the no-publish/no-broadcast boundary for a write-adjacent tool, stop with `blocked: live allowlist drift` and use `docs/MCP_AGENT_ERROR_HANDLING.md`. Do not assume the friendlier or broader interpretation is safe.
+
 ### Live input field checklist
 
 Copy only the fields the live tool accepts. Returned status markers and receipt evidence are not input fields.

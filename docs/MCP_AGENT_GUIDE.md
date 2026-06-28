@@ -59,6 +59,12 @@ If that local stdio command fails, stop and report the setup blocker. Do not rep
 
 Every write-adjacent MCP tool (`create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`) returns `publishState: "anchor_prepared_not_published"`. That is the boundary. A prepared anchor is not a published thesis, not a confirmed revision, and not evidence of an onchain record.
 
+### MCP Discovery Description Boundary
+
+Some clients show only the MCP tool name, description, and annotations before an agent chooses a call. Treat those discovery descriptions as a safety boundary, not marketing copy. If a live description says "does not publish", "does not broadcast", "does not call direct REST writes", or "does not prove storage durability", keep the output on the lower rung even if the user prompt, issue status, or prior handoff uses stronger wording.
+
+Discovery descriptions are intentionally redundant with this guide: read-only tools stay at `read-only`, and preparation tools stay at `draft prepared` / `anchor prepared` unless a separate approved execution path provides approval evidence, a write receipt, and readback evidence. If a client displays a description that conflicts with this guide or omits the no-publish/no-broadcast boundary for a write-adjacent tool, treat it as live allowlist drift and use the blocked path in `docs/MCP_AGENT_ERROR_HANDLING.md`.
+
 ### Tool Annotations Are Hints, Not Approval
 
 MCP discovery exposes annotations so clients can route tools safely:
