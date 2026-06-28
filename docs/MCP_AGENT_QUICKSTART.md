@@ -356,6 +356,7 @@ If any of these phrases appear in a prompt, slow down and write the safe-start t
 - `publish now`, `make live`, `post it`, or `ship it` — MCP can prepare draft/anchor calldata only; require separate approval, tx hash, and receipt/readback before stronger wording.
 - `use this token/route/API key` — possession of credentials is not approval; fill the separate approved execution path receipt card before any non-MCP write claim.
 - `reuse the old anchorPreparationId` — old handoff values are stale leads; regenerate preparation or re-read with an approved live path before reporting protocol state.
+- `patch this`, `append this`, `small edit`, or `diff-only revision` — `prepare_revision_draft` needs a full replacement body after fresh `get_thesis` readback; patch-only text is not a safe input.
 - `just use Eva's wallet` or any remembered wallet — task-time signer authority is required; schema defaults and memory do not approve identity.
 - `prove storage/launch readiness` — MCP draft prep cannot prove durability; name the readiness/readback check or report `storage readiness blocked`.
 
@@ -366,6 +367,7 @@ Tripwire result rule: when a prompt contains one of those phrases and the missin
 | "Find markets for this thesis." | `search_markets` | `read-only` | The user asks you to create or publish from weak evidence without approving identity. |
 | "Draft a new Eva thesis." | `create_thesis_draft` after preflight | `draft prepared` / `anchor prepared` only | `xHandle`, `walletAddress`, signer source, or evidence policy is missing. |
 | "Revise this thesis." | `get_thesis`, then `prepare_revision_draft` | revision draft prepared, previous public state unchanged | `thesisId` is missing/not found or the wallet/X handle does not match the approved author identity. |
+| "Patch / append / small edit this thesis." | `get_thesis`, then `prepare_revision_draft` only if the full replacement body can be built from readback plus approved delta | revision draft prepared, previous public state unchanged | The current body cannot be read or the delta requires inventing missing text. |
 | "Rebuild the anchor transaction." | `prepare_anchor_transaction` | calldata rebuilt only | The user expects a text change, broadcast, or confirmed onchain state. |
 | "Publish / anchor / make it live." | none through MCP alone | blocked until a separate approved path exists | Approval, broadcaster, tx hash, receipt/readback, or public publish evidence is missing. |
 | "Prove launch readiness." | none through draft prep alone | `storage not assessed` or `storage readiness blocked` | No approved durable-storage readiness/readback check is available. |
@@ -377,7 +379,7 @@ If the requested verb is stronger than the evidence, downgrade the wording, not 
 Use this decision path before touching a write-adjacent tool:
 
 1. Need evidence candidates only? Use `search_markets` and stop at read-only notes.
-2. Need to change an existing thesis? Use `get_thesis` first, then `prepare_revision_draft`. Do not create a replacement thesis because the old id is missing or inconvenient.
+2. Need to change an existing thesis? Use `get_thesis` first, then `prepare_revision_draft` with a full replacement `body`. Do not create a replacement thesis because the old id is missing or inconvenient, and do not send patch-only, diff-only, append-only, or paragraph-only text as the revision body.
 3. Need a brand-new thesis preview? Use `create_thesis_draft`.
 4. Need to rebuild calldata for an already-prepared thesis without changing text? Use `prepare_anchor_transaction`.
 5. Need publication, transaction broadcast, direct REST writes, article/blog output, claims, staking, challenge/settlement, paid verification, or LLM verification? Stop. That is outside current MCP scope unless a separate approved path and evidence are provided.

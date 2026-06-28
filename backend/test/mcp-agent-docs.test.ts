@@ -67,6 +67,9 @@ describe("Eva MCP agent docs", () => {
       "use this API key / route / token",
       "turn this PR / issue / deploy into a thesis update",
       "market-backed thesis from pasted market",
+      "patch / append / small edit this thesis",
+      "full replacement body",
+      "patch-only, diff-only, append-only, or paragraph-only",
       "platform coordination status is not protocol state",
       "does not add new powers",
     ]) {

@@ -19,7 +19,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Keep `docs/MCP_AGENT_GUIDE.md` open when creating or revising theses.
 - If starting from the repo README or API surface, treat it as product/runtime context only, not an agent permission map. Jump to the README Agent MCP Boundary and this skill before calling tools.
 - Use `docs/MCP_AGENT_EXAMPLES.md` for known-good payload shapes before improvising schema fields.
-- Use `docs/MCP_AGENT_DECISION_CARDS.md` when a prompt mixes drafting, revision, anchoring, publishing, storage readiness, API routes, credentials, or platform coordination status.
+- Use `docs/MCP_AGENT_DECISION_CARDS.md` when a prompt mixes drafting, revision, patch/append requests, anchoring, publishing, storage readiness, API routes, credentials, or platform coordination status.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
 - Use the no silent fallback ladder in `docs/MCP_AGENT_ERROR_HANDLING.md` when MCP work fails: classify client setup failure, live allowlist drift, input schema mismatch, missing thesis/identity readback, protocol readback gap, or approved non-MCP execution gap before choosing a lower-rung recovery.
 - Check the live input field matrix in `docs/MCP_AGENT_GUIDE.md` or `docs/MCP_AGENT_QUICKSTART.md` before composing payloads: `walletSource` is only accepted by `create_thesis_draft`, `note` is only accepted by `prepare_revision_draft`, and result markers such as `publishState`, `anchorStatus`, `anchorPreparationId`, tx hash, receipt/readback, and storage wording are never input fields.
@@ -65,6 +65,7 @@ Mixed prompt shortcut:
 
 - `draft and publish` means `create_thesis_draft` only through MCP, followed by a publish blocker until approval, tx hash, and receipt/readback exist.
 - `revise this thesis` means `get_thesis` first; missing thesis id or mismatched identity is a blocker, not permission to create a replacement.
+- `patch/append/small edit this thesis` still means `get_thesis` first, then `prepare_revision_draft` only with a full replacement body built from fresh readback plus the approved delta. Patch-only, diff-only, append-only, or paragraph-only text is not a safe revision body.
 - `anchor it` means `prepare_anchor_transaction` for calldata only; no broadcast or confirmation is implied.
 - `prove launch readiness` means no MCP draft-prep tool can prove storage durability; use `storage readiness blocked` unless a named readiness/readback check exists.
 
