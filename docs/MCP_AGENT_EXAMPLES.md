@@ -51,6 +51,15 @@ const parsed = JSON.parse(text);
 
 Only copy values from `parsed` into a handoff. A tool name or SDK envelope alone is not evidence for `publishState`, `anchorStatus`, storage readiness, transaction submission, confirmation, or live/public state.
 
+If `isError: true`, the text content is an error diagnostic, not a success payload. Do not parse it for `publishState`, merge it with a prior prepared result, or treat a mentioned `thesisId` as readback. Return a blocked result instead:
+
+```text
+blocked: MCP returned an error envelope.
+failure class: <input schema mismatch | missing thesis/identity readback | client setup failure | protocol readback gap>
+diagnostic: <plain text from the MCP error>
+boundary: no calldata, transaction submission, public publish, confirmation, or storage proof was produced by this call.
+```
+
 Field-placement reminder before copy-pasting payloads:
 
 - `walletSource` appears only in `create_thesis_draft` inputs.

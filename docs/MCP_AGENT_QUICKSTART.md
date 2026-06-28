@@ -325,6 +325,8 @@ For successful write-adjacent tools, parse `content[0].text` as JSON and then re
 
 If the tool result has `isError: true`, has no text part, or `content[0].text` is not valid JSON when JSON was expected, stop at `blocked:` and quote the missing or invalid field. Do not infer publish, anchor, submission, confirmation, or storage durability from the envelope alone.
 
+Error envelope rule: when `isError: true`, treat every text part as diagnostic text even if it mentions a thesis id, route, or tool name. Do not JSON-parse it as a partial success object, do not reuse old success markers, and do not retry by changing authority-bearing fields. The only safe output is `blocked:` with the failure class and the exact missing/invalid input.
+
 Use one MCP text parser per result and make malformed envelopes a blocker instead of guessing:
 
 ```ts

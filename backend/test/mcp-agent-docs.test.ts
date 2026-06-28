@@ -330,6 +330,30 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents MCP error envelopes as blockers, not partial success payloads", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("docs/MCP_AGENT_ERROR_HANDLING.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Error envelope",
+      "isError: true",
+      "diagnostic text",
+      "not a success payload",
+      "failure class",
+      "Do not parse it as a partial success payload",
+      "old `anchorPreparationId`",
+      "no new protocol evidence was produced",
+      "format-only repair",
+    ]) {
+      expect(docs, `agent docs should include MCP error-envelope boundary phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents MCP tool annotations without treating them as approval evidence", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_GUIDE.md"),
