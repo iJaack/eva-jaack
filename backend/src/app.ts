@@ -43,13 +43,21 @@ function mcpDiscovery(c: Context) {
 
 function runtimeReadiness(c: Context) {
   const dynamicConfigured = Boolean(process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID?.trim());
+  const composeGate = dynamicConfigured ? 'user_connect' : 'configuration';
+  const reason = dynamicConfigured ? 'NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID is configured' : 'missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID';
   return c.json({
     status: 'ok',
     service: protocol.app.name,
     dynamicAuth: {
       configured: dynamicConfigured,
-      composeGate: dynamicConfigured ? 'user_connect' : 'configuration',
-      reason: dynamicConfigured ? 'NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID is configured' : 'missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID',
+      composeGate,
+      reason,
+    },
+    authoring: {
+      ready: dynamicConfigured,
+      composeGate,
+      requiredEnv: ['NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID'],
+      nextAction: dynamicConfigured ? 'Connect with Dynamic before drafting a public thesis.' : 'Configure Dynamic auth before enabling the editor.',
     },
   });
 }

@@ -61,6 +61,12 @@ describe("MCP HTTP endpoint", () => {
           composeGate: "user_connect",
           reason: "NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID is configured",
         },
+        authoring: {
+          ready: true,
+          composeGate: "user_connect",
+          requiredEnv: ["NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID"],
+          nextAction: "Connect with Dynamic before drafting a public thesis.",
+        },
       });
       expect(JSON.stringify(response.body)).not.toContain("test-dynamic-env");
     } finally {
@@ -83,6 +89,12 @@ describe("MCP HTTP endpoint", () => {
           configured: false,
           composeGate: "configuration",
           reason: "missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID",
+        },
+        authoring: {
+          ready: false,
+          composeGate: "configuration",
+          requiredEnv: ["NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID"],
+          nextAction: "Configure Dynamic auth before enabling the editor.",
         },
       });
     } finally {
