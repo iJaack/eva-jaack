@@ -53,6 +53,7 @@ If the same failure repeats after the one safe retry, stop at `blocked:` and inc
 
 | Symptom | Safe response | Do not do |
 |---|---|---|
+| Tool returns `isError: true` with text content | Treat the text as a diagnostic only, classify the failure, and return `blocked:` unless the same operation can be retried once with a format-only repair. | JSON-parse the diagnostic as success, merge it with old success markers, or claim calldata/readback/public state. |
 | Tool name is missing or rejected | Re-read the allowlist above and use the nearest live draft-prep tool only when it matches the task. | Invent aliases or fallback to removed routes. |
 | Schema validation fails | Repair the input to match the documented enums, ranges, required identity fields, and URL constraints. | Drop material signals just to make the call pass. |
 | `get_thesis` or revision prep says the thesis is not found | Ask for the canonical thesis id/slug or search/read the live thesis list through approved APIs. | Create a replacement thesis unless the operator explicitly requested a new thesis. |
@@ -122,3 +123,18 @@ Use precise status words:
 
 Anything less than a receipt or contract readback is not confirmed protocol state.
 Anything less than a named persistence/readback check is not production storage-readiness evidence.
+
+## Error envelope handling
+
+Eva MCP error responses may still include a `content` text part, but that text is diagnostic prose, not parseable success JSON. Examples include missing thesis errors, setup failures, and schema/client errors. Agents must not combine that diagnostic with a previous `anchorPreparationId`, cached transaction payload, or remembered `publishState`.
+
+Safe blocked shape:
+
+```text
+blocked: MCP returned an error envelope.
+failure class: <client setup failure | live allowlist drift | input schema mismatch | missing thesis/identity readback | protocol readback gap | approved non-MCP execution gap>
+diagnostic: <plain error text, redacted if needed>
+safe boundary: I did not prepare calldata, submit a transaction, publish a thesis, confirm onchain state, or prove storage durability from this call.
+```
+
+Only retry when the failure journal allows the same operation to be retried once with a format-only repair. If the diagnostic says the thesis is missing, identity is ambiguous, a field is unauthorized, or the local server/client is unavailable, stop at `blocked:` and ask for the exact missing evidence instead of changing the signer, thesis id, payload scope, or execution path.
