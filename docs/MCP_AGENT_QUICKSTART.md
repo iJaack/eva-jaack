@@ -28,6 +28,21 @@ safe claim after execution: <submitted | confirmed | published/live | storage ve
 
 If any row is missing, stay on the MCP rung (`draft prepared` / `anchor prepared`) and say what is missing. Do not treat possession of a route URL, bearer token, wallet address, or returned calldata as approval to publish or broadcast.
 
+## Read-only MCP smoke before rehearsal
+
+Use this before a new MCP client, agent, or runtime runs any write-adjacent rehearsal. Connectivity smoke is read-only; it is not a reason to prepare calldata.
+
+```text
+read-only MCP smoke:
+- local stdio server: `eva-thesis` starts from the repo root with `pnpm --filter backend mcp`
+- tool list smoke: exactly `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, `prepare_anchor_transaction`
+- description boundary smoke: write-adjacent tool descriptions say they do not publish, broadcast, call direct REST writes, or prove storage durability
+- read-only call smoke: run `search_markets` with a low-risk query and report only `read-only` / `found candidates`
+- write-adjacent rehearsal: blocked until there is explicit onboarding or task-time approval for exact `xHandle`, `walletAddress`, and `walletSource`, and it must use the local server unless a separate approved remote path exists
+```
+
+Do not use `create_thesis_draft`, `prepare_revision_draft`, or `prepare_anchor_transaction` as a generic connectivity smoke test. If the tool list differs, descriptions omit the boundary, the local server fails, or the only available path is remote/production, report `blocked: client setup failure` or `blocked: live allowlist drift` and do not fall back to `POST /api/theses`, `POST /api/thesis-anchor/prepare`, UI scraping, or production write routes.
+
 ## No-Guesswork Preflight
 
 Before any write-adjacent MCP call, fill this out mentally or in the handoff. If any row is unclear, stop before preparing calldata.

@@ -463,6 +463,32 @@ describe("Eva MCP agent docs", () => {
     expect(docs).toContain("remote write tools");
   });
 
+  it("documents read-only MCP smoke before write-adjacent onboarding rehearsal", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Read-only MCP smoke",
+      "read-only MCP smoke",
+      "tool list smoke",
+      "description boundary smoke",
+      "read-only call smoke",
+      "write-adjacent rehearsal",
+      "Do not use `create_thesis_draft`, `prepare_revision_draft`, or `prepare_anchor_transaction` as a connectivity smoke test",
+      "exact `xHandle`, `walletAddress`, and `walletSource`",
+      "client setup failure",
+      "live allowlist drift",
+      "UI scraping",
+      "production write paths",
+    ]) {
+      expect(docs, `agent docs should include read-only MCP smoke phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("keeps direct app HTTP writes outside default agent MCP powers", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_GUIDE.md"),
