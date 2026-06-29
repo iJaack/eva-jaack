@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { CampaignLink, CampaignViewTracker } from "@/components/CampaignTelemetry";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import { protocol } from "@/lib/protocol";
@@ -43,6 +43,10 @@ const liveProof = [
     body: "The SpaceX IPO liquidity rotation thesis is live as the first inspectable record: claim, signals, revisions, and shareable artifact.",
   },
   {
+    label: "durable storage",
+    body: "Production storage readiness now reports durable Upstash Redis, so the remaining launch question is not whether the storage probe exists. It is whether the public authoring path can be safely opened.",
+  },
+  {
     label: "protocol identity",
     body: "Eva's deployed Avalanche thesis protocol and agent identity are visible in the product source of truth.",
   },
@@ -54,30 +58,30 @@ const liveProof = [
 
 const currentBlockers = [
   {
-    label: "market policy filter",
-    body: "The public source basket still needs production proof that V1-prohibited political, religious, war, sports, and tragedy-adjacent prompts stay out of the launch surface.",
+    label: "market policy regression",
+    body: "The live provider feed recently exposed sports markets again. @evapredicts should keep the wider public push gated until /api/markets proves the V1 source basket is policy-safe in production.",
   },
   {
-    label: "durable thesis writes",
-    body: "The write path needs an observable readiness signal before @evapredicts asks people to rely on persisted thesis updates.",
+    label: "authoring gate",
+    body: "The compose route remains safely locked behind the Dynamic auth/configuration gate. That is the right failure mode, but it is not a launch-clear authoring path yet.",
   },
   {
     label: "signer and runtime parity",
-    body: "Production identity and environment assumptions need to match the repo source of truth before the launch thread widens.",
+    body: "Production identity and environment assumptions still need final parity confirmation before the launch thread widens beyond proof-reading CTAs.",
   },
 ] as const;
 
 const guardedGates = [
-  "do not widen the public @evapredicts push until prohibited-market filtering is verified in production",
-  "do not pretend thesis writes are launch-clear until durable write/readiness proof is observable",
+  "do not widen the public @evapredicts push while the live market feed leaks prohibited sports or other V1-excluded markets",
+  "do not send cold readers into compose until Dynamic authoring is launch-clear instead of only safe-locked",
   "do not claim users, revenue, accuracy, testimonials, or native trading without measured evidence",
 ] as const;
 
 const statusPost = [
   "prediction products get trust from restraint, not from pretending every market is launch-safe.",
-  "Eva's public push stays gated until the source basket is policy-safe and thesis writes are durable enough to defend.",
-  "what is live: cited theses, revisions, author records, Avalanche thesis protocol.",
-  "what is not getting hand-waved: prohibited-market filtering and write-readiness proof.",
+  "Eva's public push stays gated while the live source basket still needs policy-safe proof and authoring is not launch-clear yet.",
+  "what is live: cited theses, revisions, author records, durable storage readiness, Avalanche thesis protocol.",
+  "what is not getting hand-waved: sports-market leakage, Dynamic authoring configuration, and runtime parity.",
   `follow @evapredicts for the first public thesis loop when the receipts are clean: ${xPostHref}`,
 ] as const;
 
@@ -86,6 +90,7 @@ export default function LaunchTruthStatusCampaignPage() {
     <>
       <Nav />
       <main id="main-content" className="page-shell">
+        <CampaignViewTracker campaign={campaign} channel="launch_truth_status_page" />
         <section className="hero">
           <p className="eyebrow">@evapredicts campaign · launch truth</p>
           <h1>launch status should be a receipt, not a vibe.</h1>
@@ -95,15 +100,15 @@ export default function LaunchTruthStatusCampaignPage() {
             receipt first, then let them inspect the proof thesis once the boundary feels honest.
           </p>
           <div className="hero-actions">
-            <Link href={proofHref} className="btn btn-primary">
+            <CampaignLink href={proofHref} campaign={campaign} cta="read_proof_thesis" channel="launch_truth_status_hero" className="btn btn-primary">
               Read proof thesis
-            </Link>
-            <Link href={policyHref} className="btn">
+            </CampaignLink>
+            <CampaignLink href={policyHref} campaign={campaign} cta="review_policy_gate" channel="launch_truth_status_hero" className="btn">
               Review policy gate
-            </Link>
-            <a href={followHref} className="btn" target="_blank" rel="noreferrer">
+            </CampaignLink>
+            <CampaignLink href={followHref} campaign={campaign} cta="follow_evapredicts" channel="launch_truth_status_hero" className="btn" target="_blank" rel="noreferrer" external>
               Follow @evapredicts
-            </a>
+            </CampaignLink>
           </div>
         </section>
 
@@ -135,9 +140,9 @@ export default function LaunchTruthStatusCampaignPage() {
               <p className="section-kicker">Current blockers</p>
               <h2 className="section-title section-title-sm">the public loop waits for these receipts.</h2>
             </div>
-            <Link href={homepageHref} className="section-link">
+            <CampaignLink href={homepageHref} campaign={campaign} cta="open_tracked_homepage_cta" channel="launch_truth_status_blockers" className="section-link">
               Tracked homepage CTA
-            </Link>
+            </CampaignLink>
           </div>
           <div className="product-module-grid">
             {currentBlockers.map((blocker) => (
@@ -159,12 +164,12 @@ export default function LaunchTruthStatusCampaignPage() {
             ))}
           </ul>
           <div className="route-actions">
-            <Link href={proofHref} className="mobile-action mobile-action-primary">
+            <CampaignLink href={proofHref} campaign={campaign} cta="inspect_proof_record" channel="launch_truth_status_guardrails" className="mobile-action mobile-action-primary">
               Inspect the proof record
-            </Link>
-            <Link href={composeHref} className="mobile-action">
+            </CampaignLink>
+            <CampaignLink href={composeHref} campaign={campaign} cta="draft_after_clearance" channel="launch_truth_status_guardrails" className="mobile-action">
               Draft after clearance
-            </Link>
+            </CampaignLink>
           </div>
         </section>
 
@@ -182,8 +187,8 @@ export default function LaunchTruthStatusCampaignPage() {
           </blockquote>
           <p className="inline-note">
             Metric to watch: sessions with <strong>utm_campaign=launch_truth_status</strong>, homepage CTA clicks into
-            this page, follow clicks from the status page, clicks into the SpaceX proof thesis, and downstream draft
-            starts after launch gates clear.
+            this page, proof-thesis reads, policy-gate clicks, follow clicks from the status page, and downstream draft
+            starts only after launch gates clear.
           </p>
         </section>
 
