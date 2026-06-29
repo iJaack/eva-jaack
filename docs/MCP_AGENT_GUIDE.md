@@ -47,18 +47,21 @@ For MCP clients that need an explicit local server entry, configure the stdio se
 
 If that local stdio command fails, stop and report the setup blocker. Do not replace it with UI scraping, direct unauthenticated HTTP calls, or a remote write path unless the operator supplied scoped credentials and explicitly approved that remote path.
 
+For lightweight HTTP discovery, `GET /api/mcp` returns the streamable HTTP endpoint, the exact live tool-name allowlist, `toolDescriptions`, and an `agentSafeBoundary` card with `defaultWriteScope: "draft_and_anchor_prep_only"`, `publishState: "anchor_prepared_not_published"`, required evidence for stronger claims, and forbidden fallback classes. Treat that response as a discovery/boundary smoke only; it is not a write path, not approval for remote MCP write-adjacent tools, and not evidence of draft storage, transaction submission, confirmation, or public publish.
+
 ### Read-only MCP client smoke
 
 When onboarding a new MCP client or runtime, prove client wiring with read-only evidence before any draft-prep rehearsal:
 
 1. Start the local `eva-thesis` stdio server from the repo root with `pnpm --filter backend mcp`.
 2. Run the client's tool list smoke and verify the exact five live tools: `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`.
-3. Run a description boundary smoke: every write-adjacent discovery description must still say the tool does not publish, broadcast, call direct REST writes, or prove storage durability.
-4. Run only a read-only call smoke, such as `search_markets` with a low-risk query, and report the result as `read-only` / `found candidates`.
+3. If using HTTP discovery, verify `GET /api/mcp` exposes matching `toolDescriptions` and `agentSafeBoundary.defaultWriteScope: "draft_and_anchor_prep_only"` before any write-adjacent rehearsal.
+4. Run a description boundary smoke: every write-adjacent discovery description must still say the tool does not publish, broadcast, call direct REST writes, or prove storage durability.
+5. Run only a read-only call smoke, such as `search_markets` with a low-risk query, and report the result as `read-only` / `found candidates`.
 
 Do not use `create_thesis_draft`, `prepare_revision_draft`, or `prepare_anchor_transaction` as a connectivity smoke test. Write-adjacent rehearsal needs explicit onboarding or task-time approval for the exact `xHandle`, `walletAddress`, and `walletSource`, and should stay local unless a separate approved remote path supplies scoped credentials plus receipt/readback requirements.
 
-If the tool list differs, a write-adjacent description omits the no-publish/no-broadcast/no-direct-REST/no-storage-durability boundary, or the local stdio server cannot start, use the failure classes in `docs/MCP_AGENT_ERROR_HANDLING.md`: `client setup failure` or `live allowlist drift`. Do not recover by calling app HTTP routes, scraping the UI, or trying production write paths.
+If the tool list differs, HTTP discovery omits the agent-safe boundary card, a write-adjacent description omits the no-publish/no-broadcast/no-direct-REST/no-storage-durability boundary, or the local stdio server cannot start, use the failure classes in `docs/MCP_AGENT_ERROR_HANDLING.md`: `client setup failure` or `live allowlist drift`. Do not recover by calling app HTTP routes, scraping the UI, or trying production write paths.
 
 ## Live Tools
 

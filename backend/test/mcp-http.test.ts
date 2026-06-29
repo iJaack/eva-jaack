@@ -91,7 +91,7 @@ describe("MCP HTTP endpoint", () => {
     }
   });
 
-  it("serves discovery metadata for plain GET health checks", async () => {
+  it("serves discovery metadata and agent-safe boundaries for plain GET health checks", async () => {
     const app = createApp();
 
     const response = await fetchJson(app, "/api/mcp");
@@ -103,6 +103,13 @@ describe("MCP HTTP endpoint", () => {
       transport: "streamable-http",
       endpoint: "/api/mcp",
       tools: evaMcpToolNames,
+      toolDescriptions: evaMcpToolDescriptions,
+      agentSafeBoundary: {
+        defaultWriteScope: "draft_and_anchor_prep_only",
+        publishState: "anchor_prepared_not_published",
+        strongerClaimsRequire: ["explicit_approval", "write_receipt", "readback_evidence"],
+        forbiddenFallbacks: ["direct_rest_writes", "ui_scraping", "production_write_routes_without_approval"],
+      },
     });
   });
 
