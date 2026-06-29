@@ -25,6 +25,36 @@ If the task asks for more than the selected tool can safely prove, report the mi
 
 Annotation reminder: `search_markets` and `get_thesis` are read-only. Draft-prep tools are explicitly not read-only even though they are non-destructive and idempotent. Treat tool annotations as routing hints, not approval, tx submission, publication, or storage-readiness evidence.
 
+## 0.0 Read-only MCP client smoke
+
+Use this before running the onboarding drill in a new client. The smoke test proves tool discovery and read-only calls only; it does not prepare calldata.
+
+```text
+read-only MCP smoke:
+- local stdio server: `eva-thesis` from repo root via `pnpm --filter backend mcp`
+- tool list smoke: exactly five live tools found
+- description boundary smoke: draft-prep descriptions include no publish, no broadcast, no direct REST writes, and no storage-durability proof
+- read-only call smoke: `search_markets` completed; result wording stays read-only
+- write-adjacent rehearsal: blocked until exact onboarding-approved `xHandle`, `walletAddress`, and `walletSource` are present
+```
+
+Safe smoke result:
+
+```text
+smoke: MCP client wiring is reachable through the local server.
+tools: exact live allowlist matched.
+read-only call: search_markets returned candidates.
+boundary: no draft, revision, anchor calldata, transaction broadcast, public publish, direct REST write, or storage proof happened.
+```
+
+Blocked smoke result:
+
+```text
+blocked: MCP client setup failure / live allowlist drift.
+missing: <local server start | exact five-tool allowlist | discovery description boundary | read-only search result>.
+boundary: I did not use write-adjacent tools as a connectivity test and did not fall back to app HTTP routes, UI scraping, or production write paths.
+```
+
 ## 0.1 Parse the MCP result envelope
 
 Eva MCP responses are usually wrapped as SDK text content. The safe markers are inside the JSON string at `content[0].text`:

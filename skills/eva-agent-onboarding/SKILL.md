@@ -21,6 +21,8 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Use `docs/MCP_AGENT_EXAMPLES.md` for known-good payload shapes before improvising schema fields.
 - Use `docs/MCP_AGENT_DECISION_CARDS.md` when a prompt mixes drafting, revision, patch/append requests, anchoring, publishing, storage readiness, API routes, credentials, or platform coordination status.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
+- For new clients/runtimes, run the read-only MCP smoke first: local stdio server from the repo root, exact five-tool allowlist, discovery description boundary, and a read-only `search_markets` call. Do not use write-adjacent tools as connectivity smoke.
+- Treat `create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction` rehearsal as blocked until exact onboarding or task-time `xHandle`, `walletAddress`, and `walletSource` approval exists. Keep rehearsal local unless a separate approved remote path with scoped credentials and receipt/readback requirements exists.
 - Use the no silent fallback ladder in `docs/MCP_AGENT_ERROR_HANDLING.md` when MCP work fails: classify client setup failure, live allowlist drift, input schema mismatch, missing thesis/identity readback, protocol readback gap, or approved non-MCP execution gap before choosing a lower-rung recovery.
 - Check the live input field matrix in `docs/MCP_AGENT_GUIDE.md` or `docs/MCP_AGENT_QUICKSTART.md` before composing payloads: `walletSource` is only accepted by `create_thesis_draft`, `note` is only accepted by `prepare_revision_draft`, and result markers such as `publishState`, `anchorStatus`, `anchorPreparationId`, tx hash, receipt/readback, and storage wording are never input fields.
 - Match handoff signer/source wording to the live tool. New-draft handoffs may include `walletSource`; revision handoffs should say `walletSource not accepted by prepare_revision_draft`; anchor-rebuild handoffs should report the `thesisId` and any signer/source approval needed before later broadcast. Never add walletSource to revision or anchor-rebuild payloads to make the report look complete.
@@ -75,6 +77,19 @@ Do not create a replacement thesis because `get_thesis` failed. Missing thesis i
 ## Onboarding Drill
 
 Use this drill for a new agent before it touches a real user-requested thesis. It proves the agent can route reads, draft prep, revision prep, and handoff wording without implying publication.
+
+0. Run read-only MCP smoke before any write-adjacent rehearsal:
+
+```text
+read-only MCP smoke:
+- local stdio server: `eva-thesis` from repo root via `pnpm --filter backend mcp`
+- tool list smoke: exactly `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, `prepare_anchor_transaction`
+- description boundary smoke: write-adjacent tools say no publish, no broadcast, no direct REST writes, and no storage-durability proof
+- read-only call smoke: `search_markets` works and the result stays `read-only`
+- write-adjacent rehearsal: blocked until exact onboarding-approved identity exists
+```
+
+If this smoke fails, stop at `blocked: client setup failure` or `blocked: live allowlist drift`. Do not use `create_thesis_draft`, `prepare_revision_draft`, `prepare_anchor_transaction`, app HTTP routes, UI scraping, or production write paths as a connectivity workaround.
 
 1. Start the local MCP server with the repo root as `cwd`:
 
