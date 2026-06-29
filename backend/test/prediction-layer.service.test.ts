@@ -508,6 +508,63 @@ describe("prediction layer service", () => {
           updatedAt: new Date().toISOString(),
         },
         {
+          marketId: "kalshi-kt-wiz-hanwha-first-inning-run",
+          provider: "kalshi",
+          externalId: "sports-baseball-1",
+          url: "https://kalshi.com/markets/ktwiz-hanwha-first-inning-run",
+          title: "KT Wiz vs Hanwha Eagles: First Inning Run?",
+          category: "Kalshi",
+          status: "open",
+          volumeUsd: 2_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.35 },
+            { outcomeId: "no", label: "No", price: 0.65 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "kalshi-lg-twins-kiwoom-first-inning-run",
+          provider: "kalshi",
+          externalId: "sports-baseball-2",
+          url: "https://kalshi.com/markets/lgtwins-kiwoom-first-inning-run",
+          title: "LG Twins vs Kiwoom Heroes: First Inning Run?",
+          category: "Kalshi",
+          status: "open",
+          volumeUsd: 2_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.35 },
+            { outcomeId: "no", label: "No", price: 0.65 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
+          marketId: "kalshi-lotte-doosan-first-inning-run",
+          provider: "kalshi",
+          externalId: "sports-baseball-3",
+          url: "https://kalshi.com/markets/lotte-doosan-first-inning-run",
+          title: "Lotte Giants vs Doosan Bears: First Inning Run?",
+          category: "Kalshi",
+          status: "open",
+          volumeUsd: 2_000_000,
+          liquidityUsd: 1_000_000,
+          closeTime: null,
+          outcomes: [
+            { outcomeId: "yes", label: "Yes", price: 0.35 },
+            { outcomeId: "no", label: "No", price: 0.65 },
+          ],
+          linkedClaimIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        {
           marketId: "polymarket-jesus-gta",
           provider: "polymarket",
           externalId: "religion-1",
@@ -730,6 +787,9 @@ describe("prediction layer service", () => {
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-netanyahu");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-taylor-pregnant");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("kalshi-scotus-sports-contract");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("kalshi-kt-wiz-hanwha-first-inning-run");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("kalshi-lg-twins-kiwoom-first-inning-run");
+    expect(markets.markets.map((market) => market.marketId)).not.toContain("kalshi-lotte-doosan-first-inning-run");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-jesus-gta");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-bitcoin-before-gta");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-rihanna-album-before-gta");

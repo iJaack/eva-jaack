@@ -371,14 +371,15 @@ function titleCategory(title: string, fallback: string): string {
   if (/\b(bitcoin|btc|ethereum|crypto|solana)\b/.test(normalized)) return "Crypto";
   if (/\b(fed|inflation|rates?|cpi|gdp|recession|treasury)\b/.test(normalized)) return "Macro";
   if (/\b(election|president|senate|congress|nomination|endorse|trump|biden|bernie|macron|erdo(?:g|ğ)?an)\b/.test(normalized)) return "Politics";
-  if (/\b(nba|nfl|mlb|nhl|soccer|match|game|wins?)\b/.test(normalized)) return "Sports";
+  if (/\b(nba|nfl|mlb|nhl|soccer|football|basketball|baseball|hockey|kbo|match|game|wins?|inning|run line|moneyline)\b/.test(normalized)) return "Sports";
   if (/\b(oil|iran|israel|russia|china|war|ceasefire)\b/.test(normalized)) return "Geopolitics";
   return fallback;
 }
 
 const v1ProhibitedCategoryPattern = /\b(sports?|politics?|elections?|geopolitics?|war|crime|criminal)\b/i;
 const v1ProhibitedMarketPatterns = [
-  /\b(nba|nfl|mlb|nhl|soccer|football|basketball|baseball|hockey|ufc|mma|tennis|golf|f1|formula 1|match|game|super bowl|world cup|champions league|premier league|sports? event(?:s)?|sports? contract(?:s)?)\b/i,
+  /\b(nba|nfl|mlb|nhl|soccer|football|basketball|baseball|hockey|kbo|ufc|mma|tennis|golf|f1|formula 1|match|game|inning|first inning|run line|moneyline|point spread|home run|touchdown|pitcher|batter|super bowl|world cup|champions league|premier league|sports? event(?:s)?|sports? contract(?:s)?)\b/i,
+  /\b(kt wiz|hanwha eagles|lg twins|kiwoom heroes|lotte giants|doosan bears|kia tigers|samsung lions|nc dinos|ssg landers)\b/i,
   /\b(elections?|presidential|president|nomination|nominee|primary|caucus|senate|senator|congress|parliament|prime minister|mayor|governor|supreme court|scotus|balance of power|trump|biden|harris|putin|xi jinping|jinping|netanyahu|starmer|macron|erdo(?:g|ğ)?an|bernie|sanders)\b/i,
   /\b(war|invade|invasion|blockade|ceasefire|missile|nuclear|airstrike|bombing|attack|terror|taiwan|ukraine|gaza|israel|iran|russia)\b/i,
   /\b(assassinat(?:e|ed|ion)?|murder|killed|shooting|death|die|dies|dead|hospitalized|illness|injury|pregnan(?:t|cy)|marriage|divorce)\b/i,
