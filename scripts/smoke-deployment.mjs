@@ -68,6 +68,9 @@ const checks = [
             if (body?.dynamicAuth?.configured !== true) {
               throw new Error(body?.dynamicAuth?.reason ?? "Dynamic auth not configured: missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID");
             }
+            if (body?.authoring?.ready !== true || body?.authoring?.composeGate !== "user_connect") {
+              throw new Error(body?.authoring?.nextAction ?? "Dynamic authoring is not ready for user connection");
+            }
           },
         },
       ]

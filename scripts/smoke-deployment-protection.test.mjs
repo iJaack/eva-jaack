@@ -148,7 +148,7 @@ test("deployment smoke skips Vercel dashboard HTML on backend JSON routes withou
   }
 });
 
-function createApplicationSmokeServer({ dynamicConfigured }) {
+function createApplicationSmokeServer({ dynamicConfigured, authoringReady = dynamicConfigured }) {
   return createServer((req, res) => {
     if (req.url === "/compose") {
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
@@ -164,6 +164,11 @@ function createApplicationSmokeServer({ dynamicConfigured }) {
           dynamicAuth: {
             configured: dynamicConfigured,
             reason: dynamicConfigured ? "NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID is configured" : "missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID",
+          },
+          authoring: {
+            ready: authoringReady,
+            composeGate: authoringReady ? "user_connect" : "configuration",
+            nextAction: authoringReady ? "Connect with Dynamic before drafting a public thesis." : "Configure Dynamic auth before enabling the editor.",
           },
         })
       );
@@ -209,6 +214,19 @@ test("deployment smoke passes strict Dynamic auth readiness when runtime env is 
     assert.equal(result.code, 0);
     assert.match(result.stdout, /PASS runtime readiness API/);
     assert.doesNotMatch(result.stderr, /missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID/);
+  } finally {
+    server.close();
+  }
+});
+
+test("deployment smoke fails strict Dynamic auth readiness when authoring remains gated", async () => {
+  const server = createApplicationSmokeServer({ dynamicConfigured: true, authoringReady: false });
+
+  const port = await listen(server);
+  try {
+    const result = await runSmoke(`http://127.0.0.1:${port}`, { SMOKE_REQUIRE_DYNAMIC_AUTH: "true" });
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /Configure Dynamic auth before enabling the editor/);
   } finally {
     server.close();
   }
