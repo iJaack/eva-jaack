@@ -96,7 +96,19 @@ matters.
 - **Follow-up:** compare agent-builder intent against `ai_forecast_receipts`; keep the route only if it drives manifest, quickstart, proof-record, or compose behavior.
 - **Execution pack:** `docs/EVAPREDICTS_AGENT_FORECAST_INTERFACE_CAMPAIGN.md`
 
-## Current Campaign: Launch Truth Status CTA
+## Current Campaign: Protocol Proof CTA
+
+Hypothesis: infra-minded prediction-market and agent builders are more likely to click when Eva is framed as proof infrastructure for public market theses, not as another feed or louder forecast product.
+
+Primary audience: prediction-market operators, agent builders, crypto analysts, and protocol teams who care about cited signals, revision history, author identity, and anchorable evidence.
+
+CTA: open the protocol-proof page, inspect the SpaceX IPO liquidity rotation proof thesis, then follow @evapredicts or start one proof-backed thesis.
+
+Metric to watch: homepage clicks carrying `utm_campaign=protocol_proof`, proof-record reads, source-library clicks, author-record clicks, compose starts, and @evapredicts follow clicks. Do not claim traction until measured data exists.
+
+Next follow-up: compare the homepage proof CTA against launch-truth/status traffic; if it drives stronger proof-record or author-record intent, make protocol proof the default @evapredicts approval draft.
+
+## Supporting Campaign: Launch Truth Status CTA
 
 Hypothesis: prediction-market-native builders are more likely to trust @evapredicts when the homepage makes launch readiness inspectable instead of asking for a follow on vibes.
 
@@ -104,7 +116,7 @@ Primary audience: prediction-market operators, agent builders, crypto analysts, 
 
 CTA: open the launch-truth status page, then inspect the SpaceX IPO liquidity rotation proof thesis or follow @evapredicts for the first public loop once blockers clear.
 
-Metric to watch: homepage clicks carrying `utm_campaign=launch_truth_status`, proof-thesis reads from the status page, and @evapredicts follow clicks. Do not claim traction until measured data exists.
+Metric to watch: status-page clicks carrying `utm_campaign=launch_truth_status`, proof-thesis reads from the status page, and @evapredicts follow clicks. Do not claim traction until measured data exists.
 
 Next follow-up: once policy filtering, durable write readiness, and signer/runtime parity are verified, convert the same status stance into the approved @evapredicts “what changed” post.
 

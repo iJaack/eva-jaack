@@ -29,9 +29,9 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
 
 const evaPredictsUrl = "https://x.com/evapredicts";
 const launchThesisId = "thesis-0fdef25794b38b6e8eed7524";
-const featuredCampaign = "launch_truth_status";
+const featuredCampaign = "protocol_proof";
 const launchThesisHref = `/thesis/${launchThesisId}?utm_source=homepage&utm_medium=proof_cta&utm_campaign=${featuredCampaign}&utm_content=spacex_proof_record`;
-const featuredCampaignHref = `/campaigns/launch-truth-status?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${featuredCampaign}&utm_content=homepage_callout`;
+const featuredCampaignHref = `/campaigns/protocol-proof?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${featuredCampaign}&utm_content=homepage_callout`;
 
 function formatUsd(value: number | null): string {
   if (value === null) return "—";
@@ -123,9 +123,9 @@ const participationQuests = [
 ] as const;
 
 const campaignProofPoints = [
-  "show what is live before asking anyone to trust the launch",
-  "make current product gates explicit instead of hand-waving them",
-  "route skeptical builders into the proof thesis and follow path",
+  "turn public predictions into inspectable proof objects",
+  "make cited signals, revisions, author identity, and anchors the wedge",
+  "route infra-minded builders into the proof thesis before the follow ask",
 ] as const;
 
 const activeCampaigns = [
@@ -221,10 +221,10 @@ function CampaignCallout() {
       <CampaignViewTracker campaign={featuredCampaign} channel="homepage_campaign_callout" />
       <div className="campaign-callout-copy">
         <p className="section-kicker">@evapredicts campaign</p>
-        <h2 className="section-title section-title-sm">launch status should be a receipt, not a vibe.</h2>
+        <h2 className="section-title section-title-sm">public predictions need proof objects, not louder claims.</h2>
         <p>
-          The current homepage wedge is launch truth: route readers toward what is live, what stays gated,
-          and why @evapredicts will not fake launch certainty before asking them to follow the public loop.
+          The current homepage wedge is protocol proof: route readers into one inspectable thesis record,
+          then measure whether they inspect sources, author identity, revisions, anchors, or @evapredicts.
         </p>
       </div>
       <div className="campaign-proof-grid" aria-label="Campaign proof points">
@@ -236,8 +236,8 @@ function CampaignCallout() {
         ))}
       </div>
       <div className="campaign-action-row">
-        <CampaignLink href={featuredCampaignHref} campaign={featuredCampaign} cta="open_launch_truth_status" channel="homepage_campaign_callout" className="mobile-action mobile-action-primary">
-          Open launch status
+        <CampaignLink href={featuredCampaignHref} campaign={featuredCampaign} cta="open_protocol_proof" channel="homepage_campaign_callout" className="mobile-action mobile-action-primary">
+          Open protocol proof
         </CampaignLink>
         <CampaignLink href={launchThesisHref} campaign={featuredCampaign} cta="read_proof_record" channel="homepage_campaign_callout" className="mobile-action">
           Read the proof record
@@ -247,7 +247,7 @@ function CampaignCallout() {
         </CampaignLink>
       </div>
       <p className="inline-note">
-        Metric to watch: utm_campaign=launch_truth_status clicks into the status route, then proof-record reads, policy-gate clicks, follow clicks, and downstream compose starts after launch gates clear. No traction claims until measured data exists.
+        Metric to watch: utm_campaign=protocol_proof clicks into the proof route, then proof-record reads, source-library clicks, author-record clicks, compose starts, and follow clicks. No traction claims until measured data exists.
       </p>
     </section>
   );
@@ -424,8 +424,8 @@ export default function HomePage() {
             and a readable history. The public push stays stronger when the current gates are visible too.
           </p>
           <div className="mobile-hero-actions">
-            <CampaignLink href={featuredCampaignHref} campaign={featuredCampaign} cta="open_launch_truth_status" channel="homepage_hero" className="mobile-action mobile-action-primary">
-              Open launch status
+            <CampaignLink href={featuredCampaignHref} campaign={featuredCampaign} cta="open_protocol_proof" channel="homepage_hero" className="mobile-action mobile-action-primary">
+              Open protocol proof
             </CampaignLink>
             <CampaignLink href={launchThesisHref} campaign={featuredCampaign} cta="read_proof_record" channel="homepage_hero" className="mobile-action">
               Read proof thesis
