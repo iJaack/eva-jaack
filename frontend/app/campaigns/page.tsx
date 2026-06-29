@@ -8,21 +8,21 @@ const campaign = "campaign_hub";
 const campaignPath = "/campaigns";
 const campaignUrl = `${protocol.app.siteUrl}${campaignPath}`;
 const proofHref = `/thesis/thesis-0fdef25794b38b6e8eed7524?utm_source=campaign_hub&utm_medium=proof_cta&utm_campaign=${campaign}&utm_content=spacex_proof_record`;
-const currentWedgeHref = `/campaigns/launch-truth-status?utm_source=campaign_hub&utm_medium=campaign_directory&utm_campaign=${campaign}&utm_content=launch_truth_card`;
+const currentWedgeHref = `/campaigns/protocol-proof?utm_source=campaign_hub&utm_medium=campaign_directory&utm_campaign=${campaign}&utm_content=protocol_proof_card`;
 const composeHref = `/compose?utm_source=campaign_hub&utm_medium=cta&utm_campaign=${campaign}&utm_content=start_thesis`;
 const followHref = `https://x.com/evapredicts?utm_source=eva_site&utm_medium=campaign_hub&utm_campaign=${campaign}`;
 
 export const metadata: Metadata = {
   title: "Campaign hub · Eva",
   description:
-    "A measurable @evapredicts campaign hub for routing verifier-minded builders into one proof path, one CTA, and one metric at a time.",
+    "A measurable @evapredicts campaign hub for routing verifier-minded builders into the protocol-proof path, one CTA, and one metric at a time.",
   alternates: {
     canonical: campaignPath,
   },
   openGraph: {
     title: "@evapredicts campaign hub",
     description:
-    "The active Eva Protocol growth routes: launch truth, proof theses, forecast QA, prediction memory, and conversion metrics without fake traction claims.",
+    "The active Eva Protocol growth routes: protocol proof, proof theses, forecast QA, prediction memory, and conversion metrics without fake traction claims.",
     url: campaignUrl,
     siteName: "Eva Protocol",
     type: "website",
@@ -30,17 +30,17 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "@evapredicts campaign hub",
-    description: "one launch-truth angle, one proof path, one metric.",
+    description: "one protocol-proof angle, one proof path, one metric.",
   },
 };
 
 const campaignRoutes = [
   {
-    title: "launch truth status",
+    title: "protocol proof",
     status: "current wedge",
-    body: "A transparent status page for what is live, what stays gated, and why @evapredicts will not fake launch certainty.",
+    body: "The infra-native route for public predictions that need cited signals, visible revisions, author identity, and anchorable proof objects before bigger claims.",
     href: currentWedgeHref,
-    metric: "status-page visits, proof-thesis reads, policy-gate clicks, follow clicks",
+    metric: "proof-record reads, source-library clicks, author-record clicks, compose starts, follows",
   },
   {
     title: "forecast provenance",
@@ -99,16 +99,16 @@ const campaignRoutes = [
     metric: "agent-manifest opens, MCP quickstart clicks, proof-record reads, compose starts",
   },
   {
-    title: "protocol proof",
-    status: "infra-native route",
-    body: "For crypto infrastructure readers who need anchorable proof objects, not another vague AI x prediction-market claim.",
-    href: `/campaigns/protocol-proof?utm_source=campaign_hub&utm_medium=campaign_directory&utm_campaign=${campaign}&utm_content=protocol_proof_card`,
-    metric: "proof-record reads, source-library clicks, author-record clicks, compose starts",
+    title: "launch truth status",
+    status: "launch-readiness route",
+    body: "For readers who need the live/gated status before they trust the broader @evapredicts launch narrative.",
+    href: `/campaigns/launch-truth-status?utm_source=campaign_hub&utm_medium=campaign_directory&utm_campaign=${campaign}&utm_content=launch_truth_card`,
+    metric: "status-page visits, proof-thesis reads, policy-gate clicks, follow clicks",
   },
 ] as const;
 
 const operatingRules = [
-  "one public wedge at a time: current push is launch truth, not every campaign at once",
+  "one public wedge at a time: current push is protocol proof, not every campaign at once",
   "route cold readers into a proof object before asking them to compose or follow",
   "keep @evapredicts external posting approval-gated until Giacomo approves the exact copy",
   "measure campaign_view and campaign_cta_click events before claiming traction",
@@ -122,7 +122,7 @@ export default function CampaignHubPage() {
         <CampaignViewTracker campaign={campaign} channel="campaign_hub_page" />
         <section className="hero">
           <p className="eyebrow">@evapredicts campaign hub</p>
-          <h1>one launch-truth angle, one proof path, one metric.</h1>
+          <h1>one protocol-proof angle, one proof path, one metric.</h1>
           <p>
             Eva Protocol campaigns should not sprawl into random launch copy. This hub routes prediction-market readers,
             agent builders, crypto analysts, and verifier-minded operators into the clearest live wedge, then watches
@@ -136,7 +136,7 @@ export default function CampaignHubPage() {
               channel="campaign_hub_hero"
               className="btn btn-primary"
             >
-              Open launch status
+              Open protocol proof
             </CampaignLink>
             <CampaignLink
               href={proofHref}
@@ -166,8 +166,8 @@ export default function CampaignHubPage() {
           <p className="section-kicker">Campaign hypothesis</p>
           <h2>campaign choice should be judged by proof-path intent, not impressions.</h2>
           <p>
-            The best growth signal today is not a bigger promise. It is whether high-intent readers click from a clean
-            wedge into the proof thesis, source library, author record, compose flow, or @evapredicts follow path. If a
+            The best growth signal today is not a bigger promise. It is whether high-intent readers click from protocol
+            proof into the proof thesis, source library, author record, compose flow, or @evapredicts follow path. If a
             route cannot move one of those behaviors, it should not be the public push.
           </p>
         </section>
