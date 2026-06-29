@@ -53,6 +53,10 @@ app/runtime surfaces, not default agent publish powers. Agent-safe MCP work stop
 preview and anchor calldata preparation unless a separate approved execution path returns approval,
 write receipt, and readback evidence.
 
+`GET /api/mcp` is safe discovery only. It exposes the live tool allowlist, tool descriptions, and
+an `agentSafeBoundary` card so clients can smoke-test the boundary without preparing calldata or
+calling write routes.
+
 ## Quick Start
 
 ```bash

@@ -4,7 +4,7 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import type { Context } from 'hono';
 import { config } from './config.js';
-import { createEvaMcpServer, evaMcpToolNames } from './mcp-server.js';
+import { createEvaMcpServer, evaMcpToolDescriptions, evaMcpToolNames } from './mcp-server.js';
 import { protocol } from './protocol.js';
 import { predictionRoutes } from './routes/predictions.js';
 import { getPredictionLayerService } from './services/prediction-layer.js';
@@ -38,6 +38,13 @@ function mcpDiscovery(c: Context) {
     transport: 'streamable-http',
     endpoint: `${protocol.app.apiBasePath}/mcp`,
     tools: evaMcpToolNames,
+    toolDescriptions: evaMcpToolDescriptions,
+    agentSafeBoundary: {
+      defaultWriteScope: 'draft_and_anchor_prep_only',
+      publishState: 'anchor_prepared_not_published',
+      strongerClaimsRequire: ['explicit_approval', 'write_receipt', 'readback_evidence'],
+      forbiddenFallbacks: ['direct_rest_writes', 'ui_scraping', 'production_write_routes_without_approval'],
+    },
   });
 }
 
