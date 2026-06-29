@@ -158,6 +158,7 @@ Quick routing examples:
 - `draft and publish this` -> use `create_thesis_draft` only after identity preflight, then report `draft prepared` / `anchor prepared`; block the publish wording until approval, broadcast, tx hash, and receipt/readback exist.
 - `revise this thesis` -> use `get_thesis` first; if the thesis id or author identity is missing/mismatched, block instead of creating a replacement. Then use `prepare_revision_draft` with a full replacement body.
 - `anchor it` -> use `prepare_anchor_transaction` only when the existing thesis id is known; report calldata rebuilt, not broadcast or confirmed.
+- `verify/score/certify this thesis or fact` -> no MCP tool can create verification. `get_thesis` may inspect current state, but verification wording needs a separate approved verifier path, verdict/score provenance, report/readback evidence, and matching thesis/fact identity.
 - `prove launch readiness` -> do not use draft prep as proof. Report `storage readiness blocked` unless an approved readiness/readback check proves durable thesis storage.
 
 Use this permission ladder before and after every write-adjacent call:

@@ -19,7 +19,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Keep `docs/MCP_AGENT_GUIDE.md` open when creating or revising theses.
 - If starting from the repo README or API surface, treat it as product/runtime context only, not an agent permission map. Jump to the README Agent MCP Boundary and this skill before calling tools.
 - Use `docs/MCP_AGENT_EXAMPLES.md` for known-good payload shapes before improvising schema fields.
-- Use `docs/MCP_AGENT_DECISION_CARDS.md` when a prompt mixes drafting, revision, patch/append requests, anchoring, publishing, storage readiness, API routes, credentials, or platform coordination status.
+- Use `docs/MCP_AGENT_DECISION_CARDS.md` when a prompt mixes drafting, revision, patch/append requests, anchoring, verification/scoring, publishing, storage readiness, API routes, credentials, or platform coordination status.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
 - For new clients/runtimes, run the read-only MCP smoke first: local stdio server from the repo root, optional `GET /api/mcp` discovery boundary check (`toolDescriptions` plus `agentSafeBoundary.defaultWriteScope: "draft_and_anchor_prep_only"`), exact five-tool allowlist, discovery description boundary, and a read-only `search_markets` call. Do not use write-adjacent tools as connectivity smoke.
 - Treat `create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction` rehearsal as blocked until exact onboarding or task-time `xHandle`, `walletAddress`, and `walletSource` approval exists. Keep rehearsal local unless a separate approved remote path with scoped credentials and receipt/readback requirements exists.
@@ -70,6 +70,7 @@ Mixed prompt shortcut:
 - `revise this thesis` means `get_thesis` first; missing thesis id or mismatched identity is a blocker, not permission to create a replacement.
 - `patch/append/small edit this thesis` still means `get_thesis` first, then `prepare_revision_draft` only with a full replacement body built from fresh readback plus the approved delta. Patch-only, diff-only, append-only, or paragraph-only text is not a safe revision body.
 - `anchor it` means `prepare_anchor_transaction` for calldata only; no broadcast or confirmation is implied.
+- `verify/score/certify this thesis or fact` means no MCP tool can create verification. `get_thesis` may inspect current state, but verification wording needs a separate approved verifier path, verdict/score provenance, report/readback evidence, and matching thesis/fact identity.
 - `prove launch readiness` means no MCP draft-prep tool can prove storage durability; use `storage readiness blocked` unless a named readiness/readback check exists.
 
 Do not create a replacement thesis because `get_thesis` failed. Missing thesis id, mismatched identity, or unauthorized wallet authority is a blocker.

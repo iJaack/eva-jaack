@@ -106,3 +106,11 @@ If any required field is missing, stop at `blocked:`. Do not swap wallets, guess
 - Result ceiling: `draft prepared` / `anchor prepared`, or `blocked` if the prompt only provides a patch and the current body cannot be read.
 - Safe final verb: `revision draft prepared` when a full replacement body was prepared; otherwise `blocked`.
 - Boundary line: `prepare_revision_draft` does not accept patch-only, diff-only, append-only, or paragraph-only bodies. The live public revision is unchanged until an approved transaction/public write receipt plus readback exists.
+
+## Card 12: "verify / score / certify this thesis or fact"
+
+- Smallest safe MCP tool: none for verification. `get_thesis` may inspect an existing thesis first, and draft-prep tools may carry already-existing fact-signal verdict fields only when they come from task-time evidence.
+- Required evidence for any verification claim: a separate approved verifier path, report URI or hash when cited, verdict/score provenance, and readback evidence that the verified result matches the thesis or fact.
+- Result ceiling without that evidence: `read-only` if only inspected, or `blocked` if the user asked for verification as the deliverable.
+- Safe final verb: `inspected` or `blocked`; only say `verified by <named verifier/check>` when the separate verifier evidence exists.
+- Boundary line: `verifierVerdict`, `verifierScore`, schema defaults, LLM opinions, and MCP draft prep do not verify a thesis, certify a fact, publish a report, or create a paid-verification record.

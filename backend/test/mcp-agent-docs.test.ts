@@ -68,9 +68,13 @@ describe("Eva MCP agent docs", () => {
       "turn this PR / issue / deploy into a thesis update",
       "market-backed thesis from pasted market",
       "patch / append / small edit this thesis",
+      "verify / score / certify this thesis or fact",
       "full replacement body",
       "patch-only, diff-only, append-only, or paragraph-only",
       "platform coordination status is not protocol state",
+      "verifierVerdict",
+      "verifierScore",
+      "schema defaults, LLM opinions, and MCP draft prep do not verify",
       "does not add new powers",
     ]) {
       expect(docs, `agent decision cards should include ${phrase}`).toContain(phrase);
