@@ -191,6 +191,27 @@ If the same request includes exact current inputs, build only the schema fields 
 
 Do not add `prUrl`, `issueId`, `deployUrl`, `walletSource`, `publishState`, `anchorPreparationId`, tx hash, receipt, or storage fields to `prepare_revision_draft`; those are coordination or result/handoff fields, not inputs.
 
+## 0.4 Pick the execution path before using credentials
+
+Use this when a handoff says something like "use this API key", "the deploy is green", "I am logged in", or "broadcast it". Access is not approval, and coordination state is not protocol state.
+
+```text
+execution path picker:
+- requested path: <MCP local | API route | browser session | transaction broadcaster | public/live claim>
+- evidence in hand: <query/thesisId | exact identity | approval scope | credential scope | tx hash | receipt/readback>
+- safest allowed path: <search_markets/get_thesis | create_thesis_draft | prepare_revision_draft | prepare_anchor_transaction | blocked>
+- output ceiling: <read-only inspection | draft prepared | anchor prepared | submitted | published/live | blocked>
+- missing before escalation: <approval | credential scope | tx hash | receipt/readback | storage check | none>
+```
+
+Example downgrade:
+
+```text
+blocked: the handoff supplied a route URL and deployment note, but not approval scope, credential scope, write receipt, or readback evidence.
+
+safe boundary: I did not call direct REST write routes, broadcast a transaction, publish a thesis, or treat the deployment as protocol state. Use local MCP draft/anchor-prep instead, or provide the separate approved execution path receipt card.
+```
+
 ## 1. Read-only market search
 
 Tool: `search_markets`

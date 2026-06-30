@@ -246,6 +246,29 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents the execution path picker so credentials do not expand agent powers", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_GUIDE.md"),
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Execution Path Picker",
+      "execution path picker",
+      "Credentials, route URLs, open browser sessions, merged PRs, and green deploys are not permission upgrades",
+      "Access is not approval",
+      "approval scope",
+      "credential scope",
+      "write receipt",
+      "readback evidence",
+      "stay on the lowest evidenced row",
+    ]) {
+      expect(docs, `agent docs should include execution path guardrail ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents result evidence inventory so agents do not infer publish state", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_GUIDE.md"),
