@@ -31,6 +31,20 @@ When a separate approved execution path exists, record it explicitly before maki
 
 If any of those fields is missing, stay at `draft prepared` / `anchor prepared` and report the missing evidence. A route URL, bearer token, wallet address, prepared calldata, or `anchorPreparationId` is not by itself publish/broadcast approval.
 
+### Execution Path Picker
+
+When a prompt mixes MCP work with API routes, credentials, wallets, deployments, or browser state, choose the safest evidenced path before touching a tool:
+
+| Prompt evidence in hand | Use | Do not use | Safe ceiling |
+|---|---|---|---|
+| Query text or exact `thesisId` only | `search_markets` / `get_thesis` | Draft-prep, REST writes, browser scraping | `read-only inspection` |
+| Exact identity plus draft/revision intent | Local MCP write-adjacent tool | Direct REST writes or remote write tools by default | `draft prepared` / `anchor prepared` |
+| Token, API route, deploy URL, or logged-in browser | Nothing beyond MCP unless separately approved | Treating access as approval | MCP rung until approval + receipt + readback |
+| Signed/broadcast request | Transaction path only after action-time approval | Inferring approval from prepared calldata | `submitted` after tx hash |
+| Live/public/storage claim | Named API/public/onchain/readiness readback | Issue status, PR status, deployment status, old handoff | Proven readback state only |
+
+This table is a stop sign, not a shortcut. If two rows seem possible, use the lower row and report the missing approval, receipt, or readback instead of silently escalating agent write powers.
+
 For MCP clients that need an explicit local server entry, configure the stdio server with the repo root as `cwd`:
 
 ```json

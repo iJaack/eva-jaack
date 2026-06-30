@@ -15,6 +15,20 @@ and evidenced.
 
 The broader app has HTTP routes for thesis creation and anchor preparation, but those are not agent-default publish powers. Do not call `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or production write endpoints as a workaround for MCP limits. Direct REST writes require a separate approved path, scoped credentials, and receipt/readback evidence before any stronger claim.
 
+## Execution Path Picker
+
+Use this before touching credentials, route URLs, wallets, deployments, browser sessions, or old handoffs. Pick the lowest row that matches the evidence you actually have, then keep the final wording on that row.
+
+| Prompt shape | Agent-safe path | Evidence required before action | Maximum safe wording |
+|---|---|---|---|
+| Read or discover markets/theses | `search_markets` or `get_thesis` | Exact query or `thesisId` | `read-only inspection` |
+| Create, revise, or rebuild anchor calldata | Local MCP tool only | Exact task-time identity / thesis readback and screened or signal-light evidence | `draft prepared` / `anchor prepared` |
+| Use an API route, bearer token, browser session, or deployment URL | Block by default; use only a separate approved execution path | Approval scope, credential scope, write receipt, and readback evidence | Lower MCP rung until receipt/readback exists |
+| Broadcast/sign a transaction | Block by default | Explicit action-time approval for signer, network, payload, and tx submission | `submitted` only after tx hash exists |
+| Say public, live, confirmed, revised, anchored, or storage verified | Not MCP alone | Public/API/onchain/readiness readback matching the thesis or revision | Exact proven state only |
+
+Credentials, route URLs, open browser sessions, merged PRs, and green deploys are not permission upgrades. If a request straddles two rows, do the safer lower-row MCP work when possible and name the missing approval / receipt / readback before any stronger claim.
+
 If a task really does arrive with a separate approved execution path, capture the approval and receipt evidence before using stronger language:
 
 ```text
