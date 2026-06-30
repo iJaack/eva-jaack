@@ -1,0 +1,25 @@
+agent: codex
+
+commands:
+  lint: "pnpm --filter frontend lint && pnpm --filter frontend typecheck && pnpm --filter contracts build"
+  test: "pnpm --filter backend test && pnpm --filter contracts test"
+
+ignore_patterns:
+  - "node_modules/**"
+  - ".pnpm-store/**"
+  - ".vercel/**"
+  - ".data/**"
+  - "output/**"
+  - "contracts/lib/**"
+  - "frontend/.next/**"
+  - "*.generated.*"
+
+auto_fix:
+  review: 0
+  lint: 2
+  test: 2
+  document: 2
+
+test:
+  evidence:
+    store_in_repo: false
