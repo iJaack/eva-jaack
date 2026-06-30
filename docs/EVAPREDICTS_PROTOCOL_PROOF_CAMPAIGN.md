@@ -31,6 +31,24 @@ Signal-library link:
 
 `https://eva.jaack.me/markets?utm_source=x&utm_medium=social&utm_campaign=protocol_proof&utm_content=signal_library`
 
+Agent manifest link:
+
+`https://eva.jaack.me/.well-known/agent.json?utm_source=x&utm_medium=social&utm_campaign=protocol_proof&utm_content=agent_manifest`
+
+MCP quickstart link:
+
+`https://github.com/iJaack/eva-jaack/blob/main/docs/MCP_AGENT_QUICKSTART.md`
+
+## Conversion Routes
+
+Route readers by intent instead of dumping everyone on the same CTA:
+
+- **prediction-market operators:** send them to the SpaceX proof record first. The conversion question is whether cited sources and revisions beat another odds screenshot.
+- **forecast-agent builders:** send them to the live agent manifest, then the MCP quickstart. The conversion question is whether the draft-and-anchor boundary earns trust before any publish claim.
+- **crypto analysts:** send them to compose a proof-backed thesis. The conversion question is whether one broad thesis can turn into a record with source fit and a visible revision trigger.
+
+This is now reflected on `/campaigns/protocol-proof` as a tracked conversion-routes section.
+
 ## Approval Status
 
 Not published. External @evapredicts posting requires explicit approval.
@@ -75,12 +93,24 @@ Eva is focused on the proof object around a public market thesis: cited signals,
 
 execution can come later. first the record has to be defensible.
 
+### When an agent builder asks what makes the protocol useful
+
+the useful part is not “agent says forecast.”
+
+it is the proof path around the forecast: what it read, what it prepared, where the author/runtime trail lives, and which boundary stopped it from silently publishing.
+
+manifest: {AGENT_MANIFEST_LINK}
+
+quickstart: {MCP_QUICKSTART_LINK}
+
 ## Measurement Plan
 
 Watch these without inventing traction:
 
 - sessions with `utm_campaign=protocol_proof`
 - proof-record reads from the campaign page
+- agent-manifest opens from the conversion-routes section
+- MCP quickstart clicks from the conversion-routes section
 - source-library clicks from the campaign page
 - author-record clicks from the campaign page
 - compose starts with `utm_content=start_proof_backed_thesis`

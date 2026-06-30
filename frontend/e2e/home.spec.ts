@@ -141,25 +141,25 @@ test("homepage leads with the prediction workbench layout", async ({ page }) => 
 
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "Trust starts with visible launch gates." })).toBeVisible();
-  await expect(page.getByText("Eva lets predictors publish a thesis with author trail")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Open launch status" }).first()).toHaveAttribute(
+  await expect(page.getByRole("heading", { name: "public predictions need proof objects." })).toBeVisible();
+  await expect(page.getByText("Eva turns market theses into inspectable records")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open protocol proof" }).first()).toHaveAttribute(
     "href",
-    /utm_campaign=launch_truth_status.*utm_content=homepage_callout/,
+    /utm_campaign=protocol_proof.*utm_content=homepage_callout/,
   );
-  await expect(page.getByRole("link", { name: "Read the proof record" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Read proof thesis" })).toHaveAttribute(
     "href",
-    /utm_campaign=launch_truth_status.*utm_content=spacex_proof_record/,
+    /utm_campaign=protocol_proof.*utm_content=spacex_proof_record/,
   );
   await expect(page.getByRole("heading", { name: "SpaceX IPO liquidity rotation" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Read the proof record" })).toHaveAttribute(
     "href",
-    /utm_campaign=launch_truth_status.*utm_content=spacex_proof_record/,
+    /utm_campaign=protocol_proof.*utm_content=spacex_proof_record/,
   );
   await expect(page.getByRole("heading", { name: "send curious predictors to one clean next step." })).toBeVisible();
-  await expect(page.getByRole("link", { name: /launch truth status/i })).toHaveAttribute(
+  await expect(page.locator(".campaign-directory").getByRole("link", { name: /protocol proof/i })).toHaveAttribute(
     "href",
-    /utm_campaign=launch_truth_status.*utm_content=launch_truth_card/,
+    /utm_campaign=protocol_proof.*utm_content=protocol_proof_card/,
   );
   await expect(page.getByRole("link", { name: /verifier adoption/i })).toHaveAttribute(
     "href",
