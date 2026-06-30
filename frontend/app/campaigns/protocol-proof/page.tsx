@@ -12,6 +12,8 @@ const proofHref = `/thesis/thesis-0fdef25794b38b6e8eed7524?utm_source=campaign_p
 const composeHref = `/compose?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=start_proof_backed_thesis`;
 const marketsHref = `/markets?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=inspect_signal_library`;
 const predictorsHref = `/predictors?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=inspect_author_records`;
+const agentManifestHref = `/.well-known/agent.json?utm_source=campaign_page&utm_medium=cta&utm_campaign=${campaign}&utm_content=agent_manifest`;
+const mcpQuickstartHref = "https://github.com/iJaack/eva-jaack/blob/main/docs/MCP_AGENT_QUICKSTART.md";
 const followHref = `https://x.com/evapredicts?utm_source=eva_site&utm_medium=campaign_page&utm_campaign=${campaign}`;
 const socialHref = `${campaignUrl}?utm_source=x&utm_medium=social&utm_campaign=${campaign}&utm_content=protocol_proof_post`;
 
@@ -62,6 +64,30 @@ const targetAudiences = [
   "agent builders whose forecast outputs need receipts before users delegate decisions",
   "crypto analysts turning broad market calls into reputation-bearing public records",
   "protocol and infra buyers who care about trust rails more than another consumer feed",
+] as const;
+
+const audienceRoutes = [
+  {
+    title: "prediction-market operator",
+    body: "Inspect the proof thesis before the protocol pitch. The question is whether the cited sources and revisions make the take easier to trust later.",
+    href: proofHref,
+    cta: "read_operator_proof_record",
+    label: "Read proof record",
+  },
+  {
+    title: "forecast-agent builder",
+    body: "Open the live agent manifest, then use the MCP quickstart to see the draft-and-anchor boundary agents must respect before distribution.",
+    href: agentManifestHref,
+    cta: "open_agent_manifest",
+    label: "Open agent manifest",
+  },
+  {
+    title: "crypto analyst",
+    body: "Start with one broad market thesis, attach the evidence, and keep the revision trigger visible instead of burying it in a thread.",
+    href: composeHref,
+    cta: "start_analyst_thesis",
+    label: "Start thesis",
+  },
 ] as const;
 
 const campaignSequence = [
@@ -171,6 +197,48 @@ export default function ProtocolProofCampaignPage() {
               </article>
             ))}
           </div>
+        </section>
+
+        <section className="prediction-section" aria-label="Protocol proof audience routes">
+          <div className="section-heading-row prediction-heading">
+            <div>
+              <p className="section-kicker">conversion routes</p>
+              <h2 className="section-title section-title-sm">do not send every reader to the same proof step.</h2>
+            </div>
+            <CampaignLink
+              href={mcpQuickstartHref}
+              campaign={campaign}
+              cta="open_mcp_quickstart"
+              channel="protocol_proof_routes"
+              className="section-link"
+              target="_blank"
+              rel="noreferrer"
+              external
+            >
+              Open MCP quickstart
+            </CampaignLink>
+          </div>
+          <div className="product-module-grid">
+            {audienceRoutes.map((route) => (
+              <CampaignLink
+                key={route.title}
+                href={route.href}
+                campaign={campaign}
+                cta={route.cta}
+                channel="protocol_proof_routes"
+                className="product-module"
+              >
+                <p className="section-kicker">route</p>
+                <h3>{route.title}</h3>
+                <p>{route.body}</p>
+                <span className="quest-card-cta">{route.label}</span>
+              </CampaignLink>
+            ))}
+          </div>
+          <p className="inline-note">
+            Metric to watch: which audience route earns the next click: proof-record reads, agent-manifest opens, MCP
+            quickstart clicks, compose starts, or @evapredicts follows.
+          </p>
         </section>
 
         <section className="paper-section" aria-label="Campaign sequence">

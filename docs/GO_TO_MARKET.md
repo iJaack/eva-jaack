@@ -156,6 +156,18 @@ Metric to watch: campaign sessions carrying `utm_campaign=agent_forecast_interfa
 
 Next follow-up: compare this route against `ai_forecast_receipts`; if it drives stronger manifest, quickstart, proof-record, or compose behavior, make it the default agent-builder @evapredicts route after explicit posting approval.
 
+## Current Campaign: Protocol Proof Conversion Routes
+
+Hypothesis: infra-minded readers will convert better when protocol proof is routed by intent: operators inspect the proof record, agent builders inspect the live manifest/MCP boundary, and analysts start a proof-backed thesis.
+
+Primary audience: prediction-market operators, forecast-agent builders, crypto analysts, and protocol/infra buyers who need public predictions to carry inspectable sources, revisions, author identity, and anchorable records.
+
+CTA: open `/campaigns/protocol-proof`, then choose the matching conversion route: proof record, agent manifest/MCP quickstart, or proof-backed thesis compose.
+
+Metric to watch: sessions carrying `utm_campaign=protocol_proof`, proof-record reads, agent-manifest opens, MCP quickstart clicks, compose starts, source-library clicks, author-record clicks, and @evapredicts follow clicks. Do not claim traction until measured data exists.
+
+Next follow-up: if agent-manifest or MCP quickstart clicks beat generic proof-record clicks, promote the agent-builder route into the next approval-ready @evapredicts post; otherwise keep proof-record-first as the public wedge.
+
 ## Activation Metrics
 
 - Thesis pages created.
