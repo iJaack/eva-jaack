@@ -62,3 +62,41 @@ rtk code-review-graph update --repo /Users/jaack/Desktop/Github/eva-jaack
 Files under `/Users/jaack/clawd/companies/eva-protocol/agent` are outside this workspace. Inspect
 them read-only unless the user grants explicit write approval. Proposed updates should be captured
 in `docs/autonomy/OPENCLAW_AGENT_PROPOSED_CHANGES.md`.
+
+## Cursor Cloud specific instructions
+
+The VM update script already runs `pnpm install` + `pnpm sync:abi`. Standard commands live in
+`README.md` (Quick Start / Checks) and each package's `package.json`; prefer those. Notes below are
+the non-obvious caveats.
+
+### Services
+
+- **Backend** (Hono API): `pnpm --filter backend dev` → `http://127.0.0.1:3001`. Serves `/api/*`,
+  `/health`, `/.well-known/agent.json`, and `/api/mcp`.
+- **Frontend** (Next.js): `pnpm --filter frontend dev` → `http://127.0.0.1:4281`. In dev it proxies
+  `/api/*`, `/.well-known/*`, and `/health` to the backend, so start the backend first.
+- Start long-running dev servers in `tmux`, not as one-shot background jobs.
+
+### Caveats (non-obvious)
+
+- **Markets work offline.** Live market data comes from Polymarket/Kalshi with a ~4.5s timeout and
+  graceful fallback to seeded in-memory markets, so the UI is fully usable without outbound network.
+- **Storage is local by default.** Theses persist to `.data/eva-predictions/index.json` (no external
+  DB needed locally). `/health` reports the active storage mode.
+- **Compose editor is gated by default.** With no Dynamic env vars, `/compose` shows an auth gate.
+  For local UI work without Dynamic, run the frontend with `NEXT_PUBLIC_COMPOSE_PREVIEW_IDENTITY=1`
+  (dev-only; ignored in production) to load the editor with a preview identity.
+- **The built-in compose preview identity cannot complete `Prepare anchor` against the real backend.**
+  It uses the Eva wallet (`0x0fe6…08cA4`), which already authored the seeded SpaceX thesis, so the
+  backend rejects it with `Identity payload conflicts with an existing thesis author`. To exercise
+  the real draft-anchor route, use a wallet/handle that is not the seeded author (e.g. via
+  `POST /api/thesis-drafts/protocol/prepare-anchor` with a distinct checksummed `walletAddress`).
+- **`POST /api/theses`** (publish) requires a real on-chain anchor tx hash that the backend verifies
+  on Avalanche; it is not reachable in a keyless local dev flow. The agent-safe boundary stops at
+  draft/revision preview + anchor calldata preparation.
+- **Contracts need Foundry.** `forge` is not part of the pnpm install; install Foundry
+  (`foundryup`) before `pnpm --filter contracts test`. It is only needed for the Solidity workspace.
+- **Playwright e2e starts its own dev server** on port 4281 with `NEXT_PUBLIC_DYNAMIC_TEST_CONTEXT=1`
+  and `reuseExistingServer` when not in CI. Stop any manually-started frontend on 4281 first, or it
+  will reuse a server that lacks the test context and the compose specs will behave differently.
+  Browsers install via `pnpm --filter frontend exec playwright install --with-deps chromium`.
