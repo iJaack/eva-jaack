@@ -16,6 +16,8 @@ const agentManifestHref = `/.well-known/agent.json?utm_source=campaign_page&utm_
 const mcpQuickstartHref = "https://github.com/iJaack/eva-jaack/blob/main/docs/MCP_AGENT_QUICKSTART.md";
 const followHref = `https://x.com/evapredicts?utm_source=eva_site&utm_medium=campaign_page&utm_campaign=${campaign}`;
 const socialHref = `${campaignUrl}?utm_source=x&utm_medium=social&utm_campaign=${campaign}&utm_content=protocol_proof_post`;
+const liveThreadHref = "https://x.com/evapredicts/status/2072257036251767031";
+const liveProofReplyHref = "https://x.com/evapredicts/status/2072257074587660786";
 
 export const metadata: Metadata = {
   title: "Protocol proof · Eva",
@@ -91,12 +93,12 @@ const audienceRoutes = [
 ] as const;
 
 const campaignSequence = [
-  "Send approved @evapredicts traffic to this page with utm_campaign=protocol_proof.",
+  "Keep approved @evapredicts traffic on this page with utm_campaign=protocol_proof.",
   "Route the first click into the SpaceX proof record so readers inspect the object before they hear the protocol claim.",
-  "Keep the angle only if it beats softer launch copy on proof-record reads, source-library clicks, compose starts, author-record clicks, or follows.",
+  "Keep the angle only if the live thread beats softer launch copy on proof-record reads, source-library clicks, compose starts, author-record clicks, or follows.",
 ] as const;
 
-const approvalCopy = [
+const liveThreadCopy = [
   "public predictions do not need louder confidence.",
   "they need proof objects.",
   "what sources supported the call? what changed? who authored it? where is the record after the feed moves on?",
@@ -237,7 +239,7 @@ export default function ProtocolProofCampaignPage() {
           </div>
           <p className="inline-note">
             Metric to watch: which audience route earns the next click: proof-record reads, agent-manifest opens, MCP
-            quickstart clicks, compose starts, or @evapredicts follows.
+            quickstart clicks, live-thread clicks, compose starts, or @evapredicts follows.
           </p>
         </section>
 
@@ -271,22 +273,48 @@ export default function ProtocolProofCampaignPage() {
           </div>
         </section>
 
-        <section className="paper-section" aria-label="@evapredicts copy to approve">
-          <p className="section-kicker">@evapredicts copy to approve</p>
-          <h2>make proof the public wedge.</h2>
+        <section className="paper-section" aria-label="Published @evapredicts thread">
+          <p className="section-kicker">live @evapredicts thread</p>
+          <h2>make proof the public wedge, then measure the path.</h2>
           <p>
-            External posting still needs explicit approval. Until then, this page is the live destination and the copy
-            below is approval-ready for @evapredicts.
+            The approved protocol-proof thread is live. This page now routes campaign traffic into the thread, the proof
+            thesis, and audience-specific proof steps without claiming traction before the numbers exist.
           </p>
           <blockquote>
-            {approvalCopy.map((line) => (
+            {liveThreadCopy.map((line) => (
               <p key={line}>{line}</p>
             ))}
           </blockquote>
+          <div className="route-actions">
+            <CampaignLink
+              href={liveThreadHref}
+              campaign={campaign}
+              cta="read_live_thread"
+              channel="protocol_proof_live_thread"
+              className="mobile-action mobile-action-primary"
+              target="_blank"
+              rel="noreferrer"
+              external
+            >
+              Read live thread
+            </CampaignLink>
+            <CampaignLink
+              href={liveProofReplyHref}
+              campaign={campaign}
+              cta="read_live_proof_reply"
+              channel="protocol_proof_live_thread"
+              className="mobile-action"
+              target="_blank"
+              rel="noreferrer"
+              external
+            >
+              Open proof reply
+            </CampaignLink>
+          </div>
           <p className="inline-note">
             Metric to watch: sessions with <strong>utm_campaign=protocol_proof</strong>, proof-record reads,
-            source-library clicks, compose starts, author-record clicks, and @evapredicts follow clicks. Do not claim
-            traction until those are measured.
+            source-library clicks, live-thread clicks, compose starts, author-record clicks, and @evapredicts follow
+            clicks. Do not claim traction until those are measured.
           </p>
         </section>
 
