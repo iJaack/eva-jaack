@@ -83,6 +83,8 @@ const parsed = JSON.parse(text);
 
 Only copy values from `parsed` into a handoff. A tool name or SDK envelope alone is not evidence for `publishState`, `anchorStatus`, storage readiness, transaction submission, confirmation, or live/public state.
 
+Per-call evidence isolation: if a workflow uses several MCP calls, keep one parsed evidence row per call. `search_markets` evidence can supply candidate signals only; `get_thesis` evidence can supply current thesis/author readback only; write-adjacent evidence can supply the specific `publishState`, `anchorStatus`, `anchorPreparationId`, and transactions from that call only. Do not merge a prior success with a later failure, reuse an old `anchorPreparationId` as the current result, or report a stronger final rung unless every required call in the chain has its own parsed evidence.
+
 If `isError: true`, the text content is an error diagnostic, not a success payload. Do not parse it for `publishState`, merge it with a prior prepared result, or treat a mentioned `thesisId` as readback. Return a blocked result instead:
 
 ```text
