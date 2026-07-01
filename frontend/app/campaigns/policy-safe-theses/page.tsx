@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import FadeIn from "@/components/motion/FadeIn";
+import PageShell from "@/components/ui/PageShell";
 import { protocol } from "@/lib/protocol";
 
 const campaign = "policy_safe_theses";
@@ -71,10 +71,8 @@ const approvalCopy = [
 
 export default function PolicySafeThesesCampaignPage() {
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="page-shell">
-        <section className="hero">
+    <PageShell variant="page">
+        <FadeIn className="hero">
           <p className="eyebrow">@evapredicts campaign · policy-safe launch</p>
           <h1>market theses need boundaries before distribution.</h1>
           <p>
@@ -93,7 +91,7 @@ export default function PolicySafeThesesCampaignPage() {
               Follow @evapredicts
             </a>
           </div>
-        </section>
+        </FadeIn>
 
         <section className="paper-section" aria-label="Campaign hypothesis">
           <p className="section-kicker">Campaign hypothesis</p>
@@ -167,8 +165,6 @@ export default function PolicySafeThesesCampaignPage() {
           </p>
         </section>
 
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }

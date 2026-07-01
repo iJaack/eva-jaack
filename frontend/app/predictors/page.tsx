@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import FadeIn from "@/components/motion/FadeIn";
+import StaggerChildren, { StaggerItem } from "@/components/motion/StaggerChildren";
+import PageShell from "@/components/ui/PageShell";
+import SectionHeader from "@/components/ui/SectionHeader";
 import { getPredictors, type Predictor } from "@/lib/api";
 
 const rankingLoop = ["Read thesis", "Inspect signals", "Check revisions", "Draft response"] as const;
@@ -27,21 +29,20 @@ export default function PredictorsPage() {
   const graphBackedCount = predictors.filter((predictor) => predictor.profileState === "registered").length;
 
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="mobile-shell">
-        <section className="mobile-page-head">
-          <p className="eyebrow">Author records</p>
-          <h1>Judge predictors by their thesis trail.</h1>
-          <p>Eva separates activity from proven accuracy. Read the public theses, inspect their signals, and only treat resolved outcomes as performance evidence.</p>
-          <ul className="route-proof-list" aria-label="Author record rules">
-            <li>Activity is separate from accuracy</li>
-            <li>X plus wallet establishes authorship</li>
-            <li>Thesis history comes before ranking</li>
-          </ul>
-        </section>
+    <PageShell>
+      <SectionHeader
+        eyebrow="Author records"
+        title="Judge predictors by their thesis trail."
+        description="Eva separates activity from proven accuracy. Read the public theses, inspect their signals, and only treat resolved outcomes as performance evidence."
+      >
+        <ul className="route-proof-list" aria-label="Author record rules">
+          <li>Activity is separate from accuracy</li>
+          <li>X plus wallet establishes authorship</li>
+          <li>Thesis history comes before ranking</li>
+        </ul>
+      </SectionHeader>
 
-        {loading ? (
+      {loading ? (
           <div className="loading-state">
             <div className="loading-spinner" />
           </div>
@@ -52,7 +53,7 @@ export default function PredictorsPage() {
           </section>
         ) : (
           <>
-            <section className="prediction-card route-panel">
+            <FadeIn className="prediction-card route-panel">
               <div className="section-heading-row prediction-heading">
                 <div>
                   <p className="section-kicker">Reputation desk</p>
@@ -94,11 +95,12 @@ export default function PredictorsPage() {
                   Record-only
                 </button>
               </div>
-            </section>
+            </FadeIn>
 
-            <section className="predictor-list predictor-list-large">
+            <StaggerChildren className="predictor-list predictor-list-large">
               {filteredPredictors.map((predictor) => (
-                <Link key={predictor.predictorId} href={`/predictors/${predictor.predictorId}`} className="prediction-card predictor-card">
+                <StaggerItem key={predictor.predictorId}>
+                  <Link href={`/predictors/${predictor.predictorId}`} className="prediction-card predictor-card predictor-row">
                   <div className="card-topline">
                     <span>{predictor.handle}</span>
                     <span className={predictor.profileState === "registered" ? "status-chip status-chip-verified" : "status-chip status-chip-unresolved"}>
@@ -124,6 +126,7 @@ export default function PredictorsPage() {
                     </div>
                   </div>
                 </Link>
+                </StaggerItem>
               ))}
               {filteredPredictors.length === 0 ? (
                 <article className="prediction-card empty-state-card">
@@ -131,12 +134,9 @@ export default function PredictorsPage() {
                   <p>Switch filters or wait for a new thesis record.</p>
                 </article>
               ) : null}
-            </section>
+            </StaggerChildren>
           </>
         )}
-
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }

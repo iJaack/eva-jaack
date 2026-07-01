@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CampaignLink, CampaignViewTracker } from "@/components/CampaignTelemetry";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import FadeIn from "@/components/motion/FadeIn";
+import PageShell from "@/components/ui/PageShell";
 import { protocol } from "@/lib/protocol";
 
 const campaign = "forecast_provenance";
@@ -79,11 +79,9 @@ const approvalCopy = [
 
 export default function ForecastProvenanceCampaignPage() {
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="page-shell">
+    <PageShell variant="page">
         <CampaignViewTracker campaign={campaign} channel="forecast_provenance_page" />
-        <section className="hero">
+        <FadeIn className="hero">
           <p className="eyebrow">@evapredicts campaign · forecast provenance</p>
           <h1>the missing field in AI forecasts is provenance.</h1>
           <p>
@@ -120,7 +118,7 @@ export default function ForecastProvenanceCampaignPage() {
               Open agent manifest
             </CampaignLink>
           </div>
-        </section>
+        </FadeIn>
 
         <section className="paper-section" aria-label="Campaign hypothesis">
           <p className="section-kicker">Campaign hypothesis</p>
@@ -237,8 +235,6 @@ export default function ForecastProvenanceCampaignPage() {
           </p>
         </section>
 
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }

@@ -3,8 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CampaignLink, CampaignViewTracker } from "@/components/CampaignTelemetry";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import FadeIn from "@/components/motion/FadeIn";
+import StaggerChildren, { StaggerItem } from "@/components/motion/StaggerChildren";
+import { ButtonLink } from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import PageShell from "@/components/ui/PageShell";
 import {
   getCopyPreview,
   getPredictionSummary,
@@ -269,9 +272,9 @@ function CampaignDirectory() {
           Open campaign hub
         </Link>
       </div>
-      <div className="product-module-grid">
+      <div className="product-module-grid campaign-grid">
         {activeCampaigns.map((campaign) => (
-          <Link key={campaign.title} href={campaign.href} className="product-module">
+          <Link key={campaign.title} href={campaign.href} className="product-module campaign-card">
             <h3>{campaign.title}</h3>
             <p>{campaign.body}</p>
             <span className="quest-card-cta">watch: {campaign.metric}</span>
@@ -284,7 +287,7 @@ function CampaignDirectory() {
 
 function QuestBoard({ stats }: { stats: PredictionSummary["stats"] }) {
   return (
-    <section className="prediction-section quest-board workbench-quests" aria-label="Participation missions">
+    <section className="prediction-section quest-board workbench-quests home-quest-board" aria-label="Participation missions">
       <div className="quest-board-copy">
         <p className="section-kicker">Start here</p>
         <h2 className="section-title section-title-sm">From idea to public record</h2>
@@ -293,16 +296,18 @@ function QuestBoard({ stats }: { stats: PredictionSummary["stats"] }) {
           attach the signals that make it legible, and keep the history honest as odds and facts move.
         </p>
       </div>
-      <div className="quest-grid">
+      <StaggerChildren className="quest-grid">
         {participationQuests.map((quest) => (
-          <Link key={quest.step} href={quest.href} className="quest-card">
-            <span className="quest-step">{quest.step}</span>
-            <h3>{quest.title}</h3>
-            <p>{quest.body}</p>
-            <span className="quest-card-cta">{quest.cta}</span>
-          </Link>
+          <StaggerItem key={quest.step}>
+            <Link href={quest.href} className="quest-card">
+              <span className="quest-step">{quest.step}</span>
+              <h3>{quest.title}</h3>
+              <p>{quest.body}</p>
+              <span className="quest-card-cta">{quest.cta}</span>
+            </Link>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerChildren>
       <div className="quest-scoreboard" aria-label="Current network activity">
         <div>
           <strong>{stats.weeklyActivePredictors}</strong>
@@ -340,7 +345,7 @@ function ThesisCard({ thesis, market }: { thesis: Thesis; market: PredictionMark
   };
 
   return (
-    <article className="prediction-card thesis-card">
+    <Card className="thesis-card card-spotlight" variant="spotlight">
       <div className="card-topline">
         <Link href={`/predictors/${thesis.author.xHandle.replace(/^@/, "")}`} className="handle-link">
           {thesis.author.xHandle}
@@ -379,7 +384,7 @@ function ThesisCard({ thesis, market }: { thesis: Thesis; market: PredictionMark
         </Link>
       </div>
       {copyState ? <p className="inline-note" role="status" aria-live="polite">{copyState}</p> : null}
-    </article>
+    </Card>
   );
 }
 
@@ -417,10 +422,8 @@ export default function HomePage() {
   const leadMarket = leadThesis ? thesisMarket(leadThesis, markets) : null;
 
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="mobile-shell prediction-home">
-        <section className="mobile-hero home-command">
+    <PageShell variant="home">
+        <FadeIn className="mobile-hero home-command">
           <p className="eyebrow">Protocol proof · cited signals · revision history</p>
           <h1>public predictions need proof objects.</h1>
           <p>
@@ -431,11 +434,11 @@ export default function HomePage() {
             <CampaignLink href={featuredCampaignHref} campaign={featuredCampaign} cta="open_protocol_proof" channel="homepage_hero" className="mobile-action mobile-action-primary">
               Open protocol proof
             </CampaignLink>
+            <ButtonLink href="/compose" variant="secondary">
+              Start a thesis
+            </ButtonLink>
             <CampaignLink href={launchThesisHref} campaign={featuredCampaign} cta="read_proof_record" channel="homepage_hero" className="mobile-action">
               Read proof thesis
-            </CampaignLink>
-            <CampaignLink href={evaPredictsUrl} campaign={featuredCampaign} cta="follow_evapredicts" channel="homepage_hero" className="mobile-action" target="_blank" rel="noreferrer" external>
-              Follow @evapredicts
             </CampaignLink>
           </div>
           <aside className="home-hero-artifact" aria-label="Example thesis artifact">
@@ -467,7 +470,7 @@ export default function HomePage() {
               <span>2 updates appended</span>
             </div>
           </aside>
-        </section>
+        </FadeIn>
 
         {loading ? (
           <div className="loading-state">
@@ -484,7 +487,7 @@ export default function HomePage() {
             <CampaignDirectory />
             <QuestBoard stats={summary.stats} />
 
-            <section className="prediction-section workbench-tape">
+            <FadeIn className="prediction-section workbench-tape home-tape-section">
               <div className="section-heading-row prediction-heading">
                 <div>
                   <p className="section-kicker">Live source tape</p>
@@ -495,9 +498,9 @@ export default function HomePage() {
                 </Link>
               </div>
               <MarketStrip markets={markets} />
-            </section>
+            </FadeIn>
 
-            <section className="prediction-section workbench-markets">
+            <FadeIn className="prediction-section workbench-markets home-markets-section">
               <div className="section-heading-row prediction-heading">
                 <div>
                   <p className="section-kicker">Market library</p>
@@ -529,9 +532,9 @@ export default function HomePage() {
                   <p>Refresh or check the API connection before drafting a sourced thesis.</p>
                 </article>
               )}
-            </section>
+            </FadeIn>
 
-            <section className="lead-thesis workbench-feature">
+            <FadeIn className="lead-thesis workbench-feature home-featured-thesis">
               <div className="section-heading-row prediction-heading">
                 <div>
                   <p className="section-kicker">Featured artifact</p>
@@ -549,9 +552,9 @@ export default function HomePage() {
                   <p>Publish the first anchored thesis to create the opening public artifact.</p>
                 </article>
               )}
-            </section>
+            </FadeIn>
 
-            <aside className="workbench-rail" aria-label="Network context">
+            <aside className="workbench-rail home-rail" aria-label="Network context">
               <section className="mobile-metrics workbench-metrics" aria-label="Network metrics">
                 <div>
                   <strong>{summary.stats.weeklyActivePredictors}</strong>
@@ -611,8 +614,6 @@ export default function HomePage() {
           </section>
         )}
 
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }

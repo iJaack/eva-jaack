@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import FadeIn from "@/components/motion/FadeIn";
+import StaggerChildren, { StaggerItem } from "@/components/motion/StaggerChildren";
+import PageShell from "@/components/ui/PageShell";
+import SectionHeader from "@/components/ui/SectionHeader";
 import { getMarkets, type PredictionMarket } from "@/lib/api";
 import { marketUiStatus, statusClassName, statusLabel } from "@/lib/status";
 
@@ -28,12 +30,17 @@ function providerLabel(provider: PredictionMarket["provider"]): string {
   return "External";
 }
 
-const marketPlaybook = [
-  "Find a source",
-  "Cite it inline",
-  "Anchor the thesis",
-  "Track revisions",
-] as const;
+const marketPlaybook = ["Find a source", "Cite it inline", "Anchor the thesis", "Track revisions"] as const;
+
+function MarketSkeleton() {
+  return (
+    <div className="market-stack" aria-hidden>
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div key={index} className="prediction-card skeleton-shimmer" style={{ height: 220 }} />
+      ))}
+    </div>
+  );
+}
 
 export default function MarketsPage() {
   const [markets, setMarkets] = useState<PredictionMarket[]>([]);
@@ -54,92 +61,89 @@ export default function MarketsPage() {
   const unresolvedCount = filteredMarkets.filter((market) => market.status === "open" || market.status === "closed").length;
 
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="mobile-shell">
-        <section className="mobile-page-head">
-          <p className="eyebrow">Signal library</p>
-          <h1>Markets are source material.</h1>
-          <p>Use prediction markets as citations inside a broader thesis. Eva keeps venue odds separate from the argument, the facts, and the revision trail.</p>
-          <ul className="route-proof-list" aria-label="Market library rules">
-            <li>Sports markets stay out for now</li>
-            <li>Use in thesis is the primary action</li>
-            <li>Odds are forecasts, not verified facts</li>
-          </ul>
+    <PageShell>
+      <SectionHeader
+        eyebrow="Signal library"
+        title="Markets are source material."
+        description="Use prediction markets as citations inside a broader thesis. Eva keeps venue odds separate from the argument, the facts, and the revision trail."
+      >
+        <ul className="route-proof-list" aria-label="Market library rules">
+          <li>Sports markets stay out for now</li>
+          <li>Use in thesis is the primary action</li>
+          <li>Odds are forecasts, not verified facts</li>
+        </ul>
+      </SectionHeader>
+
+      {loading ? (
+        <MarketSkeleton />
+      ) : error ? (
+        <section className="prediction-card">
+          <h2>Markets unavailable</h2>
+          <p>{error}</p>
         </section>
-
-        {loading ? (
-          <div className="loading-state">
-            <div className="loading-spinner" />
-          </div>
-        ) : error ? (
-          <section className="prediction-card">
-            <h2>Markets unavailable</h2>
-            <p>{error}</p>
-          </section>
-        ) : (
-          <>
-            <section className="prediction-card route-panel">
-              <div className="section-heading-row prediction-heading">
-                <div>
-                  <p className="section-kicker">Source basket</p>
-                  <h2 className="section-title section-title-sm">Find the market that sharpens the thesis</h2>
-                </div>
-                <span className={statusClassName("forecast")}>Forecast</span>
+      ) : (
+        <>
+          <FadeIn className="prediction-card route-panel">
+            <div className="section-heading-row prediction-heading">
+              <div>
+                <p className="section-kicker">Source basket</p>
+                <h2 className="section-title section-title-sm">Find the market that sharpens the thesis</h2>
               </div>
-              <p className="market-boundary-note">
-                Showing {filteredMarkets.length} of {markets.length} markets. Odds are venue forecasts; final truth status belongs in thesis revisions, resolved records, and fact signals.
-              </p>
-              <div className="desk-summary">
-                <div>
-                  <strong>{filteredMarkets.length}</strong>
-                  <span>visible markets</span>
-                </div>
-                <div>
-                  <strong>{formatUsd(totalVolume)}</strong>
-                  <span>visible volume</span>
-                </div>
-                <div>
-                  <strong>{unresolvedCount}</strong>
-                  <span>forecast / unresolved</span>
-                </div>
+              <span className={statusClassName("forecast")}>Forecast</span>
+            </div>
+            <p className="market-boundary-note">
+              Showing {filteredMarkets.length} of {markets.length} markets. Odds are venue forecasts; final truth status belongs in thesis revisions, resolved records, and fact signals.
+            </p>
+            <div className="desk-summary">
+              <div>
+                <strong>{filteredMarkets.length}</strong>
+                <span>visible markets</span>
               </div>
-              <div className="quest-line" aria-label="Market participation steps">
-                {marketPlaybook.map((step, index) => (
-                  <span key={step} className="quest-line-step">
-                    <strong>{index + 1}</strong>
-                    {step}
-                  </span>
-                ))}
+              <div>
+                <strong>{formatUsd(totalVolume)}</strong>
+                <span>visible volume</span>
               </div>
-              <div className="filter-bar" aria-label="Provider filters">
+              <div>
+                <strong>{unresolvedCount}</strong>
+                <span>forecast / unresolved</span>
+              </div>
+            </div>
+            <div className="quest-line" aria-label="Market participation steps">
+              {marketPlaybook.map((step, index) => (
+                <span key={step} className="quest-line-step">
+                  <strong>{index + 1}</strong>
+                  {step}
+                </span>
+              ))}
+            </div>
+            <div className="filter-bar" aria-label="Provider filters">
+              <button
+                type="button"
+                className={`filter-chip${providerFilter === "all" ? " filter-chip-active" : ""}`}
+                onClick={() => setProviderFilter("all")}
+              >
+                All
+              </button>
+              {providers.map((provider) => (
                 <button
+                  key={provider}
                   type="button"
-                  className={`filter-chip${providerFilter === "all" ? " filter-chip-active" : ""}`}
-                  onClick={() => setProviderFilter("all")}
+                  className={`filter-chip${providerFilter === provider ? " filter-chip-active" : ""}`}
+                  onClick={() => setProviderFilter(provider)}
                 >
-                  All
+                  {providerLabel(provider)}
                 </button>
-                {providers.map((provider) => (
-                  <button
-                    key={provider}
-                    type="button"
-                    className={`filter-chip${providerFilter === provider ? " filter-chip-active" : ""}`}
-                    onClick={() => setProviderFilter(provider)}
-                  >
-                    {providerLabel(provider)}
-                  </button>
-                ))}
-              </div>
-            </section>
+              ))}
+            </div>
+          </FadeIn>
 
-            <section className="market-stack">
-              {filteredMarkets.map((market) => {
-                const uiStatus = marketUiStatus(market);
+          <StaggerChildren className="market-stack">
+            {filteredMarkets.map((market) => {
+              const uiStatus = marketUiStatus(market);
 
-                return (
+              return (
+                <StaggerItem key={market.marketId}>
                   <article
-                    key={market.marketId}
                     className={`prediction-card market-card-large ${providerClassName(market.provider)}`}
                     data-testid="market-signal-card"
                   >
@@ -170,7 +174,7 @@ export default function MarketsPage() {
                         <strong>{formatUsd(market.liquidityUsd)}</strong>
                       </div>
                       <div>
-                          <span>Status</span>
+                        <span>Status</span>
                         <strong>{statusLabel(uiStatus)}</strong>
                       </div>
                     </div>
@@ -192,14 +196,12 @@ export default function MarketsPage() {
                       ) : null}
                     </div>
                   </article>
-                );
-              })}
-            </section>
-          </>
-        )}
-
-        <SiteFooter />
-      </main>
-    </>
+                </StaggerItem>
+              );
+            })}
+          </StaggerChildren>
+        </>
+      )}
+    </PageShell>
   );
 }

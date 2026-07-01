@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CampaignLink, CampaignViewTracker } from "@/components/CampaignTelemetry";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import FadeIn from "@/components/motion/FadeIn";
+import PageShell from "@/components/ui/PageShell";
 import { protocol } from "@/lib/protocol";
 
 const campaign = "forecast_trust_loop";
@@ -101,11 +101,9 @@ const approvalCopy = [
 
 export default function ForecastTrustLoopCampaignPage() {
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="page-shell">
+    <PageShell variant="page">
         <CampaignViewTracker campaign={campaign} channel="forecast_trust_loop_page" />
-        <section className="hero">
+        <FadeIn className="hero">
           <p className="eyebrow">@evapredicts campaign · forecast trust loop</p>
           <h1>a useful forecast is a trust loop, not a confident sentence.</h1>
           <p>
@@ -144,7 +142,7 @@ export default function ForecastTrustLoopCampaignPage() {
               Follow @evapredicts
             </CampaignLink>
           </div>
-        </section>
+        </FadeIn>
 
         <section className="paper-section" aria-label="Campaign hypothesis">
           <p className="section-kicker">Campaign hypothesis</p>
@@ -289,8 +287,6 @@ export default function ForecastTrustLoopCampaignPage() {
           </p>
         </section>
 
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }

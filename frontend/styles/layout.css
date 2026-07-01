@@ -1,0 +1,95 @@
+/* layout.css — shells, grids, page structure */
+.page-shell,
+.mobile-shell {
+  width: min(100%, var(--max));
+  margin-inline: auto;
+  padding: var(--space-xl) var(--pad) var(--space-3xl);
+}
+
+.mobile-shell {
+  padding-top: var(--space-lg);
+}
+
+.prediction-home {
+  display: grid;
+  gap: var(--space-2xl);
+}
+
+.home-workbench {
+  display: grid;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+.page-shell:not(.prediction-home),
+.mobile-shell:not(.prediction-home) {
+  display: grid;
+  align-items: start;
+  gap: var(--space-xl);
+}
+
+.mobile-page-head h1,
+.hero h1,
+.home-command h1 {
+  font-size: var(--text-hero);
+  line-height: 0.95;
+  max-width: 14ch;
+  background: linear-gradient(135deg, var(--color-ink) 0%, color-mix(in oklch, var(--color-ink) 75%, var(--color-accent)) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.mobile-page-head > p,
+.hero > p,
+.home-command > p {
+  max-width: 58ch;
+  color: var(--muted);
+  font-size: var(--text-md);
+  line-height: 1.65;
+}
+
+@media (min-width: 72rem) {
+  .page-shell:not(.prediction-home) {
+    grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1fr);
+    gap: var(--space-2xl);
+  }
+
+  .page-shell:not(.prediction-home) > .hero {
+    position: sticky;
+    top: calc(88px + var(--space-lg));
+  }
+
+  .home-workbench {
+    grid-template-columns: minmax(300px, 0.75fr) minmax(0, 1.35fr);
+    grid-template-areas:
+      "hero tape"
+      "hero markets"
+      "quests feature"
+      "rail feature";
+  }
+
+  .home-command {
+    grid-area: hero;
+  }
+
+  .home-tape-section {
+    grid-area: tape;
+  }
+
+  .home-markets-section {
+    grid-area: markets;
+  }
+
+  .home-quest-board {
+    grid-area: quests;
+  }
+
+  .home-featured-thesis {
+    grid-area: feature;
+  }
+
+  .home-rail {
+    grid-area: rail;
+  }
+}

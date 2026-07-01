@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import FadeIn from "@/components/motion/FadeIn";
+import PageShell from "@/components/ui/PageShell";
 
 const campaign = "agent_receipts";
 const composeHref = `/compose?utm_source=eva_site&utm_medium=campaign_page&utm_campaign=${campaign}`;
@@ -37,10 +37,8 @@ const audienceCards = [
 
 export default function AgentReceiptsCampaignPage() {
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="mobile-shell">
-        <section className="mobile-hero home-command">
+    <PageShell variant="page">
+        <FadeIn className="mobile-hero home-command">
           <p className="eyebrow">campaign · @evapredicts</p>
           <h1>agent market calls need receipts.</h1>
           <p>
@@ -80,7 +78,7 @@ export default function AgentReceiptsCampaignPage() {
               </div>
             </div>
           </aside>
-        </section>
+        </FadeIn>
 
         <section className="prediction-section quest-board" aria-label="Campaign argument">
           <div className="quest-board-copy">
@@ -139,8 +137,6 @@ export default function AgentReceiptsCampaignPage() {
           </div>
         </section>
 
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }

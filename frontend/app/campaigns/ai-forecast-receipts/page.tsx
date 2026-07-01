@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CampaignLink, CampaignViewTracker } from "@/components/CampaignTelemetry";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import FadeIn from "@/components/motion/FadeIn";
+import PageShell from "@/components/ui/PageShell";
 import { protocol } from "@/lib/protocol";
 
 const campaign = "ai_forecast_receipts";
@@ -75,11 +75,9 @@ const approvalCopy = [
 
 export default function AiForecastReceiptsCampaignPage() {
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="page-shell">
+    <PageShell variant="page">
         <CampaignViewTracker campaign={campaign} />
-        <section className="hero">
+        <FadeIn className="hero">
           <p className="eyebrow">@evapredicts campaign · AI forecast receipts</p>
           <h1>AI forecasts need receipts before they need reach.</h1>
           <p>
@@ -98,7 +96,7 @@ export default function AiForecastReceiptsCampaignPage() {
               Follow @evapredicts
             </CampaignLink>
           </div>
-        </section>
+        </FadeIn>
 
         <section className="paper-section" aria-label="Campaign hypothesis">
           <p className="section-kicker">Campaign hypothesis</p>
@@ -178,8 +176,6 @@ export default function AiForecastReceiptsCampaignPage() {
           </p>
         </section>
 
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }
