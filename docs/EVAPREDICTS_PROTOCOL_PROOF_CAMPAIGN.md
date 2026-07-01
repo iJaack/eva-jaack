@@ -2,7 +2,7 @@
 
 ## Objective
 
-Turn Eva Protocol's trust-infrastructure thesis into a measurable campaign surface without publishing externally before approval.
+Turn Eva Protocol's trust-infrastructure thesis into a measurable campaign surface anchored by the approved @evapredicts protocol-proof thread.
 
 ## Campaign Hypothesis
 
@@ -49,11 +49,15 @@ Route readers by intent instead of dumping everyone on the same CTA:
 
 This is now reflected on `/campaigns/protocol-proof` as a tracked conversion-routes section.
 
-## Approval Status
+## Publication Status
 
-Not published. External @evapredicts posting requires explicit approval.
+Published after explicit approval.
 
-## Approval-Ready Post Draft
+- Main thread: `https://x.com/evapredicts/status/2072257036251767031`
+- Proof reply: `https://x.com/evapredicts/status/2072257074587660786`
+- Page update: `/campaigns/protocol-proof` now treats the thread as live and routes traffic into the proof record, proof reply, and audience-specific conversion paths.
+
+## Published Thread Copy
 
 public predictions do not need louder confidence.
 
@@ -108,6 +112,7 @@ quickstart: {MCP_QUICKSTART_LINK}
 Watch these without inventing traction:
 
 - sessions with `utm_campaign=protocol_proof`
+- live-thread clicks from the homepage and campaign page
 - proof-record reads from the campaign page
 - agent-manifest opens from the conversion-routes section
 - MCP quickstart clicks from the conversion-routes section
@@ -119,4 +124,4 @@ Watch these without inventing traction:
 
 ## Next Follow-Up
 
-If `protocol_proof` beats softer campaign pages on proof-record reads or author-record clicks, make this the default @evapredicts positioning for infra-native audiences. If it underperforms, keep the page live but route broader public traffic back to `prediction_memory` or `ai_forecast_receipts`.
+If `protocol_proof` beats softer campaign pages on proof-record reads, live-thread clicks, or author-record clicks, keep it as the default @evapredicts positioning for infra-native audiences. If it underperforms, keep the page live but route broader public traffic back to `prediction_memory` or `ai_forecast_receipts`.

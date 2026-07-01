@@ -28,6 +28,7 @@ const percentFormatter = new Intl.NumberFormat("en-US", {
 });
 
 const evaPredictsUrl = "https://x.com/evapredicts";
+const protocolProofThreadUrl = "https://x.com/evapredicts/status/2072257036251767031";
 const launchThesisId = "thesis-0fdef25794b38b6e8eed7524";
 const featuredCampaign = "protocol_proof";
 const launchThesisHref = `/thesis/${launchThesisId}?utm_source=homepage&utm_medium=proof_cta&utm_campaign=${featuredCampaign}&utm_content=spacex_proof_record`;
@@ -224,7 +225,7 @@ function CampaignCallout() {
         <h2 className="section-title section-title-sm">public predictions need proof objects, not louder confidence.</h2>
         <p>
           The current homepage wedge is protocol proof: route readers from the trust-infrastructure claim into the
-          SpaceX proof thesis, signal library, author records, and @evapredicts follow path before any external post goes live.
+          SpaceX proof thesis, signal library, author records, and the first live @evapredicts protocol-proof thread.
         </p>
       </div>
       <div className="campaign-proof-grid" aria-label="Campaign proof points">
@@ -242,12 +243,15 @@ function CampaignCallout() {
         <CampaignLink href={launchThesisHref} campaign={featuredCampaign} cta="read_proof_record" channel="homepage_campaign_callout" className="mobile-action">
           Read the proof record
         </CampaignLink>
+        <CampaignLink href={protocolProofThreadUrl} campaign={featuredCampaign} cta="read_live_thread" channel="homepage_campaign_callout" className="mobile-action" target="_blank" rel="noreferrer" external>
+          Read live thread
+        </CampaignLink>
         <CampaignLink href={evaPredictsUrl} campaign={featuredCampaign} cta="follow_evapredicts" channel="homepage_campaign_callout" className="mobile-action" target="_blank" rel="noreferrer" external>
           Follow @evapredicts
         </CampaignLink>
       </div>
       <p className="inline-note">
-        Metric to watch: utm_campaign=protocol_proof clicks into the campaign route, then proof-record reads, source-library clicks, author-record clicks, follow clicks, and downstream compose starts. No traction claims until measured data exists.
+        Metric to watch: utm_campaign=protocol_proof clicks into the campaign route, live-thread clicks, proof-record reads, source-library clicks, author-record clicks, follow clicks, and downstream compose starts. No traction claims until measured data exists.
       </p>
     </section>
   );
