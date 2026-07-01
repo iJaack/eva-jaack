@@ -758,6 +758,28 @@ describe("Eva MCP agent docs", () => {
     }
   });
 
+  it("documents per-call evidence isolation for multi-step MCP workflows", () => {
+    const docs = [
+      readRepoFile("docs/MCP_AGENT_QUICKSTART.md"),
+      readRepoFile("docs/MCP_AGENT_EXAMPLES.md"),
+      readRepoFile("docs/AGENT_SAFE_OUTPUTS.md"),
+      readRepoFile("skills/eva-agent-onboarding/SKILL.md"),
+    ].join("\n");
+
+    for (const phrase of [
+      "Per-call evidence isolation",
+      "MCP evidence ledger",
+      "one parsed evidence row per call",
+      "search_markets` evidence can supply candidate signals only",
+      "get_thesis` evidence can supply current thesis/author readback only",
+      "Do not merge a prior success with a later failure",
+      "old `anchorPreparationId` as the current result",
+      "missing receipt, storage check, or public readback",
+    ]) {
+      expect(docs, `agent docs should include per-call evidence isolation phrase ${phrase}`).toContain(phrase);
+    }
+  });
+
   it("documents that schema defaults are not approval or evidence", () => {
     const docs = [
       readRepoFile("docs/MCP_AGENT_GUIDE.md"),

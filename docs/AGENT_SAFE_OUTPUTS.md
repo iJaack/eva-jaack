@@ -85,6 +85,8 @@ When `isError: true`, any returned text is diagnostic text only. Do not parse it
 
 MCP text parser rule: extract the first text part once, parse that JSON, and fill the inventory only from the parsed object. If the parser cannot produce JSON, the safe result is `blocked`, not a guessed partial success. Do not use the tool name, request intent, or SDK envelope as a substitute for returned `publishState`, `anchorStatus`, tx hash, receipt/readback, storage readiness, or public/live evidence.
 
+Per-call evidence isolation: for multi-step workflows, keep each MCP call's parsed evidence separate until the final result card. A `search_markets` parse row can justify candidate signals, a `get_thesis` parse row can justify current thesis/identity readback, and a write-adjacent parse row can justify only that call's prepared draft/revision/calldata markers. Do not combine an old prepared result with a new error envelope, and do not let one call's `publishState` stand in for another call's missing receipt, storage check, or public readback.
+
 Minimum inventory for write-adjacent results:
 
 - operation evidence: tool name, requested intent, and approved `xHandle` / `walletAddress`,

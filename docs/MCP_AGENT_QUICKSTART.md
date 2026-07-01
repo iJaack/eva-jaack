@@ -384,6 +384,21 @@ function parseEvaMcpTextResult(result: unknown) {
 
 After parsing, fill the result card only from returned fields. If parsing fails, the tool result is `blocked`; do not infer `publishState`, `anchorStatus`, storage readiness, tx hash, receipt, or public/live state from the tool name.
 
+### Per-call evidence isolation
+
+When a workflow uses multiple MCP calls, keep a separate evidence row for each call. Do not merge markers from `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, or `prepare_anchor_transaction` into one synthetic success object.
+
+```text
+MCP evidence ledger:
+- call: <tool name>
+- parsed envelope: <yes | blocked>
+- safe rung from this call: <read-only | draft prepared | anchor prepared | blocked>
+- reusable evidence: <market candidates | thesis readback | prepared calldata | none>
+- cannot prove from this call: <identity approval | storage | broadcast | publication | confirmation>
+```
+
+Carry forward only the reusable evidence that the parsed result actually returned. A read-only `search_markets` result can support candidate signals, but it cannot approve identity or imply a draft exists. A successful `get_thesis` readback can support revision identity checks, but it cannot prove a revision was prepared. A later `isError: true` result invalidates only that failed call; it does not let you reuse an old `publishState`, old `anchorPreparationId`, or previous prepared calldata as the current result. If the final claim needs evidence from more than one call, name each call explicitly in the handoff.
+
 ## Common Prompt Routing Cards
 
 Use these cards when an agent prompt mixes a safe MCP action with an unsafe stronger claim. Pick the lowest tool that matches the direct evidence you can produce.

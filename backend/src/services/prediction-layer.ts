@@ -97,6 +97,8 @@ export interface ThesisRevisionInput {
   }>;
 }
 
+const noOpRevisionError = "Revision must change the thesis body or at least one signal";
+
 export interface XCommandIngestInput {
   mentionId: string;
   authorHandle: string;
@@ -1022,6 +1024,42 @@ function revisionFor(version: number, body: string, note: string | null, signals
   };
 }
 
+function applyRevisionSignalUpdates(thesis: ThesisDto, input: ThesisRevisionInput, now: string): { signals: ThesisSignalDto[]; changed: boolean } {
+  let changed = false;
+  const signals = thesis.signals.map((signal) => {
+    const update = input.signalUpdates?.find((entry) => entry.signalId === signal.signalId);
+    if (!update || signal.kind !== "prediction_market") return signal;
+
+    const currentOdds = normalizeProbability(update.currentOdds, signal.currentOdds);
+    const weight = clampWeight(update.weight ?? signal.weight);
+    const status = update.status ?? signal.status;
+    const resolvedOutcomeLabel = update.resolvedOutcomeLabel?.trim() || signal.resolvedOutcomeLabel;
+
+    const signalChanged =
+      currentOdds !== signal.currentOdds ||
+      weight !== signal.weight ||
+      status !== signal.status ||
+      resolvedOutcomeLabel !== signal.resolvedOutcomeLabel;
+
+    if (!signalChanged) return signal;
+    changed = true;
+
+    const next = {
+      ...signal,
+      currentOdds,
+      weight,
+      status,
+      resolvedOutcomeLabel,
+      updatedAt: now,
+    };
+    return {
+      ...next,
+      signalScore: predictionSignalScore(next),
+    };
+  });
+  return { signals, changed };
+}
+
 function buildThesisDraft(markets: PredictionMarketDto[], input: ThesisCreateInput, author: ThesisAuthorDto, createdAt: string): ThesisDto {
   const title = input.title.trim();
   const body = input.body.trim();
@@ -1337,23 +1375,12 @@ export class LocalPredictionLayerService {
     const thesis = structuredClone(original);
     const now = new Date().toISOString();
     const scoreBefore = thesis.currentScore;
-    const signals = thesis.signals.map((signal) => {
-      const update = input.signalUpdates?.find((entry) => entry.signalId === signal.signalId);
-      if (!update || signal.kind !== "prediction_market") return signal;
-      const next = {
-        ...signal,
-        currentOdds: normalizeProbability(update.currentOdds, signal.currentOdds),
-        weight: clampWeight(update.weight ?? signal.weight),
-        status: update.status ?? signal.status,
-        resolvedOutcomeLabel: update.resolvedOutcomeLabel?.trim() || signal.resolvedOutcomeLabel,
-        updatedAt: now,
-      };
-      return {
-        ...next,
-        signalScore: predictionSignalScore(next),
-      };
-    });
     const body = input.body?.trim() || thesis.body;
+    const bodyChanged = body !== thesis.body;
+    const { signals, changed: signalsChanged } = applyRevisionSignalUpdates(thesis, input, now);
+    if (!bodyChanged && !signalsChanged) {
+      throw new Error(noOpRevisionError);
+    }
     const revision = revisionFor(thesis.revisions.length + 1, body, input.note?.trim() || null, signals, scoreBefore, now);
     thesis.body = body;
     thesis.signals = signals;
@@ -1389,23 +1416,12 @@ export class LocalPredictionLayerService {
     assertSameAuthorIdentity(thesis.author, actor);
     const now = new Date().toISOString();
     const scoreBefore = thesis.currentScore;
-    const signals = thesis.signals.map((signal) => {
-      const update = input.signalUpdates?.find((entry) => entry.signalId === signal.signalId);
-      if (!update || signal.kind !== "prediction_market") return signal;
-      const next = {
-        ...signal,
-        currentOdds: normalizeProbability(update.currentOdds, signal.currentOdds),
-        weight: clampWeight(update.weight ?? signal.weight),
-        status: update.status ?? signal.status,
-        resolvedOutcomeLabel: update.resolvedOutcomeLabel?.trim() || signal.resolvedOutcomeLabel,
-        updatedAt: now,
-      };
-      return {
-        ...next,
-        signalScore: predictionSignalScore(next),
-      };
-    });
     const body = input.body?.trim() || thesis.body;
+    const bodyChanged = body !== thesis.body;
+    const { signals, changed: signalsChanged } = applyRevisionSignalUpdates(thesis, input, now);
+    if (!bodyChanged && !signalsChanged) {
+      throw new Error(noOpRevisionError);
+    }
     const revision = revisionFor(thesis.revisions.length + 1, body, input.note?.trim() || null, signals, scoreBefore, now);
     thesis.body = body;
     thesis.signals = signals;

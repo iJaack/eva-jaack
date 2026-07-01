@@ -190,6 +190,42 @@ describe("prediction routes", () => {
     });
   });
 
+  it("rejects no-op thesis revisions before anchor preparation", async () => {
+    const app = await makeApp();
+    const payload = thesisCreatePayload();
+    const prepared = await fetchJson(app, "/api/thesis-drafts/protocol/prepare-anchor", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const created = await fetchJson(app, "/api/theses", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...payload,
+        anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
+        anchorTxHash: draftAnchorTxHash,
+      }),
+    });
+    const thesis = (created.body as { thesis: { thesisId: string; body: string; signals: Array<{ signalId: string; currentOdds: number }> } }).thesis;
+
+    const response = await fetchJson(app, `/api/theses/${thesis.thesisId}/revision-drafts/protocol/prepare-anchor`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...identityPayload(),
+        body: thesis.body,
+        note: "Note-only changes are not revisions.",
+        signalUpdates: [{ signalId: thesis.signals[0]!.signalId, currentOdds: thesis.signals[0]!.currentOdds }],
+      }),
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      error: "Revision must change the thesis body or at least one signal",
+    });
+  });
+
   it("persists anchor preparations across route instance resets", async () => {
     const service = await makeService();
     const prepareApp = makeRoutedApp(service);
