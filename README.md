@@ -55,7 +55,10 @@ write receipt, and readback evidence.
 
 `GET /api/mcp` is safe discovery only. It exposes the live tool allowlist, tool descriptions, and
 an `agentSafeBoundary` card so clients can smoke-test the boundary without preparing calldata or
-calling write routes.
+calling write routes. The boundary card is a downgrade aid, not a permission upgrade: it caps
+MCP-only output at prepared calldata, defaults storage wording to not assessed, and lists access or
+coordination artifacts (tokens, route URLs, browser sessions, deploy/issue/PR status, prepared
+calldata) that are not evidence for submitted, published/live, confirmed, or storage-verified claims.
 
 ## Quick Start
 

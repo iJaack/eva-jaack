@@ -61,7 +61,9 @@ For MCP clients that need an explicit local server entry, configure the stdio se
 
 If that local stdio command fails, stop and report the setup blocker. Do not replace it with UI scraping, direct unauthenticated HTTP calls, or a remote write path unless the operator supplied scoped credentials and explicitly approved that remote path.
 
-For lightweight HTTP discovery, `GET /api/mcp` returns the streamable HTTP endpoint, the exact live tool-name allowlist, `toolDescriptions`, and an `agentSafeBoundary` card with `defaultWriteScope: "draft_and_anchor_prep_only"`, `publishState: "anchor_prepared_not_published"`, required evidence for stronger claims, and forbidden fallback classes. Treat that response as a discovery/boundary smoke only; it is not a write path, not approval for remote MCP write-adjacent tools, and not evidence of draft storage, transaction submission, confirmation, or public publish.
+For lightweight HTTP discovery, `GET /api/mcp` returns the streamable HTTP endpoint, the exact live tool-name allowlist, `toolDescriptions`, and an `agentSafeBoundary` card. The boundary card includes `defaultWriteScope: "draft_and_anchor_prep_only"`, `publishState: "anchor_prepared_not_published"`, `mcpOutputCeiling: "anchor_prepared"`, `safeResultVerbs`, `storageClaimDefault: "storage_not_assessed"`, required evidence for stronger claims, `notEvidenceForStrongerClaims`, and forbidden fallback classes. Treat that response as a discovery/boundary smoke only; it is not a write path, not approval for remote MCP write-adjacent tools, and not evidence of draft storage, transaction submission, confirmation, or public publish.
+
+When a client can read the discovery JSON, use it as a machine-readable downgrade card: `safeResultVerbs` caps MCP-only output at `inspected`, `prepared`, or `calldata_ready`; `requiredForSubmitted` requires explicit approval plus a tx hash; `requiredForPublishedLive` requires an approved public path plus write receipt and readback evidence; `notEvidenceForStrongerClaims` names coordination or access artifacts such as route URLs, bearer tokens, browser sessions, green deploys, issue/PR status, `anchorPreparationId`, and prepared calldata. None of those artifacts upgrades MCP draft prep into submitted, published/live, or storage-verified state.
 
 ### Read-only MCP client smoke
 
@@ -69,7 +71,7 @@ When onboarding a new MCP client or runtime, prove client wiring with read-only 
 
 1. Start the local `eva-thesis` stdio server from the repo root with `pnpm --filter backend mcp`.
 2. Run the client's tool list smoke and verify the exact five live tools: `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`.
-3. If using HTTP discovery, verify `GET /api/mcp` exposes matching `toolDescriptions` and `agentSafeBoundary.defaultWriteScope: "draft_and_anchor_prep_only"` before any write-adjacent rehearsal.
+3. If using HTTP discovery, verify `GET /api/mcp` exposes matching `toolDescriptions`, `agentSafeBoundary.defaultWriteScope: "draft_and_anchor_prep_only"`, `agentSafeBoundary.mcpOutputCeiling: "anchor_prepared"`, and `agentSafeBoundary.storageClaimDefault: "storage_not_assessed"` before any write-adjacent rehearsal.
 4. Run a description boundary smoke: every write-adjacent discovery description must still say the tool does not publish, broadcast, call direct REST writes, or prove storage durability.
 5. Run only a read-only call smoke, such as `search_markets` with a low-risk query, and report the result as `read-only` / `found candidates`.
 
