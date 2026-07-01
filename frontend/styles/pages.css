@@ -1,0 +1,233 @@
+/* pages.css — route-specific MotionSites layouts */
+.home-command {
+  display: grid;
+  gap: var(--space-lg);
+  padding: var(--space-xl) 0;
+}
+
+.home-command .mobile-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.mobile-strip,
+.market-tape {
+  display: flex;
+  gap: var(--space-sm);
+  overflow-x: auto;
+  padding-bottom: var(--space-xs);
+  scrollbar-width: thin;
+}
+
+.market-chip {
+  flex: 0 0 auto;
+  min-width: 180px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  padding: var(--space-sm) var(--space-md);
+  display: grid;
+  gap: var(--space-2xs);
+  transition: transform var(--dur-mid) var(--ease-out), box-shadow var(--dur-mid) var(--ease-out);
+}
+
+.market-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-accent);
+}
+
+.market-row,
+.predictor-row {
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--blur-glass));
+}
+
+.market-row {
+  border-left: 3px solid var(--provider-accent, var(--color-accent));
+}
+
+.odds-row span strong,
+.stat-cell strong,
+.home-stat-card strong {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  color: var(--color-accent-strong);
+}
+
+.compose-layout,
+.compose-publication-layout {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+@media (min-width: 60rem) {
+  .compose-layout,
+  .compose-publication-layout {
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    align-items: start;
+  }
+
+  .compose-editor-panel {
+    position: sticky;
+    top: calc(120px + var(--space-md));
+  }
+
+  .compose-sidecar {
+    display: grid;
+    gap: var(--space-lg);
+  }
+}
+
+.compose-editor-panel {
+  background: color-mix(in oklch, var(--color-paper-2) 85%, transparent);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+}
+
+.compose-sidecar .prediction-card {
+  background: color-mix(in oklch, var(--color-surface) 75%, transparent);
+}
+
+.compose-post-preview {
+  border-radius: var(--radius-md);
+  border: 1px dashed color-mix(in oklch, var(--color-accent) 30%, transparent);
+  padding: var(--space-md);
+  background: color-mix(in oklch, var(--color-paper-3) 50%, transparent);
+}
+
+.thesis-publication-layout {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+@media (min-width: 60rem) {
+  .thesis-publication-layout {
+    grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+    align-items: start;
+  }
+
+  .thesis-signal-rail {
+    position: sticky;
+    top: calc(120px + var(--space-md));
+  }
+}
+
+.thesis-article-panel {
+  font-size: var(--text-md);
+  line-height: 1.75;
+}
+
+.thesis-article-panel p {
+  max-width: 68ch;
+}
+
+.citation-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  font-weight: 700;
+  color: var(--color-accent-strong);
+  background: color-mix(in oklch, var(--color-accent) 14%, transparent);
+  border: 1px solid color-mix(in oklch, var(--color-accent) 28%, transparent);
+}
+
+.timeline-step {
+  position: relative;
+  padding-left: var(--space-lg);
+  border-left: 2px solid var(--border-subtle);
+}
+
+.timeline-step::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 0.35rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gradient-brand);
+  box-shadow: var(--glow-accent);
+}
+
+.campaign-grid {
+  display: grid;
+  gap: var(--space-lg);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+}
+
+.campaign-card {
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--blur-glass));
+  padding: var(--space-lg);
+  display: grid;
+  gap: var(--space-sm);
+  transition: transform var(--dur-mid) var(--ease-out), box-shadow var(--dur-mid) var(--ease-out), border-color var(--dur-mid) var(--ease-out);
+}
+
+.campaign-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in oklch, var(--color-accent) 35%, transparent);
+  box-shadow: var(--shadow-glow);
+}
+
+.lead-thesis,
+.home-featured-thesis .prediction-card {
+  border-color: color-mix(in oklch, var(--color-brand-coral) 35%, transparent);
+}
+
+.market-detail-layout {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.provider-badge {
+  border-radius: 4px;
+}
+
+@media (min-width: 72rem) {
+  .market-detail-layout {
+    grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .market-detail-layout .market-detail-head {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .market-detail-layout .market-detail-signal-panel {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .market-detail-layout > .prediction-section {
+    grid-column: 1 / -1;
+  }
+
+  .workbench-tape .mobile-strip {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
+@media (max-width: 58rem) {
+  .participation-dock-copy strong {
+    display: none;
+  }
+
+  .participation-loop {
+    flex: 1 1 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+}

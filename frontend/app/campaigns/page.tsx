@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Nav from "@/components/Nav";
+import FadeIn from "@/components/motion/FadeIn";
+import PageShell from "@/components/ui/PageShell";
 import { CampaignLink, CampaignViewTracker } from "@/components/CampaignTelemetry";
-import SiteFooter from "@/components/SiteFooter";
 import { protocol } from "@/lib/protocol";
 
 const campaign = "campaign_hub";
@@ -116,11 +116,9 @@ const operatingRules = [
 
 export default function CampaignHubPage() {
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="page-shell">
+    <PageShell variant="page">
         <CampaignViewTracker campaign={campaign} channel="campaign_hub_page" />
-        <section className="hero">
+        <FadeIn className="hero">
           <p className="eyebrow">@evapredicts campaign hub</p>
           <h1>one protocol-proof angle, one proof path, one metric.</h1>
           <p>
@@ -160,7 +158,7 @@ export default function CampaignHubPage() {
               Follow @evapredicts
             </CampaignLink>
           </div>
-        </section>
+        </FadeIn>
 
         <section className="paper-section" aria-label="Campaign hypothesis">
           <p className="section-kicker">Campaign hypothesis</p>
@@ -188,7 +186,7 @@ export default function CampaignHubPage() {
               Start thesis
             </CampaignLink>
           </div>
-          <div className="product-module-grid">
+          <div className="product-module-grid campaign-grid">
             {campaignRoutes.map((route) => (
               <CampaignLink
                 key={route.title}
@@ -196,7 +194,7 @@ export default function CampaignHubPage() {
                 campaign={campaign}
                 cta={`open_${route.title.replaceAll(" ", "_")}`}
                 channel="campaign_hub_directory"
-                className="product-module"
+                className="product-module campaign-card"
               >
                 <p className="section-kicker">{route.status}</p>
                 <h3>{route.title}</h3>
@@ -222,8 +220,6 @@ export default function CampaignHubPage() {
           </p>
         </section>
 
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }

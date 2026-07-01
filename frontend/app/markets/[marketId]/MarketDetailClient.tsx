@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import FadeIn from "@/components/motion/FadeIn";
+import PageShell from "@/components/ui/PageShell";
+import SectionHeader from "@/components/ui/SectionHeader";
 import { getMarketDetail, type PredictionMarketDetail } from "@/lib/api";
 import { marketUiStatus, statusClassName, statusLabel, thesisUiStatus } from "@/lib/status";
 
@@ -28,9 +29,7 @@ export default function MarketDetailClient() {
   }, [marketId]);
 
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="mobile-shell">
+    <PageShell>
         <div className="back-row">
           <Link href="/markets" className="section-link">Back to markets</Link>
         </div>
@@ -45,18 +44,20 @@ export default function MarketDetailClient() {
             <p>{error ?? "This market could not be loaded."}</p>
           </section>
         ) : (
-          <>
-            <section className="mobile-page-head market-detail-head">
-              <p className="eyebrow">{detail.market.category}</p>
-              <h1>{detail.market.title}</h1>
-              <p>Use this market as one cited signal inside a broader thesis. Eva keeps the venue forecast separate from the article, its facts, and its revision history.</p>
+          <div className="market-detail-layout">
+            <SectionHeader
+              className="market-detail-head"
+              eyebrow={detail.market.category}
+              title={detail.market.title}
+              description="Use this market as one cited signal inside a broader thesis. Eva keeps the venue forecast separate from the article, its facts, and its revision history."
+            >
               <div className="status-row">
                 <span className="status-chip status-chip-forecast">Odds forecast</span>
                 <span className={statusClassName(marketUiStatus(detail.market))}>{statusLabel(marketUiStatus(detail.market))}</span>
               </div>
-            </section>
+            </SectionHeader>
 
-            <section className="prediction-card market-detail-signal-panel">
+            <FadeIn className="prediction-card market-detail-signal-panel card-spotlight">
               <div className="section-heading-row prediction-heading">
                 <div>
                   <p className="section-kicker">Selected source</p>
@@ -81,7 +82,7 @@ export default function MarketDetailClient() {
                   </a>
                 ) : null}
               </div>
-            </section>
+            </FadeIn>
 
             <section className="prediction-section">
               <div className="section-heading-row prediction-heading">
@@ -121,11 +122,8 @@ export default function MarketDetailClient() {
                 )}
               </div>
             </section>
-          </>
+          </div>
         )}
-
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }

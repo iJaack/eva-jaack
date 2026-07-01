@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CampaignLink, CampaignViewTracker } from "@/components/CampaignTelemetry";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import FadeIn from "@/components/motion/FadeIn";
+import PageShell from "@/components/ui/PageShell";
 import { protocol } from "@/lib/protocol";
 
 const campaign = "agent_forecast_interface";
@@ -80,11 +80,9 @@ const approvalCopy = [
 
 export default function AgentForecastInterfaceCampaignPage() {
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="page-shell">
+    <PageShell variant="page">
         <CampaignViewTracker campaign={campaign} channel="agent_forecast_interface_page" />
-        <section className="hero">
+        <FadeIn className="hero">
           <p className="eyebrow">@evapredicts campaign · agent forecast interface</p>
           <h1>forecast agents need an interface for receipts.</h1>
           <p>
@@ -123,7 +121,7 @@ export default function AgentForecastInterfaceCampaignPage() {
               Read MCP quickstart
             </CampaignLink>
           </div>
-        </section>
+        </FadeIn>
 
         <section className="paper-section" aria-label="Campaign hypothesis">
           <p className="section-kicker">Campaign hypothesis</p>
@@ -239,8 +237,6 @@ export default function AgentForecastInterfaceCampaignPage() {
           </p>
         </section>
 
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }

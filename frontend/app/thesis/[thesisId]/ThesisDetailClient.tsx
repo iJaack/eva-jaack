@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import FadeIn from "@/components/motion/FadeIn";
+import PageShell from "@/components/ui/PageShell";
 import {
   getCopyPreview,
   getThesisDetail,
@@ -291,9 +291,7 @@ export default function ThesisDetailClient() {
     : [];
 
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="mobile-shell thesis-detail-shell">
+    <PageShell className="thesis-detail-shell">
         <div className="back-row">
           <Link href="/markets" className="section-link">Back to markets</Link>
         </div>
@@ -308,7 +306,7 @@ export default function ThesisDetailClient() {
             <p>{error ?? "This thesis could not be loaded."}</p>
           </section>
         ) : (
-          <section className="thesis-publication-layout">
+          <FadeIn className="thesis-publication-layout">
             <article className="prediction-card thesis-article-panel">
               <div className="card-topline">
                 <Link href={`/predictors/${detail.predictor.predictorId}`} className="handle-link">
@@ -600,10 +598,8 @@ export default function ThesisDetailClient() {
                 <p className="inline-note">No timeline events match this filter yet.</p>
               )}
             </section>
-          </section>
+          </FadeIn>
         )}
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }

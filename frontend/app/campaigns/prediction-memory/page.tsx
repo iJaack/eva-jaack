@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Nav from "@/components/Nav";
+import FadeIn from "@/components/motion/FadeIn";
+import PageShell from "@/components/ui/PageShell";
 import { CampaignLink, CampaignViewTracker } from "@/components/CampaignTelemetry";
-import SiteFooter from "@/components/SiteFooter";
 import { protocol } from "@/lib/protocol";
 
 const campaign = "prediction_memory";
@@ -74,11 +74,9 @@ const approvalCopy = [
 
 export default function PredictionMemoryCampaignPage() {
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="page-shell">
+    <PageShell variant="page">
         <CampaignViewTracker campaign={campaign} channel="prediction_memory_page" />
-        <section className="hero">
+        <FadeIn className="hero">
           <p className="eyebrow">@evapredicts campaign · prediction memory</p>
           <h1>prediction markets price the moment. Eva remembers the thesis.</h1>
           <p>
@@ -118,7 +116,7 @@ export default function PredictionMemoryCampaignPage() {
               Follow @evapredicts
             </CampaignLink>
           </div>
-        </section>
+        </FadeIn>
 
         <section className="paper-section" aria-label="Campaign hypothesis">
           <p className="section-kicker">Campaign hypothesis</p>
@@ -217,8 +215,6 @@ export default function PredictionMemoryCampaignPage() {
           </p>
         </section>
 
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }

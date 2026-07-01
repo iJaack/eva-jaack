@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import FadeIn from "@/components/motion/FadeIn";
+import PageShell from "@/components/ui/PageShell";
 import { protocol } from "@/lib/protocol";
 
 const campaign = "trust_receipts_launch";
@@ -68,10 +68,8 @@ const launchSequence = [
 
 export default function TrustReceiptsCampaignPage() {
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="page-shell">
-        <section className="hero">
+    <PageShell variant="page">
+        <FadeIn className="hero">
           <p className="eyebrow">@evapredicts launch path</p>
           <h1>prediction markets need trust receipts.</h1>
           <p>
@@ -89,7 +87,7 @@ export default function TrustReceiptsCampaignPage() {
               Follow @evapredicts
             </a>
           </div>
-        </section>
+        </FadeIn>
 
         <section className="paper-section" aria-label="Campaign hypothesis">
           <p className="section-kicker">Campaign hypothesis</p>
@@ -145,8 +143,6 @@ export default function TrustReceiptsCampaignPage() {
           <p className="inline-note">Primary metric: clicks to Draft a thesis and Read the example from utm_content=launch_post.</p>
         </section>
 
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import FadeIn from "@/components/motion/FadeIn";
+import PageShell from "@/components/ui/PageShell";
 import { protocol } from "@/lib/protocol";
 
 const campaign = "evapredicts_reply_sprint";
@@ -87,10 +87,8 @@ function targetHref(content: string) {
 
 export default function ReplySprintCampaignPage() {
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="page-shell">
-        <section className="hero">
+    <PageShell variant="page">
+        <FadeIn className="hero">
           <p className="eyebrow">@evapredicts campaign · approval required</p>
           <h1>turn live market debates into thesis clicks.</h1>
           <p>
@@ -108,7 +106,7 @@ export default function ReplySprintCampaignPage() {
               Draft a sourced thesis
             </Link>
           </div>
-        </section>
+        </FadeIn>
 
         <section className="paper-section" aria-label="Campaign hypothesis">
           <p className="section-kicker">Campaign hypothesis</p>
@@ -172,8 +170,6 @@ export default function ReplySprintCampaignPage() {
           </ul>
         </section>
 
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }

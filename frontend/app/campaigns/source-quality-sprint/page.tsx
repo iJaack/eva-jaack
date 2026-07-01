@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import FadeIn from "@/components/motion/FadeIn";
+import PageShell from "@/components/ui/PageShell";
 import { protocol } from "@/lib/protocol";
 
 const campaign = "source_quality_sprint";
@@ -72,10 +72,8 @@ const approvalCopy = [
 
 export default function SourceQualitySprintCampaignPage() {
   return (
-    <>
-      <Nav />
-      <main id="main-content" className="page-shell">
-        <section className="hero">
+    <PageShell variant="page">
+        <FadeIn className="hero">
           <p className="eyebrow">@evapredicts campaign · source quality sprint</p>
           <h1>prediction feeds need source quality, not louder calls.</h1>
           <p>
@@ -94,7 +92,7 @@ export default function SourceQualitySprintCampaignPage() {
               Follow @evapredicts
             </a>
           </div>
-        </section>
+        </FadeIn>
 
         <section className="paper-section" aria-label="Campaign hypothesis">
           <p className="section-kicker">Campaign hypothesis</p>
@@ -173,8 +171,6 @@ export default function SourceQualitySprintCampaignPage() {
           </p>
         </section>
 
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }

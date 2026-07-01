@@ -4,8 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useMemo, useState, type ComponentType } from "react";
 import DynamicAuthControl from "@/components/DynamicAuthControl";
-import Nav from "@/components/Nav";
-import SiteFooter from "@/components/SiteFooter";
+import PageShell from "@/components/ui/PageShell";
 import { createThesis, getMarkets, prepareDraftThesisAnchor, type PredictionMarket, type Thesis, type ThesisCreateRequest } from "@/lib/api";
 import type { DynamicIdentityState, DynamicThesisIdentity } from "@/lib/dynamic-identity";
 import { protocol } from "@/lib/protocol";
@@ -338,10 +337,8 @@ function ComposeInner() {
   };
 
   return (
-    <>
-      <Nav />
+    <PageShell className="compose-publication-shell">
       <DynamicIdentityLoader onIdentity={setIdentity} onIdentityState={setIdentityState} />
-      <main id="main-content" className="mobile-shell compose-publication-shell">
         <section className="mobile-page-head compose-page-head">
           <p className="eyebrow">Structured editor</p>
           <h1>Write the thesis before the tweet.</h1>
@@ -591,9 +588,7 @@ function ComposeInner() {
             </aside>
           </section>
         )}
-        <SiteFooter />
-      </main>
-    </>
+    </PageShell>
   );
 }
 
@@ -601,14 +596,11 @@ export default function ComposePage() {
   return (
     <Suspense
       fallback={
-        <>
-          <Nav />
-          <main id="main-content" className="mobile-shell">
-            <div className="loading-state">
-              <div className="loading-spinner" />
-            </div>
-          </main>
-        </>
+        <PageShell className="compose-publication-shell">
+          <div className="loading-state">
+            <div className="loading-spinner" />
+          </div>
+        </PageShell>
       }
     >
       <ComposeInner />

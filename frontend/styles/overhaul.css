@@ -1,0 +1,93 @@
+/* overhaul.css — final MotionSites polish and animation utilities */
+.hero,
+.mobile-page-head,
+.home-command {
+  position: relative;
+}
+
+.hero::after,
+.home-command::after {
+  content: "";
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  top: -80px;
+  right: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in oklch, var(--color-accent) 18%, transparent), transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.market-provider-polymarket {
+  --provider-accent: var(--color-provider-polymarket);
+}
+
+.market-provider-kalshi {
+  --provider-accent: var(--color-provider-kalshi);
+}
+
+.market-provider-manual,
+.market-provider-external {
+  --provider-accent: var(--color-accent);
+}
+
+.compose-auth-gate {
+  text-align: center;
+  padding: var(--space-2xl) var(--space-lg);
+}
+
+.publish-success {
+  border-color: color-mix(in oklch, var(--color-success) 40%, transparent);
+  box-shadow: 0 0 48px color-mix(in oklch, var(--color-success) 15%, transparent);
+}
+
+.section-heading-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.section-link {
+  font-weight: 700;
+  color: var(--color-accent-strong);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklch, var(--color-accent) 40%, transparent);
+  text-underline-offset: 4px;
+}
+
+.product-module-grid {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+}
+
+.product-module {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  padding: var(--space-md);
+  background: color-mix(in oklch, var(--color-surface) 70%, transparent);
+  transition: border-color var(--dur-mid) var(--ease-out);
+}
+
+.product-module:hover {
+  border-color: color-mix(in oklch, var(--color-accent) 30%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prediction-card:hover,
+  .market-row:hover,
+  .market-chip:hover,
+  .campaign-card:hover,
+  .mobile-action:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .loading-spinner,
+  .skeleton-shimmer {
+    animation: none;
+  }
+}

@@ -14,9 +14,12 @@
   "dependencies": {
     "@dynamic-labs/ethereum": "^4.88.1",
     "@dynamic-labs/sdk-react-core": "^4.88.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.42.2",
     "next": "16.1.7",
     "react": "19.0.0",
     "react-dom": "19.0.0",
+    "tailwind-merge": "^3.6.0",
     "viem": "^2.46.3"
   },
   "devDependencies": {
