@@ -49,12 +49,14 @@ Use this before a new MCP client, agent, or runtime runs any write-adjacent rehe
 ```text
 read-only MCP smoke:
 - local stdio server: `eva-thesis` starts from the repo root with `pnpm --filter backend mcp`
-- optional HTTP discovery smoke: `GET /api/mcp` returns the same five tool names, `toolDescriptions`, and `agentSafeBoundary.defaultWriteScope: "draft_and_anchor_prep_only"`
+- optional HTTP discovery smoke: `GET /api/mcp` returns the same five tool names, `toolDescriptions`, and an `agentSafeBoundary` with `defaultWriteScope: "draft_and_anchor_prep_only"`, `mcpOutputCeiling: "anchor_prepared"`, `storageClaimDefault: "storage_not_assessed"`, `safeResultVerbs`, and `notEvidenceForStrongerClaims`
 - tool list smoke: exactly `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, `prepare_anchor_transaction`
 - description boundary smoke: write-adjacent tool descriptions say they do not publish, broadcast, call direct REST writes, or prove storage durability
 - read-only call smoke: run `search_markets` with a low-risk query and report only `read-only` / `found candidates`
 - write-adjacent rehearsal: blocked until there is explicit onboarding or task-time approval for exact `xHandle`, `walletAddress`, and `walletSource`, and it must use the local server unless a separate approved remote path exists
 ```
+
+Discovery JSON is a downgrade card, not a permission upgrade. If all an agent has is a route URL, bearer token, browser session, green deploy, issue/PR status, `anchorPreparationId`, or prepared calldata, keep the output on the MCP rung named by `mcpOutputCeiling` and `safeResultVerbs`. `requiredForSubmitted` and `requiredForPublishedLive` must be satisfied before saying submitted, published/live, confirmed, or storage verified.
 
 Do not use `create_thesis_draft`, `prepare_revision_draft`, or `prepare_anchor_transaction` as a generic connectivity smoke test. If the HTTP discovery metadata or MCP tool list differs, descriptions omit the boundary, the local server fails, or the only available path is remote/production, report `blocked: client setup failure` or `blocked: live allowlist drift` and do not fall back to `POST /api/theses`, `POST /api/thesis-anchor/prepare`, UI scraping, or production write routes.
 

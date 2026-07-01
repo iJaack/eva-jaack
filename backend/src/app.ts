@@ -42,7 +42,22 @@ function mcpDiscovery(c: Context) {
     agentSafeBoundary: {
       defaultWriteScope: 'draft_and_anchor_prep_only',
       publishState: 'anchor_prepared_not_published',
+      mcpOutputCeiling: 'anchor_prepared',
+      safeResultVerbs: ['inspected', 'prepared', 'calldata_ready'],
+      storageClaimDefault: 'storage_not_assessed',
       strongerClaimsRequire: ['explicit_approval', 'write_receipt', 'readback_evidence'],
+      requiredForSubmitted: ['explicit_approval', 'tx_hash'],
+      requiredForPublishedLive: ['approved_public_path', 'write_receipt', 'readback_evidence'],
+      notEvidenceForStrongerClaims: [
+        'route_url',
+        'bearer_token',
+        'browser_session',
+        'green_deploy',
+        'issue_status',
+        'pr_status',
+        'anchor_preparation_id',
+        'prepared_calldata',
+      ],
       forbiddenFallbacks: ['direct_rest_writes', 'ui_scraping', 'production_write_routes_without_approval'],
     },
   });
