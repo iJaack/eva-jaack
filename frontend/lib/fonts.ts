@@ -1,4 +1,4 @@
-import { Manrope, Space_Grotesk } from "next/font/google";
+import { Instrument_Serif, Manrope, Space_Grotesk } from "next/font/google";
 
 export const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -12,4 +12,12 @@ export const manrope = Manrope({
   display: "swap",
 });
 
-export const fontVariables = `${spaceGrotesk.variable} ${manrope.variable}`;
+export const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-instrument-serif",
+  display: "swap",
+});
+
+export const fontVariables = `${spaceGrotesk.variable} ${manrope.variable} ${instrumentSerif.variable}`;

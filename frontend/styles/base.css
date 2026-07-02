@@ -1,4 +1,4 @@
-/* base.css — reset, typography, animated backdrop */
+/* base.css — reset, typography, cinematic animated backdrop */
 html,
 body {
   min-height: 100%;
@@ -26,30 +26,73 @@ body {
   color: var(--ink);
 }
 
+/* ---- Cinematic backdrop -------------------------------------------- */
 .site-backdrop {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
-  background: radial-gradient(ellipse 80% 60% at 50% -10%, color-mix(in oklch, var(--color-accent) 12%, transparent), transparent 60%),
-    radial-gradient(ellipse 60% 50% at 100% 50%, color-mix(in oklch, var(--color-brand-lavender) 8%, transparent), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 0% 80%, color-mix(in oklch, var(--color-brand-coral) 6%, transparent), transparent 50%),
-    var(--bg-base);
+  background: var(--bg-base);
+  opacity: 1;
+}
+
+.backdrop-beam {
+  position: absolute;
+  inset: -10% -20% auto;
+  height: 70vh;
+  background: radial-gradient(
+    ellipse 60% 90% at 50% -20%,
+    color-mix(in oklch, var(--color-accent) 16%, transparent),
+    transparent 68%
+  );
+  filter: blur(4px);
+}
+
+.backdrop-aurora {
+  position: absolute;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.5;
+  will-change: transform;
+}
+
+.backdrop-aurora-a {
+  top: -28vmax;
+  left: -14vmax;
+  background: radial-gradient(circle at 40% 40%, color-mix(in oklch, var(--color-brand-cyan) 16%, transparent), transparent 65%);
+  animation: auroraDriftA 32s var(--ease-in-out) infinite alternate;
+}
+
+.backdrop-aurora-b {
+  top: 10vh;
+  right: -30vmax;
+  background: radial-gradient(circle at 55% 45%, color-mix(in oklch, var(--color-brand-lavender) 14%, transparent), transparent 65%);
+  animation: auroraDriftB 40s var(--ease-in-out) infinite alternate;
+}
+
+.backdrop-aurora-c {
+  bottom: -34vmax;
+  left: 16vw;
+  background: radial-gradient(circle at 50% 50%, color-mix(in oklch, var(--color-brand-coral) 10%, transparent), transparent 62%);
+  animation: auroraDriftC 46s var(--ease-in-out) infinite alternate;
 }
 
 .backdrop-mesh {
   position: absolute;
   inset: -20%;
   background:
-    linear-gradient(to right, var(--grid-line-v) 1px, transparent 1px) 0 0 / 72px 72px,
-    linear-gradient(to bottom, var(--grid-line-h) 1px, transparent 1px) 0 0 / 72px 72px;
-  opacity: 0.35;
-  animation: meshDrift 28s linear infinite;
-  mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 20%, transparent 75%);
+    linear-gradient(to right, var(--grid-line-v) 1px, transparent 1px) 0 0 / 84px 84px,
+    linear-gradient(to bottom, var(--grid-line-h) 1px, transparent 1px) 0 0 / 84px 84px;
+  opacity: 0.32;
+  animation: meshDrift 36s linear infinite;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 34%, black 12%, transparent 74%);
 }
 
-.backdrop-mesh-static {
+.backdrop-mesh-static,
+.backdrop-static .backdrop-aurora {
   animation: none;
 }
 
@@ -58,16 +101,29 @@ body {
   position: absolute;
   inset: 0;
   background: var(--gradient-brand-soft);
-  opacity: 0.4;
+  opacity: 0.22;
   mix-blend-mode: screen;
 }
 
 .backdrop-grain {
   position: absolute;
   inset: 0;
-  opacity: 0.045;
+  opacity: 0.05;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   pointer-events: none;
+}
+
+:root[data-theme="light"] .backdrop-aurora {
+  opacity: 0.35;
+}
+
+:root[data-theme="light"] .backdrop-grain {
+  opacity: 0.03;
+}
+
+:root[data-theme="light"] .backdrop-grid {
+  mix-blend-mode: multiply;
+  opacity: 0.12;
 }
 
 @keyframes meshDrift {
@@ -75,42 +131,86 @@ body {
     transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translate3d(-72px, -72px, 0);
+    transform: translate3d(-84px, -84px, 0);
   }
 }
 
+@keyframes auroraDriftA {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(9vw, 7vh, 0) scale(1.14);
+  }
+}
+
+@keyframes auroraDriftB {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.08);
+  }
+  to {
+    transform: translate3d(-11vw, 9vh, 0) scale(0.94);
+  }
+}
+
+@keyframes auroraDriftC {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(7vw, -8vh, 0) scale(1.1);
+  }
+}
+
+/* ---- Typography ------------------------------------------------------ */
 h1,
 h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
   font-weight: 700;
+  text-wrap: balance;
+}
+
+.serif-accent {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 .eyebrow {
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
+  flex-wrap: wrap;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in oklch, var(--color-accent) 22%, transparent);
+  background: color-mix(in oklch, var(--color-accent) 7%, transparent);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--color-accent-strong);
 }
 
 .eyebrow::before {
   content: "";
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--gradient-brand);
-  box-shadow: var(--glow-accent);
+  box-shadow: 0 0 12px color-mix(in oklch, var(--color-accent) 60%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .backdrop-mesh {
+  .backdrop-mesh,
+  .backdrop-aurora {
     animation: none;
   }
 

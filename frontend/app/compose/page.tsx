@@ -341,7 +341,9 @@ function ComposeInner() {
       <DynamicIdentityLoader onIdentity={setIdentity} onIdentityState={setIdentityState} />
         <section className="mobile-page-head compose-page-head">
           <p className="eyebrow">Structured editor</p>
-          <h1>Write the thesis before the tweet.</h1>
+          <h1>
+            Write the thesis before <em>the tweet.</em>
+          </h1>
           <p>Draft privately, turn markets and facts into inline citations, prepare the anchor, then publish a durable post you can share on X.</p>
           <ul className="route-proof-list" aria-label="Compose workflow">
             <li>Private draft until publish</li>

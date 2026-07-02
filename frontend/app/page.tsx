@@ -425,7 +425,9 @@ export default function HomePage() {
     <PageShell variant="home">
         <FadeIn className="mobile-hero home-command">
           <p className="eyebrow">Protocol proof · cited signals · revision history</p>
-          <h1>public predictions need proof objects.</h1>
+          <h1>
+            public predictions need <em>proof objects.</em>
+          </h1>
           <p>
             Eva turns market theses into inspectable records: author trail, cited markets and facts, revision triggers,
             and readable history. The public push should prove the object before asking people to trust the protocol.

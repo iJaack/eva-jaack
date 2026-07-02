@@ -1,10 +1,29 @@
-/* components.css — glass surfaces, nav, buttons, chips, forms */
+/* components.css — glass chrome, gradient CTAs, cards, chips, forms */
+
+/* ---- Topbar ---------------------------------------------------------- */
 .topbar {
-  border-bottom: var(--rule-hairline);
+  border-bottom: 1px solid transparent;
   background: var(--topbar-bg);
-  backdrop-filter: blur(var(--blur-glass)) saturate(1.4);
-  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(1.4);
+  backdrop-filter: blur(var(--blur-glass)) saturate(1.5);
+  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(1.5);
   padding-block: var(--space-sm);
+}
+
+.topbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklch, var(--color-brand-cyan) 45%, transparent) 25%,
+    color-mix(in oklch, var(--color-brand-lavender) 45%, transparent) 50%,
+    color-mix(in oklch, var(--color-brand-coral) 40%, transparent) 75%,
+    transparent
+  );
 }
 
 .brand-mark {
@@ -13,7 +32,20 @@
   border: none;
   border-radius: var(--radius-sm);
   background: transparent url("/eva-logo-mark.svg") center / cover no-repeat;
-  box-shadow: var(--glow-accent);
+  box-shadow: 0 0 24px color-mix(in oklch, var(--color-accent) 35%, transparent);
+}
+
+.brand-title {
+  font-size: var(--text-md);
+  letter-spacing: -0.02em;
+}
+
+.nav-links {
+  border-color: color-mix(in oklch, var(--color-rule) 70%, transparent);
+  background: color-mix(in oklch, var(--color-surface) 55%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--edge-highlight);
 }
 
 .nav-pill {
@@ -22,12 +54,14 @@
   padding: 0.55rem 1rem;
   font-size: var(--text-sm);
   font-weight: 600;
+  color: var(--color-ink-2);
   transition: background var(--dur-mid) var(--ease-out), border-color var(--dur-mid) var(--ease-out), color var(--dur-mid) var(--ease-out);
 }
 
 .nav-pill:hover {
   background: color-mix(in oklch, var(--color-accent) 8%, transparent);
   border-color: var(--border-subtle);
+  color: var(--ink);
 }
 
 .nav-pill-active {
@@ -42,25 +76,35 @@
 .nav-hamburger {
   border-radius: var(--radius-pill);
   border: 1px solid var(--border-subtle);
-  background: color-mix(in oklch, var(--color-surface) 80%, transparent);
+  background: color-mix(in oklch, var(--color-surface) 70%, transparent);
   backdrop-filter: blur(12px);
   transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-mid) var(--ease-out), border-color var(--dur-mid) var(--ease-out);
 }
 
 .nav-edge-cta {
+  position: relative;
   background: var(--gradient-brand);
   color: var(--color-accent-ink);
   border: none;
   font-weight: 700;
   padding-inline: 1.1rem;
-  box-shadow: var(--glow-accent);
+  box-shadow: 0 0 24px color-mix(in oklch, var(--color-accent) 30%, transparent), var(--edge-highlight);
+}
+
+.nav-edge-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid oklch(100% 0 0 / 0.25);
+  pointer-events: none;
 }
 
 .nav-edge-cta:hover,
 .theme-toggle:hover,
 .nav-hamburger:hover {
   transform: translateY(-1px);
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--shadow-soft), 0 0 32px color-mix(in oklch, var(--color-accent) 30%, transparent);
 }
 
 .theme-toggle-icon {
@@ -69,29 +113,43 @@
   display: block;
 }
 
+/* ---- Participation dock ---------------------------------------------- */
 .participation-dock {
   position: sticky;
-  top: calc(60px + env(safe-area-inset-top));
+  top: calc(80px + env(safe-area-inset-top));
   z-index: 150;
   border-bottom: var(--rule-hairline);
-  background: color-mix(in oklch, var(--color-paper-2) 88%, transparent);
+  background: color-mix(in oklch, var(--color-paper-2) 78%, transparent);
   backdrop-filter: blur(var(--blur-glass));
+  color: var(--ink);
 }
 
 .participation-dock-inner {
   width: min(100%, var(--max));
   margin-inline: auto;
   padding: var(--space-sm) var(--pad);
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-md);
+}
+
+.participation-dock-copy {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.participation-dock-copy strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink);
 }
 
 .participation-kicker {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-accent-strong);
 }
@@ -99,17 +157,29 @@
 .loop-step {
   border-radius: var(--radius-pill);
   border: 1px solid var(--border-subtle);
+  background: color-mix(in oklch, var(--color-surface) 60%, transparent);
+  color: var(--color-ink-2);
   padding: 0.4rem 0.85rem;
   font-size: var(--text-xs);
   font-weight: 600;
   transition: all var(--dur-mid) var(--ease-out);
 }
 
+.loop-step span {
+  background: color-mix(in oklch, var(--color-ink) 12%, transparent);
+  color: var(--color-ink-2);
+}
+
 .loop-step-active {
-  background: var(--nav-active-bg);
   border-color: color-mix(in oklch, var(--color-accent) 40%, transparent);
+  background: var(--nav-active-bg);
   color: var(--color-accent-strong);
-  box-shadow: var(--glow-accent);
+  box-shadow: 0 0 20px color-mix(in oklch, var(--color-accent) 22%, transparent);
+}
+
+.loop-step-active span {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
 }
 
 .participation-cta {
@@ -123,6 +193,7 @@
   color: var(--color-accent-strong);
 }
 
+/* ---- Cards ------------------------------------------------------------ */
 .prediction-card,
 .surface,
 .route-panel,
@@ -132,15 +203,15 @@
   border-radius: var(--radius-card);
   border: 1px solid var(--border-subtle);
   background: var(--bg-glass);
-  backdrop-filter: blur(var(--blur-glass)) saturate(1.2);
-  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(1.2);
-  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(var(--blur-glass)) saturate(1.25);
+  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(1.25);
+  box-shadow: var(--shadow-card), var(--edge-highlight);
   transition: transform var(--dur-mid) var(--ease-out), box-shadow var(--dur-mid) var(--ease-out), border-color var(--dur-mid) var(--ease-out);
 }
 
 .card-spotlight {
   position: relative;
-  border-color: color-mix(in oklch, var(--color-accent) 35%, transparent);
+  border-color: color-mix(in oklch, var(--color-accent) 30%, transparent);
   box-shadow: var(--shadow-glow), var(--shadow-float);
 }
 
@@ -154,41 +225,54 @@
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.6;
 }
 
 .prediction-card:hover,
 .market-row:hover,
 .predictor-row:hover,
 .quest-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   border-color: color-mix(in oklch, var(--color-accent) 28%, transparent);
   box-shadow: var(--shadow-glow), var(--shadow-soft);
 }
 
+/* ---- Buttons ----------------------------------------------------------- */
 .mobile-action {
   border-radius: var(--radius-pill);
   border: 1px solid var(--border-subtle);
-  background: color-mix(in oklch, var(--color-surface) 85%, transparent);
+  background: color-mix(in oklch, var(--color-surface) 72%, transparent);
+  backdrop-filter: blur(10px);
   padding: 0.65rem 1.15rem;
   font-size: var(--text-sm);
   font-weight: 700;
   cursor: pointer;
-  transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-mid) var(--ease-out), background var(--dur-mid) var(--ease-out);
+  transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-mid) var(--ease-out), background var(--dur-mid) var(--ease-out), border-color var(--dur-mid) var(--ease-out);
 }
 
 .mobile-action-primary,
 .compose-submit {
+  position: relative;
   background: var(--gradient-brand);
   color: var(--color-accent-ink);
   border: none;
-  box-shadow: var(--glow-accent);
+  box-shadow: 0 0 28px color-mix(in oklch, var(--color-accent) 26%, transparent), var(--edge-highlight);
+}
+
+.mobile-action-primary::after,
+.compose-submit::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid oklch(100% 0 0 / 0.28);
+  pointer-events: none;
 }
 
 .mobile-action:hover:not(:disabled),
 .mobile-action-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-soft), var(--glow-accent);
+  transform: translateY(-1px) scale(1.015);
+  box-shadow: var(--shadow-soft), 0 0 36px color-mix(in oklch, var(--color-accent) 32%, transparent);
 }
 
 .mobile-action:disabled {
@@ -196,6 +280,7 @@
   cursor: not-allowed;
 }
 
+/* ---- Chips & badges ----------------------------------------------------- */
 .status-chip {
   border-radius: var(--radius-pill);
   padding: 0.2rem 0.65rem;
@@ -220,12 +305,13 @@
   border: 1px solid color-mix(in oklch, var(--color-accent) 25%, transparent);
 }
 
+/* ---- Forms --------------------------------------------------------------- */
 .field-input,
 .compose-textarea,
 .compose-title-input {
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
-  background: color-mix(in oklch, var(--color-paper-3) 70%, transparent);
+  background: color-mix(in oklch, var(--color-paper-3) 65%, transparent);
   padding: 0.75rem 1rem;
   transition: border-color var(--dur-mid) var(--ease-out), box-shadow var(--dur-mid) var(--ease-out);
 }
@@ -241,6 +327,7 @@
 .filter-chip {
   border-radius: var(--radius-pill);
   border: 1px solid var(--border-subtle);
+  background: color-mix(in oklch, var(--color-surface) 55%, transparent);
   padding: 0.45rem 0.9rem;
   font-size: var(--text-sm);
   font-weight: 600;
@@ -251,31 +338,54 @@
   background: color-mix(in oklch, var(--color-accent) 18%, transparent);
   border-color: color-mix(in oklch, var(--color-accent) 40%, transparent);
   color: var(--color-accent-strong);
-  box-shadow: var(--glow-accent);
+  box-shadow: 0 0 20px color-mix(in oklch, var(--color-accent) 20%, transparent);
 }
 
+/* ---- Footer ---------------------------------------------------------------- */
 .site-footer,
 .footer.site-footer {
+  position: relative;
   width: min(100%, var(--max));
   margin: var(--space-3xl) auto 0;
-  padding: var(--space-xl) var(--pad) calc(var(--space-xl) + env(safe-area-inset-bottom));
-  border-top: 1px solid transparent;
-  border-image: var(--gradient-brand) 1;
+  padding: var(--space-2xl) var(--pad) calc(var(--space-xl) + env(safe-area-inset-bottom));
+  border-top: none;
   display: grid;
-  gap: var(--space-md);
+  gap: var(--space-lg);
   color: var(--muted);
   font-size: var(--text-sm);
 }
 
+.site-footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: var(--pad);
+  right: var(--pad);
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklch, var(--color-brand-cyan) 55%, transparent) 20%,
+    color-mix(in oklch, var(--color-brand-lavender) 55%, transparent) 45%,
+    color-mix(in oklch, var(--color-brand-coral) 50%, transparent) 70%,
+    color-mix(in oklch, var(--color-brand-lime) 45%, transparent) 90%,
+    transparent
+  );
+}
+
 .footer-brand {
   display: grid;
-  gap: var(--space-xs);
-  max-width: 48ch;
+  gap: var(--space-sm);
+  max-width: 52ch;
 }
 
 .footer-brand p {
   margin: 0;
-  line-height: 1.6;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--text-md);
+  line-height: 1.55;
+  color: var(--color-ink-2);
 }
 
 .footer-links {
@@ -288,6 +398,7 @@
   position: relative;
   font-weight: 600;
   color: var(--color-ink-2);
+  text-decoration: none;
   transition: color var(--dur-mid) var(--ease-out);
 }
 
@@ -312,6 +423,7 @@
   transform: scaleX(1);
 }
 
+/* ---- Loading ------------------------------------------------------------------ */
 .loading-spinner {
   width: 28px;
   height: 28px;
@@ -348,6 +460,7 @@
   }
 }
 
+/* ---- Generic buttons (campaign pages) ----------------------------------------- */
 .btn,
 .hero-actions .btn {
   display: inline-flex;
@@ -357,7 +470,8 @@
   padding: 0.65rem 1.15rem;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border-subtle);
-  background: color-mix(in oklch, var(--color-surface) 85%, transparent);
+  background: color-mix(in oklch, var(--color-surface) 72%, transparent);
+  backdrop-filter: blur(10px);
   font-size: var(--text-sm);
   font-weight: 700;
   transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-mid) var(--ease-out);
@@ -365,16 +479,26 @@
 
 .btn-primary,
 .hero-actions .btn-primary {
+  position: relative;
   background: var(--gradient-brand);
   color: var(--color-accent-ink);
   border: none;
-  box-shadow: var(--glow-accent);
+  box-shadow: 0 0 28px color-mix(in oklch, var(--color-accent) 26%, transparent), var(--edge-highlight);
+}
+
+.btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid oklch(100% 0 0 / 0.28);
+  pointer-events: none;
 }
 
 .btn:hover,
 .hero-actions .btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-soft);
+  transform: translateY(-1px) scale(1.015);
+  box-shadow: var(--shadow-soft), 0 0 32px color-mix(in oklch, var(--color-accent) 24%, transparent);
 }
 
 .hero-actions {
@@ -384,6 +508,7 @@
   margin-top: var(--space-lg);
 }
 
+/* ---- Timeline cards -------------------------------------------------------------- */
 .revision-card,
 .timeline-card {
   border-radius: var(--radius-md);
@@ -410,4 +535,3 @@
   border-radius: 50%;
   background: var(--gradient-brand);
 }
-

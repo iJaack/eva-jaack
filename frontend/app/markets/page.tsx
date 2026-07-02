@@ -64,7 +64,11 @@ export default function MarketsPage() {
     <PageShell>
       <SectionHeader
         eyebrow="Signal library"
-        title="Markets are source material."
+        title={
+          <>
+            Markets are <em>source material.</em>
+          </>
+        }
         description="Use prediction markets as citations inside a broader thesis. Eva keeps venue odds separate from the argument, the facts, and the revision trail."
       >
         <ul className="route-proof-list" aria-label="Market library rules">

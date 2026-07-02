@@ -1,4 +1,4 @@
-/* layout.css — shells, grids, page structure */
+/* layout.css — shells, grids, display typography */
 .page-shell,
 .mobile-shell {
   width: min(100%, var(--max));
@@ -28,13 +28,28 @@
   gap: var(--space-xl);
 }
 
+/* Display headlines — gradient-clipped, oversized, tight leading */
 .mobile-page-head h1,
 .hero h1,
 .home-command h1 {
-  font-size: var(--text-hero);
-  line-height: 0.95;
-  max-width: 14ch;
-  background: linear-gradient(135deg, var(--color-ink) 0%, color-mix(in oklch, var(--color-ink) 75%, var(--color-accent)) 100%);
+  font-size: var(--text-display-s);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  max-width: 16ch;
+  background: var(--gradient-headline);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.mobile-page-head h1 em,
+.hero h1 em,
+.home-command h1 em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  background: var(--gradient-brand);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -49,6 +64,43 @@
   line-height: 1.65;
 }
 
+/* ---- Homepage hero — open, cinematic, artifact floating right ---- */
+.home-command {
+  grid-area: auto;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: var(--space-xl) 0 var(--space-md);
+}
+
+.home-command h1 {
+  max-width: 15ch;
+  font-size: clamp(2.6rem, 5.4vw, 4.6rem);
+  line-height: 0.99;
+}
+
+@media (min-width: 64rem) {
+  .home-command {
+    grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.82fr) !important;
+    column-gap: var(--space-2xl);
+    align-items: center;
+  }
+
+  .home-command > .eyebrow,
+  .home-command > h1,
+  .home-command > p,
+  .home-command > .mobile-hero-actions {
+    grid-column: 1;
+  }
+
+  .home-command > .home-hero-artifact {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    margin-top: 0;
+  }
+}
+
+/* ---- Homepage workbench — explicit areas for every section ---- */
 @media (min-width: 72rem) {
   .page-shell:not(.prediction-home) {
     grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1fr);
@@ -61,16 +113,52 @@
   }
 
   .home-workbench {
-    grid-template-columns: minmax(300px, 0.75fr) minmax(0, 1.35fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
-      "hero tape"
-      "hero markets"
-      "quests feature"
-      "rail feature";
+      "callout callout"
+      "quests quests"
+      "tape tape"
+      "markets feature"
+      "markets rail"
+      "directory directory";
   }
 
-  .home-command {
-    grid-area: hero;
+  .home-workbench .quest-scoreboard {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .home-workbench > .workbench-tape,
+  .home-workbench > .workbench-quests,
+  .home-workbench > .workbench-feature,
+  .home-workbench > .workbench-rail {
+    position: static;
+    top: auto;
+    z-index: auto;
+    min-height: 0;
+  }
+
+  .home-workbench .quest-board {
+    min-height: 0;
+  }
+
+  .home-workbench > .workbench-rail {
+    grid-template-columns: 1fr;
+  }
+
+  .home-workbench .workbench-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .home-workbench .workbench-system .product-module-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-workbench > .campaign-callout {
+    grid-area: callout;
+  }
+
+  .home-workbench > .campaign-directory {
+    grid-area: directory;
   }
 
   .home-tape-section {
@@ -91,5 +179,24 @@
 
   .home-rail {
     grid-area: rail;
+  }
+}
+
+@media (min-width: 96rem) {
+  .home-workbench {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "callout callout"
+      "quests quests"
+      "tape tape"
+      "markets feature"
+      "markets rail"
+      "directory directory";
+  }
+
+  .home-featured-thesis.workbench-feature,
+  .home-rail.workbench-rail {
+    position: static;
+    top: auto;
   }
 }

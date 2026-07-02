@@ -32,7 +32,11 @@ export default function PredictorsPage() {
     <PageShell>
       <SectionHeader
         eyebrow="Author records"
-        title="Judge predictors by their thesis trail."
+        title={
+          <>
+            Judge predictors by their <em>thesis trail.</em>
+          </>
+        }
         description="Eva separates activity from proven accuracy. Read the public theses, inspect their signals, and only treat resolved outcomes as performance evidence."
       >
         <ul className="route-proof-list" aria-label="Author record rules">
