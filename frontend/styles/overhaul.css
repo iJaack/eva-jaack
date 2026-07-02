@@ -176,11 +176,33 @@
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 400;
-  background: var(--gradient-brand);
+  background: var(--gradient-accent-text);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   line-height: 1;
+}
+
+/* Keep eyebrow pills on a single line when space allows (legacy caps hero p at 62ch) */
+p.eyebrow,
+.eyebrow {
+  max-width: 100%;
+  width: fit-content;
+}
+
+/* Gradient CTAs keep dark ink on pastel gradient in both themes */
+.home-command .mobile-action-primary {
+  background: var(--gradient-brand);
+  border: none;
+  color: var(--color-accent-ink);
+}
+
+:root[data-theme="light"] .nav-edge-cta,
+:root[data-theme="light"] .mobile-action-primary,
+:root[data-theme="light"] .home-command .mobile-action-primary,
+:root[data-theme="light"] .btn-primary,
+:root[data-theme="light"] .compose-submit {
+  color: oklch(16% 0.02 260);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -30,6 +30,7 @@
     color-mix(in oklch, var(--color-ink) 55%, var(--color-brand-cyan)) 72%,
     color-mix(in oklch, var(--color-ink) 40%, var(--color-brand-lavender)) 100%
   );
+  --gradient-accent-text: var(--gradient-brand);
 
   /* Dark theme (default) — deep space base */
   --color-paper: oklch(9% 0.02 275);
@@ -186,4 +187,11 @@
   --shadow-soft: 0 8px 24px oklch(30% 0.02 260 / 0.1);
   --edge-highlight: inset 0 1px 0 oklch(100% 0 0 / 0.6);
   --glow-accent: 0 0 44px color-mix(in oklch, var(--color-accent) 18%, transparent);
+  --gradient-accent-text: linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--color-brand-cyan) 55%, oklch(35% 0.09 210)) 0%,
+    color-mix(in oklch, var(--color-brand-lavender) 50%, oklch(35% 0.1 300)) 40%,
+    color-mix(in oklch, var(--color-brand-coral) 55%, oklch(40% 0.13 40)) 75%,
+    color-mix(in oklch, var(--color-brand-lime) 45%, oklch(42% 0.12 130)) 100%
+  );
 }

@@ -49,7 +49,7 @@
   font-style: italic;
   font-weight: 400;
   letter-spacing: -0.015em;
-  background: var(--gradient-brand);
+  background: var(--gradient-accent-text);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
