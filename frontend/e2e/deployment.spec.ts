@@ -23,7 +23,8 @@ test("deployed authoring and proof routes hydrate without client errors @deploym
 
   await page.goto("/compose");
   await expect(page.getByRole("heading", { name: "Build the argument. Keep the receipts." })).toBeVisible();
-  await expect(page.getByTestId("compose-auth-gate")).toBeVisible();
+  await expect(page.getByTestId("compose-workspace")).toBeVisible();
+  await expect(page.getByLabel("Thesis title")).toBeVisible();
 
   await page.goto("/eva");
   await expect(page.getByRole("heading", { name: "$EVA, on Avalanche." })).toBeVisible();
