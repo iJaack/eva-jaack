@@ -54,10 +54,16 @@ export function SelfCustodyWalletProvider({ children }: { children: ReactNode })
 
   useEffect(() => {
     const nextProvider = getInjectedProvider();
-    setProvider(nextProvider);
-    if (!nextProvider) return;
-
     let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) setProvider(nextProvider);
+    });
+    if (!nextProvider) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
     Promise.all([getConnectedAccounts(nextProvider), getCurrentChainId(nextProvider)])
       .then(([accounts, currentChainId]) => {
         if (cancelled) return;

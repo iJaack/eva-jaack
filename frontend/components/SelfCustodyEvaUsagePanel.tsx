@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { encodeFunctionData, keccak256, parseUnits, toBytes, type Hash } from "viem";
 import {
   evaPublicClient,
@@ -41,13 +41,12 @@ export default function SelfCustodyEvaUsagePanel() {
   const [reference, setReference] = useState("");
   const [state, setState] = useState<TransactionState>({ phase: "idle", hash: null, message: null });
 
-  const amountWei = useMemo(() => {
-    try {
-      return parseUnits(amount || "0", protocol.tokens.eva.decimals);
-    } catch {
-      return 0n;
-    }
-  }, [amount]);
+  let amountWei = 0n;
+  try {
+    amountWei = parseUnits(amount || "0", protocol.tokens.eva.decimals);
+  } catch {
+    amountWei = 0n;
+  }
 
   const refresh = useCallback(async () => {
     const nextSnapshot = await readEvaUsageSnapshot(walletAddress);

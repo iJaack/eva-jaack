@@ -189,7 +189,7 @@ function ComposeInner() {
 
   useEffect(() => {
     const savedHandle = window.localStorage.getItem("eva.publicXHandle");
-    if (savedHandle) setXHandleInput(savedHandle);
+    if (savedHandle) queueMicrotask(() => setXHandleInput(savedHandle));
   }, []);
 
   const marketSignalText = selectedMarket
@@ -198,12 +198,6 @@ function ComposeInner() {
   const factSignalText = normalizedFactClaim
     ? `Fact signal: ${normalizedFactClaim}${factUrl.trim() ? ` Source: ${factUrl.trim()}` : ""}.`
     : "Fact signal: Add an observed fact, source, or closed prediction that changes how readers should interpret the thesis.";
-
-  useEffect(() => {
-    if (!selectedMarket?.outcomes.length) return;
-    const hasSelectedOutcome = selectedMarket.outcomes.some((outcome) => outcome.label === selectedOutcomeLabel);
-    if (!hasSelectedOutcome) setSelectedOutcomeLabel(selectedMarket.outcomes[0].label);
-  }, [selectedMarket, selectedOutcomeLabel]);
 
   const invalidateAnchor = (nextDraftState = "Unsaved private draft") => {
     setDraftState(nextDraftState);
@@ -584,7 +578,16 @@ function ComposeInner() {
                 </div>
                 <label className="field-group">
                   <span className="field-label">Primary market signal</span>
-                  <select className="field-input" value={marketId} onChange={(event) => setMarketId(event.target.value)}>
+                  <select
+                    className="field-input"
+                    value={marketId}
+                    onChange={(event) => {
+                      const nextMarketId = event.target.value;
+                      const nextMarket = markets.find((market) => market.marketId === nextMarketId);
+                      setMarketId(nextMarketId);
+                      if (nextMarket?.outcomes[0]) setSelectedOutcomeLabel(nextMarket.outcomes[0].label);
+                    }}
+                  >
                     <option value="">Manual signal</option>
                     {markets.map((market) => (
                       <option key={market.marketId} value={market.marketId}>

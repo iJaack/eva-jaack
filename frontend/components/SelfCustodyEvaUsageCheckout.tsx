@@ -48,10 +48,7 @@ export default function SelfCustodyEvaUsageCheckout({
   }, [quote.account]);
 
   useEffect(() => {
-    if (!matchingWallet) {
-      setAllowance(null);
-      return;
-    }
+    if (!matchingWallet) return;
     let cancelled = false;
     readEvaUsageSnapshot(quote.account)
       .then((snapshot) => {
@@ -122,7 +119,7 @@ export default function SelfCustodyEvaUsageCheckout({
   }
 
   const busy = state.phase === "submitting" || state.phase === "confirming";
-  const hasAllowance = allowance !== null && allowance >= amount;
+  const hasAllowance = matchingWallet && allowance !== null && allowance >= amount;
   const explorerHash = state.hash ?? (/^0x[a-fA-F0-9]{64}$/.test(txHash) ? (txHash as Hash) : null);
 
   return (

@@ -168,15 +168,17 @@ export default function ThesisDetailClient() {
   useEffect(() => {
     if (!thesisId) return;
     getThesisDetail(thesisId)
-      .then(setDetail)
+      .then((nextDetail) => {
+        setDetail(nextDetail);
+        setSignalUpdateDrafts(
+          Object.fromEntries(
+            predictionSignals(nextDetail.thesis).map((signal) => [signal.signalId, signalDraftFor(signal)]),
+          ),
+        );
+      })
       .catch((reason) => setError(reason instanceof Error ? reason.message : "Failed to load thesis."))
       .finally(() => setLoading(false));
   }, [thesisId]);
-
-  useEffect(() => {
-    if (!detail) return;
-    setSignalUpdateDrafts(Object.fromEntries(predictionSignals(detail.thesis).map((signal) => [signal.signalId, signalDraftFor(signal)])));
-  }, [detail]);
 
   const previewCopy = async () => {
     const preview = await getCopyPreview(thesisId);
@@ -298,6 +300,11 @@ export default function ThesisDetailClient() {
         evaUsageTxHash: revisionEvaUsageTxHash.trim(),
       });
       setDetail(response);
+      setSignalUpdateDrafts(
+        Object.fromEntries(
+          predictionSignals(response.thesis).map((signal) => [signal.signalId, signalDraftFor(signal)]),
+        ),
+      );
       setUpdateBody("");
       setUpdateNote("");
       setRevisionAnchorPreparationId(null);

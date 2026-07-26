@@ -14,11 +14,11 @@
   "dependencies": {
     "clsx": "^2.1.1",
     "framer-motion": "^12.42.2",
-    "next": "16.1.7",
+    "next": "16.2.11",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "tailwind-merge": "^3.6.0",
-    "viem": "^2.46.3"
+    "viem": "^2.55.8"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",
@@ -27,7 +27,7 @@
     "@types/react-dom": "^19.0.3",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.39.1",
-    "eslint-config-next": "16.1.6",
+    "eslint-config-next": "16.2.11",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3"
