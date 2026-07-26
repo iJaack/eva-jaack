@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
-import AnimatedBackdrop from "@/components/motion/AnimatedBackdrop";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import EvaProviders from "@/components/EvaProviders";
-import { fontVariables, manrope, spaceGrotesk } from "@/lib/fonts";
+import { fontVariables, geist } from "@/lib/fonts";
 import { protocol } from "@/lib/protocol";
 
 const title = `${protocol.app.name} — Public thesis publishing for prediction markets`;
@@ -48,17 +47,9 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={fontVariables}>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)})();`,
-          }}
-        />
-      </head>
-      <body className={`${spaceGrotesk.className} ${manrope.className}`}>
+    <html lang="en" className={fontVariables}>
+      <body className={geist.className}>
         <MotionProvider>
-          <AnimatedBackdrop />
           <EvaProviders>{children}</EvaProviders>
         </MotionProvider>
       </body>

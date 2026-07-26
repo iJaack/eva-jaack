@@ -4,401 +4,142 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CampaignLink, CampaignViewTracker } from "@/components/CampaignTelemetry";
 import FadeIn from "@/components/motion/FadeIn";
-import StaggerChildren, { StaggerItem } from "@/components/motion/StaggerChildren";
-import { ButtonLink } from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
 import PageShell from "@/components/ui/PageShell";
-import {
-  getCopyPreview,
-  getPredictionSummary,
-  type PredictionMarket,
-  type PredictionSummary,
-  type Predictor,
-  type Thesis,
-} from "@/lib/api";
-import { marketUiStatus, statusClassName, statusLabel, thesisUiStatus } from "@/lib/status";
+import { getPredictionSummary, type PredictionMarket, type PredictionSummary, type Thesis } from "@/lib/api";
+import { protocol } from "@/lib/protocol";
+import { marketUiStatus, statusLabel, thesisUiStatus } from "@/lib/status";
 
-const compactUsdFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  notation: "compact",
-  maximumFractionDigits: 1,
-});
-
-const percentFormatter = new Intl.NumberFormat("en-US", {
-  style: "percent",
-  maximumFractionDigits: 0,
-});
-
-const evaPredictsUrl = "https://x.com/evapredicts";
-const protocolProofThreadUrl = "https://x.com/evapredicts/status/2072257036251767031";
 const launchThesisId = "thesis-0fdef25794b38b6e8eed7524";
 const featuredCampaign = "protocol_proof";
 const launchThesisHref = `/thesis/${launchThesisId}?utm_source=homepage&utm_medium=proof_cta&utm_campaign=${featuredCampaign}&utm_content=spacex_proof_record`;
-const featuredCampaignHref = `/campaigns/protocol-proof?utm_source=homepage&utm_medium=campaign_cta&utm_campaign=${featuredCampaign}&utm_content=homepage_callout`;
 
-function formatUsd(value: number | null): string {
-  if (value === null) return "—";
-  return compactUsdFormatter.format(value);
+function shortAddress(address: string): string {
+  return `${address.slice(0, 8)}…${address.slice(-6)}`;
 }
 
 function formatOdds(value: number): string {
-  return percentFormatter.format(value);
+  return `${Math.round(value * 100)}%`;
 }
 
-function leadingOutcome(market: PredictionMarket): { label: string; price: number } | null {
-  return [...market.outcomes].sort((left, right) => right.price - left.price)[0] ?? null;
+function formatUsd(value: number | null): string {
+  if (value === null) return "—";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(value);
 }
 
-function thesisMarket(thesis: Thesis, markets: PredictionMarket[]): PredictionMarket | null {
-  const firstMarketSignal = thesis.signals.find((signal) => signal.kind === "prediction_market" && signal.marketId);
-  return firstMarketSignal && firstMarketSignal.kind === "prediction_market"
-    ? markets.find((market) => market.marketId === firstMarketSignal.marketId) ?? null
-    : null;
+function signalValue(signal: Thesis["signals"][number]): string {
+  if (signal.kind === "prediction_market") {
+    return `${signal.selectedOutcomeLabel} ${formatOdds(signal.currentOdds)}`;
+  }
+  return signal.verifierVerdict === "unverifiable_yet" ? "Not verified" : signal.verifierVerdict.replaceAll("_", " ");
 }
 
-function MarketStrip({ markets }: { markets: PredictionMarket[] }) {
-  return (
-    <div className="mobile-strip" aria-label="Trending markets">
-      {markets.map((market) => {
-        const outcome = leadingOutcome(market);
-        const uiStatus = marketUiStatus(market);
-
-        return (
-          <Link key={market.marketId} href={`/markets/${market.marketId}`} className="market-chip">
-            <span>{market.category}</span>
-            <strong>{outcome ? `${outcome.label} ${formatOdds(outcome.price)}` : "No odds"}</strong>
-            <span className={statusClassName(uiStatus)}>{statusLabel(uiStatus)}</span>
-          </Link>
-        );
-      })}
-    </div>
-  );
-}
-
-const productModules = [
-  {
-    title: "Readable thesis",
-    body: "A public post that can carry a broad market idea without becoming a dashboard.",
-  },
-  {
-    title: "Cited signals",
-    body: "Prediction markets, closed forecasts, facts, and second-order effects stay attached as reviewable sources.",
-  },
-  {
-    title: "Visible updates",
-    body: "Each material change appends a revision so readers can see how the argument moved.",
-  },
-  {
-    title: "Author record",
-    body: "X plus wallet identity gives every thesis an author trail agents and readers can inspect.",
-  },
-] as const;
-
-const participationQuests = [
-  {
-    step: "01",
-    title: "Start the argument",
-    body: "Write the thesis as a post first, then decide which signals deserve to support it.",
-    href: "/compose",
-    cta: "Open editor",
-  },
-  {
-    step: "02",
-    title: "Attach sources",
-    body: "Add live markets, closed predictions, facts, and lateral effects as citations.",
-    href: "/markets",
-    cta: "Browse library",
-  },
-  {
-    step: "03",
-    title: "Publish the artifact",
-    body: "Anchor the first version, publish the post, then append updates as the thesis evolves.",
-    href: "/thesis/thesis-0fdef25794b38b6e8eed7524",
-    cta: "Read example",
-  },
-  {
-    step: "04",
-    title: "Build the record",
-    body: "Connect X and wallet identity so authorship can persist across posts.",
-    href: "/predictors",
-    cta: "View records",
-  },
-] as const;
-
-const campaignProofPoints = [
-  "make the proof object visible before the protocol claim",
-  "route infra-minded builders into cited signals and author records",
-  "measure proof-record intent before asking for wider distribution",
-] as const;
-
-const activeCampaigns = [
-  {
-    title: "forecast provenance",
-    body: "A supporting @evapredicts route: who made the call, what it read, what would change it, and where the revision lives.",
-    href: "/campaigns/forecast-provenance?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=forecast_provenance&utm_content=forecast_provenance_card",
-    metric: "author-record clicks, agent-manifest opens, proof-record reads, market-context clicks, compose starts, and follows",
-  },
-  {
-    title: "verifier adoption",
-    body: "A supporting verifier route: public forecasts need claim boundaries, source fit, break conditions, author trails, and visible revisions before amplification.",
-    href: "/campaigns/verifier-adoption?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=verifier_adoption&utm_content=verifier_adoption_card",
-    metric: "proof-record reads, market-signal clicks, author-record clicks, agent-manifest opens, compose starts, and follows",
-  },
-  {
-    title: "trust receipts",
-    body: "A launch page for prediction-market operators who need cited theses, visible revisions, and author records instead of screenshots.",
-    href: "/campaigns/trust-receipts?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=trust_receipts_launch&utm_content=trust_receipts_card",
-    metric: "draft-thesis clicks and example-thesis reads",
-  },
-  {
-    title: "agent receipts",
-    body: "A sharper wedge for agent builders: public market calls are only useful when the underlying signals and revisions are inspectable.",
-    href: "/campaigns/agent-receipts?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=agent_receipts&utm_content=agent_receipts_card",
-    metric: "compose starts, follow clicks, and example-thesis clicks",
-  },
-  {
-    title: "reply sprint",
-    body: "An approval-ready @evapredicts distribution loop for live prediction-market conversations, with target-specific UTM links.",
-    href: "/campaigns/reply-sprint?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=evapredicts_reply_sprint&utm_content=reply_sprint_card",
-    metric: "qualified thesis visits from X replies",
-  },
-  {
-    title: "policy-safe theses",
-    body: "A boundary-first launch page that explains which markets @evapredicts will not amplify before the public reply sprint widens.",
-    href: "/campaigns/policy-safe-theses?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=policy_safe_theses&utm_content=policy_safe_card",
-    metric: "safe-thesis starts, follow clicks, and example reads",
-  },
-  {
-    title: "launch truth status",
-    body: "A supporting status route for what is live, what stays gated, and why @evapredicts will not fake launch certainty.",
-    href: "/campaigns/launch-truth-status?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=launch_truth_status&utm_content=launch_truth_card",
-    metric: "status-page visits, follow clicks, and proof-thesis reads",
-  },
-  {
-    title: "source quality sprint",
-    body: "A tighter campaign for prediction-market builders: the useful object is the thesis, the cited signals, the revision trigger, and the author record.",
-    href: "/campaigns/source-quality-sprint?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=source_quality_sprint&utm_content=source_quality_card",
-    metric: "proof-thesis reads, source-library clicks, compose starts, and follows",
-  },
-  {
-    title: "prediction memory",
-    body: "A supporting @evapredicts route: prediction markets price the moment, but Eva keeps the thesis, sources, revisions, and author trail inspectable.",
-    href: "/campaigns/prediction-memory?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=prediction_memory&utm_content=prediction_memory_card",
-    metric: "prediction-memory sessions, proof-thesis reads, compose starts, and follows",
-  },
-  {
-    title: "AI forecast receipts",
-    body: "A campaign for agent builders and prediction-market people: AI forecasts should carry source fit, revision triggers, and author/runtime trails before amplification.",
-    href: "/campaigns/ai-forecast-receipts?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=ai_forecast_receipts&utm_content=forecast_receipts_card",
-    metric: "receipt-page visits, proof-thesis reads, market-signal clicks, compose starts, and follows",
-  },
-  {
-    title: "protocol proof",
-    body: "The current infra-native wedge: public predictions need cited signals, visible revisions, author identity, and anchorable proof objects before bigger claims.",
-    href: "/campaigns/protocol-proof?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=protocol_proof&utm_content=protocol_proof_card",
-    metric: "proof-record reads, source-library clicks, author-record clicks, compose starts, and follows",
-  },
-  {
-    title: "forecast QA checklist",
-    body: "A checklist wedge for AI forecast and market-thesis builders: source fit, break conditions, revision triggers, and author trail before amplification.",
-    href: "/campaigns/forecast-qa-checklist?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=forecast_qa_checklist&utm_content=forecast_qa_card",
-    metric: "proof-record reads, market-signal clicks, compose starts, author-record clicks, and follows",
-  },
-  {
-    title: "forecast trust loop",
-    body: "A proof CTA route for skeptical builders: source the claim, state what would break it, revise visibly, and keep the receipt inspectable.",
-    href: "/campaigns/forecast-trust-loop?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=forecast_trust_loop&utm_content=trust_loop_card",
-    metric: "proof-record reads, market-signal clicks, compose starts, author-record clicks, and follows",
-  },
-  {
-    title: "agent forecast interface",
-    body: "A measurable route for agent builders: inspect markets, prepare thesis drafts, preserve revision boundaries, and hand users proof objects instead of loose answers.",
-    href: "/campaigns/agent-forecast-interface?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=agent_forecast_interface&utm_content=agent_forecast_card",
-    metric: "agent-manifest opens, MCP quickstart clicks, proof-record reads, compose starts, author-record clicks, and follows",
-  },
-] as const;
-
-function CampaignCallout() {
-  return (
-    <section className="prediction-section campaign-callout" aria-label="Current Eva Protocol campaign">
-      <CampaignViewTracker campaign={featuredCampaign} channel="homepage_campaign_callout" />
-      <div className="campaign-callout-copy">
-        <p className="section-kicker">@evapredicts campaign</p>
-        <h2 className="section-title section-title-sm">public predictions need proof objects, not louder confidence.</h2>
-        <p>
-          The current homepage wedge is protocol proof: route readers from the trust-infrastructure claim into the
-          SpaceX proof thesis, signal library, author records, and the first live @evapredicts protocol-proof thread.
-        </p>
+function ProofArtifact({ thesis, loading }: { thesis: Thesis | null; loading: boolean }) {
+  if (loading) {
+    return (
+      <div className="eva-proof-sheet eva-proof-loading" aria-label="Loading proof thesis">
+        <span>Loading proof object</span>
       </div>
-      <div className="campaign-proof-grid" aria-label="Campaign proof points">
-        {campaignProofPoints.map((point) => (
-          <div key={point}>
-            <span>prove</span>
-            <strong>{point}</strong>
+    );
+  }
+
+  if (!thesis) {
+    return (
+      <div className="eva-proof-sheet eva-proof-loading">
+        <span>Proof object unavailable</span>
+        <Link href="/markets">Browse source library</Link>
+      </div>
+    );
+  }
+
+  const revisions = [...thesis.revisions].sort((left, right) => left.version - right.version);
+
+  return (
+    <article className="eva-proof-sheet" aria-label={`Proof object: ${thesis.title}`}>
+      <div className="eva-proof-topline">
+        <span>Thesis 01</span>
+        <span>Revision v{thesis.currentRevision.version}</span>
+      </div>
+      <h2>{thesis.title}</h2>
+      <div className="eva-proof-grid">
+        <div className="eva-evidence-column">
+          <span className="eva-ledger-label">Evidence rail</span>
+          <div className="eva-evidence-list">
+            {thesis.signals.slice(0, 4).map((signal, index) => (
+              <div className="eva-evidence-item" key={signal.signalId}>
+                <span className="eva-evidence-node" aria-hidden="true" />
+                <div>
+                  <span>S{index + 1} · {signal.kind === "prediction_market" ? "Forecast" : "Fact"}</span>
+                  <strong>{signal.title}</strong>
+                  <em>{signalValue(signal)}</em>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <div className="campaign-action-row">
-        <CampaignLink href={featuredCampaignHref} campaign={featuredCampaign} cta="open_protocol_proof" channel="homepage_campaign_callout" className="mobile-action mobile-action-primary">
-          Open protocol proof
-        </CampaignLink>
-        <CampaignLink href={launchThesisHref} campaign={featuredCampaign} cta="read_proof_record" channel="homepage_campaign_callout" className="mobile-action">
-          Read the proof record
-        </CampaignLink>
-        <CampaignLink href={protocolProofThreadUrl} campaign={featuredCampaign} cta="read_live_thread" channel="homepage_campaign_callout" className="mobile-action" target="_blank" rel="noreferrer" external>
-          Read live thread
-        </CampaignLink>
-        <CampaignLink href={evaPredictsUrl} campaign={featuredCampaign} cta="follow_evapredicts" channel="homepage_campaign_callout" className="mobile-action" target="_blank" rel="noreferrer" external>
-          Follow @evapredicts
-        </CampaignLink>
-      </div>
-      <p className="inline-note">
-        Metric to watch: utm_campaign=protocol_proof clicks into the campaign route, live-thread clicks, proof-record reads, source-library clicks, author-record clicks, follow clicks, and downstream compose starts. No traction claims until measured data exists.
-      </p>
-    </section>
-  );
-}
-
-function CampaignDirectory() {
-  return (
-    <section className="prediction-section campaign-directory" aria-label="Active Eva Protocol campaigns">
-      <div className="section-heading-row prediction-heading">
-        <div>
-          <p className="section-kicker">campaign directory</p>
-          <h2 className="section-title section-title-sm">send curious predictors to one clean next step.</h2>
         </div>
-        <Link href="/campaigns?utm_source=homepage&utm_medium=campaign_directory&utm_campaign=campaign_hub&utm_content=section_link" className="section-link">
-          Open campaign hub
-        </Link>
+        <dl className="eva-proof-facts">
+          <div>
+            <dt>Author</dt>
+            <dd>{thesis.author.xHandle}</dd>
+          </div>
+          <div>
+            <dt>Score</dt>
+            <dd>{thesis.currentScore}<small>/100</small></dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd>{statusLabel(thesisUiStatus(thesis))}</dd>
+          </div>
+          <div>
+            <dt>Anchor</dt>
+            <dd>{thesis.anchor.status}</dd>
+          </div>
+        </dl>
       </div>
-      <div className="product-module-grid campaign-grid">
-        {activeCampaigns.map((campaign) => (
-          <Link key={campaign.title} href={campaign.href} className="product-module campaign-card">
-            <h3>{campaign.title}</h3>
-            <p>{campaign.body}</p>
-            <span className="quest-card-cta">watch: {campaign.metric}</span>
-          </Link>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function QuestBoard({ stats }: { stats: PredictionSummary["stats"] }) {
-  return (
-    <section className="prediction-section quest-board workbench-quests home-quest-board" aria-label="Participation missions">
-      <div className="quest-board-copy">
-        <p className="section-kicker">Start here</p>
-        <h2 className="section-title section-title-sm">From idea to public record</h2>
-        <p>
-          The point is not to place a trade inside Eva. The point is to publish the broader thesis,
-          attach the signals that make it legible, and keep the history honest as odds and facts move.
-        </p>
-      </div>
-      <StaggerChildren className="quest-grid">
-        {participationQuests.map((quest) => (
-          <StaggerItem key={quest.step}>
-            <Link href={quest.href} className="quest-card">
-              <span className="quest-step">{quest.step}</span>
-              <h3>{quest.title}</h3>
-              <p>{quest.body}</p>
-              <span className="quest-card-cta">{quest.cta}</span>
-            </Link>
-          </StaggerItem>
-        ))}
-      </StaggerChildren>
-      <div className="quest-scoreboard" aria-label="Current network activity">
+      <div className="eva-revision-trace" aria-label="Revision trace">
+        <span>Revision trace</span>
         <div>
-          <strong>{stats.weeklyActivePredictors}</strong>
-          <span>authors</span>
-        </div>
-        <div>
-          <strong>{stats.openThesisCount}</strong>
-          <span>open theses</span>
-        </div>
-        <div>
-          <strong>{stats.copiedThesisEvents}</strong>
-          <span>shares/copies</span>
+          {revisions.map((revision, index) => (
+            <span key={revision.revisionId}>
+              v{revision.version}{index < revisions.length - 1 ? <i aria-hidden="true">→</i> : null}
+            </span>
+          ))}
         </div>
       </div>
-    </section>
-  );
-}
-
-function ThesisCard({ thesis, market }: { thesis: Thesis; market: PredictionMarket | null }) {
-  const [copyState, setCopyState] = useState<string | null>(null);
-  const [copyPending, setCopyPending] = useState(false);
-
-  const previewCopy = async () => {
-    setCopyPending(true);
-    setCopyState(null);
-
-    try {
-      const preview = await getCopyPreview(thesis.thesisId);
-      setCopyState(preview.venueUrl ? "External venue opened as preview." : "Copy preview recorded. No execution in v1.");
-    } catch {
-      setCopyState("Copy preview failed. Refresh and try again.");
-    } finally {
-      setCopyPending(false);
-    }
-  };
-
-  return (
-    <Card className="thesis-card card-spotlight" variant="spotlight">
-      <div className="card-topline">
-        <Link href={`/predictors/${thesis.author.xHandle.replace(/^@/, "")}`} className="handle-link">
-          {thesis.author.xHandle}
-        </Link>
-        <span>{thesis.copiedCount} copied</span>
-      </div>
-      <Link href={`/thesis/${thesis.thesisId}`} className="thesis-card-main">
-        <span className="market-label">{market?.category ?? "Market"}</span>
-        <h2>{thesis.title}</h2>
-        <p>{thesis.body}</p>
+      <Link href={`/thesis/${thesis.thesisId}`} className="eva-sheet-link">
+        Inspect full proof <span aria-hidden="true">↗</span>
       </Link>
-      <div className="status-row" aria-label="Thesis status">
-        <span className={statusClassName("forecast")}>Forecast</span>
-        <span className={statusClassName(thesisUiStatus(thesis))}>{statusLabel(thesisUiStatus(thesis))}</span>
-      </div>
-      <div className="odds-row">
-        <div>
-          <span>Signals</span>
-          <strong>{thesis.signals.length}</strong>
-        </div>
-        <div>
-          <span>Score</span>
-          <strong>{thesis.currentScore}</strong>
-        </div>
-        <div>
-          <span>Revision</span>
-          <strong>v{thesis.currentRevision.version}</strong>
-        </div>
-      </div>
-      <div className="sticky-action-row">
-        <button className="mobile-action mobile-action-primary" type="button" onClick={previewCopy} disabled={copyPending}>
-          {copyPending ? "Preparing…" : "Preview X copy"}
-        </button>
-        <Link className="mobile-action" href={`/compose?counterTo=${thesis.thesisId}`}>
-          Build from this
-        </Link>
-      </div>
-      {copyState ? <p className="inline-note" role="status" aria-live="polite">{copyState}</p> : null}
-    </Card>
+    </article>
   );
 }
 
-function PredictorRow({ predictor }: { predictor: Predictor }) {
+function SourceRow({ market, index }: { market: PredictionMarket; index: number }) {
+  const leadingOutcome = [...market.outcomes].sort((left, right) => right.price - left.price)[0] ?? null;
+
   return (
-    <Link href={`/predictors/${predictor.predictorId}`} className="predictor-row">
+    <Link href={`/markets/${market.marketId}`} className="eva-source-row">
+      <span className="eva-source-index">S{index + 1}</span>
+      <div className="eva-source-title">
+        <small>{market.category} · {market.provider}</small>
+        <strong>{market.title}</strong>
+      </div>
       <div>
-        <strong>{predictor.handle}</strong>
-        <span>{predictor.profileState === "registered" ? "Wallet-linked" : "Record-only X profile"}</span>
+        <small>Forecast</small>
+        <strong>{leadingOutcome ? `${leadingOutcome.label} ${formatOdds(leadingOutcome.price)}` : "No odds"}</strong>
       </div>
-      <div className="predictor-score">
-        <strong>{predictor.trustScore}</strong>
-        <span>{predictor.accuracy === null ? "pending" : `${predictor.accuracy}% acc`}</span>
+      <div>
+        <small>Status</small>
+        <strong>{statusLabel(marketUiStatus(market))}</strong>
       </div>
+      <div>
+        <small>Volume</small>
+        <strong>{formatUsd(market.volumeUsd)}</strong>
+      </div>
+      <span className="eva-row-arrow" aria-hidden="true">→</span>
     </Link>
   );
 }
@@ -411,209 +152,146 @@ export default function HomePage() {
   useEffect(() => {
     getPredictionSummary()
       .then(setSummary)
-      .catch((reason) => setError(reason instanceof Error ? reason.message : "Failed to load prediction network."))
+      .catch((reason) => setError(reason instanceof Error ? reason.message : "The public record is unavailable."))
       .finally(() => setLoading(false));
   }, []);
 
-  const markets = summary?.markets ?? [];
-  const theses = summary?.theses ?? [];
-  const predictors = summary?.predictors ?? [];
-  const leadThesis = theses[0] ?? null;
-  const leadMarket = leadThesis ? thesisMarket(leadThesis, markets) : null;
+  const launchThesis = summary?.theses.find((thesis) => thesis.thesisId === launchThesisId) ?? summary?.theses[0] ?? null;
+  const markets = summary?.markets.slice(0, 3) ?? [];
+  const predictors = summary?.predictors.slice(0, 3) ?? [];
+  const contractUrl = `${protocol.chain.explorerUrl}/address/${protocol.contracts.evaThesisProtocol}`;
 
   return (
     <PageShell variant="home">
-        <FadeIn className="mobile-hero home-command">
-          <p className="eyebrow">Protocol proof · cited signals · revision history</p>
-          <h1>public predictions need proof objects.</h1>
+      <CampaignViewTracker campaign={featuredCampaign} channel="homepage" />
+      <section className="eva-hero">
+        <FadeIn className="eva-hero-copy">
+          <h1>Public predictions need proof.</h1>
           <p>
-            Eva turns market theses into inspectable records: author trail, cited markets and facts, revision triggers,
-            and readable history. The public push should prove the object before asking people to trust the protocol.
+            Eva turns market theses into inspectable records—with cited signals, visible revisions,
+            author identity, and an on-chain anchor.
           </p>
-          <div className="mobile-hero-actions">
-            <CampaignLink href={featuredCampaignHref} campaign={featuredCampaign} cta="open_protocol_proof" channel="homepage_hero" className="mobile-action mobile-action-primary">
-              Open protocol proof
-            </CampaignLink>
-            <ButtonLink href="/compose" variant="secondary">
-              Start a thesis
-            </ButtonLink>
-            <CampaignLink href={launchThesisHref} campaign={featuredCampaign} cta="read_proof_record" channel="homepage_hero" className="mobile-action">
+          <div className="eva-hero-actions">
+            <CampaignLink
+              href={launchThesisHref}
+              campaign={featuredCampaign}
+              cta="read_proof_record"
+              channel="homepage_hero"
+              className="eva-primary-action"
+            >
               Read proof thesis
             </CampaignLink>
+            <Link href="/compose" className="eva-text-action">Start a thesis <span aria-hidden="true">→</span></Link>
           </div>
-          <aside className="home-hero-artifact" aria-label="Example thesis artifact">
-            <div className="artifact-header">
-              <span>Working thesis</span>
-              <strong>v3</strong>
-            </div>
-            <h2>SpaceX IPO liquidity rotation</h2>
-            <p>
-              IPO anticipation can absorb speculative liquidity before the listing window is explicit,
-              then release attention into adjacent risk markets after the path clears.
-            </p>
-            <div className="artifact-signal-grid" aria-label="Attached thesis signals">
-              <div>
-                <span>S1 · IPO timing</span>
-                <strong>Yes priced at 42%</strong>
-              </div>
-              <div>
-                <span>S2 · Tender liquidity</span>
-                <strong>Fact not verified yet</strong>
-              </div>
-              <div>
-                <span>S3 · Risk rotation</span>
-                <strong>Second-order signal</strong>
-              </div>
-            </div>
-            <div className="artifact-history">
-              <span>Initial anchor confirmed</span>
-              <span>2 updates appended</span>
-            </div>
-          </aside>
+          <a className="eva-chain-receipt" href={contractUrl} target="_blank" rel="noreferrer">
+            <span className="eva-avalanche-mark" aria-hidden="true" />
+            <span>
+              <strong>Avalanche C-Chain</strong>
+              <small>Live contract · {shortAddress(protocol.contracts.evaThesisProtocol)}</small>
+            </span>
+            <i aria-hidden="true">↗</i>
+          </a>
         </FadeIn>
+        <FadeIn delay={0.08} className="eva-hero-proof">
+          <ProofArtifact thesis={launchThesis} loading={loading} />
+        </FadeIn>
+      </section>
 
-        {loading ? (
-          <div className="loading-state">
-            <div className="loading-spinner" />
+      <section className="eva-process" aria-labelledby="process-title">
+        <div>
+          <h2 id="process-title">One argument.<br />Every receipt.</h2>
+        </div>
+        {[
+          ["01", "Cite the signal", "Attach the forecast or fact that shapes the claim."],
+          ["02", "Publish the thesis", "Anchor an authored, readable public record."],
+          ["03", "Revise in public", "Append changes without erasing the earlier view."],
+        ].map(([step, title, body]) => (
+          <article key={step}>
+            <span>{step}</span>
+            <h3>{title}</h3>
+            <p>{body}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="eva-home-section" aria-labelledby="sources-title">
+        <header className="eva-section-head">
+          <div>
+            <span>Live source tape</span>
+            <h2 id="sources-title">Forecasts ready to become citations.</h2>
           </div>
-        ) : error || !summary ? (
-          <section className="prediction-card">
-            <h2>Signal network unavailable</h2>
-            <p>{error ?? "Eva could not load prediction activity."}</p>
-          </section>
+          <Link href="/markets">Open market library <span aria-hidden="true">→</span></Link>
+        </header>
+        {loading ? (
+          <div className="eva-ruled-loading">Loading source library…</div>
+        ) : error ? (
+          <p className="eva-inline-error">{error}</p>
+        ) : markets.length ? (
+          <div className="eva-source-list">
+            {markets.map((market, index) => <SourceRow key={market.marketId} market={market} index={index} />)}
+          </div>
         ) : (
-          <section className="home-workbench" aria-label="Eva prediction workbench">
-            <CampaignCallout />
-            <CampaignDirectory />
-            <QuestBoard stats={summary.stats} />
-
-            <FadeIn className="prediction-section workbench-tape home-tape-section">
-              <div className="section-heading-row prediction-heading">
-                <div>
-                  <p className="section-kicker">Live source tape</p>
-                  <h2 className="section-title section-title-sm">Markets ready to become citations</h2>
-                </div>
-                <Link href="/compose" className="section-link">
-                  Draft thesis
-                </Link>
-              </div>
-              <MarketStrip markets={markets} />
-            </FadeIn>
-
-            <FadeIn className="prediction-section workbench-markets home-markets-section">
-              <div className="section-heading-row prediction-heading">
-                <div>
-                  <p className="section-kicker">Market library</p>
-                  <h2 className="section-title section-title-sm">Source cards for thesis builders</h2>
-                </div>
-                <Link href="/markets" className="section-link">
-                  Open library
-                </Link>
-              </div>
-              {markets.length > 0 ? (
-                <div className="market-list-mobile">
-                  {markets.map((market) => (
-                    <Link key={market.marketId} href={`/markets/${market.marketId}`} className="market-row">
-                      <div>
-                        <span>{market.category}</span>
-                        <strong>{market.title}</strong>
-                        <span className={statusClassName(marketUiStatus(market))}>{statusLabel(marketUiStatus(market))}</span>
-                      </div>
-                      <div>
-                        <span>Vol</span>
-                        <strong>{formatUsd(market.volumeUsd)}</strong>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <article className="prediction-card empty-state-card">
-                  <h2>No markets loaded</h2>
-                  <p>Refresh or check the API connection before drafting a sourced thesis.</p>
-                </article>
-              )}
-            </FadeIn>
-
-            <FadeIn className="lead-thesis workbench-feature home-featured-thesis">
-              <div className="section-heading-row prediction-heading">
-                <div>
-                  <p className="section-kicker">Featured artifact</p>
-                  <h2 className="section-title section-title-sm">Read an evolving thesis</h2>
-                </div>
-                <Link href="/markets" className="section-link">
-                  Find sources
-                </Link>
-              </div>
-              {leadThesis ? (
-                <ThesisCard thesis={leadThesis} market={leadMarket} />
-              ) : (
-                <article className="prediction-card empty-state-card">
-                  <h2>No featured thesis yet</h2>
-                  <p>Publish the first anchored thesis to create the opening public artifact.</p>
-                </article>
-              )}
-            </FadeIn>
-
-            <aside className="workbench-rail home-rail" aria-label="Network context">
-              <section className="mobile-metrics workbench-metrics" aria-label="Network metrics">
-                <div>
-                  <strong>{summary.stats.weeklyActivePredictors}</strong>
-                  <span>active predictors</span>
-                </div>
-                <div>
-                  <strong>{summary.stats.openThesisCount}</strong>
-                  <span>open theses</span>
-                </div>
-                <div>
-                  <strong>{summary.stats.copiedThesisEvents}</strong>
-                  <span>copied theses</span>
-                </div>
-              </section>
-
-              <section className="prediction-section workbench-predictors">
-                <div className="section-heading-row prediction-heading">
-                  <div>
-                    <p className="section-kicker">Author records</p>
-                    <h2 className="section-title section-title-sm">Who is building a track record</h2>
-                  </div>
-                  <Link href="/predictors" className="section-link">
-                    View records
-                  </Link>
-                </div>
-                {predictors.length > 0 ? (
-                  <div className="predictor-list">
-                    {predictors.map((predictor) => (
-                      <PredictorRow key={predictor.predictorId} predictor={predictor} />
-                    ))}
-                  </div>
-                ) : (
-                  <article className="prediction-card empty-state-card">
-                    <h2>No predictors yet</h2>
-                    <p>Published theses will create public author records.</p>
-                  </article>
-                )}
-              </section>
-
-              <section className="prediction-section product-system workbench-system">
-                <div className="section-heading-row prediction-heading">
-                  <div>
-                    <p className="section-kicker">Product object</p>
-                    <h2 className="section-title section-title-sm">What every thesis carries</h2>
-                  </div>
-                </div>
-                <div className="product-module-grid">
-                  {productModules.map((module) => (
-                    <article key={module.title} className="product-module">
-                      <h3>{module.title}</h3>
-                      <p>{module.body}</p>
-                    </article>
-                  ))}
-                </div>
-              </section>
-            </aside>
-          </section>
+          <p className="eva-empty-row">No markets loaded.</p>
         )}
+      </section>
 
+      <section className="eva-record-section" aria-labelledby="record-title">
+        <div className="eva-record-copy">
+          <span>Public record</span>
+          <h2 id="record-title">The argument stays readable. The provenance stays attached.</h2>
+          <p>
+            Eva keeps venue odds distinct from verified facts, turns material changes into revisions,
+            and preserves the author and anchor trail for readers and agents to inspect.
+          </p>
+          <Link href={launchThesis ? `/thesis/${launchThesis.thesisId}` : "/markets"} className="eva-text-action">
+            Inspect the proof ledger <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+        <div className="eva-record-ledger">
+          {[
+            ["01", "Source", "Time-stamped forecast or cited fact"],
+            ["02", "Claim", "Readable mechanism and break condition"],
+            ["03", "Revision", "Append-only view of material changes"],
+            ["04", "Anchor", "Contract and transaction receipt"],
+          ].map(([step, title, body]) => (
+            <div key={step}>
+              <span>{step}</span>
+              <strong>{title}</strong>
+              <p>{body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {predictors.length ? (
+        <section className="eva-home-section eva-author-section" aria-labelledby="authors-title">
+          <header className="eva-section-head">
+            <div>
+              <span>Author records</span>
+              <h2 id="authors-title">Follow the record, not the confidence.</h2>
+            </div>
+            <Link href="/predictors">View all authors <span aria-hidden="true">→</span></Link>
+          </header>
+          <div className="eva-author-list">
+            {predictors.map((predictor) => (
+              <Link href={`/predictors/${predictor.predictorId}`} key={predictor.predictorId}>
+                <strong>{predictor.handle}</strong>
+                <span>{predictor.profileState === "registered" ? "Wallet-linked" : "Record-only"}</span>
+                <span>{predictor.openTheses} open theses</span>
+                <i aria-hidden="true">→</i>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <section className="eva-campaign-strip" aria-label="Protocol proof campaign">
+        <div>
+          <span>@evapredicts / protocol proof</span>
+          <strong>The product claim starts with one inspectable object.</strong>
+        </div>
+        <Link href="/campaigns/protocol-proof">Open campaign note <span aria-hidden="true">→</span></Link>
+      </section>
     </PageShell>
   );
 }

@@ -340,13 +340,13 @@ function ComposeInner() {
     <PageShell className="compose-publication-shell">
       <DynamicIdentityLoader onIdentity={setIdentity} onIdentityState={setIdentityState} />
         <section className="mobile-page-head compose-page-head">
-          <p className="eyebrow">Structured editor</p>
-          <h1>Write the thesis before the tweet.</h1>
-          <p>Draft privately, turn markets and facts into inline citations, prepare the anchor, then publish a durable post you can share on X.</p>
-          <ul className="route-proof-list" aria-label="Compose workflow">
-            <li>Private draft until publish</li>
-            <li>Signals become inline citations</li>
-            <li>Anchor confirmation gates the public post</li>
+          <p className="eyebrow">Compose / new thesis</p>
+          <h1>Build the argument. Keep the receipts.</h1>
+          <p>Start with a claim, attach the sources that shape it, and define what would make you revise.</p>
+          <ul className="route-proof-list" aria-label="Compose state">
+            <li>Identity — {identityReady ? "Ready" : "Required"}</li>
+            <li>Sources — {attachedSignals.length} attached</li>
+            <li>Anchor — {anchorPrepared ? "Prepared" : "Not prepared"}</li>
           </ul>
         </section>
 
@@ -385,14 +385,14 @@ function ComposeInner() {
           </section>
         ) : !showComposeWorkspace ? (
           <section className="prediction-card compose-auth-gate" data-testid="compose-auth-gate">
-            <p className="eyebrow">Author identity required</p>
-            <h2>Connect before drafting a public thesis.</h2>
+            <p className="eyebrow">Identity / required</p>
+            <h2>Connect to start writing.</h2>
             <p>{authGateMessage}</p>
             <DynamicAuthControl />
             <ul className="route-proof-list" aria-label="Compose auth requirements">
-              <li>No preview author or wallet is shown before Dynamic identity is ready</li>
-              <li>X identity and wallet are required before the draft editor loads</li>
-              <li>Anchoring and publishing stay locked behind the verified session</li>
+              <li>Your draft remains private until publish</li>
+              <li>Publishing needs a confirmed wallet transaction</li>
+              <li>Eva prepares thesis anchors; it never submits a trade</li>
             </ul>
           </section>
         ) : (
