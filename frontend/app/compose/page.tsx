@@ -7,6 +7,7 @@ import DynamicAuthControl from "@/components/DynamicAuthControl";
 import PageShell from "@/components/ui/PageShell";
 import { createThesis, getMarkets, prepareDraftThesisAnchor, type PredictionMarket, type Thesis, type ThesisCreateRequest } from "@/lib/api";
 import type { DynamicIdentityState, DynamicThesisIdentity } from "@/lib/dynamic-identity";
+import { formatEvaAmount, readEvaTokenSnapshot } from "@/lib/eva-token";
 import { protocol } from "@/lib/protocol";
 
 type ThesisIdentity = DynamicThesisIdentity;
@@ -114,6 +115,7 @@ function ComposeInner() {
   const [preparingAnchor, setPreparingAnchor] = useState(false);
   const [identity, setIdentity] = useState<ThesisIdentity>(defaultIdentity);
   const [identityState, setIdentityState] = useState<DynamicIdentityState | null>(null);
+  const [evaBalance, setEvaBalance] = useState("Not read");
 
   useEffect(() => {
     getMarkets().then((response) => setMarkets(response.markets)).catch(() => setMarkets([]));
@@ -146,6 +148,23 @@ function ComposeInner() {
   const showComposeWorkspace = !dynamicIdentityRequired || identityReady;
   const authGateMessage = identityState?.message ?? dynamicUnavailableMessage;
   const nextSignalLabel = `S${attachedSignals.length + 1}`;
+
+  useEffect(() => {
+    if (!showComposeWorkspace) return;
+    let cancelled = false;
+    readEvaTokenSnapshot(identity.walletAddress as `0x${string}`)
+      .then((snapshot) => {
+        if (!cancelled && snapshot.walletBalance !== null) {
+          setEvaBalance(`${formatEvaAmount(snapshot.walletBalance, snapshot.decimals)} EVA`);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setEvaBalance("Unavailable");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [identity.walletAddress, showComposeWorkspace]);
 
   const marketSignalText = selectedMarket
     ? `Prediction signal: ${selectedMarket.title} - ${selectedOutcomeLabel} is priced at ${Math.round(selectedOutcomePrice * 100)}%.`
@@ -340,13 +359,13 @@ function ComposeInner() {
     <PageShell className="compose-publication-shell">
       <DynamicIdentityLoader onIdentity={setIdentity} onIdentityState={setIdentityState} />
         <section className="mobile-page-head compose-page-head">
-          <p className="eyebrow">Structured editor</p>
-          <h1>Write the thesis before the tweet.</h1>
-          <p>Draft privately, turn markets and facts into inline citations, prepare the anchor, then publish a durable post you can share on X.</p>
-          <ul className="route-proof-list" aria-label="Compose workflow">
-            <li>Private draft until publish</li>
-            <li>Signals become inline citations</li>
-            <li>Anchor confirmation gates the public post</li>
+          <p className="eyebrow">Compose / new thesis</p>
+          <h1>Build the argument. Keep the receipts.</h1>
+          <p>Start with a claim, attach the sources that shape it, and define what would make you revise.</p>
+          <ul className="route-proof-list" aria-label="Compose state">
+            <li>Identity — {identityReady ? "Ready" : "Required"}</li>
+            <li>Sources — {attachedSignals.length} attached</li>
+            <li>Anchor — {anchorPrepared ? "Prepared" : "Not prepared"}</li>
           </ul>
         </section>
 
@@ -385,14 +404,14 @@ function ComposeInner() {
           </section>
         ) : !showComposeWorkspace ? (
           <section className="prediction-card compose-auth-gate" data-testid="compose-auth-gate">
-            <p className="eyebrow">Author identity required</p>
-            <h2>Connect before drafting a public thesis.</h2>
+            <p className="eyebrow">Identity / required</p>
+            <h2>Connect to start writing.</h2>
             <p>{authGateMessage}</p>
             <DynamicAuthControl />
             <ul className="route-proof-list" aria-label="Compose auth requirements">
-              <li>No preview author or wallet is shown before Dynamic identity is ready</li>
-              <li>X identity and wallet are required before the draft editor loads</li>
-              <li>Anchoring and publishing stay locked behind the verified session</li>
+              <li>Your draft remains private until publish</li>
+              <li>Publishing needs a confirmed wallet transaction</li>
+              <li>Eva prepares thesis anchors; it never submits a trade</li>
             </ul>
           </section>
         ) : (
@@ -421,7 +440,12 @@ function ComposeInner() {
                     <span>Wallet</span>
                     <strong>{identityReady || !dynamicIdentityRequired ? shortWallet(identity.walletAddress) : "Not connected"}</strong>
                   </div>
+                  <div>
+                    <span>$EVA holder state</span>
+                    <strong>{evaBalance}</strong>
+                  </div>
                 </div>
+                <p className="compose-token-boundary">$EVA balance is author context, never a publishing gate or credibility score.</p>
               </div>
               <div className="compose-editor-heading">
                 <div>

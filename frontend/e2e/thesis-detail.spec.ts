@@ -227,7 +227,7 @@ test("thesis detail reads as a public thesis with attached citation cards and re
 
   await expect(page.getByRole("heading", { name: "Fed hold liquidity thesis" })).toBeVisible();
   await expect(page.getByTestId("thesis-body")).toContainText("[S1]");
-  await expect(page.getByRole("heading", { name: "Signals supporting the thesis" })).toBeVisible();
+  await expect(page.getByText("Supporting signals", { exact: true })).toBeVisible();
   await expect(page.getByTestId("thesis-signal-card").first()).toContainText("S1");
   await expect(page.getByTestId("thesis-signal-card").first()).toContainText("Hold priced at 58%");
   await expect(page.getByTestId("thesis-signal-card").first()).toContainText("open");
@@ -239,7 +239,9 @@ test("thesis detail reads as a public thesis with attached citation cards and re
   await expect(page.getByRole("heading", { name: "Thesis timeline" })).toBeVisible();
   await expect(page.getByTestId("timeline-card")).toHaveCount(1);
   await expect(page.getByTestId("timeline-card").first()).toContainText("Thesis published with initial signal basket.");
-  await expect(page.getByRole("heading", { name: "Append an update" })).toBeVisible();
+  const updateDisclosure = page.locator("details.thesis-update-disclosure");
+  await expect(updateDisclosure.getByText("Append an update", { exact: true })).toBeVisible();
+  await expect(updateDisclosure).not.toHaveAttribute("open", "");
 
   const shareHref = await page.getByRole("link", { name: "Share current revision on X" }).getAttribute("href");
   expect(shareHref).toContain("https://x.com/intent/post?");
@@ -338,6 +340,7 @@ test("publishing an update appends it to the thesis and creates the next revisio
   });
 
   await page.goto("/thesis/thesis-fed-hold");
+  await page.locator("details.thesis-update-disclosure > summary").click();
   const publishButton = page.getByRole("button", { name: "Publish update" });
   await expect(publishButton).toBeDisabled();
   await page.getByLabel("Update body").fill("Rates market repriced after CPI, so this thesis now needs a stronger liquidity extension. [S1]");

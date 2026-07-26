@@ -1,15 +1,21 @@
-import { Manrope, Space_Grotesk } from "next/font/google";
+import { Geist, Geist_Mono, Newsreader } from "next/font/google";
 
-export const spaceGrotesk = Space_Grotesk({
+export const geist = Geist({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
+  variable: "--font-geist",
   display: "swap",
 });
 
-export const manrope = Manrope({
+export const geistMono = Geist_Mono({
   subsets: ["latin"],
-  variable: "--font-manrope",
+  variable: "--font-geist-mono",
   display: "swap",
 });
 
-export const fontVariables = `${spaceGrotesk.variable} ${manrope.variable}`;
+export const newsreader = Newsreader({
+  subsets: ["latin"],
+  variable: "--font-newsreader",
+  display: "swap",
+});
+
+export const fontVariables = `${geist.variable} ${geistMono.variable} ${newsreader.variable}`;

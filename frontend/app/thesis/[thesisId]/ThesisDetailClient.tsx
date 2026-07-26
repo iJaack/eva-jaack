@@ -32,6 +32,10 @@ function formatDate(value: string): string {
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(value));
 }
 
+function shortValue(value: string): string {
+  return `${value.slice(0, 8)}…${value.slice(-6)}`;
+}
+
 function humanize(value: string): string {
   return value.replace(/_/g, " ");
 }
@@ -293,7 +297,7 @@ export default function ThesisDetailClient() {
   return (
     <PageShell className="thesis-detail-shell">
         <div className="back-row">
-          <Link href="/markets" className="section-link">Back to markets</Link>
+          <Link href="/markets" className="section-link">← Market library</Link>
         </div>
 
         {loading ? (
@@ -308,13 +312,18 @@ export default function ThesisDetailClient() {
         ) : (
           <FadeIn className="thesis-publication-layout">
             <article className="prediction-card thesis-article-panel">
+              <p className="eva-thesis-receipt">
+                Thesis / Revision v{detail.thesis.currentRevision.version} / {statusLabel(thesisUiStatus(detail.thesis))}
+              </p>
               <div className="card-topline">
                 <Link href={`/predictors/${detail.predictor.predictorId}`} className="handle-link">
                   {detail.thesis.author.xHandle}
                 </Link>
-                <span>{detail.predictor.profileState === "registered" ? "Wallet-linked" : "Record-only"}</span>
+                <span>
+                  {detail.predictor.profileState === "registered" ? "Wallet-linked author" : "Record-only author"}
+                  {" · "}{formatDate(detail.thesis.updatedAt)}
+                </span>
               </div>
-              <p className="eyebrow">Public thesis artifact</p>
               <h1>{detail.thesis.title}</h1>
               <div className="status-row">
                 <span className={statusClassName(scoreUiStatus(detail.thesis.currentScore))}>Score {detail.thesis.currentScore}</span>
@@ -342,12 +351,12 @@ export default function ThesisDetailClient() {
                 </div>
               </div>
               <div className="mobile-bottom-actions thesis-action-row">
-                <button className="mobile-action mobile-action-primary" type="button" onClick={previewCopy}>
-                  Preview X copy
-                </button>
-                <Link className="mobile-action" href={`/compose?counterTo=${detail.thesis.thesisId}`}>
+                <Link className="mobile-action mobile-action-primary" href={`/compose?counterTo=${detail.thesis.thesisId}`}>
                   Draft response
                 </Link>
+                <button className="mobile-action" type="button" onClick={previewCopy}>
+                  Preview X copy
+                </button>
                 <button className="mobile-action" type="button" onClick={previewAnchor}>
                   Prepare anchor tx
                 </button>
@@ -366,8 +375,42 @@ export default function ThesisDetailClient() {
 
             <aside className="thesis-signal-rail">
               <section className="prediction-card thesis-signal-panel">
-                <p className="eyebrow">Citation basket</p>
-                <h2>Signals supporting the thesis</h2>
+                <p className="eyebrow">Proof ledger</p>
+                <h2>Authorship to anchor</h2>
+                <dl className="eva-thesis-proof-ledger">
+                  <div>
+                    <dt><span aria-hidden="true" />Author</dt>
+                    <dd>
+                      <strong>{detail.thesis.author.xHandle}</strong>
+                      <small>{shortValue(detail.thesis.author.walletAddress)}</small>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt><span aria-hidden="true" />Signals</dt>
+                    <dd>
+                      <strong>{detail.thesis.signals.length} attached</strong>
+                      <small>Forecasts and cited facts</small>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt><span aria-hidden="true" />Revisions</dt>
+                    <dd>
+                      <strong>v{detail.thesis.currentRevision.version} current</strong>
+                      <small>{detail.thesis.revisions.length} versions preserved</small>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt><span aria-hidden="true" />Anchor</dt>
+                    <dd>
+                      <strong>{detail.thesis.anchor.status}</strong>
+                      <small>{shortValue(detail.thesis.anchor.contractAddress ?? protocol.contracts.evaThesisProtocol)}</small>
+                    </dd>
+                  </div>
+                </dl>
+                <div className="eva-thesis-signal-heading">
+                  <span>Supporting signals</span>
+                  <span>{detail.thesis.signals.length.toString().padStart(2, "0")}</span>
+                </div>
                 <div className="attached-signal-list">
                   {detail.thesis.signals.map((signal, index) => (
                     <article key={signal.signalId} className="thesis-signal-card" data-testid="thesis-signal-card">
@@ -421,9 +464,14 @@ export default function ThesisDetailClient() {
                 </div>
               </section>
 
-              <form className="prediction-card thesis-update-panel" onSubmit={publishUpdate}>
-                <p className="eyebrow">Author extension</p>
-                <h2>Append an update</h2>
+              <details className="thesis-update-disclosure">
+                <summary>
+                  <span>Append an update</span>
+                  <small>Author action</small>
+                </summary>
+                <form className="prediction-card thesis-update-panel" onSubmit={publishUpdate}>
+                <p className="eyebrow">Author update</p>
+                <h2>Publish revision v{detail.thesis.currentRevision.version + 1}</h2>
                 <label className="field-group">
                   <span className="field-label">Update body</span>
                   <textarea
@@ -527,7 +575,8 @@ export default function ThesisDetailClient() {
                   </button>
                 </div>
                 {updateState ? <p className="inline-note" role="status">{updateState}</p> : null}
-              </form>
+                </form>
+              </details>
             </aside>
 
             <section className="prediction-card thesis-revision-panel">

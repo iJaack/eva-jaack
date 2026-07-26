@@ -10,6 +10,8 @@ export const config = {
   avalancheRpc: env('AVALANCHE_RPC', protocol.chain.rpcUrl),
 
   evaThesisProtocol: env('EVA_THESIS_PROTOCOL', protocol.contracts.evaThesisProtocol) as `0x${string}`,
+  evaToken: env('EVA_TOKEN', protocol.tokens.eva.address) as `0x${string}`,
+  evaUsageBurner: env('EVA_USAGE_BURNER', protocol.contracts.evaUsageBurner) as `0x${string}`,
 
   evaAgentId: env('EVA_AGENT_ID', protocol.agents.eva.id),
   evaSovereignWallet: env('EVA_SOVEREIGN_WALLET', protocol.agents.eva.wallet) as `0x${string}`,

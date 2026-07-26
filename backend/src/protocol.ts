@@ -24,6 +24,15 @@ export type ProtocolConfig = {
   contracts: {
     deployBlock: number;
     evaThesisProtocol: `0x${string}`;
+    evaUsageBurner: `0x${string}`;
+  };
+  tokens: {
+    eva: {
+      address: `0x${string}`;
+      name: string;
+      symbol: string;
+      decimals: number;
+    };
   };
   agents: {
     eva: {

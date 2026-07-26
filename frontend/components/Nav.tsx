@@ -4,123 +4,79 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import DynamicAuthControl from "./DynamicAuthControl";
-import ThemeToggle from "./ThemeToggle";
 
-const navItems: readonly { href: string; label: string; exact?: boolean; highlight?: boolean }[] = [
+const navItems = [
   { href: "/markets", label: "Markets" },
   { href: "/compose", label: "Compose" },
   { href: "/predictors", label: "Predictors" },
-  { href: "/campaigns", label: "Campaigns" },
-];
-
-const loopItems = [
-  { href: "/markets", label: "Find signals" },
-  { href: "/compose", label: "Draft thesis" },
-  { href: "/thesis/thesis-0fdef25794b38b6e8eed7524", label: "Track updates" },
-  { href: "/predictors", label: "Build record" },
+  { href: "/eva", label: "$EVA" },
 ] as const;
 
-function activeLoopHref(pathname: string): string | null {
-  if (pathname === "/") return "/markets";
-  if (pathname.startsWith("/markets")) return "/markets";
-  if (pathname.startsWith("/compose")) return "/compose";
-  if (pathname.startsWith("/thesis")) return "/thesis/thesis-0fdef25794b38b6e8eed7524";
-  if (pathname.startsWith("/predictors")) {
-    return "/predictors";
-  }
-  return null;
-}
-
-function routeCta(pathname: string): { href: string; label: string } {
-  if (pathname.startsWith("/markets")) return { href: "/compose", label: "Use signal" };
-  if (pathname.startsWith("/compose")) return { href: "/markets", label: "Add signals" };
-  if (pathname.startsWith("/thesis")) return { href: "/compose", label: "Draft response" };
-  if (pathname.startsWith("/predictors")) return { href: "/markets", label: "Find signals" };
-  if (pathname.startsWith("/campaigns")) return { href: "/campaigns/forecast-qa-checklist", label: "Run campaign" };
-  return { href: "/markets", label: "Start thesis" };
+function EvaGlyph() {
+  return (
+    <svg className="brand-glyph" viewBox="0 0 32 36" fill="none" aria-hidden="true">
+      <path d="M16 1.5 29 9 16 16.5 3 9 16 1.5Z" stroke="currentColor" />
+      <path d="m3 9 13 7.5L3 24l13 7.5L29 24l-7-4" stroke="currentColor" />
+      <path d="m9.5 12.75 13 7.5-6.5 3.75-6.5-3.75 6.5-3.75" stroke="currentColor" />
+    </svg>
+  );
 }
 
 export default function Nav() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-  const cta = routeCta(pathname);
-  const activeHref = activeLoopHref(pathname);
+
+  const closeMenu = () => setMenuOpen(false);
 
   return (
-    <>
-      <header className="topbar">
-        <a href="#main-content" className="skip-link">
-          Skip to Content
-        </a>
-        <Link href="/" className="brand" onClick={() => setMenuOpen(false)}>
-          <div className="brand-mark" aria-hidden />
-          <div className="brand-text">
-            <span className="brand-title">Eva Protocol</span>
-            <span className="brand-sub">public thesis publishing</span>
-          </div>
+    <header className="topbar">
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
+      <div className="topbar-inner">
+        <Link href="/" className="brand" onClick={closeMenu} aria-label="Eva Protocol home">
+          <EvaGlyph />
+          <span className="brand-title">Eva Protocol</span>
         </Link>
 
-        <nav className={`nav-links ${menuOpen ? "nav-open" : ""}`}>
+        <nav id="primary-navigation" className={`nav-links${menuOpen ? " nav-open" : ""}`} aria-label="Primary">
           {navItems.map((item) => {
-            const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+            const active = pathname.startsWith(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`nav-pill${active ? " nav-pill-active" : ""}${item.highlight ? " nav-pill-highlight" : ""}`}
-                onClick={() => setMenuOpen(false)}
+                className={`nav-link${active ? " nav-link-active" : ""}`}
+                aria-current={active ? "page" : undefined}
+                onClick={closeMenu}
               >
                 {item.label}
               </Link>
             );
           })}
+          <Link href="/compose" className="nav-mobile-cta" onClick={closeMenu}>
+            Start thesis
+          </Link>
         </nav>
 
         <div className="topbar-actions">
           <DynamicAuthControl />
-          <ThemeToggle />
-          <Link href="/compose" className="nav-edge-cta" onClick={() => setMenuOpen(false)}>
+          <Link href="/compose" className="nav-edge-cta">
             Start thesis
           </Link>
           <button
             className="nav-hamburger"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
+            type="button"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
+            aria-controls="primary-navigation"
           >
-            <span className={`hamburger-line ${menuOpen ? "open" : ""}`} />
-            <span className={`hamburger-line ${menuOpen ? "open" : ""}`} />
-            <span className={`hamburger-line ${menuOpen ? "open" : ""}`} />
+            <span />
+            <span />
           </button>
         </div>
-      </header>
-      <section className="participation-dock" aria-label="Participation loop">
-        <div className="participation-dock-inner">
-          <div className="participation-dock-copy">
-            <span className="participation-kicker">Thesis loop</span>
-            <strong>Build one public argument from markets, facts, and revisions</strong>
-          </div>
-          <nav className="participation-loop" aria-label="Eva participation stages">
-            {loopItems.map((item, index) => {
-              const active = item.href === activeHref;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  aria-current={active ? "page" : undefined}
-                  className={`loop-step${active ? " loop-step-active" : ""}`}
-                >
-                  <span>{index + 1}</span>
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-          <Link href={cta.href} className="participation-cta">
-            {cta.label}
-          </Link>
-        </div>
-      </section>
-    </>
+      </div>
+    </header>
   );
 }

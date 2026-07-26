@@ -21,6 +21,21 @@ function agentManifest() {
       localMcp: 'eva-mcp stdio',
       writePolicy: 'X identity plus wallet required; transaction broadcasts require explicit approval.',
     },
+    platformToken: {
+      contract: `eip155:${protocol.chain.id}:${config.evaToken}`,
+      usageBurner: `eip155:${protocol.chain.id}:${config.evaUsageBurner}`,
+      symbol: protocol.tokens.eva.symbol,
+      liveCapabilities: [
+        'contract_metadata',
+        'holder_balance_readback',
+        'author_context',
+        'usage_retirement',
+        'usage_receipts',
+      ],
+      supplyAccounting: 'Tokens used through Eva are transferred to 0xdead; legacy totalSupply remains unchanged.',
+      priceBoundary: 'Usage can create token demand and circulating-supply pressure; price appreciation is not guaranteed.',
+      notActive: ['staking', 'gating', 'yield', 'governance', 'trade_execution'],
+    },
   };
 }
 

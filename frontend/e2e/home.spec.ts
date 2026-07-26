@@ -130,7 +130,7 @@ const summaryPayload = {
   ],
 };
 
-test("homepage leads with the prediction workbench layout", async ({ page }) => {
+test("homepage leads with an inspectable proof ledger", async ({ page }) => {
   await page.route("**/api/prediction-summary", async (route) => {
     await route.fulfill({
       status: 200,
@@ -141,70 +141,24 @@ test("homepage leads with the prediction workbench layout", async ({ page }) => 
 
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "public predictions need proof objects." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Public predictions need proof." })).toBeVisible();
   await expect(page.getByText("Eva turns market theses into inspectable records")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Open protocol proof" }).first()).toHaveAttribute(
-    "href",
-    /utm_campaign=protocol_proof.*utm_content=homepage_callout/,
-  );
   await expect(page.getByRole("link", { name: "Read proof thesis" })).toHaveAttribute(
     "href",
     /utm_campaign=protocol_proof.*utm_content=spacex_proof_record/,
   );
-  await expect(page.getByRole("heading", { name: "SpaceX IPO liquidity rotation" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Read the proof record" })).toHaveAttribute(
-    "href",
-    /utm_campaign=protocol_proof.*utm_content=spacex_proof_record/,
-  );
-  await expect(page.getByRole("heading", { name: "send curious predictors to one clean next step." })).toBeVisible();
-  await expect(page.locator(".campaign-directory").getByRole("link", { name: /protocol proof/i })).toHaveAttribute(
-    "href",
-    /utm_campaign=protocol_proof.*utm_content=protocol_proof_card/,
-  );
-  await expect(page.getByRole("link", { name: /verifier adoption/i })).toHaveAttribute(
-    "href",
-    /utm_campaign=verifier_adoption.*utm_content=verifier_adoption_card/,
-  );
-  await expect(page.getByRole("link", { name: /trust receipts/i })).toHaveAttribute(
-    "href",
-    /utm_campaign=trust_receipts_launch.*utm_content=trust_receipts_card/,
-  );
-  await expect(page.getByRole("link", { name: /agent receipts/i })).toHaveAttribute(
-    "href",
-    /utm_campaign=agent_receipts.*utm_content=agent_receipts_card/,
-  );
-  await expect(page.getByRole("link", { name: /launch truth status/i })).toHaveAttribute(
-    "href",
-    /utm_campaign=launch_truth_status.*utm_content=launch_truth_card/,
-  );
-  await expect(page.getByRole("link", { name: /source quality sprint/i })).toHaveAttribute(
-    "href",
-    /utm_campaign=source_quality_sprint.*utm_content=source_quality_card/,
-  );
-  await expect(page.getByRole("link", { name: /AI forecast receipts/i })).toHaveAttribute(
-    "href",
-    /utm_campaign=ai_forecast_receipts.*utm_content=forecast_receipts_card/,
-  );
-  await expect(page.getByRole("heading", { name: "From idea to public record" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /01 Start the argument/i })).toBeVisible();
-  await expect(page.getByRole("link", { name: /02 Attach sources/i })).toBeVisible();
-  await expect(page.getByText("authors", { exact: true })).toBeVisible();
-  await expect(page.locator(".workbench-tape").getByText("Live source tape")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Markets ready to become citations" })).toBeVisible();
-  await expect(page.getByText("active predictors")).toBeVisible();
-  await expect(page.getByText("copied theses")).toBeVisible();
-  await expect(page.getByText("Featured artifact")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Read an evolving thesis" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Source cards for thesis builders" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Who is building a track record" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "What every thesis carries" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Readable thesis", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Cited signals", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Visible updates", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Author record", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Fed hold liquidity thesis" })).toBeVisible();
+  await expect(page.getByText("Revision v1")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "One argument. Every receipt." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Forecasts ready to become citations." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "The argument stays readable. The provenance stays attached." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Follow the record, not the confidence." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "$EVA is used for public proof receipts." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Inspect $EVA" })).toHaveAttribute("href", "/eva");
+  await expect(page.getByText("Wallet → platform use → dead-address burn → receipt")).toBeVisible();
 });
 
-test("copy thesis button shows pending state and announces the result", async ({ page }) => {
+test("homepage source tape routes a forecast into its market receipt", async ({ page }) => {
   await page.route("**/api/prediction-summary", async (route) => {
     await route.fulfill({
       status: 200,
@@ -212,32 +166,12 @@ test("copy thesis button shows pending state and announces the result", async ({
       body: JSON.stringify(summaryPayload),
     });
   });
-  await page.route("**/api/copy-preview*", async (route) => {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        thesisId: "thesis-fed-hold",
-        marketId: "fed-hold",
-        selectedOutcomeId: "hold",
-        selectedOutcomeLabel: "Hold",
-        originalOdds: 0.44,
-        currentOdds: 0.58,
-        venueUrl: "https://example.com/market/fed-hold",
-        execution: "external-link-only",
-        warning: "Eva records copy intent only; execute on the external venue.",
-      }),
-    });
-  });
-
   await page.goto("/");
 
-  const copyButton = page.getByRole("button", { name: "Preview X copy" });
-  await copyButton.click();
-
-  await expect(page.getByRole("button", { name: "Preparing…" })).toBeDisabled();
-  await expect(page.getByRole("status")).toHaveText("External venue opened as preview.");
+  const sourceLink = page.getByRole("link", { name: /Will the Fed hold rates at the next meeting\?/ });
+  await expect(sourceLink).toHaveAttribute("href", "/markets/fed-hold");
+  await sourceLink.click();
+  await expect(page).toHaveURL(/\/markets\/fed-hold$/);
 });
 
 test("homepage renders compact empty states when prediction summary has no records", async ({ page }) => {
@@ -261,15 +195,14 @@ test("homepage renders compact empty states when prediction summary has no recor
 
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "No featured thesis yet" })).toBeVisible();
-  await expect(page.getByText("Publish the first anchored thesis to create the opening public artifact.")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "No markets loaded" })).toBeVisible();
-  await expect(page.getByText("Refresh or check the API connection before drafting a sourced thesis.")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "No predictors yet" })).toBeVisible();
-  await expect(page.getByText("Published theses will create public author records.")).toBeVisible();
+  await expect(page.getByText("Proof object unavailable")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Browse source library" })).toHaveAttribute("href", "/markets");
+  await expect(page.getByText("No markets loaded.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "$EVA is used for public proof receipts." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Follow the record, not the confidence." })).toHaveCount(0);
 });
 
-test("desktop homepage keeps shared product sections in the main grid", async ({ page }) => {
+test("desktop homepage keeps proof, source, and token ledgers inside the page width", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.route("**/api/prediction-summary", async (route) => {
     await route.fulfill({
@@ -281,32 +214,24 @@ test("desktop homepage keeps shared product sections in the main grid", async ({
 
   await page.goto("/");
 
-  const productSystem = page.locator(".product-system");
+  const proofLedger = page.locator(".eva-record-section");
+  const tokenLedger = page.locator(".eva-home-token");
   const footer = page.locator("footer.site-footer");
-  const marketStrip = page.locator(".mobile-strip");
-  const counterLink = page.getByRole("link", { name: "Build from this", exact: true });
 
-  await expect(productSystem).toBeVisible();
+  await expect(proofLedger).toBeVisible();
+  await expect(tokenLedger).toBeVisible();
   await expect(footer).toBeVisible();
-  await counterLink.scrollIntoViewIfNeeded();
-  await expect(counterLink).toBeInViewport();
-  await counterLink.click();
-  await expect(page).toHaveURL(/\/compose\?counterTo=thesis-fed-hold$/);
-  await page.goBack();
   await expect.poll(async () => {
-    const productBox = await productSystem.boundingBox();
+    const productBox = await tokenLedger.boundingBox();
     const footerBox = await footer.boundingBox();
     return Boolean(productBox && footerBox && footerBox.y > productBox.y);
-  }).toBe(true);
-  await expect.poll(async () => {
-    return marketStrip.evaluate((element) => element.scrollWidth <= element.clientWidth + 1);
   }).toBe(true);
   await expect.poll(async () => {
     return page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1);
   }).toBe(true);
 });
 
-test("desktop homepage keeps thesis actions inside the page width at 1280px", async ({ page }) => {
+test("desktop homepage keeps primary actions inside the page width at 1280px", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 1000 });
   await page.route("**/api/prediction-summary", async (route) => {
     await route.fulfill({
@@ -318,13 +243,12 @@ test("desktop homepage keeps thesis actions inside the page width at 1280px", as
 
   await page.goto("/");
 
-  const counterLink = page.getByRole("link", { name: "Build from this", exact: true });
-  await counterLink.scrollIntoViewIfNeeded();
-  await expect(counterLink).toBeInViewport();
+  const proofLink = page.getByRole("link", { name: "Read proof thesis" });
+  const tokenLink = page.getByRole("link", { name: "Inspect $EVA" });
+  await expect(proofLink).toBeInViewport();
+  await tokenLink.scrollIntoViewIfNeeded();
+  await expect(tokenLink).toBeInViewport();
   await expect.poll(async () => {
     return page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1);
   }).toBe(true);
-
-  await counterLink.click();
-  await expect(page).toHaveURL(/\/compose\?counterTo=thesis-fed-hold$/);
 });

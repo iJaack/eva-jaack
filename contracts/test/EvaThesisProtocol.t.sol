@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {Test} from "forge-std/Test.sol";
+import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {EvaThesisProtocol} from "../src/EvaThesisProtocol.sol";
 
 contract EvaThesisProtocolTest is Test {
@@ -17,6 +18,31 @@ contract EvaThesisProtocolTest is Test {
     function setUp() external {
         protocol = new EvaThesisProtocol();
         protocol.initialize(admin, operator);
+    }
+
+    function testProtocolVersionIsCurrent() external view {
+        assertEq(protocol.PROTOCOL_VERSION(), 2);
+    }
+
+    function testUupsUpgradePreservesThesisState() external {
+        EvaThesisProtocol firstImplementation = new EvaThesisProtocol();
+        ERC1967Proxy proxy = new ERC1967Proxy(
+            address(firstImplementation),
+            abi.encodeCall(EvaThesisProtocol.initialize, (admin, operator))
+        );
+        EvaThesisProtocol proxied = EvaThesisProtocol(address(proxy));
+
+        vm.prank(author);
+        proxied.createThesis(THESIS_ID, author, REVISION_HASH, 67);
+
+        EvaThesisProtocol latestImplementation = new EvaThesisProtocol();
+        vm.prank(admin);
+        proxied.upgradeToAndCall(address(latestImplementation), "");
+
+        EvaThesisProtocol.ThesisCore memory thesis = proxied.getThesis(THESIS_ID);
+        assertEq(thesis.author, author);
+        assertEq(thesis.currentScore, 67);
+        assertEq(proxied.PROTOCOL_VERSION(), 2);
     }
 
     function testAuthorCanCreateStructuredThesisAndSignals() external {

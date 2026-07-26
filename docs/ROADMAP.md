@@ -43,6 +43,51 @@ Checks and regressions:
 
 Milestone 2 is not complete until invalid identity states cannot publish.
 
+## Milestone 2B: $EVA Core Chain Context
+
+Goal: make the canonical `$EVA` token an inspectable platform primitive without inventing inactive
+economic utility.
+
+Atomic tasks:
+
+- Add the `$EVA` contract to shared runtime configuration and the agent manifest.
+- Add a first-class `/eva` route with live ERC-20 metadata and holder balance readback.
+- Attach read-only `$EVA` holder state to wallet/author context in compose.
+- Keep holder balance separate from publishing rights, credibility, and thesis scoring.
+
+Checks and regressions:
+
+- Unit tests for the canonical Avalanche address and bounded manifest capabilities.
+- Live Avalanche readback for name, symbol, decimals, total supply, and wallet balance.
+- Desktop and mobile browser checks for the token receipt and signed-out wallet state.
+- Text scan preventing unsupported staking, gating, yield, governance, or trading claims.
+
+Milestone 2B is not complete until live chain state and visible product copy agree.
+
+## Milestone 2C: `$EVA` Platform Use And Burn Receipts
+
+Goal: let holders consume canonical `$EVA` for inspectable platform uses without promising a market
+outcome or misreporting legacy token supply.
+
+Atomic tasks:
+
+- Deploy immutable `EvaUsageBurner` against canonical `$EVA`.
+- Support thesis-proof, forecast-receipt, and agent-verification usage references.
+- Transfer approved `$EVA` atomically to the irrecoverable `0xdead` sink and emit a receipt.
+- Add exact-amount approval and use/burn controls to `/eva`.
+- Disclose that circulating supply falls while legacy `totalSupply()` remains unchanged.
+- State that demand and supply pressure do not guarantee price appreciation.
+
+Checks and regressions:
+
+- Contract tests for allowance enforcement, minimum amount, duplicate references, receipt totals,
+  dead-sink balances, and unchanged legacy total supply.
+- Live Avalanche deployment receipt, immutable token/sink getters, and runtime code hash.
+- Backend/frontend manifest parity and deployment-smoke validation.
+- Desktop/mobile E2E for disconnected and connected burn states.
+
+Milestone 2C is not complete until the onchain receipt, chain readback, UI copy, and manifests agree.
+
 ## Milestone 3: Agent-Ready Thesis Creation
 
 Goal: let agents create, revise, inspect, and anchor theses safely.
@@ -102,6 +147,7 @@ Checks and regressions:
 - Production smoke for home, markets, SpaceX market, SpaceX thesis, predictors, health, and agent manifest.
 - Browser screenshots against production desktop and mobile.
 - Contract readback for `EvaThesisProtocol`.
+- UUPS implementation-slot and protocol-version readback after any upgrade.
 - Final text scan for removed old-product claims.
 
 Milestone 5 is not complete until the deployed app and onchain/source-of-truth data agree.
