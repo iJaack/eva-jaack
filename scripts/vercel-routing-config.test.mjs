@@ -28,10 +28,15 @@ test("Vercel resolves public dynamic paths through the static detail entry", () 
       .filter((route) => ["/markets/([^/]+)", "/predictors/([^/]+)", "/thesis/([^/]+)"].includes(route.src))
       .map((route) => route.dest),
     [
-      "/frontend/resolve?kind=market&id=$1",
-      "/frontend/resolve?kind=predictor&id=$1",
-      "/frontend/resolve?kind=thesis&id=$1",
+      "/resolve?kind=market&id=$1",
+      "/resolve?kind=predictor&id=$1",
+      "/resolve?kind=thesis&id=$1",
     ],
+  );
+  assert.ok(
+    vercelConfig.routes
+      .filter((route) => ["/markets/([^/]+)", "/predictors/([^/]+)", "/thesis/([^/]+)"].includes(route.src))
+      .every((route) => route.continue === true),
   );
   assert.ok(vercelConfig.routes.some((route) => route.src === "/(.*)" && route.dest === "/frontend/$1"));
 });

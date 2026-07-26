@@ -48,15 +48,18 @@
     },
     {
       "src": "/markets/([^/]+)",
-      "dest": "/frontend/resolve?kind=market&id=$1"
+      "dest": "/resolve?kind=market&id=$1",
+      "continue": true
     },
     {
       "src": "/predictors/([^/]+)",
-      "dest": "/frontend/resolve?kind=predictor&id=$1"
+      "dest": "/resolve?kind=predictor&id=$1",
+      "continue": true
     },
     {
       "src": "/thesis/([^/]+)",
-      "dest": "/frontend/resolve?kind=thesis&id=$1"
+      "dest": "/resolve?kind=thesis&id=$1",
+      "continue": true
     },
     {
       "handle": "filesystem"
