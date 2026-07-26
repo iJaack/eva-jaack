@@ -9,7 +9,9 @@ type EvaProvidersProps = {
 };
 
 export default function EvaProviders({ children }: EvaProvidersProps) {
-  const environmentId = process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
+  const environmentId =
+    process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID ||
+    (process.env.NEXT_PUBLIC_DYNAMIC_TEST_CONTEXT === "1" ? "dynamic-test-environment" : undefined);
   if (!environmentId) return <>{children}</>;
 
   // Dynamic consumers can render anywhere in the app chrome. Keep their provider
