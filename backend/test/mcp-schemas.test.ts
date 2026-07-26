@@ -2,6 +2,7 @@ import { z } from "zod";
 import { describe, expect, it } from "vitest";
 import {
   createThesisDraftToolSchema,
+  getPaidThesisProofBundleToolSchema,
   predictionMarketStatusValues,
   predictionSignalInputSchema,
   prepareRevisionDraftToolSchema,
@@ -49,5 +50,19 @@ describe("Eva MCP schemas", () => {
         walletAddress,
       })).toThrow(/walletAddress/);
     }
+  });
+
+  it("requires a full transaction hash before an agent proof bundle can be released", () => {
+    const proofInput = z.object(getPaidThesisProofBundleToolSchema);
+    expect(proofInput.parse({
+      thesisId: "thesis_123",
+      walletAddress: "0x1111111111111111111111111111111111111111",
+      evaUsageTxHash: `0x${"d".repeat(64)}`,
+    })).toMatchObject({ thesisId: "thesis_123" });
+    expect(() => proofInput.parse({
+      thesisId: "thesis_123",
+      walletAddress: "0x1111111111111111111111111111111111111111",
+      evaUsageTxHash: "0xdddd",
+    })).toThrow(/evaUsageTxHash/);
   });
 });

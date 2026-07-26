@@ -31,10 +31,21 @@ function agentManifest() {
         'author_context',
         'usage_retirement',
         'usage_receipts',
+        'paid_thesis_publication',
+        'paid_thesis_revisions',
+        'paid_agent_proof_bundles',
       ],
+      paymentProtocol: {
+        type: 'direct_erc20_allowance',
+        quoteEndpoint: `${protocol.app.siteUrl}${protocol.app.apiBasePath}/eva/usage/quote`,
+        spender: `eip155:${protocol.chain.id}:${config.evaUsageBurner}`,
+        flow: ['approve_exact_amount', 'retireForUsage', 'verify_EvaUsedAndRetired'],
+        permit2: false,
+        serverCanSpendWalletFunds: false,
+      },
       supplyAccounting: 'Tokens used through Eva are transferred to 0xdead; legacy totalSupply remains unchanged.',
       priceBoundary: 'Usage can create token demand and circulating-supply pressure; price appreciation is not guaranteed.',
-      notActive: ['staking', 'gating', 'yield', 'governance', 'trade_execution'],
+      notActive: ['staking', 'balance_based_access', 'yield', 'governance', 'trade_execution'],
     },
   };
 }
@@ -74,6 +85,12 @@ function mcpDiscovery(c: Context) {
         'prepared_calldata',
       ],
       forbiddenFallbacks: ['direct_rest_writes', 'ui_scraping', 'production_write_routes_without_approval'],
+      evaConsumption: {
+        protocol: 'direct_erc20_allowance',
+        permit2: false,
+        serverCanSpendWalletFunds: false,
+        paidOutputs: ['public_thesis', 'public_revision', 'agent_proof_bundle'],
+      },
     },
   });
 }

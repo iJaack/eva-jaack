@@ -18,10 +18,21 @@ describe("agent manifest", () => {
         "author_context",
         "usage_retirement",
         "usage_receipts",
+        "paid_thesis_publication",
+        "paid_thesis_revisions",
+        "paid_agent_proof_bundles",
       ],
+      paymentProtocol: {
+        type: "direct_erc20_allowance",
+        quoteEndpoint: "https://eva.jaack.me/api/eva/usage/quote",
+        spender: `eip155:43114:${protocol.contracts.evaUsageBurner}`,
+        flow: ["approve_exact_amount", "retireForUsage", "verify_EvaUsedAndRetired"],
+        permit2: false,
+        serverCanSpendWalletFunds: false,
+      },
       supplyAccounting: "Tokens used through Eva are transferred to 0xdead; legacy totalSupply remains unchanged.",
       priceBoundary: "Usage can create token demand and circulating-supply pressure; price appreciation is not guaranteed.",
-      notActive: ["staking", "gating", "yield", "governance", "trade_execution"],
+      notActive: ["staking", "balance_based_access", "yield", "governance", "trade_execution"],
     });
   });
 });

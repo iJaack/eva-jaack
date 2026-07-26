@@ -8,6 +8,7 @@ import { config } from "../config.js";
 import type {
   ClaimVerdict,
   CopyThesisPreviewResponse,
+  EvaUsageReceiptDto,
   MarketDetailResponse,
   MarketListResponse,
   PredictionMarketDto,
@@ -1441,7 +1442,12 @@ export class LocalPredictionLayerService {
     return this.getThesis(thesis.thesisId);
   }
 
-  async markThesisAnchorConfirmed(thesisId: string, txHash: `0x${string}`, confirmedAt: string): Promise<ThesisDetailResponse | null> {
+  async markThesisAnchorConfirmed(
+    thesisId: string,
+    txHash: `0x${string}`,
+    confirmedAt: string,
+    usageReceipt?: EvaUsageReceiptDto,
+  ): Promise<ThesisDetailResponse | null> {
     const store = await this.readStore();
     const thesis = store.theses.find((entry) => entry.thesisId === thesisId || entry.slug === thesisId);
     if (!thesis) return null;
@@ -1459,12 +1465,20 @@ export class LocalPredictionLayerService {
       scoreBefore: null,
       scoreAfter: thesis.currentScore,
     });
+    if (usageReceipt && !(thesis.evaUsageReceipts ?? []).some((receipt) => receipt.receiptId === usageReceipt.receiptId)) {
+      thesis.evaUsageReceipts = [...(thesis.evaUsageReceipts ?? []), usageReceipt];
+    }
 
     await this.writeStore(store);
     return this.getThesis(thesis.thesisId);
   }
 
-  async markCurrentRevisionAnchorConfirmed(thesisId: string, txHash: `0x${string}`, confirmedAt: string): Promise<ThesisDetailResponse | null> {
+  async markCurrentRevisionAnchorConfirmed(
+    thesisId: string,
+    txHash: `0x${string}`,
+    confirmedAt: string,
+    usageReceipt?: EvaUsageReceiptDto,
+  ): Promise<ThesisDetailResponse | null> {
     const store = await this.readStore();
     const thesis = store.theses.find((entry) => entry.thesisId === thesisId || entry.slug === thesisId);
     if (!thesis) return null;
@@ -1481,6 +1495,9 @@ export class LocalPredictionLayerService {
       scoreBefore: null,
       scoreAfter: thesis.currentScore,
     });
+    if (usageReceipt && !(thesis.evaUsageReceipts ?? []).some((receipt) => receipt.receiptId === usageReceipt.receiptId)) {
+      thesis.evaUsageReceipts = [...(thesis.evaUsageReceipts ?? []), usageReceipt];
+    }
 
     await this.writeStore(store);
     return this.getThesis(thesis.thesisId);

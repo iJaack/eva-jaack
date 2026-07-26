@@ -11,6 +11,8 @@ The live MCP server exposes only these agent-facing tools:
 - `create_thesis_draft`
 - `prepare_revision_draft`
 - `prepare_anchor_transaction`
+- `prepare_eva_proof_quote`
+- `get_paid_thesis_proof_bundle`
 
 If a client, prompt, old note, or autocomplete suggests any other write tool, treat it as stale. Do not call or recreate removed tools such as `record_revision`, `/claims`, `/articles`, curator, staking, challenge, settlement, paid-verification, or LLM-verification flows.
 
@@ -21,13 +23,18 @@ When MCP work fails, classify the failure before choosing a fallback. A fallback
 | Failure class | Smallest safe fallback | Fallback ceiling |
 |---|---|---|
 | Client setup failure | Restart or reconfigure the local `eva-thesis` stdio server from the repo root. | `blocked` until the local server starts. |
-| Live allowlist drift | Re-read the allowlist above and choose only one of the five live tools. | `read-only` unless a matching draft-prep tool exists. |
+| Live allowlist drift | Re-read the allowlist above and choose only one of the seven live tools. | `read-only` unless a matching draft-prep or paid-proof tool exists. |
 | Input schema mismatch | Repair only directly evidenced fields with the schema repair cards below. | Same requested rung, or `blocked` if repair would guess. |
 | Missing thesis or identity readback | Ask for the canonical `thesisId`, task-time `xHandle`, wallet address, and signer/source approval. | `blocked`; do not create a replacement thesis. |
 | Protocol readback gap | Use `get_thesis`, approved API/public URL evidence, or onchain receipt/readback. | Historical handoff only; no live/confirmed wording. |
 | Approved non-MCP execution gap | Fill the separate execution receipt card before using REST, broadcaster, or transaction claims. | `draft prepared` / `anchor prepared` until approval, receipt, and readback exist. |
 
 Unsafe fallbacks are still unsafe even if they are technically possible: UI scraping, direct REST writes, unauthenticated production calls, guessed wallets, stale issue metadata, or reusing an old `anchorPreparationId` do not repair a failed MCP path.
+
+For `get_paid_thesis_proof_bundle`, a missing, reverted, wrong-wallet, wrong-amount, wrong-reference,
+or wrong-burner transaction is a payment-evidence failure. Do not release a partial bundle. Prepare
+a fresh `prepare_eva_proof_quote` only when the thesis or payer changes; never substitute Permit2 or
+server-held spending authority.
 
 ## Retry budget and failure journal
 

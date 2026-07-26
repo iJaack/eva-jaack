@@ -555,7 +555,7 @@ describe("Eva MCP agent docs", () => {
       "## Agent MCP Boundary",
       "README API surface is not an agent permission map",
       "start with `docs/MCP_AGENT_QUICKSTART.md`",
-      "five live MCP tools",
+      "seven live MCP tools",
       "POST /api/theses",
       "POST /api/thesis-anchor/prepare",
       "app/runtime surfaces",

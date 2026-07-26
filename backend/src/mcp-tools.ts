@@ -1,6 +1,11 @@
 import { createHash } from "node:crypto";
 import type { ClaimVerdict, PredictionMarketStatus, ThesisDetailResponse, ThesisSignalRole, ThesisWalletSource } from "./lib/api-types.js";
 import type { LocalPredictionLayerService, ThesisCreateInput, ThesisRevisionInput } from "./services/prediction-layer.js";
+import {
+  createAvalancheEvaUsageVerifier,
+  createEvaUsageQuote,
+  type EvaUsageVerifier,
+} from "./services/eva-usage.js";
 import { prepareThesisAnchorTransactions, prepareThesisRevisionAnchorTransactions } from "./services/thesis-protocol.js";
 
 type ToolTextResult = {
@@ -99,7 +104,10 @@ function identityFor(input: { xHandle: string; walletAddress: string; walletSour
   };
 }
 
-export function createEvaMcpToolHandlers(predictions: LocalPredictionLayerService) {
+export function createEvaMcpToolHandlers(
+  predictions: LocalPredictionLayerService,
+  usageVerifier: EvaUsageVerifier = createAvalancheEvaUsageVerifier(),
+) {
   return {
     async searchMarkets({ query }: { query?: string } = {}): Promise<ToolTextResult> {
       const markets = await predictions.listMarkets();
@@ -161,6 +169,80 @@ export function createEvaMcpToolHandlers(predictions: LocalPredictionLayerServic
         transactions: prepareThesisAnchorTransactions(detail.thesis),
         nextStep: "Have the user approve and confirm the anchor transaction before publishing or re-anchoring this thesis through Eva.",
       }));
+    },
+
+    async prepareEvaProofQuote(input: { thesisId: string; walletAddress: string }): Promise<ToolTextResult> {
+      const detail = await predictions.getThesis(input.thesisId);
+      if (!detail) return toolError(`Thesis not found: ${input.thesisId}`);
+      try {
+        return toolJson(createEvaUsageQuote({
+          action: "agent_proof_bundle",
+          account: input.walletAddress,
+          resourceId: detail.thesis.thesisId,
+        }));
+      } catch (error) {
+        return toolError(error instanceof Error ? error.message : "Unable to prepare EVA usage quote");
+      }
+    },
+
+    async getPaidThesisProofBundle(input: {
+      thesisId: string;
+      walletAddress: string;
+      evaUsageTxHash: `0x${string}`;
+    }): Promise<ToolTextResult> {
+      const detail = await predictions.getThesis(input.thesisId);
+      if (!detail) return toolError(`Thesis not found: ${input.thesisId}`);
+
+      const quote = createEvaUsageQuote({
+        action: "agent_proof_bundle",
+        account: input.walletAddress,
+        resourceId: detail.thesis.thesisId,
+      });
+      const verification = await usageVerifier.verifyUsage({
+        txHash: input.evaUsageTxHash,
+        quote,
+      });
+      if (!verification.ok) return toolError(verification.error);
+
+      const sourceUrls = Array.from(new Set([
+        ...detail.thesis.evidenceLinks,
+        ...detail.thesis.signals.flatMap((signal) => {
+          if (signal.kind === "prediction_market") return [signal.marketUrl].filter((value): value is string => Boolean(value));
+          return [signal.sourceUrl].filter((value): value is string => Boolean(value));
+        }),
+      ]));
+      return toolJson({
+        releaseState: "paid_proof_bundle_released",
+        payment: {
+          txHash: input.evaUsageTxHash,
+          receiptId: verification.receiptId,
+          confirmedAt: verification.confirmedAt,
+          amountWei: quote.amountWei,
+          token: quote.token,
+          burner: quote.burner,
+          referenceHash: quote.referenceHash,
+          permit2: false,
+        },
+        proofBundle: {
+          thesisId: detail.thesis.thesisId,
+          title: detail.thesis.title,
+          currentRevision: detail.thesis.currentRevision.version,
+          currentScore: detail.thesis.currentScore,
+          status: detail.thesis.status,
+          author: detail.thesis.author,
+          anchor: detail.thesis.anchor,
+          sources: sourceUrls,
+          signals: detail.thesis.signals,
+          revisionReceipts: detail.thesis.revisions.map((revision) => ({
+            revisionId: revision.revisionId,
+            version: revision.version,
+            note: revision.note,
+            scoreBefore: revision.scoreBefore,
+            scoreAfter: revision.scoreAfter,
+            anchor: revision.anchor,
+          })),
+        },
+      });
     },
   };
 }

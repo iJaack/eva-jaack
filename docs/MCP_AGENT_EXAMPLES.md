@@ -19,6 +19,8 @@ Use alongside:
 | Revise a thesis | `get_thesis` | The thesis id, author wallet, and X handle match the approved identity. |
 | Prepare a new thesis | `create_thesis_draft` | The operator-approved identity is present and signals are real or intentionally empty. |
 | Rebuild calldata | `prepare_anchor_transaction` | The thesis already exists and no text change is requested. |
+| Quote a paid proof bundle | `prepare_eva_proof_quote` | The exact thesis id and payer wallet are known. |
+| Release a paid proof bundle | `get_paid_thesis_proof_bundle` | The matching usage-burn transaction is confirmed. |
 | Publish/broadcast/article/claim/stake/settle/verify | none via MCP | A separate approved path and evidence exist. |
 
 If the task asks for more than the selected tool can safely prove, report the missing evidence instead of upgrading the claim.
@@ -32,7 +34,7 @@ Use this before running the onboarding drill in a new client. The smoke test pro
 ```text
 read-only MCP smoke:
 - local stdio server: `eva-thesis` from repo root via `pnpm --filter backend mcp`
-- tool list smoke: exactly five live tools found
+- tool list smoke: exactly seven live tools found, including `prepare_eva_proof_quote` and `get_paid_thesis_proof_bundle`
 - optional HTTP discovery smoke: `GET /api/mcp` exposes `agentSafeBoundary.mcpOutputCeiling: "anchor_prepared"`, `storageClaimDefault: "storage_not_assessed"`, `safeResultVerbs`, and `notEvidenceForStrongerClaims`
 - description boundary smoke: draft-prep descriptions include no publish, no broadcast, no direct REST writes, and no storage-durability proof
 - read-only call smoke: `search_markets` completed; result wording stays read-only
@@ -53,11 +55,18 @@ Blocked smoke result:
 
 ```text
 blocked: MCP client setup failure / live allowlist drift.
-missing: <local server start | exact five-tool allowlist | discovery description boundary | read-only search result>.
+missing: <local server start | exact seven-tool allowlist | discovery description boundary | read-only search result>.
 boundary: I did not use write-adjacent tools as a connectivity test and did not fall back to app HTTP routes, UI scraping, or production write paths.
 ```
 
-## 0.1 Parse the MCP result envelope
+## 0.1 Paid EVA proof bundle
+
+Call `prepare_eva_proof_quote` with `thesisId` and `walletAddress`, sign its standard ERC-20
+`approve` and `retireForUsage` transactions, then call `get_paid_thesis_proof_bundle` with those same
+fields plus `evaUsageTxHash`. Eva releases no bundle until the exact receipt verifies. This is a
+direct burner flow, not Permit2.
+
+## 0.2 Parse the MCP result envelope
 
 Eva MCP responses are usually wrapped as SDK text content. The safe markers are inside the JSON string at `content[0].text`:
 

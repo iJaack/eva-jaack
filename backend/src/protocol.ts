@@ -34,6 +34,17 @@ export type ProtocolConfig = {
       decimals: number;
     };
   };
+  evaUsage: {
+    quoteVersion: string;
+    actions: Record<
+      "publish_thesis" | "publish_revision" | "agent_proof_bundle",
+      {
+        usageKind: number;
+        amountWei: string;
+        label: string;
+      }
+    >;
+  };
   agents: {
     eva: {
       id: string;

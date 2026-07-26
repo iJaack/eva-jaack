@@ -74,3 +74,16 @@ export const prepareRevisionDraftToolSchema = {
 export const prepareAnchorTransactionToolSchema = {
   thesisId: z.string(),
 } satisfies z.ZodRawShape;
+
+export const prepareEvaProofQuoteToolSchema = {
+  thesisId: z.string(),
+  walletAddress: walletAddressSchema,
+} satisfies z.ZodRawShape;
+
+export const getPaidThesisProofBundleToolSchema = {
+  thesisId: z.string(),
+  walletAddress: walletAddressSchema,
+  evaUsageTxHash: z
+    .string()
+    .regex(/^0x[a-fA-F0-9]{64}$/, "evaUsageTxHash must be a full Avalanche transaction hash"),
+} satisfies z.ZodRawShape;

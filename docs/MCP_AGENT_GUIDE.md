@@ -70,7 +70,7 @@ When a client can read the discovery JSON, use it as a machine-readable downgrad
 When onboarding a new MCP client or runtime, prove client wiring with read-only evidence before any draft-prep rehearsal:
 
 1. Start the local `eva-thesis` stdio server from the repo root with `pnpm --filter backend mcp`.
-2. Run the client's tool list smoke and verify the exact five live tools: `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`.
+2. Run the client's tool list smoke and verify the exact seven live tools: `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, `prepare_anchor_transaction`, `prepare_eva_proof_quote`, and `get_paid_thesis_proof_bundle`.
 3. If using HTTP discovery, verify `GET /api/mcp` exposes matching `toolDescriptions`, `agentSafeBoundary.defaultWriteScope: "draft_and_anchor_prep_only"`, `agentSafeBoundary.mcpOutputCeiling: "anchor_prepared"`, and `agentSafeBoundary.storageClaimDefault: "storage_not_assessed"` before any write-adjacent rehearsal.
 4. Run a description boundary smoke: every write-adjacent discovery description must still say the tool does not publish, broadcast, call direct REST writes, or prove storage durability.
 5. Run only a read-only call smoke, such as `search_markets` with a low-risk query, and report the result as `read-only` / `found candidates`.
@@ -88,6 +88,12 @@ If the tool list differs, HTTP discovery omits the agent-safe boundary card, a w
 | `create_thesis_draft` | Preview a new thesis and prepare anchor calldata. | No |
 | `prepare_revision_draft` | Preview a new revision and prepare revision-anchor calldata. | No |
 | `prepare_anchor_transaction` | Rebuild anchor calldata for an existing thesis. | No |
+| `prepare_eva_proof_quote` | Prepare direct-allowance and usage-burn calldata for a proof bundle. | No |
+| `get_paid_thesis_proof_bundle` | Verify EVA usage and release the formatted proof bundle. | No |
+
+The paid proof flow is `prepare_eva_proof_quote` → wallet signs standard ERC-20 `approve` plus
+`retireForUsage` → `get_paid_thesis_proof_bundle` verifies `EvaUsedAndRetired`. It does not use
+Permit2, and neither MCP nor the Eva backend can spend wallet funds.
 
 Every write-adjacent MCP tool (`create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`) returns `publishState: "anchor_prepared_not_published"`. That is the boundary. A prepared anchor is not a published thesis, not a confirmed revision, and not evidence of an onchain record.
 

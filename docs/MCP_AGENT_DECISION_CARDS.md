@@ -4,6 +4,11 @@ Use these cards when an agent prompt mixes thesis drafting, revision, anchoring,
 
 This file does not add new powers. The default MCP ceiling is still draft/anchor preparation only.
 
+Paid proof card: use `prepare_eva_proof_quote` only for a formatted proof bundle with an exact payer
+wallet. Use `get_paid_thesis_proof_bundle` only with its confirmed `evaUsageTxHash`. The result
+ceiling is the bundle, not transaction broadcast or publication. The wallet signs direct ERC-20
+allowance and burner calls; Permit2 is not used.
+
 ## How to use a card
 
 For each prompt, fill only the fields the selected live MCP tool accepts. Keep issue links, PR links, deploy links, old metadata, and old prepared JSON out of the MCP payload unless the live schema explicitly accepts that field.

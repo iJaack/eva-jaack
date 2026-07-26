@@ -12,6 +12,7 @@ const walletAddress = "0x1111111111111111111111111111111111111111";
 const draftAnchorTxHash = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const revisionAnchorTxHash = "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
 const rejectedAnchorTxHash = "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
+const evaUsageTxHash = "0xdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
 
 afterEach(async () => {
   await Promise.all(cleanupDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
@@ -37,8 +38,22 @@ function makeRoutedApp(service: LocalPredictionLayerService, options: { confirme
       return { ok: true, confirmedAt: "2026-06-06T21:30:00.000Z" };
     },
   };
+  const usageVerifier = {
+    async verifyUsage({ txHash, quote }: { txHash: string; quote: { account: string; amountWei: string; permit2: boolean } }) {
+      if (txHash !== evaUsageTxHash) return { ok: false as const, error: "EVA usage transaction is not confirmed on Avalanche" };
+      if (quote.account.toLowerCase() !== walletAddress.toLowerCase() || BigInt(quote.amountWei) <= 0n || quote.permit2) {
+        return { ok: false as const, error: "EVA usage receipt does not match this quote" };
+      }
+      return {
+        ok: true as const,
+        receiptId: `0x${"e".repeat(64)}` as `0x${string}`,
+        confirmedAt: "2026-06-06T21:31:00.000Z",
+        blockNumber: "90000000",
+      };
+    },
+  };
   const app = new Hono();
-  const deps = { predictions: service, anchorVerifier };
+  const deps = { predictions: service, anchorVerifier, usageVerifier };
   app.route("/api", createPredictionRoutes(deps));
   return app;
 }
@@ -111,6 +126,36 @@ describe("prediction routes", () => {
     });
   });
 
+  it("quotes deterministic direct ERC-20 EVA usage without Permit2", async () => {
+    const app = await makeApp();
+    const quoted = await fetchJson(app, "/api/eva/usage/quote", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        action: "agent_proof_bundle",
+        account: walletAddress,
+        resourceId: "thesis-route-proof-1",
+      }),
+    });
+
+    expect(quoted.status).toBe(200);
+    expect(quoted.body).toMatchObject({
+      action: "agent_proof_bundle",
+      amountWei: "10000000000000000000000",
+      account: "0x1111111111111111111111111111111111111111",
+      paymentBoundary: "wallet_approval_and_broadcast_required",
+      permit2: false,
+      approvalTransaction: {
+        to: "0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672",
+        data: expect.stringMatching(/^0x095ea7b3/),
+      },
+      retirementTransaction: {
+        to: "0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296",
+        data: expect.stringMatching(/^0x/),
+      },
+    });
+  });
+
   it("creates and revises a multi-signal thesis", async () => {
     const app = await makeApp();
     const payload = thesisCreatePayload();
@@ -124,6 +169,11 @@ describe("prediction routes", () => {
       anchorPreparationId: expect.stringMatching(/^draft-anchor-/),
       anchorStatus: "prepared",
       transactions: expect.arrayContaining([expect.objectContaining({ description: expect.stringContaining("Create thesis protocol record") })]),
+      evaUsageQuote: {
+        action: "publish_thesis",
+        amountWei: "100000000000000000000000",
+        permit2: false,
+      },
     });
 
     const created = await fetchJson(app, "/api/theses", {
@@ -133,6 +183,7 @@ describe("prediction routes", () => {
         ...payload,
         anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
         anchorTxHash: draftAnchorTxHash,
+        evaUsageTxHash,
       }),
     });
 
@@ -147,6 +198,13 @@ describe("prediction routes", () => {
         title: "SpaceX IPO liquidity rotation thesis",
         anchor: { status: "confirmed", txHash: draftAnchorTxHash, confirmedAt: "2026-06-06T21:30:00.000Z" },
         currentRevision: { anchor: { status: "confirmed", txHash: draftAnchorTxHash, confirmedAt: "2026-06-06T21:30:00.000Z" } },
+        evaUsageReceipts: [
+          expect.objectContaining({
+            action: "publish_thesis",
+            txHash: evaUsageTxHash,
+            amountWei: "100000000000000000000000",
+          }),
+        ],
         signals: expect.arrayContaining([expect.objectContaining({ kind: "prediction_market" })]),
       },
     });
@@ -178,6 +236,7 @@ describe("prediction routes", () => {
         ...revisionPayload,
         anchorPreparationId: (preparedRevision.body as { anchorPreparationId: string }).anchorPreparationId,
         anchorTxHash: revisionAnchorTxHash,
+        evaUsageTxHash,
       }),
     });
 
@@ -205,6 +264,7 @@ describe("prediction routes", () => {
         ...payload,
         anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
         anchorTxHash: draftAnchorTxHash,
+        evaUsageTxHash,
       }),
     });
     const thesis = (created.body as { thesis: { thesisId: string; body: string; signals: Array<{ signalId: string; currentOdds: number }> } }).thesis;
@@ -248,6 +308,7 @@ describe("prediction routes", () => {
         ...payload,
         anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
         anchorTxHash: draftAnchorTxHash,
+        evaUsageTxHash,
       }),
     });
 
@@ -276,6 +337,7 @@ describe("prediction routes", () => {
         ...revisionPayload,
         anchorPreparationId: (preparedRevision.body as { anchorPreparationId: string }).anchorPreparationId,
         anchorTxHash: revisionAnchorTxHash,
+        evaUsageTxHash,
       }),
     });
 
@@ -396,6 +458,45 @@ describe("prediction routes", () => {
     });
   });
 
+  it("rejects public thesis publishing until the exact EVA usage receipt is confirmed", async () => {
+    const app = await makeApp();
+    const payload = thesisCreatePayload();
+    const prepared = await fetchJson(app, "/api/thesis-drafts/protocol/prepare-anchor", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const missing = await fetchJson(app, "/api/theses", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...payload,
+        anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
+        anchorTxHash: draftAnchorTxHash,
+      }),
+    });
+    expect(missing.status).toBe(400);
+    expect(missing.body).toMatchObject({
+      error: "Use EVA and submit its Avalanche receipt before publishing thesis",
+    });
+
+    const wrong = await fetchJson(app, "/api/theses", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...payload,
+        anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
+        anchorTxHash: draftAnchorTxHash,
+        evaUsageTxHash: rejectedAnchorTxHash,
+      }),
+    });
+    expect(wrong.status).toBe(400);
+    expect(wrong.body).toMatchObject({
+      error: "EVA usage transaction is not confirmed on Avalanche",
+    });
+  });
+
   it("rejects public thesis publishing when the confirmed anchor does not match prepared calldata", async () => {
     const app = await makeApp({ confirmedTxHashes: [rejectedAnchorTxHash], wrongCalldataTxHashes: [rejectedAnchorTxHash] });
     const payload = thesisCreatePayload();
@@ -436,6 +537,7 @@ describe("prediction routes", () => {
         ...payload,
         anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
         anchorTxHash: draftAnchorTxHash,
+        evaUsageTxHash,
       }),
     });
     const thesisId = (created.body as { thesis: { thesisId: string } }).thesis.thesisId;
@@ -471,6 +573,7 @@ describe("prediction routes", () => {
         ...payload,
         anchorPreparationId: (prepared.body as { anchorPreparationId: string }).anchorPreparationId,
         anchorTxHash: draftAnchorTxHash,
+        evaUsageTxHash,
       }),
     });
     const thesisId = (created.body as { thesis: { thesisId: string } }).thesis.thesisId;
@@ -493,6 +596,7 @@ describe("prediction routes", () => {
         body: "Changed after revision anchor preparation.",
         anchorPreparationId: (preparedRevision.body as { anchorPreparationId: string }).anchorPreparationId,
         anchorTxHash: revisionAnchorTxHash,
+        evaUsageTxHash,
       }),
     });
 

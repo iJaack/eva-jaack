@@ -75,6 +75,8 @@ Atomic tasks:
 - Support thesis-proof, forecast-receipt, and agent-verification usage references.
 - Transfer approved `$EVA` atomically to the irrecoverable `0xdead` sink and emit a receipt.
 - Add exact-amount approval and use/burn controls to `/eva`.
+- Require exact wallet/action/resource-bound receipts for public thesis and revision release.
+- Add direct-allowance quote and paid proof-bundle tools for agents without Permit2.
 - Disclose that circulating supply falls while legacy `totalSupply()` remains unchanged.
 - State that demand and supply pressure do not guarantee price appreciation.
 
@@ -85,6 +87,7 @@ Checks and regressions:
 - Live Avalanche deployment receipt, immutable token/sink getters, and runtime code hash.
 - Backend/frontend manifest parity and deployment-smoke validation.
 - Desktop/mobile E2E for disconnected and connected burn states.
+- Security tests for wrong wallet, action, amount, reference, burner, sink, and replayed resource.
 
 Milestone 2C is not complete until the onchain receipt, chain readback, UI copy, and manifests agree.
 

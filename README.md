@@ -44,6 +44,7 @@ gate or credibility score, and usage does not guarantee market-price appreciatio
 - `POST /api/x/ingest`
 - `POST /api/copy-preview`
 - `POST /api/thesis-anchor/prepare`
+- `POST /api/eva/usage/quote`
 - `GET /api/mcp`
 - `GET /.well-known/agent.json`
 - `GET /health`
@@ -51,9 +52,9 @@ gate or credibility score, and usage does not guarantee market-price appreciatio
 ## Agent MCP Boundary
 
 README API surface is not an agent permission map. Agents that need to create or revise theses
-should start with `docs/MCP_AGENT_QUICKSTART.md`, then use only the five live MCP tools documented
-there: `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, and
-`prepare_anchor_transaction`.
+should start with `docs/MCP_AGENT_QUICKSTART.md`, then use only the seven live MCP tools documented
+there: `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`,
+`prepare_anchor_transaction`, `prepare_eva_proof_quote`, and `get_paid_thesis_proof_bundle`.
 
 `POST /api/theses`, `POST /api/thesis-anchor/prepare`, and other production write routes are
 app/runtime surfaces, not default agent publish powers. Agent-safe MCP work stops at draft/revision

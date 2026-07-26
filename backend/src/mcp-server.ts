@@ -2,8 +2,10 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createEvaMcpToolHandlers } from "./mcp-tools.js";
 import {
   createThesisDraftToolSchema,
+  getPaidThesisProofBundleToolSchema,
   getThesisToolSchema,
   prepareAnchorTransactionToolSchema,
+  prepareEvaProofQuoteToolSchema,
   prepareRevisionDraftToolSchema,
   searchMarketsToolSchema,
 } from "./mcp-schemas.js";
@@ -15,6 +17,8 @@ export const evaMcpToolNames = [
   "get_thesis",
   "prepare_revision_draft",
   "prepare_anchor_transaction",
+  "prepare_eva_proof_quote",
+  "get_paid_thesis_proof_bundle",
 ] as const;
 
 type EvaMcpToolName = typeof evaMcpToolNames[number];
@@ -30,6 +34,10 @@ export const evaMcpToolDescriptions = {
     "Prepare a full-body revision preview and revision-anchor calldata only. Returns anchor_prepared_not_published; does not update the live thesis, publish, broadcast, call direct REST writes, or prove storage durability.",
   prepare_anchor_transaction:
     "Rebuild anchor calldata for an existing thesis only. Returns anchor_prepared_not_published. Does not publish, revise, broadcast, call direct REST writes, confirm onchain state, or prove storage durability.",
+  prepare_eva_proof_quote:
+    "Prepare direct standard ERC-20 approval and EvaUsageBurner calldata for an agent proof bundle. Does not publish, broadcast, call direct REST writes, use Permit2, or spend wallet funds.",
+  get_paid_thesis_proof_bundle:
+    "Release a formatted thesis proof bundle only after exact Avalanche EVA usage-receipt verification. Does not publish, broadcast, call direct REST writes, use Permit2, or mutate thesis state.",
 } satisfies Record<EvaMcpToolName, string>;
 
 const readOnlyToolAnnotations = {
@@ -122,6 +130,34 @@ export function createEvaMcpServer() {
     },
     async ({ thesisId }) => {
       return handlers.prepareExistingThesisAnchorTransaction({ thesisId });
+    },
+  );
+
+  server.registerTool(
+    "prepare_eva_proof_quote",
+    {
+      description: evaMcpToolDescriptions.prepare_eva_proof_quote,
+      inputSchema: prepareEvaProofQuoteToolSchema,
+      annotations: preparationToolAnnotations,
+    },
+    async ({ thesisId, walletAddress }) => {
+      return handlers.prepareEvaProofQuote({ thesisId, walletAddress });
+    },
+  );
+
+  server.registerTool(
+    "get_paid_thesis_proof_bundle",
+    {
+      description: evaMcpToolDescriptions.get_paid_thesis_proof_bundle,
+      inputSchema: getPaidThesisProofBundleToolSchema,
+      annotations: { ...readOnlyToolAnnotations, openWorldHint: true },
+    },
+    async ({ thesisId, walletAddress, evaUsageTxHash }) => {
+      return handlers.getPaidThesisProofBundle({
+        thesisId,
+        walletAddress,
+        evaUsageTxHash: evaUsageTxHash as `0x${string}`,
+      });
     },
   );
 
