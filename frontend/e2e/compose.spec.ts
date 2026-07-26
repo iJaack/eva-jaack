@@ -51,19 +51,24 @@ const marketsPayload = {
   ],
 };
 
-test("compose hides the editor until a self-custodial wallet and public handle are ready", async ({ page }) => {
+test("compose keeps private drafting available before wallet connection", async ({ page }) => {
   await page.route("**/api/markets", async (route) => {
     await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(marketsPayload) });
   });
 
   await page.goto("/compose");
 
-  await expect(page.getByTestId("compose-auth-gate")).toBeVisible();
-  await expect(page.getByTestId("compose-auth-gate")).toContainText(/Connect your own self-custodial EVM wallet/);
+  await expect(page.getByTestId("compose-workspace")).toBeVisible();
+  await expect(page.getByTestId("compose-identity-panel")).toContainText(/Draft first. Sign when ready./);
+  await expect(page.getByTestId("compose-identity-panel")).toContainText(/self-custodial EVM wallet/);
   await expect(page.getByText("@spacethesis")).toHaveCount(0);
   await expect(page.getByText(/embedded wallet/i)).toHaveCount(0);
-  await expect(page.getByLabel("Thesis title")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Publish anchored thesis" })).toHaveCount(0);
+  await expect(page.getByLabel("Thesis title")).toBeVisible();
+  await page.getByLabel("Thesis title").fill("Private pre-wallet draft");
+  await page.getByRole("button", { name: "Save private draft" }).click();
+  await expect(page.getByText("Private draft saved")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Prepare anchor" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Publish anchored thesis" })).toBeDisabled();
 });
 
 test("self-custodial wallet consumers hydrate inside their provider boundary", async ({ page }) => {
@@ -83,8 +88,8 @@ test("self-custodial wallet consumers hydrate inside their provider boundary", a
   }
 
   await page.goto("/compose");
-  await expect(page.getByTestId("compose-auth-gate")).toBeVisible();
-  await expect(page.getByTestId("compose-auth-gate").getByRole("button", { name: "Connect wallet" })).toBeVisible();
+  await expect(page.getByTestId("compose-workspace")).toBeVisible();
+  await expect(page.getByTestId("compose-identity-panel").getByRole("button", { name: "Connect wallet" })).toBeVisible();
   expect(pageErrors).toEqual([]);
 });
 
@@ -482,9 +487,9 @@ test("compose blocks a connected wallet until a valid public X handle is supplie
   });
 
   await page.goto("/compose");
-  await expect(page.getByTestId("compose-auth-gate")).toContainText("Add the public X handle");
+  await expect(page.getByTestId("compose-identity-panel")).toContainText("Add the public X handle");
   await expect(page.getByText("@spacethesis")).toHaveCount(0);
-  await expect(page.getByLabel("Thesis title")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Prepare anchor" })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Publish anchored thesis" })).toHaveCount(0);
+  await expect(page.getByLabel("Thesis title")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Prepare anchor" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Publish anchored thesis" })).toBeDisabled();
 });

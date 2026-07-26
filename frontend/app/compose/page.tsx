@@ -64,13 +64,11 @@ const SelfCustodyEvaUsageCheckout = dynamic(
 const initialBlocks: DraftBlock[] = [
   {
     id: "block-1",
-    text:
-      "SpaceX IPO anticipation is absorbing speculative liquidity now. My working thesis is that attention and risk capital are being held back before the listing path becomes explicit.",
+    text: "",
   },
   {
     id: "block-2",
-    text:
-      "After the IPO window is resolved, that trapped attention can rotate into adjacent risk markets and make the second-order move larger than the IPO headline itself.",
+    text: "",
   },
 ];
 
@@ -91,12 +89,12 @@ function ComposeInner() {
   const searchParams = useSearchParams();
   const { address: connectedWallet } = useSelfCustodyWallet();
   const [markets, setMarkets] = useState<PredictionMarket[]>([]);
-  const [title, setTitle] = useState("SpaceX IPO liquidity rotation thesis");
+  const [title, setTitle] = useState("");
   const [blocks, setBlocks] = useState<DraftBlock[]>(initialBlocks);
-  const [marketId, setMarketId] = useState(searchParams.get("marketId") ?? "spacex-ipo-before-2027");
+  const [marketId, setMarketId] = useState(searchParams.get("marketId") ?? "");
   const [selectedOutcomeLabel, setSelectedOutcomeLabel] = useState("Yes");
   const [signalWeight, setSignalWeight] = useState("60");
-  const [factClaim, setFactClaim] = useState("SpaceX has explored tender offers before a public listing.");
+  const [factClaim, setFactClaim] = useState("");
   const [factUrl, setFactUrl] = useState("");
   const [attachedSignals, setAttachedSignals] = useState<AttachedSignal[]>([]);
   const [anchorPrepared, setAnchorPrepared] = useState(false);
@@ -144,7 +142,7 @@ function ComposeInner() {
   const identityMessage = previewIdentityEnabled
     ? "Preview identity active for local compose."
     : !connectedWallet
-      ? "Connect your own self-custodial EVM wallet before drafting a public thesis."
+      ? "Draft privately now. Connect your own self-custodial EVM wallet when you are ready to publish."
       : !publicXHandle
         ? "Add the public X handle that will appear on this thesis."
         : "Public X handle and self-custodial wallet are ready.";
@@ -166,12 +164,10 @@ function ComposeInner() {
               : !attachedSignals.length
                 ? "Attach at least one signal before publishing"
                 : null;
-  const showComposeWorkspace = identityReady;
-  const authGateMessage = identityMessage;
   const nextSignalLabel = `S${attachedSignals.length + 1}`;
 
   useEffect(() => {
-    if (!showComposeWorkspace || !identity.walletAddress) return;
+    if (!identity.walletAddress) return;
     let cancelled = false;
     readEvaTokenSnapshot(identity.walletAddress as `0x${string}`)
       .then((snapshot) => {
@@ -185,7 +181,7 @@ function ComposeInner() {
     return () => {
       cancelled = true;
     };
-  }, [identity.walletAddress, showComposeWorkspace]);
+  }, [identity.walletAddress]);
 
   useEffect(() => {
     const savedHandle = window.localStorage.getItem("eva.publicXHandle");
@@ -400,15 +396,29 @@ function ComposeInner() {
 
   return (
     <PageShell className="compose-publication-shell">
-        <section className="mobile-page-head compose-page-head">
-          <p className="eyebrow">Compose / new thesis</p>
-          <h1>Build the argument. Keep the receipts.</h1>
-          <p>Start with a claim, attach the sources that shape it, and define what would make you revise.</p>
-          <ul className="route-proof-list" aria-label="Compose state">
-            <li>Identity — {identityReady ? "Ready" : "Required"}</li>
-            <li>Sources — {attachedSignals.length} attached</li>
-            <li>Anchor — {anchorPrepared ? "Prepared" : "Not prepared"}</li>
-            <li>$EVA — {evaUsageConfirmed ? "Receipt ready" : "Required to publish"}</li>
+        <section className="compose-instrument-head">
+          <div className="compose-head-copy">
+            <p className="eyebrow">Compose / new thesis</p>
+            <h1>Build the argument. Keep the receipts.</h1>
+            <p>Write clearly. Back every claim with a source. Connect and add $EVA when you are ready to publish.</p>
+          </div>
+          <ul className="compose-readiness-rail" aria-label="Compose state">
+            <li>
+              <strong>Identity — {identityReady ? "Ready" : "Required"}</strong>
+              <span>{identityReady ? identity.xHandle : "Connect at publish"}</span>
+            </li>
+            <li>
+              <strong>Sources — {attachedSignals.length} attached</strong>
+              <span>{attachedSignals.length ? "Usage receipts ready" : "Attach usage receipts"}</span>
+            </li>
+            <li>
+              <strong>Anchor — {anchorPrepared ? "Prepared" : "Not prepared"}</strong>
+              <span>{anchorPrepared ? "Confirm wallet receipt" : "Define your outcome"}</span>
+            </li>
+            <li>
+              <strong>$EVA — {evaUsageConfirmed ? "Receipt ready" : "Required"}</strong>
+              <span>{evaUsageConfirmed ? "Usage verified" : "Add EVA at publish"}</span>
+            </li>
           </ul>
         </section>
 
@@ -445,67 +455,14 @@ function ComposeInner() {
               </a>
             </div>
           </section>
-        ) : !showComposeWorkspace ? (
-          <section className="prediction-card compose-auth-gate" data-testid="compose-auth-gate">
-            <p className="eyebrow">Identity / required</p>
-            <h2>Use your own wallet.</h2>
-            <p>{authGateMessage}</p>
-            <SelfCustodyWalletControl />
-            <label className="field-group">
-              <span className="field-label">Public X handle</span>
-              <input
-                className="field-input"
-                value={xHandleInput}
-                onChange={(event) => updateXHandle(event.target.value)}
-                placeholder="@yourhandle"
-                autoComplete="off"
-              />
-            </label>
-            <p className="inline-note">
-              This is a public author label, not an X verification. Wallet control is proven by your signed
-              Avalanche transactions.
-            </p>
-            <ul className="route-proof-list" aria-label="Compose auth requirements">
-              <li>Your draft remains private until publish</li>
-              <li>Only your connected self-custodial wallet can sign</li>
-              <li>Eva never creates a wallet, holds a key, or submits a trade</li>
-            </ul>
-          </section>
         ) : (
-          <section className="compose-layout compose-publication-layout">
+          <section className="compose-layout compose-publication-layout" data-testid="compose-workspace">
             <form className="prediction-card compose-form compose-editor-panel" onSubmit={submit}>
               <div className="card-topline">
-                <span>{identity.xHandle}</span>
-                <span>{identity.walletSource} wallet · {shortWallet(identity.walletAddress)}</span>
+                <span>{identity.xHandle || "Private draft"}</span>
+                <span>{identity.walletAddress ? `self-custodial · ${shortWallet(identity.walletAddress)}` : "Wallet not connected"}</span>
               </div>
-              <div className="wallet-panel compose-identity-panel" data-testid="compose-identity-panel">
-                <div>
-                  <p className="eyebrow">Author identity</p>
-                  <h3>{identityReady ? "Ready to publish" : "Identity required"}</h3>
-                  <p>{identityMessage}</p>
-                </div>
-                <div className="wallet-panel-grid">
-                  <div>
-                    <span>Public X handle</span>
-                    <strong>{identity.xHandle}</strong>
-                  </div>
-                  <div>
-                    <span>Wallet source</span>
-                    <strong>Self-custodial</strong>
-                  </div>
-                  <div>
-                    <span>Wallet</span>
-                    <strong>{shortWallet(identity.walletAddress)}</strong>
-                  </div>
-                  <div>
-                    <span>$EVA holder state</span>
-                    <strong>{evaBalance}</strong>
-                  </div>
-                </div>
-                <p className="compose-token-boundary">
-                  Balance never changes credibility or score. Publishing consumes the exact quoted EVA proof receipt.
-                </p>
-              </div>
+              <div className="compose-editor-core">
               <div className="compose-editor-heading">
                 <div>
                   <p className="eyebrow">Private workspace</p>
@@ -515,11 +472,23 @@ function ComposeInner() {
                   {draftState}
                 </span>
               </div>
-              {!identityReady ? <p className="form-warning">Connect your wallet and add a public X handle before publishing a thesis.</p> : null}
+              {!identityReady ? (
+                <p className="compose-draft-permission">
+                  Drafting is private and available now. Your public handle and self-custodial wallet are only required
+                  when you prepare the publish receipts.
+                </p>
+              ) : null}
 
               <label className="field-group">
                 <span className="field-label">Thesis title</span>
-                <textarea className="field-input compose-title-input" value={title} onChange={(event) => updateTitle(event.target.value)} rows={2} required />
+                <textarea
+                  className="field-input compose-title-input"
+                  value={title}
+                  onChange={(event) => updateTitle(event.target.value)}
+                  placeholder="State the claim readers should inspect"
+                  rows={2}
+                  required
+                />
               </label>
 
               <div className="compose-block-stack">
@@ -530,6 +499,7 @@ function ComposeInner() {
                       className="field-input compose-textarea compose-block-textarea"
                       value={block.text}
                       onChange={(event) => updateBlock(block.id, event.target.value)}
+                      placeholder={index === 0 ? "Make the core argument." : "Add supporting logic, a counterpoint, or a revision condition."}
                       required={index === 0}
                     />
                   </label>
@@ -568,10 +538,12 @@ function ComposeInner() {
                 </button>
               </div>
               {error ? <p className="form-warning">{error}</p> : null}
+              </div>
             </form>
 
             <aside className="compose-sidecar compose-source-rail">
               <section className="prediction-card compose-source-panel">
+                <div className="compose-source-core">
                 <div>
                   <p className="eyebrow">Source basket</p>
                   <h2>Signals to cite</h2>
@@ -623,7 +595,12 @@ function ComposeInner() {
                 </div>
                 <label className="field-group">
                   <span className="field-label">Lateral fact signal</span>
-                  <textarea className="field-input compose-textarea compose-textarea-small" value={factClaim} onChange={(event) => setFactClaim(event.target.value)} />
+                  <textarea
+                    className="field-input compose-textarea compose-textarea-small"
+                    value={factClaim}
+                    onChange={(event) => setFactClaim(event.target.value)}
+                    placeholder="What observed fact changes the thesis?"
+                  />
                 </label>
                 <label className="field-group">
                   <span className="field-label">Fact source URL</span>
@@ -638,6 +615,52 @@ function ComposeInner() {
                     Attach fact signal
                   </button>
                 </div>
+                </div>
+              </section>
+
+              <section className="prediction-card wallet-panel compose-identity-panel" data-testid="compose-identity-panel">
+                <div>
+                  <p className="eyebrow">Connect at publish</p>
+                  <h2>{identityReady ? "Ready to publish" : "Draft first. Sign when ready."}</h2>
+                  <p>{identityMessage}</p>
+                </div>
+                <div className="compose-identity-actions">
+                  <label className="field-group">
+                    <span className="field-label">Public X handle</span>
+                    <input
+                      className="field-input"
+                      value={xHandleInput}
+                      onChange={(event) => updateXHandle(event.target.value)}
+                      placeholder="@yourhandle"
+                      autoComplete="off"
+                    />
+                  </label>
+                  <div className="field-group">
+                    <span className="field-label">Your self-custodial wallet</span>
+                    <SelfCustodyWalletControl />
+                  </div>
+                </div>
+                <div className="wallet-panel-grid">
+                  <div>
+                    <span>Public X handle</span>
+                    <strong>{identity.xHandle || "Required at publish"}</strong>
+                  </div>
+                  <div>
+                    <span>Wallet source</span>
+                    <strong>{identity.walletAddress ? "Self-custodial" : "Connect at publish"}</strong>
+                  </div>
+                  <div>
+                    <span>Wallet</span>
+                    <strong>{identity.walletAddress ? shortWallet(identity.walletAddress) : "Not connected"}</strong>
+                  </div>
+                  <div>
+                    <span>$EVA holder state</span>
+                    <strong>{evaBalance}</strong>
+                  </div>
+                </div>
+                <p className="compose-token-boundary">
+                  Balance never changes credibility or score. Publishing consumes the exact quoted EVA proof receipt.
+                </p>
               </section>
 
               <section className="prediction-card compose-attached-panel" data-testid="attached-signals">
