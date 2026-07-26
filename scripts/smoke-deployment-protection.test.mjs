@@ -194,8 +194,15 @@ function createApplicationSmokeServer({ dynamicConfigured, authoringReady = dyna
         JSON.stringify({
           platformToken: {
             contract: `eip155:${protocol.chain.id}:${protocol.tokens.eva.address}`,
+            usageBurner: `eip155:${protocol.chain.id}:${protocol.contracts.evaUsageBurner}`,
             symbol: protocol.tokens.eva.symbol,
-            liveCapabilities: ["contract_metadata", "holder_balance_readback", "author_context"],
+            liveCapabilities: [
+              "contract_metadata",
+              "holder_balance_readback",
+              "author_context",
+              "usage_retirement",
+              "usage_receipts",
+            ],
           },
         })
       );

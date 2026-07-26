@@ -18,8 +18,17 @@ export function GET() {
     },
     platformToken: {
       contract: `eip155:${protocol.chain.id}:${protocol.tokens.eva.address}`,
+      usageBurner: `eip155:${protocol.chain.id}:${protocol.contracts.evaUsageBurner}`,
       symbol: protocol.tokens.eva.symbol,
-      liveCapabilities: ["contract_metadata", "holder_balance_readback", "author_context"],
+      liveCapabilities: [
+        "contract_metadata",
+        "holder_balance_readback",
+        "author_context",
+        "usage_retirement",
+        "usage_receipts",
+      ],
+      supplyAccounting: "Tokens used through Eva are transferred to 0xdead; legacy totalSupply remains unchanged.",
+      priceBoundary: "Usage can create token demand and circulating-supply pressure; price appreciation is not guaranteed.",
       notActive: ["staking", "gating", "yield", "governance", "trade_execution"],
     },
   });

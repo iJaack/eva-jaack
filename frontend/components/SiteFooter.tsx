@@ -16,6 +16,7 @@ function shortAddress(address: string): string {
 export default function SiteFooter() {
   const contractUrl = `${protocol.chain.explorerUrl}/address/${protocol.contracts.evaThesisProtocol}`;
   const tokenUrl = `${protocol.chain.explorerUrl}/address/${protocol.tokens.eva.address}`;
+  const usageBurnerUrl = `${protocol.chain.explorerUrl}/address/${protocol.contracts.evaUsageBurner}`;
 
   return (
     <footer className="site-footer">
@@ -34,6 +35,9 @@ export default function SiteFooter() {
         </a>
         <a href={tokenUrl} target="_blank" rel="noreferrer">
           $EVA contract {shortAddress(protocol.tokens.eva.address)}
+        </a>
+        <a href={usageBurnerUrl} target="_blank" rel="noreferrer">
+          Usage burner {shortAddress(protocol.contracts.evaUsageBurner)}
         </a>
         <a href="https://github.com/iJaack/eva-jaack" target="_blank" rel="noreferrer">
           GitHub

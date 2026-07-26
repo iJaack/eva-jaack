@@ -1,66 +1,19 @@
-## Foundry
+# Eva Protocol Contracts
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+Foundry workspace for the Avalanche C-Chain contracts used by Eva:
 
-Foundry consists of:
+- `EvaThesisProtocol` — UUPS thesis and signal anchors. Canonical proxy:
+  `0x5eDBd1eea3228662326e60634E53AB8975D6641c`.
+- `EvaUsageBurner` — immutable canonical `$EVA` usage receipts and dead-address retirement:
+  `0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296`.
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
-
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
+`EvaUsageBurner` sends approved `$EVA` to `0x000000000000000000000000000000000000dEaD`.
+This reduces circulating supply but does not change the legacy token's reported `totalSupply()`.
+No contract or product claim guarantees price appreciation.
 
 ```shell
-$ forge build
+/Users/jaack/.foundry/bin/forge build
+/Users/jaack/.foundry/bin/forge test
 ```
 
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+Deployment receipts live in `deployments/mainnet.json`.

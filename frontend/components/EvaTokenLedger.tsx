@@ -37,6 +37,33 @@ function DynamicWalletLoader({
   return <Bridge onWallet={onWallet} />;
 }
 
+function DynamicUsageLoader() {
+  const [Panel, setPanel] = useState<ComponentType | null>(null);
+
+  useEffect(() => {
+    if (!dynamicEnvironmentId && !dynamicTestMode) return;
+    let cancelled = false;
+    import("@/components/DynamicEvaUsagePanel")
+      .then((module) => {
+        if (!cancelled) setPanel(() => module.default);
+      })
+      .catch(() => setPanel(null));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!dynamicEnvironmentId && !dynamicTestMode) {
+    return (
+      <div className="eva-usage-unconfigured">
+        <p>The usage-burn contract is live on Avalanche.</p>
+        <span>Wallet transactions are not configured in this environment.</span>
+      </div>
+    );
+  }
+  return Panel ? <Panel /> : <p className="eva-usage-unconfigured">Loading the Avalanche usage receipt…</p>;
+}
+
 export default function EvaTokenLedger() {
   const [walletAddress, setWalletAddress] = useState<`0x${string}` | null>(null);
   const [snapshot, setSnapshot] = useState<EvaTokenSnapshot | null>(null);
@@ -152,26 +179,34 @@ export default function EvaTokenLedger() {
         </div>
       </section>
 
-      <section className="eva-token-row" aria-labelledby="eva-platform-relationship">
+      <section className="eva-token-row" aria-labelledby="eva-use-and-burn">
         <div className="eva-token-row-label">
           <span>03</span>
+          <p id="eva-use-and-burn">Use &amp; burn</p>
+        </div>
+        <DynamicUsageLoader />
+      </section>
+
+      <section className="eva-token-row" aria-labelledby="eva-platform-relationship">
+        <div className="eva-token-row-label">
+          <span>04</span>
           <p id="eva-platform-relationship">Platform relationship</p>
         </div>
         <ol className="eva-token-sequence">
           <li><span>1</span><strong>Wallet</strong></li>
           <li><span>2</span><strong>$EVA balance</strong></li>
-          <li><span>3</span><strong>Author record</strong></li>
-          <li><span>4</span><strong>Thesis proof</strong></li>
+          <li><span>3</span><strong>Platform use</strong></li>
+          <li><span>4</span><strong>Burn receipt</strong></li>
         </ol>
       </section>
 
       <section className="eva-token-row" aria-labelledby="eva-boundary-ledger">
         <div className="eva-token-row-label">
-          <span>04</span>
+          <span>05</span>
           <p id="eva-boundary-ledger">Boundary ledger</p>
         </div>
         <div className="eva-token-boundaries">
-          <p><strong>Live now</strong> Contract metadata, holder balance readback, author context</p>
+          <p><strong>Live now</strong> Contract metadata, holder readback, author context, usage burns, receipts</p>
           <p><strong>Not active</strong> Staking, gating, yield, governance, trade execution</p>
         </div>
       </section>

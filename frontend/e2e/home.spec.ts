@@ -153,9 +153,9 @@ test("homepage leads with an inspectable proof ledger", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Forecasts ready to become citations." })).toBeVisible();
   await expect(page.getByRole("heading", { name: "The argument stays readable. The provenance stays attached." })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Follow the record, not the confidence." })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "$EVA holder state, attached to the author record." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "$EVA is used for public proof receipts." })).toBeVisible();
   await expect(page.getByRole("link", { name: "Inspect $EVA" })).toHaveAttribute("href", "/eva");
-  await expect(page.getByText("Wallet → $EVA balance → author → thesis")).toBeVisible();
+  await expect(page.getByText("Wallet → platform use → dead-address burn → receipt")).toBeVisible();
 });
 
 test("homepage source tape routes a forecast into its market receipt", async ({ page }) => {
@@ -198,7 +198,7 @@ test("homepage renders compact empty states when prediction summary has no recor
   await expect(page.getByText("Proof object unavailable")).toBeVisible();
   await expect(page.getByRole("link", { name: "Browse source library" })).toHaveAttribute("href", "/markets");
   await expect(page.getByText("No markets loaded.")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "$EVA holder state, attached to the author record." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "$EVA is used for public proof receipts." })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Follow the record, not the confidence." })).toHaveCount(0);
 });
 

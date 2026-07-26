@@ -161,6 +161,7 @@ export default function HomePage() {
   const predictors = summary?.predictors.slice(0, 3) ?? [];
   const contractUrl = `${protocol.chain.explorerUrl}/address/${protocol.contracts.evaThesisProtocol}`;
   const tokenUrl = `${protocol.chain.explorerUrl}/address/${protocol.tokens.eva.address}`;
+  const usageBurnerUrl = `${protocol.chain.explorerUrl}/address/${protocol.contracts.evaUsageBurner}`;
 
   return (
     <PageShell variant="home">
@@ -289,10 +290,10 @@ export default function HomePage() {
       <section className="eva-home-token" aria-labelledby="home-token-title">
         <div>
           <span>Platform token / Avalanche</span>
-          <h2 id="home-token-title">$EVA holder state, attached to the author record.</h2>
+          <h2 id="home-token-title">$EVA is used for public proof receipts.</h2>
           <p>
-            Eva reads the canonical token contract and wallet balance from Avalanche. Holder state adds inspectable
-            context; it does not buy credibility or unlock publishing.
+            Read the canonical token and wallet balance from Avalanche, then use $EVA for a named platform proof.
+            Used tokens are retired to 0xdead with an onchain receipt; usage cannot guarantee market price.
           </p>
           <Link href="/eva" className="eva-text-action">
             Inspect $EVA <span aria-hidden="true">→</span>
@@ -309,7 +310,15 @@ export default function HomePage() {
           </div>
           <div>
             <dt>Live relationship</dt>
-            <dd>Wallet → $EVA balance → author → thesis</dd>
+            <dd>Wallet → platform use → dead-address burn → receipt</dd>
+          </div>
+          <div>
+            <dt>Usage burner</dt>
+            <dd>
+              <a href={usageBurnerUrl} target="_blank" rel="noreferrer">
+                {shortAddress(protocol.contracts.evaUsageBurner)}
+              </a>
+            </dd>
           </div>
           <div>
             <dt>Not active</dt>

@@ -10,8 +10,17 @@ describe("agent manifest", () => {
     expect(response.status).toBe(200);
     expect(manifest.platformToken).toEqual({
       contract: `eip155:43114:${protocol.tokens.eva.address}`,
+      usageBurner: `eip155:43114:${protocol.contracts.evaUsageBurner}`,
       symbol: "EVA",
-      liveCapabilities: ["contract_metadata", "holder_balance_readback", "author_context"],
+      liveCapabilities: [
+        "contract_metadata",
+        "holder_balance_readback",
+        "author_context",
+        "usage_retirement",
+        "usage_receipts",
+      ],
+      supplyAccounting: "Tokens used through Eva are transferred to 0xdead; legacy totalSupply remains unchanged.",
+      priceBoundary: "Usage can create token demand and circulating-supply pressure; price appreciation is not guaranteed.",
       notActive: ["staking", "gating", "yield", "governance", "trade_execution"],
     });
   });

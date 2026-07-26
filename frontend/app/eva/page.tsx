@@ -6,7 +6,7 @@ import { protocol } from "@/lib/protocol";
 
 export const metadata: Metadata = {
   title: "$EVA on Avalanche",
-  description: "Inspect the canonical $EVA token contract, live metadata, and read-only holder state on Avalanche C-Chain.",
+  description: "Inspect $EVA on Avalanche, use it for platform proofs, and create an onchain dead-address burn receipt.",
 };
 
 export default function EvaTokenPage() {
@@ -18,8 +18,8 @@ export default function EvaTokenPage() {
         <p className="eyebrow">Platform token / Avalanche C-Chain</p>
         <h1>$EVA, on Avalanche.</h1>
         <p>
-          The Eva platform token is an inspectable part of the protocol record. Contract metadata and wallet balances
-          are read directly from Avalanche C-Chain.
+          Read the canonical token directly from Avalanche. Use $EVA for a thesis proof, forecast receipt, or agent
+          verification—and retire it irreversibly with an onchain receipt.
         </p>
         <div className="eva-token-actions">
           <a className="eva-inline-link" href={contractUrl} target="_blank" rel="noreferrer">

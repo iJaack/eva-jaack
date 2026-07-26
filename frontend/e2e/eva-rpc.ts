@@ -4,6 +4,15 @@ import { encodeAbiParameters, toHex } from "viem";
 const rpcUrl = "https://avalanche-c-chain-rpc.publicnode.com/**";
 const tokenSupply = 10_000_000_000n * 10n ** 18n;
 const protocolBalance = 1_000_000n * 10n ** 18n;
+const deadSinkBalance = 50_000_000n * 10n ** 18n;
+const burnSink = "0x000000000000000000000000000000000000dEaD" as const;
+
+type EvaRpcOptions = {
+  allowance?: bigint;
+  totalRetired?: bigint;
+  receiptCount?: bigint;
+  walletBalance?: bigint;
+};
 
 type JsonRpcRequest = {
   id: number;
@@ -11,33 +20,57 @@ type JsonRpcRequest = {
   params?: unknown[];
 };
 
-function ethCallResult(request: JsonRpcRequest): `0x${string}` {
-  const call = request.params?.[0] as { data?: string } | undefined;
+function ethCallResult(request: JsonRpcRequest, options: EvaRpcOptions): `0x${string}` {
+  const call = request.params?.[0] as { data?: string; to?: string } | undefined;
   const selector = call?.data?.slice(0, 10);
 
   if (selector === "0x06fdde03") return encodeAbiParameters([{ type: "string" }], ["evajaack"]);
   if (selector === "0x95d89b41") return encodeAbiParameters([{ type: "string" }], ["EVA"]);
   if (selector === "0x313ce567") return encodeAbiParameters([{ type: "uint8" }], [18]);
   if (selector === "0x18160ddd") return encodeAbiParameters([{ type: "uint256" }], [tokenSupply]);
-  if (selector === "0x70a08231") return encodeAbiParameters([{ type: "uint256" }], [protocolBalance]);
+  if (selector === "0x70a08231") {
+    const account = `0x${call?.data?.slice(-40) ?? ""}`.toLowerCase();
+    const balance =
+      account === burnSink.toLowerCase()
+        ? deadSinkBalance
+        : account === "0x0fe61780bd5508b3c99e420662050e5560608ca4"
+          ? protocolBalance
+          : (options.walletBalance ?? 1_000n * 10n ** 18n);
+    return encodeAbiParameters([{ type: "uint256" }], [balance]);
+  }
+  if (selector === "0xdd62ed3e") {
+    return encodeAbiParameters([{ type: "uint256" }], [options.allowance ?? 0n]);
+  }
+  if (selector === "0x5e4807f2") {
+    return encodeAbiParameters([{ type: "address" }], [burnSink]);
+  }
+  if (selector === "0x207fcf9e") {
+    return encodeAbiParameters([{ type: "uint256" }], [10n ** 18n]);
+  }
+  if (selector === "0x4d8f59f0") {
+    return encodeAbiParameters([{ type: "uint256" }], [options.totalRetired ?? 0n]);
+  }
+  if (selector === "0x7f038f3c") {
+    return encodeAbiParameters([{ type: "uint256" }], [options.receiptCount ?? 0n]);
+  }
 
   throw new Error(`Unhandled $EVA eth_call selector: ${selector ?? "missing"}`);
 }
 
-function rpcResult(request: JsonRpcRequest): string {
-  if (request.method === "eth_call") return ethCallResult(request);
+function rpcResult(request: JsonRpcRequest, options: EvaRpcOptions): string {
+  if (request.method === "eth_call") return ethCallResult(request, options);
   if (request.method === "eth_blockNumber") return toHex(91_285_587);
   if (request.method === "eth_chainId") return toHex(43_114);
   throw new Error(`Unhandled $EVA RPC method: ${request.method}`);
 }
 
-async function fulfillRpc(route: Route) {
+async function fulfillRpc(route: Route, options: EvaRpcOptions) {
   const payload = route.request().postDataJSON() as JsonRpcRequest | JsonRpcRequest[];
   const requests = Array.isArray(payload) ? payload : [payload];
   const responses = requests.map((request) => ({
     jsonrpc: "2.0",
     id: request.id,
-    result: rpcResult(request),
+    result: rpcResult(request, options),
   }));
 
   await route.fulfill({
@@ -47,6 +80,6 @@ async function fulfillRpc(route: Route) {
   });
 }
 
-export async function stubEvaRpc(page: Page) {
-  await page.route(rpcUrl, fulfillRpc);
+export async function stubEvaRpc(page: Page, options: EvaRpcOptions = {}) {
+  await page.route(rpcUrl, (route) => fulfillRpc(route, options));
 }

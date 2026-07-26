@@ -2371,8 +2371,6 @@ select {
   display: grid;
   grid-template-columns: minmax(190px, 0.24fr) minmax(0, 1fr);
   border-bottom: 1px solid var(--color-rule-strong);
-  content-visibility: auto;
-  contain-intrinsic-size: 260px;
 }
 
 .eva-token-row-label {
@@ -2500,6 +2498,172 @@ select {
   color: var(--color-warning);
   font-family: var(--font-mono);
   font-size: 0.7rem;
+}
+
+.eva-usage-panel {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.25fr) minmax(360px, 1fr);
+  padding-left: 44px;
+}
+
+.eva-usage-summary {
+  display: grid;
+  align-content: start;
+  padding: 34px 34px 34px 0;
+  border-right: 1px solid var(--color-rule);
+}
+
+.eva-usage-summary p,
+.eva-usage-summary span {
+  margin: 0;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+}
+
+.eva-usage-summary strong {
+  margin: 18px 0 10px;
+  color: var(--color-accent);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.3vw, 3.7rem);
+  font-weight: 380;
+  line-height: 1;
+}
+
+.eva-usage-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  padding: 34px 0 34px 34px;
+}
+
+.eva-usage-form label {
+  display: grid;
+  gap: 9px;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+}
+
+.eva-usage-form input,
+.eva-usage-form select {
+  min-width: 0;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--color-rule-strong);
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font: 0.75rem var(--font-mono);
+}
+
+.eva-usage-form input:focus,
+.eva-usage-form select:focus {
+  border-color: var(--color-accent);
+}
+
+.eva-usage-reference,
+.eva-usage-form > p,
+.eva-usage-actions,
+.eva-usage-connect,
+.eva-usage-state {
+  grid-column: 1 / -1;
+}
+
+.eva-usage-form > p,
+.eva-usage-connect {
+  margin: 0;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  line-height: 1.6;
+}
+
+.eva-usage-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-top: 4px;
+}
+
+.eva-usage-actions button {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid var(--color-accent);
+  border-radius: 0;
+  background: var(--color-accent);
+  color: var(--color-ground);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.eva-usage-actions button:disabled {
+  border-color: var(--color-rule-strong);
+  background: transparent;
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+.eva-usage-actions span,
+.eva-usage-state {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+}
+
+.eva-usage-state {
+  margin: 0;
+}
+
+.eva-usage-state.is-confirmed {
+  color: var(--color-accent);
+}
+
+.eva-usage-state.is-error {
+  color: var(--color-warning);
+}
+
+.eva-usage-state a {
+  color: inherit;
+}
+
+.eva-usage-disclosure {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+  padding: 22px 0;
+  border-top: 1px solid var(--color-rule);
+}
+
+.eva-usage-disclosure p,
+.eva-usage-unconfigured {
+  margin: 0;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  line-height: 1.65;
+}
+
+.eva-usage-disclosure code {
+  color: var(--color-ink-2);
+}
+
+.eva-usage-unconfigured {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  min-height: 160px;
+  padding-left: 44px;
+}
+
+.eva-usage-unconfigured p {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 1.4rem;
 }
 
 .eva-token-sequence {
@@ -2741,6 +2905,15 @@ select {
   .eva-token-sequence {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 34px;
+  }
+
+  .eva-usage-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .eva-usage-summary {
+    border-right: 0;
+    border-bottom: 1px solid var(--color-rule);
   }
 
   .eva-token-sequence li:nth-child(2)::after {
@@ -3047,7 +3220,6 @@ select {
 
   .eva-token-row {
     grid-template-columns: 1fr;
-    contain-intrinsic-size: 420px;
   }
 
   .eva-token-row-label {
@@ -3066,9 +3238,39 @@ select {
 
   .eva-token-receipt,
   .eva-token-wallet,
-  .eva-token-sequence {
+  .eva-token-sequence,
+  .eva-usage-panel,
+  .eva-usage-unconfigured {
     padding-right: 0;
     padding-left: 0;
+  }
+
+  .eva-usage-form {
+    grid-template-columns: 1fr;
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .eva-usage-form label,
+  .eva-usage-form > p,
+  .eva-usage-actions,
+  .eva-usage-connect,
+  .eva-usage-state {
+    grid-column: 1;
+  }
+
+  .eva-usage-actions,
+  .eva-usage-disclosure {
+    grid-template-columns: 1fr;
+  }
+
+  .eva-usage-actions {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .eva-usage-actions button {
+    width: 100%;
   }
 
   .eva-token-receipt > div {

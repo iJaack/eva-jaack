@@ -16,7 +16,8 @@
   },
   "contracts": {
     "deployBlock": 87265823,
-    "evaThesisProtocol": "0x5eDBd1eea3228662326e60634E53AB8975D6641c"
+    "evaThesisProtocol": "0x5eDBd1eea3228662326e60634E53AB8975D6641c",
+    "evaUsageBurner": "0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296"
   },
   "tokens": {
     "eva": {

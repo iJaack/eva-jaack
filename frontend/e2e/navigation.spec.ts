@@ -32,6 +32,10 @@ test("primary navigation stays focused on the thesis product", async ({ page }) 
     "href",
     /0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672/,
   );
+  await expect(footer.getByRole("link", { name: /Usage burner/ })).toHaveAttribute(
+    "href",
+    "https://snowtrace.io/address/0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296",
+  );
   await expect(footer.getByRole("link", { name: "Verify" })).toHaveCount(0);
   await expect(footer.getByRole("link", { name: "Claims" })).toHaveCount(0);
   await expect(footer.getByRole("link", { name: "GitHub" })).toBeVisible();

@@ -3,6 +3,7 @@
   "chainId": 43114,
   "thesisProtocolDeployedAt": "2026-06-05T20:02:16Z",
   "thesisProtocolUpgradedAt": "2026-07-26T15:07:08Z",
+  "usageBurnerDeployedAt": "2026-07-26T15:52:24Z",
   "deployer": "0x0fe61780bd5508b3C99e420662050e5560608cA4",
   "contracts": {
     "EvaThesisProtocol": {
@@ -16,6 +17,17 @@
       "deployedBlock": 87265823,
       "implementationBlock": 91284740,
       "upgradeBlock": 91284742,
+      "verified": false
+    },
+    "EvaUsageBurner": {
+      "address": "0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296",
+      "token": "0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672",
+      "burnSink": "0x000000000000000000000000000000000000dEaD",
+      "deploymentTxHash": "0x88899e9cc943d59a792e71f927372af0cc1e24606baeb267f05300f8040e3340",
+      "deployedBlock": 91287297,
+      "codeHash": "0xcdbfdb12af6f360b6b1d60a3afc5dd5f384a0e570e50ddec80f96b2cb2c50be5",
+      "minimumRetirement": "1000000000000000000",
+      "supplyAccounting": "circulating_supply_sink; legacy token totalSupply remains unchanged",
       "verified": false
     }
   },

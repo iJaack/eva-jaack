@@ -64,6 +64,30 @@ Checks and regressions:
 
 Milestone 2B is not complete until live chain state and visible product copy agree.
 
+## Milestone 2C: `$EVA` Platform Use And Burn Receipts
+
+Goal: let holders consume canonical `$EVA` for inspectable platform uses without promising a market
+outcome or misreporting legacy token supply.
+
+Atomic tasks:
+
+- Deploy immutable `EvaUsageBurner` against canonical `$EVA`.
+- Support thesis-proof, forecast-receipt, and agent-verification usage references.
+- Transfer approved `$EVA` atomically to the irrecoverable `0xdead` sink and emit a receipt.
+- Add exact-amount approval and use/burn controls to `/eva`.
+- Disclose that circulating supply falls while legacy `totalSupply()` remains unchanged.
+- State that demand and supply pressure do not guarantee price appreciation.
+
+Checks and regressions:
+
+- Contract tests for allowance enforcement, minimum amount, duplicate references, receipt totals,
+  dead-sink balances, and unchanged legacy total supply.
+- Live Avalanche deployment receipt, immutable token/sink getters, and runtime code hash.
+- Backend/frontend manifest parity and deployment-smoke validation.
+- Desktop/mobile E2E for disconnected and connected burn states.
+
+Milestone 2C is not complete until the onchain receipt, chain readback, UI copy, and manifests agree.
+
 ## Milestone 3: Agent-Ready Thesis Creation
 
 Goal: let agents create, revise, inspect, and anchor theses safely.
