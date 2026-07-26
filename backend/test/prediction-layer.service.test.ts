@@ -213,6 +213,68 @@ describe("prediction layer service", () => {
     expect(reRevised?.thesis.timeline.map((entry) => entry.scoreAfter)).toEqual([50, 70, 85]);
   });
 
+  it("persists a paid revision, confirmed anchor, and EVA receipt in one revision write", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
+    cleanupDirs.push(dir);
+    const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => [], async () => []);
+    const created = await service.createThesis({
+      identity: auth(),
+      title: "Atomic paid revision",
+      body: "Initial thesis.",
+      predictionSignals: [
+        {
+          provider: "manual",
+          marketTitle: "Will the atomic path work?",
+          selectedOutcomeLabel: "Yes",
+          oddsAtAdd: 0.5,
+          currentOdds: 0.5,
+          weight: 100,
+          role: "core",
+          status: "open",
+        },
+      ],
+    });
+    const txHash = `0x${"b".repeat(64)}` as `0x${string}`;
+    const receiptTxHash = `0x${"c".repeat(64)}` as `0x${string}`;
+    const confirmedAt = "2026-07-26T12:00:00.000Z";
+
+    const revised = await service.recordRevision(
+      created.thesis.thesisId,
+      {
+        identity: auth(),
+        body: "Updated thesis with an atomic paid receipt.",
+        note: "Atomic paid revision.",
+      },
+      {
+        txHash,
+        confirmedAt,
+        usageReceipt: {
+          action: "publish_revision",
+          txHash: receiptTxHash,
+          receiptId: "usage-receipt-atomic",
+          amountWei: "25000000000000000000000",
+          referenceHash: `0x${"d".repeat(64)}`,
+          confirmedAt,
+          blockNumber: "76543210",
+        },
+      },
+    );
+
+    expect(revised?.thesis.currentRevision.anchor).toMatchObject({
+      status: "confirmed",
+      txHash,
+      confirmedAt,
+    });
+    expect(revised?.thesis.evaUsageReceipts).toEqual([
+      expect.objectContaining({
+        receiptId: "usage-receipt-atomic",
+        action: "publish_revision",
+        txHash: receiptTxHash,
+      }),
+    ]);
+    expect(revised?.thesis.timeline.slice(-2).map((entry) => entry.action)).toEqual(["revised", "anchored"]);
+  });
+
   it("scores closed prediction signals from resolved outcomes", async () => {
     const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
     cleanupDirs.push(dir);

@@ -1409,7 +1409,15 @@ export class LocalPredictionLayerService {
     };
   }
 
-  async recordRevision(thesisId: string, input: ThesisRevisionInput): Promise<ThesisDetailResponse | null> {
+  async recordRevision(
+    thesisId: string,
+    input: ThesisRevisionInput,
+    confirmation?: {
+      txHash: `0x${string}`;
+      confirmedAt: string;
+      usageReceipt: EvaUsageReceiptDto;
+    },
+  ): Promise<ThesisDetailResponse | null> {
     const actor = normalizeIdentity(input.identity);
     const store = await this.readStore();
     const thesis = store.theses.find((entry) => entry.thesisId === thesisId || entry.slug === thesisId);
@@ -1423,7 +1431,10 @@ export class LocalPredictionLayerService {
     if (!bodyChanged && !signalsChanged) {
       throw new Error(noOpRevisionError);
     }
-    const revision = revisionFor(thesis.revisions.length + 1, body, input.note?.trim() || null, signals, scoreBefore, now);
+    const preparedRevision = revisionFor(thesis.revisions.length + 1, body, input.note?.trim() || null, signals, scoreBefore, now);
+    const revision = confirmation
+      ? { ...preparedRevision, anchor: confirmedAnchor(confirmation.txHash, confirmation.confirmedAt) }
+      : preparedRevision;
     thesis.body = body;
     thesis.signals = signals;
     thesis.currentRevision = revision;
@@ -1438,6 +1449,25 @@ export class LocalPredictionLayerService {
       scoreBefore,
       scoreAfter: thesis.currentScore,
     });
+    if (confirmation) {
+      thesis.updatedAt = confirmation.confirmedAt;
+      thesis.timeline.push({
+        timelineId: `tl-${stableHash({
+          thesisId,
+          revisionId: revision.revisionId,
+          txHash: confirmation.txHash,
+          action: "revision-anchor-confirmed",
+        })}`,
+        action: "anchored",
+        at: confirmation.confirmedAt,
+        note: `Revision v${revision.version} anchor transaction confirmed.`,
+        scoreBefore: null,
+        scoreAfter: thesis.currentScore,
+      });
+      if (!(thesis.evaUsageReceipts ?? []).some((receipt) => receipt.receiptId === confirmation.usageReceipt.receiptId)) {
+        thesis.evaUsageReceipts = [...(thesis.evaUsageReceipts ?? []), confirmation.usageReceipt];
+      }
+    }
     await this.writeStore(store);
     return this.getThesis(thesis.thesisId);
   }

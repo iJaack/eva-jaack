@@ -412,13 +412,10 @@ export function createPredictionRoutes(
         return c.json({ error: usageVerification.error }, 400);
       }
 
-      const response = await deps.predictions.recordRevision(c.req.param("thesisId"), input);
-      if (!response) return c.json({ error: "Thesis not found" }, 404);
-      const anchored = await deps.predictions.markCurrentRevisionAnchorConfirmed(
-        response.thesis.thesisId,
-        anchorTxHash,
-        verification.confirmedAt,
-        {
+      const response = await deps.predictions.recordRevision(c.req.param("thesisId"), input, {
+        txHash: anchorTxHash,
+        confirmedAt: verification.confirmedAt,
+        usageReceipt: {
           action: "publish_revision",
           txHash: evaUsageTxHash,
           receiptId: usageVerification.receiptId,
@@ -427,9 +424,10 @@ export function createPredictionRoutes(
           confirmedAt: usageVerification.confirmedAt,
           blockNumber: usageVerification.blockNumber,
         },
-      );
+      });
+      if (!response) return c.json({ error: "Thesis not found" }, 404);
       await deps.predictions.deleteAnchorPreparation(anchorPreparationId);
-      return c.json<ThesisDetailResponse>(anchored ?? response);
+      return c.json<ThesisDetailResponse>(response);
     } catch (error) {
       return c.json({ error: error instanceof Error ? error.message : "Failed to revise thesis" }, 400);
     }
