@@ -145,9 +145,9 @@ function thesisShareText(thesis: Thesis): string {
   return `Tracking v${thesis.currentRevision.version} of "${thesis.title}" on Eva (score ${thesis.currentScore}, ${thesis.signals.length} ${signalLabel}, revision history visible).`;
 }
 
-export default function ThesisDetailClient() {
-  const params = useParams();
-  const thesisId = params.thesisId as string;
+export default function ThesisDetailClient({ thesisId: providedThesisId }: { thesisId?: string } = {}) {
+  const params = useParams<{ thesisId?: string }>();
+  const thesisId = providedThesisId ?? params.thesisId ?? "";
   const [detail, setDetail] = useState<PredictionThesisDetail | null>(null);
   const [copyState, setCopyState] = useState<string | null>(null);
   const [anchorState, setAnchorState] = useState<string | null>(null);

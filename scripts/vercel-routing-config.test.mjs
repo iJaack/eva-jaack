@@ -6,7 +6,7 @@ const vercelConfig = JSON.parse(
   await readFile(new URL("../vercel.json", import.meta.url), "utf8"),
 );
 
-test("Vercel leaves frontend dynamic paths for the Next builder to resolve", () => {
+test("Vercel resolves public dynamic paths through the static detail entry", () => {
   const destinations = vercelConfig.routes
     .filter((route) => typeof route.dest === "string")
     .map((route) => route.dest);
@@ -23,12 +23,15 @@ test("Vercel leaves frontend dynamic paths for the Next builder to resolve", () 
     destinations.some((destination) => destination.includes("/thesis/[thesisId]")),
     false,
   );
-  assert.ok(
-    vercelConfig.routes.some(
-      (route) =>
-        route.src === "/(.*)" &&
-        route.dest === "/frontend/$1" &&
-        route.continue === true,
-    ),
+  assert.deepEqual(
+    vercelConfig.routes
+      .filter((route) => ["/markets/([^/]+)", "/predictors/([^/]+)", "/thesis/([^/]+)"].includes(route.src))
+      .map((route) => route.dest),
+    [
+      "/frontend/resolve?kind=market&id=$1",
+      "/frontend/resolve?kind=predictor&id=$1",
+      "/frontend/resolve?kind=thesis&id=$1",
+    ],
   );
+  assert.ok(vercelConfig.routes.some((route) => route.src === "/(.*)" && route.dest === "/frontend/$1"));
 });

@@ -8,9 +8,9 @@ import PageShell from "@/components/ui/PageShell";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { getPredictorDetail, type PredictionPredictorDetail } from "@/lib/api";
 
-export default function PredictorDetailClient() {
-  const params = useParams();
-  const id = params.id as string;
+export default function PredictorDetailClient({ id: providedId }: { id?: string } = {}) {
+  const params = useParams<{ id?: string }>();
+  const id = providedId ?? params.id ?? "";
   const [detail, setDetail] = useState<PredictionPredictorDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

@@ -40,6 +40,7 @@ const staticRoutes = [
   { path: "/compose", label: "compose" },
   { path: "/predictors", label: "predictors" },
   { path: "/eva", label: "eva" },
+  { path: "/resolve", label: "detail-resolver" },
 ];
 
 async function fetchJson(url) {
