@@ -18,7 +18,8 @@
     "smoke:deploy": "node scripts/smoke-deployment.mjs",
     "confirm:deployer": "node scripts/confirm-deployer.mjs",
     "finalize:thesis-protocol": "node scripts/finalize-thesis-protocol-deploy.mjs",
-    "publish:spacex-thesis": "node scripts/publish-spacex-thesis.mjs"
+    "publish:spacex-thesis": "node scripts/publish-spacex-thesis.mjs",
+    "upgrade:thesis-protocol": "pnpm --filter backend upgrade:thesis-protocol:evalanche"
   },
   "dependencies": {
     "hono": "^4.12.8"

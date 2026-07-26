@@ -35,7 +35,7 @@ curator onboarding funnel, or publish a platform blog in the narrowed product.
                │                              │
 ┌──────────────▼─────────────┐  ┌─────────────▼───────────────┐
 │ Prediction/thesis storage   │  │ Avalanche C-Chain           │
-│ markets, theses, commands   │  │ EvaThesisProtocol + $EVA    │
+│ markets, theses, commands   │  │ EvaThesisProtocol v2 + $EVA │
 │ predictor records, history  │  │ thesis anchors + balances   │
 └────────────────────────────┘  └─────────────────────────────┘
 ```
@@ -111,6 +111,11 @@ functionality.
 
 Docs, frontend, backend, scripts, and deployment checks should reference that file rather than
 duplicating stale contract sets.
+
+`EvaThesisProtocol` is a UUPS proxy. The canonical proxy remains
+`0x5eDBd1eea3228662326e60634E53AB8975D6641c`; protocol version 2 points to implementation
+`0x51cBB77D3b5Df8031F1A916548df07D3B05ae9BB`. Upgrade receipts and blocks live in
+`contracts/deployments/mainnet.json`.
 
 ## Removed Scope
 

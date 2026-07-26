@@ -6,6 +6,7 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 contract EvaThesisProtocol is Initializable, UUPSUpgradeable, AccessControlUpgradeable {
+    uint32 public constant PROTOCOL_VERSION = 2;
     bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
 
     enum ThesisStatus {

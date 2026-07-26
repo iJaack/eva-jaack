@@ -123,6 +123,7 @@ Checks and regressions:
 - Production smoke for home, markets, SpaceX market, SpaceX thesis, predictors, health, and agent manifest.
 - Browser screenshots against production desktop and mobile.
 - Contract readback for `EvaThesisProtocol`.
+- UUPS implementation-slot and protocol-version readback after any upgrade.
 - Final text scan for removed old-product claims.
 
 Milestone 5 is not complete until the deployed app and onchain/source-of-truth data agree.

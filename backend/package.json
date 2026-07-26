@@ -10,7 +10,8 @@
     "anchor:thesis:evalanche": "tsx scripts/broadcast-thesis-anchor-evalanche.ts",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "upgrade:thesis-protocol:evalanche": "tsx scripts/upgrade-thesis-protocol-evalanche.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

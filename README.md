@@ -28,6 +28,7 @@ holder state is not a publishing gate or credibility score.
 - Eva agent ID: `1599`
 - Eva wallet: `0x0fe61780bd5508b3C99e420662050e5560608cA4`
 - Thesis protocol: `0x5eDBd1eea3228662326e60634E53AB8975D6641c`
+- Thesis implementation v2: `0x51cBB77D3b5Df8031F1A916548df07D3B05ae9BB`
 - `$EVA`: `0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672`
 
 ## API Surface
