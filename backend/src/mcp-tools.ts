@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { ClaimVerdict, PredictionMarketStatus, ThesisDetailResponse, ThesisSignalRole, ThesisWalletSource } from "./lib/api-types.js";
+import type { ClaimVerdict, PredictionMarketStatus, ThesisDetailResponse, ThesisSignalRole } from "./lib/api-types.js";
 import type { LocalPredictionLayerService, ThesisCreateInput, ThesisRevisionInput } from "./services/prediction-layer.js";
 import {
   createAvalancheEvaUsageVerifier,
@@ -43,7 +43,7 @@ export type McpCreateThesisDraftInput = {
   body: string;
   xHandle: string;
   walletAddress: string;
-  walletSource: ThesisWalletSource;
+  walletSource: "external";
   predictionSignals: McpPredictionSignalInput[];
   factSignals: McpFactSignalInput[];
 };
@@ -94,7 +94,7 @@ function preparedAnchorPayload(input: {
   };
 }
 
-function identityFor(input: { xHandle: string; walletAddress: string; walletSource?: ThesisWalletSource }): ThesisCreateInput["identity"] {
+function identityFor(input: { xHandle: string; walletAddress: string; walletSource?: "external" }): ThesisCreateInput["identity"] {
   return {
     dynamicUserId: `mcp:${input.xHandle}`,
     xHandle: input.xHandle,

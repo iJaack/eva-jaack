@@ -20,8 +20,8 @@ import {
 import { protocol } from "@/lib/protocol";
 import { scoreUiStatus, statusClassName, statusLabel, thesisUiStatus } from "@/lib/status";
 
-const DynamicEvaUsageCheckout = dynamic(
-  () => import("@/components/DynamicEvaUsageCheckout"),
+const SelfCustodyEvaUsageCheckout = dynamic(
+  () => import("@/components/SelfCustodyEvaUsageCheckout"),
   { ssr: false },
 );
 
@@ -214,7 +214,7 @@ export default function ThesisDetailClient() {
       xHandle: detail.thesis.author.xHandle,
       xProfileId: detail.thesis.author.xProfileId,
       walletAddress: detail.thesis.author.walletAddress,
-      walletSource: detail.thesis.author.walletSource,
+      walletSource: "external" as const,
       body,
       note: updateNote.trim() || `Published update v${nextVersion}.`,
       signalUpdates: nextSignalUpdates,
@@ -623,7 +623,7 @@ export default function ThesisDetailClient() {
                   </label>
                 ) : null}
                 {revisionEvaUsageQuote ? (
-                  <DynamicEvaUsageCheckout
+                  <SelfCustodyEvaUsageCheckout
                     quote={revisionEvaUsageQuote}
                     txHash={revisionEvaUsageTxHash}
                     onTxHash={setRevisionEvaUsageTxHash}

@@ -110,7 +110,7 @@ handoff gap: <source URL gap | default weight | exploratory verifier state | sto
 ## Minimum preflight before any draft-prep call
 
 1. Confirm the operator-approved X handle and wallet address.
-2. Confirm whether the signer is external or embedded when the tool accepts `walletSource`.
+2. Confirm the exact self-custodial external signer when the tool accepts `walletSource`; embedded wallets are invalid.
 3. Keep all material source URLs, signal weights, roles, and revision notes.
 4. Screen externally supplied, stale, or manual prediction markets against `docs/MARKET_POLICY.md`; omit prohibited market categories instead of forcing them into `predictionSignals`.
 5. For revisions, call `get_thesis` first and verify the wallet matches the thesis author.

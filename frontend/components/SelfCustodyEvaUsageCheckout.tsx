@@ -1,10 +1,7 @@
 "use client";
 
-import { isEthereumWallet } from "@dynamic-labs/ethereum";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { useCallback, useEffect, useState } from "react";
-import { formatUnits, type Hash } from "viem";
-import { avalanche } from "viem/chains";
+import { encodeFunctionData, formatUnits, type Hash } from "viem";
 import type { EvaUsageQuote } from "@/lib/api";
 import {
   evaPublicClient,
@@ -13,6 +10,7 @@ import {
   readEvaUsageSnapshot,
 } from "@/lib/eva-usage";
 import { protocol } from "@/lib/protocol";
+import { useSelfCustodyWallet } from "@/lib/self-custody-wallet";
 
 type CheckoutState =
   | { phase: "idle"; message: null; hash: null }
@@ -28,7 +26,7 @@ function errorMessage(error: unknown): string {
   return "The wallet transaction failed.";
 }
 
-export default function DynamicEvaUsageCheckout({
+export default function SelfCustodyEvaUsageCheckout({
   quote,
   txHash,
   onTxHash,
@@ -37,15 +35,12 @@ export default function DynamicEvaUsageCheckout({
   txHash: string;
   onTxHash: (value: string) => void;
 }) {
-  const { primaryWallet } = useDynamicContext();
-  const walletAddress =
-    primaryWallet?.address && /^0x[a-fA-F0-9]{40}$/.test(primaryWallet.address)
-      ? (primaryWallet.address as `0x${string}`)
-      : null;
+  const { address, sendTransaction } = useSelfCustodyWallet();
   const amount = BigInt(quote.amountWei);
   const amountLabel = `${formatUnits(amount, protocol.tokens.eva.decimals)} EVA`;
   const [allowance, setAllowance] = useState<bigint | null>(null);
   const [state, setState] = useState<CheckoutState>({ phase: "idle", message: null, hash: null });
+  const matchingWallet = Boolean(address && address.toLowerCase() === quote.account.toLowerCase());
 
   const refreshAllowance = useCallback(async () => {
     const snapshot = await readEvaUsageSnapshot(quote.account);
@@ -53,7 +48,7 @@ export default function DynamicEvaUsageCheckout({
   }, [quote.account]);
 
   useEffect(() => {
-    if (!walletAddress || walletAddress.toLowerCase() !== quote.account.toLowerCase()) {
+    if (!matchingWallet) {
       setAllowance(null);
       return;
     }
@@ -68,32 +63,34 @@ export default function DynamicEvaUsageCheckout({
     return () => {
       cancelled = true;
     };
-  }, [quote.account, walletAddress]);
+  }, [matchingWallet, quote.account]);
 
-  async function walletClient() {
-    if (!primaryWallet || !walletAddress || !isEthereumWallet(primaryWallet)) {
-      throw new Error("Connect the quoted EVM wallet with Dynamic first.");
+  function requireMatchingWallet() {
+    if (!address) throw new Error("Connect the quoted self-custodial wallet first.");
+    if (!matchingWallet) throw new Error("The connected wallet does not match this EVA usage quote.");
+    if (
+      quote.chainId !== protocol.chain.id ||
+      quote.token.toLowerCase() !== protocol.tokens.eva.address.toLowerCase() ||
+      quote.burner.toLowerCase() !== protocol.contracts.evaUsageBurner.toLowerCase() ||
+      quote.burnSink.toLowerCase() !== "0x000000000000000000000000000000000000dead" ||
+      quote.permit2 !== false
+    ) {
+      throw new Error("The EVA usage quote does not match the canonical protocol configuration.");
     }
-    if (walletAddress.toLowerCase() !== quote.account.toLowerCase()) {
-      throw new Error("The connected wallet does not match this EVA usage quote.");
-    }
-    const client = await primaryWallet.getWalletClient();
-    if (client.chain?.id !== avalanche.id) await client.switchChain({ id: avalanche.id });
-    return client;
   }
 
   async function approve() {
     try {
+      requireMatchingWallet();
       setState({ phase: "submitting", message: `Approve exactly ${amountLabel} in your wallet.`, hash: null });
-      const client = await walletClient();
-      const simulation = await evaPublicClient.simulateContract({
-        account: quote.account,
-        address: quote.token,
-        abi: evaTokenUsageAbi,
-        functionName: "approve",
-        args: [quote.burner, amount],
+      const hash = await sendTransaction({
+        to: protocol.tokens.eva.address as `0x${string}`,
+        data: encodeFunctionData({
+          abi: evaTokenUsageAbi,
+          functionName: "approve",
+          args: [protocol.contracts.evaUsageBurner as `0x${string}`, amount],
+        }),
       });
-      const hash = await client.writeContract(simulation.request);
       setState({ phase: "confirming", message: "Exact allowance submitted. Waiting for Avalanche.", hash });
       await evaPublicClient.waitForTransactionReceipt({ hash });
       await refreshAllowance();
@@ -105,16 +102,16 @@ export default function DynamicEvaUsageCheckout({
 
   async function retire() {
     try {
+      requireMatchingWallet();
       setState({ phase: "submitting", message: `Confirm the irreversible ${amountLabel} usage.`, hash: null });
-      const client = await walletClient();
-      const simulation = await evaPublicClient.simulateContract({
-        account: quote.account,
-        address: quote.burner,
-        abi: evaUsageBurnerAbi,
-        functionName: "retireForUsage",
-        args: [quote.usageKind, quote.referenceHash, amount],
+      const hash = await sendTransaction({
+        to: protocol.contracts.evaUsageBurner as `0x${string}`,
+        data: encodeFunctionData({
+          abi: evaUsageBurnerAbi,
+          functionName: "retireForUsage",
+          args: [quote.usageKind, quote.referenceHash, amount],
+        }),
       });
-      const hash = await client.writeContract(simulation.request);
       setState({ phase: "confirming", message: "Usage submitted. Waiting for the exact burn receipt.", hash });
       await evaPublicClient.waitForTransactionReceipt({ hash });
       onTxHash(hash);
@@ -138,16 +135,21 @@ export default function DynamicEvaUsageCheckout({
         <strong>{amountLabel}</strong>
       </div>
       <p>
-        Standard ERC-20 exact allowance → immutable EvaUsageBurner → <code>0x…dEaD</code>.
-        No Permit2 and no server spending authority.
+        Your own wallet signs a standard ERC-20 exact allowance and the immutable EvaUsageBurner
+        call. Eva never creates, holds, or controls the wallet. No Permit2 and no server spending authority.
       </p>
+      {!matchingWallet ? (
+        <p className="eva-usage-state is-error" role="status">
+          Connect {quote.account.slice(0, 6)}…{quote.account.slice(-4)} to continue.
+        </p>
+      ) : null}
       <div className="eva-quote-actions">
         {!hasAllowance ? (
-          <button className="mobile-action" type="button" onClick={approve} disabled={busy || !walletAddress}>
+          <button className="mobile-action" type="button" onClick={approve} disabled={busy || !matchingWallet}>
             Approve exactly {amountLabel}
           </button>
         ) : (
-          <button className="mobile-action mobile-action-primary" type="button" onClick={retire} disabled={busy || !walletAddress}>
+          <button className="mobile-action mobile-action-primary" type="button" onClick={retire} disabled={busy || !matchingWallet}>
             Use &amp; burn {amountLabel}
           </button>
         )}

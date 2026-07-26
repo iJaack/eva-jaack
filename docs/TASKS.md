@@ -10,9 +10,9 @@
 
 ## Identity And Wallets
 
-- [x] Choose X plus embedded-wallet provider: Dynamic.
-- [x] Add provider-backed auth to compose.
-- [x] Add E2E coverage for external wallet and embedded wallet paths.
+- [x] Replace embedded wallets with direct EIP-1193 self-custodial wallet connection.
+- [x] Derive compose identity from the connected external wallet plus a public X handle.
+- [x] Add E2E coverage for external wallet, missing-wallet, and missing-handle paths.
 - [x] Add spoofing checks for author identity payloads.
 
 ## Thesis Evolution

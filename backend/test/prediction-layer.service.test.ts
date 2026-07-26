@@ -306,7 +306,7 @@ describe("prediction layer service", () => {
     });
   });
 
-  it("requires verified X and wallet identity for thesis writes", async () => {
+  it("requires a public X handle and connected wallet identity for thesis writes", async () => {
     const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
     cleanupDirs.push(dir);
     const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => [], async () => []);
@@ -323,7 +323,21 @@ describe("prediction layer service", () => {
         title: "Missing identity",
         body: "This should fail.",
       }),
-    ).rejects.toThrow("Connected X identity and wallet are required");
+    ).rejects.toThrow("Public X handle and connected wallet are required");
+  });
+
+  it("rejects embedded wallets from new thesis writes", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
+    cleanupDirs.push(dir);
+    const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => [], async () => []);
+
+    await expect(
+      service.createThesis({
+        identity: { ...auth(), walletSource: "embedded" },
+        title: "Embedded signer",
+        body: "Eva must never create or use an embedded wallet for a platform write.",
+      }),
+    ).rejects.toThrow("A self-custodial external wallet is required");
   });
 
   it("rejects spoofed author identity payloads for existing thesis authors", async () => {
@@ -334,7 +348,7 @@ describe("prediction layer service", () => {
     const created = await service.createThesis({
       identity: auth(),
       title: "Author binding thesis",
-      body: "The first thesis binds X, Dynamic, and wallet identity.",
+      body: "The first thesis binds a public X handle and a self-custodial wallet identity.",
       predictionSignals: [
         {
           provider: "manual",

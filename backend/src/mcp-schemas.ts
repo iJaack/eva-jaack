@@ -54,7 +54,7 @@ export const createThesisDraftToolSchema = {
   body: z.string(),
   xHandle: z.string(),
   walletAddress: walletAddressSchema,
-  walletSource: z.enum(["external", "embedded"]).default("external"),
+  walletSource: z.literal("external").default("external"),
   predictionSignals: z.array(predictionSignalInputSchema).default([]),
   factSignals: z.array(factSignalInputSchema).default([]),
 } satisfies z.ZodRawShape;

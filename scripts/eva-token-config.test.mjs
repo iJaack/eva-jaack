@@ -26,6 +26,12 @@ test("$EVA config does not invent inactive token utility", () => {
   }
 });
 
+test("$EVA usage only accepts self-custodial external wallets", () => {
+  assert.equal(protocol.evaUsage.walletMode, "self_custody");
+  assert.equal(protocol.evaUsage.embeddedWallets, false);
+  assert.equal(protocol.evaUsage.serverCanSign, false);
+});
+
 test("$EVA usage burns point to the confirmed immutable Avalanche deployment", () => {
   assert.equal(
     protocol.contracts.evaUsageBurner,

@@ -57,10 +57,29 @@ function ethCallResult(request: JsonRpcRequest, options: EvaRpcOptions): `0x${st
   throw new Error(`Unhandled $EVA eth_call selector: ${selector ?? "missing"}`);
 }
 
-function rpcResult(request: JsonRpcRequest, options: EvaRpcOptions): string {
+function rpcResult(request: JsonRpcRequest, options: EvaRpcOptions): unknown {
   if (request.method === "eth_call") return ethCallResult(request, options);
   if (request.method === "eth_blockNumber") return toHex(91_285_587);
   if (request.method === "eth_chainId") return toHex(43_114);
+  if (request.method === "eth_getTransactionReceipt") {
+    const transactionHash = request.params?.[0];
+    return {
+      blockHash: `0x${"a".repeat(64)}`,
+      blockNumber: toHex(91_285_587),
+      contractAddress: null,
+      cumulativeGasUsed: "0x5208",
+      effectiveGasPrice: "0x1",
+      from: "0x1111111111111111111111111111111111111111",
+      gasUsed: "0x5208",
+      logs: [],
+      logsBloom: `0x${"0".repeat(512)}`,
+      status: "0x1",
+      to: "0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296",
+      transactionHash,
+      transactionIndex: "0x0",
+      type: "0x2",
+    };
+  }
   throw new Error(`Unhandled $EVA RPC method: ${request.method}`);
 }
 

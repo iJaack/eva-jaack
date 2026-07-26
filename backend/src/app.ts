@@ -19,7 +19,12 @@ function agentManifest() {
       contract: `eip155:43114:${config.evaThesisProtocol}`,
       mcp: `${protocol.app.siteUrl}${protocol.app.apiBasePath}/mcp`,
       localMcp: 'eva-mcp stdio',
-      writePolicy: 'X identity plus wallet required; transaction broadcasts require explicit approval.',
+      writePolicy: 'Public X handle plus a self-custodial external wallet required; transaction broadcasts require explicit approval.',
+      walletBoundary: {
+        mode: protocol.evaUsage.walletMode,
+        embeddedWallets: protocol.evaUsage.embeddedWallets,
+        serverCanSign: protocol.evaUsage.serverCanSign,
+      },
     },
     platformToken: {
       contract: `eip155:${protocol.chain.id}:${config.evaToken}`,
@@ -87,6 +92,8 @@ function mcpDiscovery(c: Context) {
       forbiddenFallbacks: ['direct_rest_writes', 'ui_scraping', 'production_write_routes_without_approval'],
       evaConsumption: {
         protocol: 'direct_erc20_allowance',
+        walletMode: protocol.evaUsage.walletMode,
+        embeddedWallets: protocol.evaUsage.embeddedWallets,
         permit2: false,
         serverCanSpendWalletFunds: false,
         paidOutputs: ['public_thesis', 'public_revision', 'agent_proof_bundle'],
@@ -96,22 +103,22 @@ function mcpDiscovery(c: Context) {
 }
 
 function runtimeReadiness(c: Context) {
-  const dynamicConfigured = Boolean(process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID?.trim());
-  const composeGate = dynamicConfigured ? 'user_connect' : 'configuration';
-  const reason = dynamicConfigured ? 'NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID is configured' : 'missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID';
   return c.json({
     status: 'ok',
     service: protocol.app.name,
-    dynamicAuth: {
-      configured: dynamicConfigured,
-      composeGate,
-      reason,
+    walletConnection: {
+      ready: true,
+      mode: protocol.evaUsage.walletMode,
+      composeGate: 'self_custody_wallet',
+      embeddedWallets: protocol.evaUsage.embeddedWallets,
+      serverCanSign: protocol.evaUsage.serverCanSign,
+      reason: 'EIP-1193 self-custodial wallet connection is built into the client',
     },
     authoring: {
-      ready: dynamicConfigured,
-      composeGate,
-      requiredEnv: ['NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID'],
-      nextAction: dynamicConfigured ? 'Connect with Dynamic before drafting a public thesis.' : 'Configure Dynamic auth before enabling the editor.',
+      ready: true,
+      composeGate: 'self_custody_wallet',
+      requiredEnv: [],
+      nextAction: 'Connect your own EVM wallet and add the public X handle for the thesis.',
     },
   });
 }

@@ -60,13 +60,14 @@ an atomic factual assertion inside a thesis. That is not the removed claims-mark
 
 Writes require:
 
-- X identity
-- wallet address
-- wallet source: external injected wallet or embedded wallet
+- public X handle
+- externally connected self-custodial EVM wallet
+- wallet source fixed to `external`
 
-The current implementation accepts the identity payload directly. Production auth should plug in a
-provider such as Privy or Dynamic for X login plus embedded wallets, while keeping the same thesis
-author shape.
+Eva does not create wallets, hold private keys, or expose an embedded-wallet fallback. The current
+implementation accepts the public X handle as an author label; it is not proof of X account
+ownership. Wallet control is proven by the action-bound Avalanche transactions required for a
+paid write.
 
 When a wallet is connected, Eva reads its `$EVA` balance from Avalanche C-Chain. Publishing and
 paid agent outputs require an exact action-bound usage receipt rather than a minimum holder
@@ -76,7 +77,7 @@ balance. The balance does not change thesis scores or imply staking, governance,
 
 ### Create A Thesis
 
-1. User connects X plus wallet.
+1. User connects a self-custodial wallet and supplies the public X author label.
 2. User writes a thesis body and attaches market/fact signals.
 3. Backend validates identity and previews the thesis without storing it.
 4. Eva prepares Avalanche anchor transactions for the thesis and signals.

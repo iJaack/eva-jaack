@@ -36,6 +36,9 @@ export type ProtocolConfig = {
   };
   evaUsage: {
     quoteVersion: string;
+    walletMode: "self_custody";
+    embeddedWallets: false;
+    serverCanSign: false;
     actions: Record<
       "publish_thesis" | "publish_revision" | "agent_proof_bundle",
       {

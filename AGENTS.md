@@ -83,8 +83,8 @@ the non-obvious caveats.
   graceful fallback to seeded in-memory markets, so the UI is fully usable without outbound network.
 - **Storage is local by default.** Theses persist to `.data/eva-predictions/index.json` (no external
   DB needed locally). `/health` reports the active storage mode.
-- **Compose editor is gated by default.** With no Dynamic env vars, `/compose` shows an auth gate.
-  For local UI work without Dynamic, run the frontend with `NEXT_PUBLIC_COMPOSE_PREVIEW_IDENTITY=1`
+- **Compose editor is gated by default.** Until a self-custodial browser wallet and public X handle
+  are present, `/compose` shows an identity gate. For local UI work without a wallet, run the frontend with `NEXT_PUBLIC_COMPOSE_PREVIEW_IDENTITY=1`
   (dev-only; ignored in production) to load the editor with a preview identity.
 - **The built-in compose preview identity cannot complete `Prepare anchor` against the real backend.**
   It uses the Eva wallet (`0x0fe6…08cA4`), which already authored the seeded SpaceX thesis, so the
@@ -96,7 +96,7 @@ the non-obvious caveats.
   draft/revision preview + anchor calldata preparation.
 - **Contracts need Foundry.** `forge` is not part of the pnpm install; install Foundry
   (`foundryup`) before `pnpm --filter contracts test`. It is only needed for the Solidity workspace.
-- **Playwright e2e starts its own dev server** on port 4281 with `NEXT_PUBLIC_DYNAMIC_TEST_CONTEXT=1`
-  and `reuseExistingServer` when not in CI. Stop any manually-started frontend on 4281 first, or it
-  will reuse a server that lacks the test context and the compose specs will behave differently.
+- **Playwright e2e starts its own dev server** on port 4281 and uses injected EIP-1193 test providers
+  inside the wallet-specific specs. It uses `reuseExistingServer` when not in CI. Stop any
+  manually-started frontend on 4281 first, or it may reuse stale code.
   Browsers install via `pnpm --filter frontend exec playwright install --with-deps chromium`.

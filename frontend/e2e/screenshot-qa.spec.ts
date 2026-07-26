@@ -27,7 +27,7 @@ const author = {
   xHandle: "@spacethesis",
   xProfileId: "x-spacethesis",
   walletAddress: "0x0fe61780bd5508b3C99e420662050e5560608cA4",
-  walletSource: "embedded",
+  walletSource: "external",
 } as const;
 
 const thesis = {

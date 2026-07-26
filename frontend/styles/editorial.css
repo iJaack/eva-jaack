@@ -231,7 +231,7 @@ select {
   gap: 20px;
 }
 
-.dynamic-auth-control button {
+.self-custody-wallet-control button {
   min-height: 40px !important;
   padding: 0 4px !important;
   border: 0 !important;
@@ -242,8 +242,28 @@ select {
   font-size: 0.84rem !important;
 }
 
-.dynamic-auth-control button:hover {
+.self-custody-wallet-control button:hover {
   color: var(--color-ink) !important;
+}
+
+.self-custody-wallet-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.self-custody-wallet-address {
+  color: var(--color-neutral);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  white-space: nowrap;
+}
+
+.self-custody-wallet-error {
+  max-width: 420px;
+  color: var(--color-danger);
+  font-size: 0.76rem;
+  line-height: 1.4;
 }
 
 .nav-edge-cta,
@@ -1930,7 +1950,7 @@ select {
   line-height: 1.65;
 }
 
-.compose-auth-gate .dynamic-auth-control {
+.compose-auth-gate .self-custody-wallet-control {
   display: inline-flex;
   width: max-content;
   margin-top: 26px;
@@ -1939,7 +1959,7 @@ select {
   background: var(--color-accent);
 }
 
-.compose-auth-gate .dynamic-auth-control button {
+.compose-auth-gate .self-custody-wallet-control button {
   color: var(--color-accent-ink) !important;
 }
 
@@ -2463,7 +2483,7 @@ select {
   font-size: 0.7rem;
 }
 
-.eva-token-wallet .dynamic-auth-control {
+.eva-token-wallet .self-custody-wallet-control {
   justify-self: start;
 }
 
@@ -3048,7 +3068,7 @@ select {
     margin-top: 22px;
   }
 
-  .topbar-actions .dynamic-auth-control,
+  .topbar-actions .self-custody-wallet-control,
   .nav-edge-cta {
     display: none;
   }

@@ -149,7 +149,12 @@ test("deployment smoke skips Vercel dashboard HTML on backend JSON routes withou
   }
 });
 
-function createApplicationSmokeServer({ dynamicConfigured, authoringReady = dynamicConfigured }) {
+function createApplicationSmokeServer({
+  walletMode = "self_custody",
+  embeddedWallets = false,
+  serverCanSign = false,
+  authoringReady = true,
+}) {
   return createServer((req, res) => {
     if (req.url === "/compose") {
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
@@ -162,14 +167,17 @@ function createApplicationSmokeServer({ dynamicConfigured, authoringReady = dyna
       res.end(
         JSON.stringify({
           status: "ok",
-          dynamicAuth: {
-            configured: dynamicConfigured,
-            reason: dynamicConfigured ? "NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID is configured" : "missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID",
+          walletConnection: {
+            ready: walletMode === "self_custody",
+            mode: walletMode,
+            embeddedWallets,
+            serverCanSign,
+            reason: walletMode === "self_custody" ? "self-custodial wallet ready" : "embedded wallet mode is not allowed",
           },
           authoring: {
             ready: authoringReady,
-            composeGate: authoringReady ? "user_connect" : "configuration",
-            nextAction: authoringReady ? "Connect with Dynamic before drafting a public thesis." : "Configure Dynamic auth before enabling the editor.",
+            composeGate: authoringReady ? "self_custody_wallet" : "configuration",
+            nextAction: authoringReady ? "Connect your own EVM wallet." : "Enable self-custodial wallet authoring.",
           },
         })
       );
@@ -192,6 +200,13 @@ function createApplicationSmokeServer({ dynamicConfigured, authoringReady = dyna
       res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
       res.end(
         JSON.stringify({
+          thesisProtocol: {
+            walletBoundary: {
+              mode: walletMode,
+              embeddedWallets,
+              serverCanSign,
+            },
+          },
           platformToken: {
             contract: `eip155:${protocol.chain.id}:${protocol.tokens.eva.address}`,
             usageBurner: `eip155:${protocol.chain.id}:${protocol.contracts.evaUsageBurner}`,
@@ -214,41 +229,41 @@ function createApplicationSmokeServer({ dynamicConfigured, authoringReady = dyna
   });
 }
 
-test("deployment smoke fails strict Dynamic auth readiness when runtime env is missing", async () => {
-  const server = createApplicationSmokeServer({ dynamicConfigured: false });
+test("deployment smoke rejects embedded-wallet runtime mode", async () => {
+  const server = createApplicationSmokeServer({ walletMode: "embedded", embeddedWallets: true, serverCanSign: true });
 
   const port = await listen(server);
   try {
-    const result = await runSmoke(`http://127.0.0.1:${port}`, { SMOKE_REQUIRE_DYNAMIC_AUTH: "true" });
+    const result = await runSmoke(`http://127.0.0.1:${port}`, { SMOKE_REQUIRE_SELF_CUSTODY_WALLET: "true" });
     assert.equal(result.code, 1);
-    assert.match(result.stderr, /missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID/);
+    assert.match(result.stderr, /embedded wallet mode is not allowed/);
   } finally {
     server.close();
   }
 });
 
-test("deployment smoke passes strict Dynamic auth readiness when runtime env is configured", async () => {
-  const server = createApplicationSmokeServer({ dynamicConfigured: true });
+test("deployment smoke passes strict self-custodial wallet readiness", async () => {
+  const server = createApplicationSmokeServer({});
 
   const port = await listen(server);
   try {
-    const result = await runSmoke(`http://127.0.0.1:${port}`, { SMOKE_REQUIRE_DYNAMIC_AUTH: "true" });
+    const result = await runSmoke(`http://127.0.0.1:${port}`, { SMOKE_REQUIRE_SELF_CUSTODY_WALLET: "true" });
     assert.equal(result.code, 0);
     assert.match(result.stdout, /PASS runtime readiness API/);
-    assert.doesNotMatch(result.stderr, /missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID/);
+    assert.doesNotMatch(result.stderr, /embedded wallet mode is not allowed/);
   } finally {
     server.close();
   }
 });
 
-test("deployment smoke fails strict Dynamic auth readiness when authoring remains gated", async () => {
-  const server = createApplicationSmokeServer({ dynamicConfigured: true, authoringReady: false });
+test("deployment smoke fails strict self-custodial readiness when authoring remains gated", async () => {
+  const server = createApplicationSmokeServer({ authoringReady: false });
 
   const port = await listen(server);
   try {
-    const result = await runSmoke(`http://127.0.0.1:${port}`, { SMOKE_REQUIRE_DYNAMIC_AUTH: "true" });
+    const result = await runSmoke(`http://127.0.0.1:${port}`, { SMOKE_REQUIRE_SELF_CUSTODY_WALLET: "true" });
     assert.equal(result.code, 1);
-    assert.match(result.stderr, /Configure Dynamic auth before enabling the editor/);
+    assert.match(result.stderr, /Enable self-custodial wallet authoring/);
   } finally {
     server.close();
   }

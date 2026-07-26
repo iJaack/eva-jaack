@@ -13,7 +13,7 @@ const vercelBypassSecret = (
 ).trim();
 const allowProtectedSkip = process.env.SMOKE_ALLOW_PROTECTED_SKIP === "true";
 const requireDurableStorage = process.env.SMOKE_REQUIRE_DURABLE_STORAGE !== "false";
-const requireDynamicAuth = process.env.SMOKE_REQUIRE_DYNAMIC_AUTH === "true";
+const requireSelfCustodyWallet = process.env.SMOKE_REQUIRE_SELF_CUSTODY_WALLET === "true";
 
 if (!baseUrl) {
   console.error("Missing SMOKE_BASE_URL or CLI base URL argument.");
@@ -67,6 +67,9 @@ const checks = [
         body?.platformToken?.contract !== expectedContract ||
         body?.platformToken?.usageBurner !== `eip155:${protocol.chain.id}:${protocol.contracts.evaUsageBurner}` ||
         body?.platformToken?.symbol !== protocol.tokens.eva.symbol ||
+        body?.thesisProtocol?.walletBoundary?.mode !== "self_custody" ||
+        body?.thesisProtocol?.walletBoundary?.embeddedWallets !== false ||
+        body?.thesisProtocol?.walletBoundary?.serverCanSign !== false ||
         !body?.platformToken?.liveCapabilities?.includes("author_context") ||
         !body?.platformToken?.liveCapabilities?.includes("usage_retirement") ||
         !body?.platformToken?.liveCapabilities?.includes("usage_receipts")
@@ -75,7 +78,7 @@ const checks = [
       }
     },
   },
-  ...(requireDynamicAuth
+  ...(requireSelfCustodyWallet
     ? [
         {
           name: "runtime readiness API",
@@ -83,11 +86,16 @@ const checks = [
           path: `${protocol.app.apiBasePath}/runtime-readiness`,
           validate: async (response) => {
             const body = await response.json();
-            if (body?.dynamicAuth?.configured !== true) {
-              throw new Error(body?.dynamicAuth?.reason ?? "Dynamic auth not configured: missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID");
+            if (
+              body?.walletConnection?.ready !== true ||
+              body?.walletConnection?.mode !== "self_custody" ||
+              body?.walletConnection?.embeddedWallets !== false ||
+              body?.walletConnection?.serverCanSign !== false
+            ) {
+              throw new Error(body?.walletConnection?.reason ?? "Self-custodial wallet connection is not ready");
             }
-            if (body?.authoring?.ready !== true || body?.authoring?.composeGate !== "user_connect") {
-              throw new Error(body?.authoring?.nextAction ?? "Dynamic authoring is not ready for user connection");
+            if (body?.authoring?.ready !== true || body?.authoring?.composeGate !== "self_custody_wallet") {
+              throw new Error(body?.authoring?.nextAction ?? "Self-custodial authoring is not ready");
             }
           },
         },

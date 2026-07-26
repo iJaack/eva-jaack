@@ -29,6 +29,9 @@
   },
   "evaUsage": {
     "quoteVersion": "eva-usage-v1",
+    "walletMode": "self_custody",
+    "embeddedWallets": false,
+    "serverCanSign": false,
     "actions": {
       "publish_thesis": {
         "usageKind": 0,

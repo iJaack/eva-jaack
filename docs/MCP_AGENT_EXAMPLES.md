@@ -407,7 +407,7 @@ blocked: the requested thesis preparation is missing an approved signer identity
 missing evidence:
 - approved xHandle: <missing or mismatched>
 - approved walletAddress: <missing or mismatched>
-- walletSource: <external or embedded, when required>
+- walletSource: <external self-custodial signer, when required>
 
 I did not prepare calldata, broadcast a transaction, publish a thesis, or change identity fields.
 ```

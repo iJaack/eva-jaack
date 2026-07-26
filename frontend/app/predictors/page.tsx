@@ -37,7 +37,7 @@ export default function PredictorsPage() {
       >
         <ul className="route-proof-list" aria-label="Author record rules">
           <li>Activity is separate from accuracy</li>
-          <li>X plus wallet establishes authorship</li>
+          <li>Public X label plus a self-custodial wallet trail attributes authorship</li>
           <li>Thesis history comes before ranking</li>
         </ul>
       </SectionHeader>

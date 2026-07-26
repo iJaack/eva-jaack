@@ -1,78 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState, type ComponentType } from "react";
-import DynamicAuthControl from "@/components/DynamicAuthControl";
+import { useEffect, useState } from "react";
+import SelfCustodyEvaUsagePanel from "@/components/SelfCustodyEvaUsagePanel";
+import SelfCustodyWalletControl from "@/components/SelfCustodyWalletControl";
 import { formatEvaAmount, readEvaTokenSnapshot, type EvaTokenSnapshot } from "@/lib/eva-token";
 import { protocol } from "@/lib/protocol";
-
-const dynamicEnvironmentId = process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
-const dynamicTestMode = process.env.NEXT_PUBLIC_DYNAMIC_TEST_CONTEXT === "1";
+import { useSelfCustodyWallet } from "@/lib/self-custody-wallet";
 
 function shortAddress(address: string): string {
   return `${address.slice(0, 6)}…${address.slice(-4)}`;
 }
 
-function DynamicWalletLoader({
-  onWallet,
-}: {
-  onWallet: (address: `0x${string}` | null) => void;
-}) {
-  const [Bridge, setBridge] = useState<ComponentType<{ onWallet: (address: `0x${string}` | null) => void }> | null>(null);
-
-  useEffect(() => {
-    if (!dynamicEnvironmentId && !dynamicTestMode) return;
-    let cancelled = false;
-    import("@/components/DynamicEvaWalletBridge")
-      .then((module) => {
-        if (!cancelled) setBridge(() => module.default);
-      })
-      .catch(() => setBridge(null));
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  if ((!dynamicEnvironmentId && !dynamicTestMode) || !Bridge) return null;
-  return <Bridge onWallet={onWallet} />;
-}
-
-function DynamicUsageLoader() {
-  const [Panel, setPanel] = useState<ComponentType | null>(null);
-
-  useEffect(() => {
-    if (!dynamicEnvironmentId && !dynamicTestMode) return;
-    let cancelled = false;
-    import("@/components/DynamicEvaUsagePanel")
-      .then((module) => {
-        if (!cancelled) setPanel(() => module.default);
-      })
-      .catch(() => setPanel(null));
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  if (!dynamicEnvironmentId && !dynamicTestMode) {
-    return (
-      <div className="eva-usage-unconfigured">
-        <p>The usage-burn contract is live on Avalanche.</p>
-        <span>Wallet transactions are not configured in this environment.</span>
-      </div>
-    );
-  }
-  return Panel ? <Panel /> : <p className="eva-usage-unconfigured">Loading the Avalanche usage receipt…</p>;
-}
-
 export default function EvaTokenLedger() {
-  const [walletAddress, setWalletAddress] = useState<`0x${string}` | null>(null);
+  const { address: walletAddress } = useSelfCustodyWallet();
   const [snapshot, setSnapshot] = useState<EvaTokenSnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loadedWallet, setLoadedWallet] = useState<`0x${string}` | null | undefined>(undefined);
-
-  const updateWallet = useCallback((address: `0x${string}` | null) => {
-    setWalletAddress(address);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -100,8 +44,6 @@ export default function EvaTokenLedger() {
 
   return (
     <div className="eva-token-ledger">
-      <DynamicWalletLoader onWallet={updateWallet} />
-
       <section className="eva-token-row" aria-labelledby="eva-token-receipt">
         <div className="eva-token-row-label">
           <span>01</span>
@@ -163,9 +105,8 @@ export default function EvaTokenLedger() {
             </>
           ) : (
             <>
-              <p>Connect to read your $EVA balance.</p>
-              <DynamicAuthControl />
-              {!dynamicEnvironmentId ? <span>Wallet connection is not configured in this environment.</span> : null}
+              <p>Connect your own wallet to read your $EVA balance.</p>
+              <SelfCustodyWalletControl />
             </>
           )}
           <div className="eva-protocol-holding">
@@ -184,7 +125,7 @@ export default function EvaTokenLedger() {
           <span>03</span>
           <p id="eva-use-and-burn">Use &amp; burn</p>
         </div>
-        <DynamicUsageLoader />
+        <SelfCustodyEvaUsagePanel />
       </section>
 
       <section className="eva-token-row" aria-labelledby="eva-platform-relationship">
@@ -208,7 +149,7 @@ export default function EvaTokenLedger() {
         <div className="eva-token-boundaries">
           <p><strong>Live now</strong> Paid thesis publishing, paid revisions, paid agent proof bundles, usage receipts</p>
           <p><strong>Exact v1 uses</strong> Thesis 100,000 EVA · revision 25,000 EVA · agent bundle 10,000 EVA</p>
-          <p><strong>Payment path</strong> Direct ERC-20 allowance; no Permit2 and no server spending authority</p>
+          <p><strong>Payment path</strong> Your self-custodial wallet signs a direct ERC-20 allowance; no embedded wallet, no Permit2, and no server spending authority</p>
           <p><strong>Not active</strong> Staking, balance-based access, yield, governance, trade execution</p>
         </div>
       </section>

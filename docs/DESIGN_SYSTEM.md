@@ -9,7 +9,7 @@ The primary object is the evolving thesis post:
 - a readable argument,
 - composed from prediction-market signals and factual evidence,
 - carrying revision history,
-- attributable to an X identity and wallet,
+- attributable to a public X author label and self-custodial wallet trail,
 - shareable outside Eva.
 
 Every visual decision must make that object clearer.

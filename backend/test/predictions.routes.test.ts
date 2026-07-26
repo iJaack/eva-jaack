@@ -68,7 +68,7 @@ function identityPayload() {
     xHandle: "@routealpha",
     xProfileId: "x-route-1",
     walletAddress,
-    walletSource: "embedded",
+    walletSource: "external",
   };
 }
 
@@ -365,7 +365,21 @@ describe("prediction routes", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toMatchObject({
-      error: "Connected X identity and wallet are required",
+      error: "Public X handle and connected wallet are required",
+    });
+  });
+
+  it("rejects embedded wallets before preparing a paid write", async () => {
+    const app = await makeApp();
+    const response = await fetchJson(app, "/api/thesis-drafts/protocol/prepare-anchor", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ ...thesisCreatePayload(), walletSource: "embedded" }),
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      error: "A self-custodial external wallet is required",
     });
   });
 

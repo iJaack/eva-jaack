@@ -122,7 +122,7 @@ Before reporting any write-adjacent result, verify that the authority inputs cam
 
 - `xHandle`: exact approved handle, not a display name or stale issue comment.
 - `walletAddress`: exact approved `0x...` address, not ENS, a shortened address, a remembered wallet, a private key, or "same as last time".
-- `walletSource`: explicit `external` / `embedded` approval when the live tool accepts it; a schema default is not signer approval.
+- `walletSource`: explicit approval for the exact self-custodial `external` signer when the live tool accepts it; embedded wallets are invalid and a schema default is not signer approval.
 - `thesisId`: exact id from the task or approved readback, not a title, slug, screenshot, old metadata value, or `anchorPreparationId`.
 
 Safe wording when identity is incomplete:

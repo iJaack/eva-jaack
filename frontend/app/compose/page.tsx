@@ -3,8 +3,8 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
-import { FormEvent, Suspense, useEffect, useMemo, useState, type ComponentType } from "react";
-import DynamicAuthControl from "@/components/DynamicAuthControl";
+import { FormEvent, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import SelfCustodyWalletControl from "@/components/SelfCustodyWalletControl";
 import PageShell from "@/components/ui/PageShell";
 import {
   createThesis,
@@ -15,11 +15,17 @@ import {
   type Thesis,
   type ThesisCreateRequest,
 } from "@/lib/api";
-import type { DynamicIdentityState, DynamicThesisIdentity } from "@/lib/dynamic-identity";
 import { formatEvaAmount, readEvaTokenSnapshot } from "@/lib/eva-token";
 import { protocol } from "@/lib/protocol";
+import { useSelfCustodyWallet } from "@/lib/self-custody-wallet";
 
-type ThesisIdentity = DynamicThesisIdentity;
+type ThesisIdentity = {
+  dynamicUserId: string;
+  xHandle: string;
+  xProfileId: string;
+  walletAddress: string;
+  walletSource: "external";
+};
 
 type DraftBlock = {
   id: string;
@@ -41,23 +47,17 @@ type AttachedSignal = {
 };
 
 const defaultIdentity: ThesisIdentity = {
-  dynamicUserId: "local-dynamic-preview",
+  dynamicUserId: "local-self-custody-preview",
   xHandle: "@spacethesis",
   xProfileId: "local-x-preview",
   walletAddress: "0x0fe61780bd5508b3C99e420662050e5560608cA4",
-  walletSource: "embedded" as const,
+  walletSource: "external",
 };
 
-const dynamicEnvironmentId = process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
-const dynamicTestMode = process.env.NEXT_PUBLIC_DYNAMIC_TEST_CONTEXT === "1";
 const previewIdentityEnabled = process.env.NEXT_PUBLIC_COMPOSE_PREVIEW_IDENTITY === "1" && process.env.NODE_ENV !== "production";
-const dynamicIdentityRequired = dynamicTestMode || Boolean(dynamicEnvironmentId) || !previewIdentityEnabled;
-const dynamicUnavailableMessage = dynamicEnvironmentId
-  ? "Connect with Dynamic before drafting a public thesis."
-  : "Dynamic identity is required before drafting a public thesis. Configure Dynamic auth before enabling the editor.";
 
-const DynamicEvaUsageCheckout = dynamic(
-  () => import("@/components/DynamicEvaUsageCheckout"),
+const SelfCustodyEvaUsageCheckout = dynamic(
+  () => import("@/components/SelfCustodyEvaUsageCheckout"),
   { ssr: false },
 );
 
@@ -74,34 +74,13 @@ const initialBlocks: DraftBlock[] = [
   },
 ];
 
-function DynamicIdentityLoader({
-  onIdentity,
-  onIdentityState,
-}: {
-  onIdentity: (identity: ThesisIdentity) => void;
-  onIdentityState: (state: DynamicIdentityState) => void;
-}) {
-  const [Bridge, setBridge] = useState<ComponentType<{ onIdentity: (identity: ThesisIdentity) => void; onIdentityState: (state: DynamicIdentityState) => void }> | null>(null);
-
-  useEffect(() => {
-    if (!dynamicEnvironmentId && !dynamicTestMode) return;
-    let cancelled = false;
-    import("@/components/DynamicComposeIdentityBridge")
-      .then((module) => {
-        if (!cancelled) setBridge(() => module.default as ComponentType<{ onIdentity: (identity: ThesisIdentity) => void; onIdentityState: (state: DynamicIdentityState) => void }>);
-      })
-      .catch(() => setBridge(null));
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  if ((!dynamicEnvironmentId && !dynamicTestMode) || !Bridge) return null;
-  return <Bridge onIdentity={onIdentity} onIdentityState={onIdentityState} />;
-}
-
 function shortWallet(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
+function normalizePublicXHandle(value: string): string | null {
+  const handle = value.trim().replace(/^@+/, "");
+  return /^[A-Za-z0-9_]{1,15}$/.test(handle) ? `@${handle}` : null;
 }
 
 function isTxHash(value: string): boolean {
@@ -110,6 +89,7 @@ function isTxHash(value: string): boolean {
 
 function ComposeInner() {
   const searchParams = useSearchParams();
+  const { address: connectedWallet } = useSelfCustodyWallet();
   const [markets, setMarkets] = useState<PredictionMarket[]>([]);
   const [title, setTitle] = useState("SpaceX IPO liquidity rotation thesis");
   const [blocks, setBlocks] = useState<DraftBlock[]>(initialBlocks);
@@ -129,9 +109,9 @@ function ComposeInner() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [preparingAnchor, setPreparingAnchor] = useState(false);
-  const [identity, setIdentity] = useState<ThesisIdentity>(defaultIdentity);
-  const [identityState, setIdentityState] = useState<DynamicIdentityState | null>(null);
+  const [xHandleInput, setXHandleInput] = useState("");
   const [evaBalance, setEvaBalance] = useState("Not read");
+  const previousWallet = useRef<string | null>(connectedWallet);
 
   useEffect(() => {
     getMarkets().then((response) => setMarkets(response.markets)).catch(() => setMarkets([]));
@@ -146,15 +126,35 @@ function ComposeInner() {
   const selectedOutcomePrice = selectedOutcome?.price ?? 0.5;
   const normalizedFactClaim = factClaim.trim().replace(/[.]+$/, "");
   const body = blocks.map((block) => block.text.trim()).filter(Boolean).join("\n\n");
-  const identityReady = !dynamicIdentityRequired || identityState?.status === "ready";
-  const identityMessage = dynamicIdentityRequired ? identityState?.message ?? dynamicUnavailableMessage : "Preview identity active for local compose.";
+  const publicXHandle = normalizePublicXHandle(xHandleInput);
+  const identity = useMemo<ThesisIdentity>(
+    () =>
+      previewIdentityEnabled
+        ? defaultIdentity
+        : {
+            dynamicUserId: connectedWallet ? `wallet:${connectedWallet.toLowerCase()}` : "",
+            xHandle: publicXHandle ?? "",
+            xProfileId: publicXHandle ? `x:${publicXHandle.slice(1).toLowerCase()}` : "",
+            walletAddress: connectedWallet ?? "",
+            walletSource: "external",
+          },
+    [connectedWallet, publicXHandle],
+  );
+  const identityReady = previewIdentityEnabled || Boolean(connectedWallet && publicXHandle);
+  const identityMessage = previewIdentityEnabled
+    ? "Preview identity active for local compose."
+    : !connectedWallet
+      ? "Connect your own self-custodial EVM wallet before drafting a public thesis."
+      : !publicXHandle
+        ? "Add the public X handle that will appear on this thesis."
+        : "Public X handle and self-custodial wallet are ready.";
   const anchorConfirmed = isTxHash(anchorTxHash);
   const evaUsageConfirmed = isTxHash(evaUsageTxHash);
   const canPublish = Boolean(title.trim() && body.trim() && attachedSignals.length > 0 && identityReady && anchorPrepared && anchorPreparationId && anchorConfirmed && evaUsageQuote && evaUsageConfirmed && !submitting && !preparingAnchor);
   const publishBlocker = preparingAnchor
     ? "Preparing anchor"
     : !identityReady
-      ? "Connect X and a wallet before publishing"
+      ? "Connect your wallet and add a public X handle before publishing"
       : !anchorPrepared || !anchorPreparationId
         ? "Prepare anchor before publishing"
         : !anchorConfirmed
@@ -166,12 +166,12 @@ function ComposeInner() {
               : !attachedSignals.length
                 ? "Attach at least one signal before publishing"
                 : null;
-  const showComposeWorkspace = !dynamicIdentityRequired || identityReady;
-  const authGateMessage = identityState?.message ?? dynamicUnavailableMessage;
+  const showComposeWorkspace = identityReady;
+  const authGateMessage = identityMessage;
   const nextSignalLabel = `S${attachedSignals.length + 1}`;
 
   useEffect(() => {
-    if (!showComposeWorkspace) return;
+    if (!showComposeWorkspace || !identity.walletAddress) return;
     let cancelled = false;
     readEvaTokenSnapshot(identity.walletAddress as `0x${string}`)
       .then((snapshot) => {
@@ -186,6 +186,11 @@ function ComposeInner() {
       cancelled = true;
     };
   }, [identity.walletAddress, showComposeWorkspace]);
+
+  useEffect(() => {
+    const savedHandle = window.localStorage.getItem("eva.publicXHandle");
+    if (savedHandle) setXHandleInput(savedHandle);
+  }, []);
 
   const marketSignalText = selectedMarket
     ? `Prediction signal: ${selectedMarket.title} - ${selectedOutcomeLabel} is priced at ${Math.round(selectedOutcomePrice * 100)}%.`
@@ -207,6 +212,23 @@ function ComposeInner() {
     setAnchorTxHash("");
     setEvaUsageQuote(null);
     setEvaUsageTxHash("");
+  };
+
+  useEffect(() => {
+    if (previousWallet.current === connectedWallet) return;
+    previousWallet.current = connectedWallet;
+    setDraftState("Wallet changed — prepare a new anchor");
+    setAnchorPrepared(false);
+    setAnchorPreparationId(null);
+    setAnchorTxHash("");
+    setEvaUsageQuote(null);
+    setEvaUsageTxHash("");
+  }, [connectedWallet]);
+
+  const updateXHandle = (nextHandle: string) => {
+    setXHandleInput(nextHandle);
+    window.localStorage.setItem("eva.publicXHandle", nextHandle);
+    invalidateAnchor("Author handle changed — prepare a new anchor");
   };
 
   const updateTitle = (nextTitle: string) => {
@@ -384,7 +406,6 @@ function ComposeInner() {
 
   return (
     <PageShell className="compose-publication-shell">
-      <DynamicIdentityLoader onIdentity={setIdentity} onIdentityState={setIdentityState} />
         <section className="mobile-page-head compose-page-head">
           <p className="eyebrow">Compose / new thesis</p>
           <h1>Build the argument. Keep the receipts.</h1>
@@ -433,13 +454,27 @@ function ComposeInner() {
         ) : !showComposeWorkspace ? (
           <section className="prediction-card compose-auth-gate" data-testid="compose-auth-gate">
             <p className="eyebrow">Identity / required</p>
-            <h2>Connect to start writing.</h2>
+            <h2>Use your own wallet.</h2>
             <p>{authGateMessage}</p>
-            <DynamicAuthControl />
+            <SelfCustodyWalletControl />
+            <label className="field-group">
+              <span className="field-label">Public X handle</span>
+              <input
+                className="field-input"
+                value={xHandleInput}
+                onChange={(event) => updateXHandle(event.target.value)}
+                placeholder="@yourhandle"
+                autoComplete="off"
+              />
+            </label>
+            <p className="inline-note">
+              This is a public author label, not an X verification. Wallet control is proven by your signed
+              Avalanche transactions.
+            </p>
             <ul className="route-proof-list" aria-label="Compose auth requirements">
               <li>Your draft remains private until publish</li>
-              <li>Publishing needs a confirmed wallet transaction</li>
-              <li>Eva prepares thesis anchors; it never submits a trade</li>
+              <li>Only your connected self-custodial wallet can sign</li>
+              <li>Eva never creates a wallet, holds a key, or submits a trade</li>
             </ul>
           </section>
         ) : (
@@ -457,16 +492,16 @@ function ComposeInner() {
                 </div>
                 <div className="wallet-panel-grid">
                   <div>
-                    <span>X account</span>
-                    <strong>{identityReady || !dynamicIdentityRequired ? identity.xHandle : "Not connected"}</strong>
+                    <span>Public X handle</span>
+                    <strong>{identity.xHandle}</strong>
                   </div>
                   <div>
                     <span>Wallet source</span>
-                    <strong>{identityReady || !dynamicIdentityRequired ? identity.walletSource : "Missing"}</strong>
+                    <strong>Self-custodial</strong>
                   </div>
                   <div>
                     <span>Wallet</span>
-                    <strong>{identityReady || !dynamicIdentityRequired ? shortWallet(identity.walletAddress) : "Not connected"}</strong>
+                    <strong>{shortWallet(identity.walletAddress)}</strong>
                   </div>
                   <div>
                     <span>$EVA holder state</span>
@@ -486,7 +521,7 @@ function ComposeInner() {
                   {draftState}
                 </span>
               </div>
-              {!identityReady ? <p className="form-warning">Connect X and a wallet before publishing a thesis.</p> : null}
+              {!identityReady ? <p className="form-warning">Connect your wallet and add a public X handle before publishing a thesis.</p> : null}
 
               <label className="field-group">
                 <span className="field-label">Thesis title</span>
@@ -526,7 +561,7 @@ function ComposeInner() {
                 </label>
               ) : null}
               {evaUsageQuote ? (
-                <DynamicEvaUsageCheckout
+                <SelfCustodyEvaUsageCheckout
                   quote={evaUsageQuote}
                   txHash={evaUsageTxHash}
                   onTxHash={setEvaUsageTxHash}

@@ -91,7 +91,8 @@ If the tool list differs, HTTP discovery omits the agent-safe boundary card, a w
 | `prepare_eva_proof_quote` | Prepare direct-allowance and usage-burn calldata for a proof bundle. | No |
 | `get_paid_thesis_proof_bundle` | Verify EVA usage and release the formatted proof bundle. | No |
 
-The paid proof flow is `prepare_eva_proof_quote` → wallet signs standard ERC-20 `approve` plus
+The paid proof flow is `prepare_eva_proof_quote` → the agent/operator-owned self-custodial wallet
+signs standard ERC-20 `approve` plus
 `retireForUsage` → `get_paid_thesis_proof_bundle` verifies `EvaUsedAndRetired`. It does not use
 Permit2, and neither MCP nor the Eva backend can spend wallet funds.
 
@@ -174,7 +175,7 @@ All draft or revision preparation requires:
 
 - `xHandle`
 - `walletAddress` as a full `0x`-prefixed 40-hex-character EVM address (ENS, shortened addresses, and missing `0x` prefixes are rejected by the live schema)
-- wallet source where supported (`external` or `embedded`)
+- wallet source fixed to `external`; embedded wallets are rejected
 
 Use Eva's sovereign wallet (`0x0fe61780bd5508b3C99e420662050e5560608cA4`) only when the operator explicitly approved that signer for the task. Transaction broadcast always needs explicit approval at action time.
 
@@ -197,7 +198,7 @@ Safe sources:
 
 - task-time approval that names the exact X handle and EVM wallet address,
 - fresh `get_thesis` readback when preparing a revision for the same author,
-- explicit signer/source approval for `external` or `embedded` when the live tool accepts `walletSource`,
+- explicit approval for the exact self-custodial external signer when the live tool accepts `walletSource`,
 - canonical `thesisId` from the task or approved readback.
 
 Unsafe substitutions:
@@ -523,7 +524,7 @@ Use `docs/AGENT_SAFE_OUTPUTS.md` for short user-facing snippets. Use `docs/MCP_A
 
 1. `search_markets` for candidate market signals.
 2. Draft the thesis body and collect fact sources.
-3. Call `create_thesis_draft` with X plus wallet identity.
+3. Call `create_thesis_draft` with the public X author label plus exact self-custodial wallet identity.
 4. Show the prepared summary and transactions to the user.
 5. Wait for explicit approval before any broadcast or public publish path.
 6. For updates, call `get_thesis`, then `prepare_revision_draft`, then repeat the approval boundary.

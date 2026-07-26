@@ -63,7 +63,7 @@ export type ThesisCreateRequest = {
   xHandle: string;
   xProfileId?: string;
   walletAddress: string;
-  walletSource: "external" | "embedded";
+  walletSource: "external";
   title: string;
   body: string;
   predictionSignals?: Array<{
@@ -133,7 +133,7 @@ export async function recordThesisRevision(
     xHandle: string;
     xProfileId?: string | null;
     walletAddress: string;
-    walletSource: "external" | "embedded";
+    walletSource: "external";
     body: string;
     note?: string;
     signalUpdates?: Array<{
@@ -164,7 +164,7 @@ export async function prepareThesisRevisionAnchor(
     xHandle: string;
     xProfileId?: string | null;
     walletAddress: string;
-    walletSource: "external" | "embedded";
+    walletSource: "external";
     body: string;
     note?: string;
     signalUpdates?: Array<{

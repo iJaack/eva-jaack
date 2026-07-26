@@ -219,8 +219,8 @@ export interface ThesisCreateResponse {
 }
 
 export interface PreparedProtocolTransactionDto {
-  to: string;
-  data: string;
+  to: `0x${string}`;
+  data: `0x${string}`;
   description: string;
 }
 

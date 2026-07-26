@@ -445,7 +445,7 @@ function confirmedAnchor(txHash: `0x${string}`, confirmedAt: string): ThesisAnch
 
 function normalizeHandle(handle: string): string {
   const trimmed = handle.trim();
-  if (!trimmed) throw new Error("Connected X identity and wallet are required");
+  if (!trimmed) throw new Error("Public X handle and connected wallet are required");
   return trimmed.startsWith("@") ? trimmed : `@${trimmed}`;
 }
 
@@ -453,7 +453,10 @@ function normalizeIdentity(identity: ThesisIdentityInput): ThesisAuthorDto {
   const wallet = identity.walletAddress?.trim();
   const source = identity.walletSource ?? null;
   if (!identity.dynamicUserId?.trim() || !identity.xHandle?.trim() || !wallet || !source || !wallet.match(/^0x[0-9a-fA-F]{40}$/)) {
-    throw new Error("Connected X identity and wallet are required");
+    throw new Error("Public X handle and connected wallet are required");
+  }
+  if (source !== "external") {
+    throw new Error("A self-custodial external wallet is required");
   }
   return {
     dynamicUserId: identity.dynamicUserId.trim(),
@@ -485,7 +488,7 @@ function assertSameAuthorIdentity(expected: ThesisAuthorDto, actual: ThesisAutho
 }
 
 function assertNoAuthorIdentityConflict(theses: ThesisDto[], author: ThesisAuthorDto): void {
-  const incomingDynamicUserId = author.dynamicUserId.toLowerCase();
+  const incomingAuthorUserId = author.dynamicUserId.toLowerCase();
   const incomingHandle = author.xHandle.toLowerCase();
   const incomingProfileId = author.xProfileId?.toLowerCase() ?? null;
   const incomingWallet = author.walletAddress.toLowerCase();
@@ -495,7 +498,7 @@ function assertNoAuthorIdentityConflict(theses: ThesisDto[], author: ThesisAutho
     if (sameAuthorIdentity(existing, author)) return false;
 
     return (
-      existing.dynamicUserId.toLowerCase() === incomingDynamicUserId ||
+      existing.dynamicUserId.toLowerCase() === incomingAuthorUserId ||
       existing.xHandle.toLowerCase() === incomingHandle ||
       (!!incomingProfileId && existing.xProfileId?.toLowerCase() === incomingProfileId) ||
       existing.walletAddress.toLowerCase() === incomingWallet
@@ -789,7 +792,7 @@ function seedSpaceXThesis(markets: PredictionMarketDto[]): ThesisDto {
     xHandle: "@spacethesis",
     xProfileId: "spaceX-ipo-liquidity",
     walletAddress: "0x0fe61780bd5508b3C99e420662050e5560608cA4",
-    walletSource: "embedded",
+    walletSource: "external",
   };
   const thesisId = `thesis-${stableHash({ title: title.toLowerCase(), author: author.xHandle.toLowerCase(), body })}`;
   const signals: ThesisSignalDto[] = [

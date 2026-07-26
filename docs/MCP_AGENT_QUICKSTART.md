@@ -62,8 +62,9 @@ Do not use `create_thesis_draft`, `prepare_revision_draft`, or `prepare_anchor_t
 
 ## Consume EVA For An Agent Proof Bundle
 
-Call `prepare_eva_proof_quote` with the exact `thesisId` and payer `walletAddress`. The wallet—not
-Eva—signs a standard exact ERC-20 approval and `retireForUsage`. Pass the confirmed transaction hash
+Call `prepare_eva_proof_quote` with the exact `thesisId` and the agent/operator-owned
+self-custodial `walletAddress`. That external wallet—not Eva—signs a standard exact ERC-20 approval
+and `retireForUsage`. Pass the confirmed transaction hash
 to `get_paid_thesis_proof_bundle`. It releases only when the burner event matches the wallet, action,
 amount, reference, and dead-address sink. Permit2 is not used.
 
@@ -152,7 +153,7 @@ Identity fields are authority-bearing. Copy them from task-time approval or fres
 |---|---|---|
 | `xHandle` | explicit task-time handle, or matching live thesis author handle for revisions | display name, bio text, old issue comment, or guessed handle |
 | `walletAddress` | exact approved `0x...` EVM address, or matching live thesis author wallet for revisions | ENS/name, shortened address, remembered Eva wallet, deployer wallet, private key, seed phrase, or "same as last time" |
-| `walletSource` | explicit `external` / `embedded` approval when the tool accepts it | schema default, wallet UI label, or inferred custody model |
+| `walletSource` | explicit approval for the exact self-custodial `external` signer when the tool accepts it | embedded wallet, schema default, wallet UI label, or inferred authority |
 | `thesisId` | exact id from the task or `get_thesis`/approved readback | title, slug guess, screenshot text, `anchorPreparationId`, or stale metadata |
 
 Safe repair is narrow: trim surrounding whitespace and preserve address casing as supplied. The live schema now rejects malformed `walletAddress` values; pass only a full `0x`-prefixed 40-hex-character EVM address. Do not resolve ENS, expand shortened addresses, choose between two wallets, or swap in Eva's wallet to make the payload pass. If the exact identity is missing or mismatched, return `blocked: exact identity input missing` and do not prepare calldata.
