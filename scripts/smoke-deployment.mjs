@@ -56,7 +56,22 @@ const checks = [
       }
     },
   },
-  { name: "agent manifest", method: "GET", path: protocol.app.agentManifestPath },
+  {
+    name: "agent manifest",
+    method: "GET",
+    path: protocol.app.agentManifestPath,
+    validate: async (response) => {
+      const body = await response.json();
+      const expectedContract = `eip155:${protocol.chain.id}:${protocol.tokens.eva.address}`;
+      if (
+        body?.platformToken?.contract !== expectedContract ||
+        body?.platformToken?.symbol !== protocol.tokens.eva.symbol ||
+        !body?.platformToken?.liveCapabilities?.includes("author_context")
+      ) {
+        throw new Error("agent manifest does not publish the canonical bounded $EVA platform token");
+      }
+    },
+  },
   ...(requireDynamicAuth
     ? [
         {

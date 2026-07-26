@@ -3,6 +3,7 @@ import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
+import protocol from "../protocol.config.json" with { type: "json" };
 
 const protectionPage = `<!doctype html><html lang="en"><meta charset="utf-8"><title>Authentication Required</title>
   <script type="text/llms.txt">This page requires Vercel authentication. Use x-vercel-protection-bypass.</script>
@@ -187,6 +188,20 @@ function createApplicationSmokeServer({ dynamicConfigured, authoringReady = dyna
       return;
     }
 
+    if (req.url?.startsWith(protocol.app.agentManifestPath)) {
+      res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+      res.end(
+        JSON.stringify({
+          platformToken: {
+            contract: `eip155:${protocol.chain.id}:${protocol.tokens.eva.address}`,
+            symbol: protocol.tokens.eva.symbol,
+            liveCapabilities: ["contract_metadata", "holder_balance_readback", "author_context"],
+          },
+        })
+      );
+      return;
+    }
+
     res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
     res.end(JSON.stringify({ ok: true }));
   });
@@ -227,6 +242,32 @@ test("deployment smoke fails strict Dynamic auth readiness when authoring remain
     const result = await runSmoke(`http://127.0.0.1:${port}`, { SMOKE_REQUIRE_DYNAMIC_AUTH: "true" });
     assert.equal(result.code, 1);
     assert.match(result.stderr, /Configure Dynamic auth before enabling the editor/);
+  } finally {
+    server.close();
+  }
+});
+
+test("deployment smoke fails when the agent manifest omits the canonical $EVA token", async () => {
+  const server = createServer((req, res) => {
+    if (req.url?.startsWith("/health")) {
+      res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify({ storage: { ready: true, durable: true } }));
+      return;
+    }
+    if (req.url?.startsWith("/api/storage-readiness")) {
+      res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify({ ready: true, durable: true, probe: { ok: true } }));
+      return;
+    }
+    res.writeHead(200, { "content-type": "application/json; charset=utf-8" });
+    res.end(JSON.stringify({ ok: true }));
+  });
+
+  const port = await listen(server);
+  try {
+    const result = await runSmoke(`http://127.0.0.1:${port}`);
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /agent manifest does not publish the canonical bounded \$EVA platform token/);
   } finally {
     server.close();
   }
