@@ -215,7 +215,7 @@ export function createPredictionRoutes(
         txHash: anchorTxHash,
         expectedTransactions,
       });
-      if (!verification.ok) {
+      if (verification.ok === false) {
         return c.json({ error: verification.error }, 400);
       }
 
@@ -232,7 +232,7 @@ export function createPredictionRoutes(
         txHash: evaUsageTxHash,
         quote: usageQuote,
       });
-      if (!usageVerification.ok) {
+      if (usageVerification.ok === false) {
         return c.json({ error: usageVerification.error }, 400);
       }
 
@@ -391,7 +391,7 @@ export function createPredictionRoutes(
         txHash: anchorTxHash,
         expectedTransactions,
       });
-      if (!verification.ok) {
+      if (verification.ok === false) {
         return c.json({ error: verification.error }, 400);
       }
 
@@ -408,7 +408,7 @@ export function createPredictionRoutes(
         txHash: evaUsageTxHash,
         quote: usageQuote,
       });
-      if (!usageVerification.ok) {
+      if (usageVerification.ok === false) {
         return c.json({ error: usageVerification.error }, 400);
       }
 

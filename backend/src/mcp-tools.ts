@@ -202,7 +202,7 @@ export function createEvaMcpToolHandlers(
         txHash: input.evaUsageTxHash,
         quote,
       });
-      if (!verification.ok) return toolError(verification.error);
+      if (verification.ok === false) return toolError(verification.error);
 
       const sourceUrls = Array.from(new Set([
         ...detail.thesis.evidenceLinks,
