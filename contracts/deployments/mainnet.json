@@ -17,7 +17,11 @@
       "deployedBlock": 87265823,
       "implementationBlock": 91284740,
       "upgradeBlock": 91284742,
-      "verified": false
+      "verified": true,
+      "verificationProvider": "sourcify",
+      "verificationMatch": "exact_match",
+      "verificationUrl": "https://repo.sourcify.dev/43114/0x51cBB77D3b5Df8031F1A916548df07D3B05ae9BB",
+      "verifiedAt": "2026-07-26T16:40:42Z"
     },
     "EvaUsageBurner": {
       "address": "0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296",
@@ -28,7 +32,11 @@
       "codeHash": "0xcdbfdb12af6f360b6b1d60a3afc5dd5f384a0e570e50ddec80f96b2cb2c50be5",
       "minimumRetirement": "1000000000000000000",
       "supplyAccounting": "circulating_supply_sink; legacy token totalSupply remains unchanged",
-      "verified": false
+      "verified": true,
+      "verificationProvider": "sourcify",
+      "verificationMatch": "exact_match",
+      "verificationUrl": "https://repo.sourcify.dev/43114/0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296",
+      "verifiedAt": "2026-07-26T16:40:21Z"
     }
   },
   "roles": {

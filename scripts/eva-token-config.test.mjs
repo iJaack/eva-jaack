@@ -40,6 +40,11 @@ test("$EVA usage burns point to the confirmed immutable Avalanche deployment", (
     codeHash: "0xcdbfdb12af6f360b6b1d60a3afc5dd5f384a0e570e50ddec80f96b2cb2c50be5",
     minimumRetirement: "1000000000000000000",
     supplyAccounting: "circulating_supply_sink; legacy token totalSupply remains unchanged",
-    verified: false,
+    verified: true,
+    verificationProvider: "sourcify",
+    verificationMatch: "exact_match",
+    verificationUrl:
+      "https://repo.sourcify.dev/43114/0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296",
+    verifiedAt: "2026-07-26T16:40:21Z",
   });
 });

@@ -19,5 +19,12 @@ test("the canonical thesis proxy records the confirmed v2 Avalanche upgrade", ()
   assert.equal(thesis.implementationBlock, 91284740);
   assert.equal(thesis.upgradeBlock, 91284742);
   assert.equal(thesis.upgradeTxHash, "0x99da914de41aaa0e7e6cc32590429b52a1f447ba0ced833d9c9ecdd78bd8b5f7");
-  assert.equal(thesis.verified, false);
+  assert.equal(thesis.verified, true);
+  assert.equal(thesis.verificationProvider, "sourcify");
+  assert.equal(thesis.verificationMatch, "exact_match");
+  assert.equal(
+    thesis.verificationUrl,
+    "https://repo.sourcify.dev/43114/0x51cBB77D3b5Df8031F1A916548df07D3B05ae9BB",
+  );
+  assert.equal(thesis.verifiedAt, "2026-07-26T16:40:42Z");
 });

@@ -66,9 +66,15 @@ Eva should not claim:
   runtime code hash is `0xcdbfdb12af6f360b6b1d60a3afc5dd5f384a0e570e50ddec80f96b2cb2c50be5`.
 - Compose keeps `$EVA` holder state separate from identity and publishing requirements.
 
-## Source Verification Boundary
+## Source Verification
 
-The v2 implementation deployment and proxy upgrade are confirmed by Avalanche transaction receipts
-and live readback. Explorer source-code verification is not claimed: Snowtrace rejected the
-verification submission because this environment has no valid `SNOWTRACE_API_KEY`. The deployment
-records therefore remain `verified: false`.
+The v2 implementation and usage burner are publicly verified through Sourcify without an explorer
+API key. Both have exact creation-bytecode and runtime-bytecode matches:
+
+- [EvaThesisProtocol v2](https://repo.sourcify.dev/43114/0x51cBB77D3b5Df8031F1A916548df07D3B05ae9BB)
+- [EvaUsageBurner](https://repo.sourcify.dev/43114/0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296)
+
+The verification inputs use Solidity `0.8.24`, optimizer runs `200`, `viaIR=true`, EVM version
+`cancun`, and the deployment transaction hashes recorded above. The v2 proxy upgrade remains
+separately confirmed by its Avalanche receipt, implementation-slot readback, protocol-version
+readback, and preserved thesis state.
