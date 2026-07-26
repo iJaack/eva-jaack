@@ -19,11 +19,14 @@ test("deployed authoring and proof routes hydrate without client errors @deploym
       (await page.getByRole("heading", { name: "Log in to Vercel" }).isVisible()),
     "Vercel preview authentication is enabled and no automation bypass secret is configured.",
   );
-  await expect(page.getByRole("heading", { name: "public predictions need proof objects." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Public predictions need proof." })).toBeVisible();
 
   await page.goto("/compose");
-  await expect(page.getByRole("heading", { name: "Write the thesis before the tweet." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Build the argument. Keep the receipts." })).toBeVisible();
   await expect(page.getByTestId("compose-auth-gate")).toBeVisible();
+
+  await page.goto("/eva");
+  await expect(page.getByRole("heading", { name: "$EVA, on Avalanche." })).toBeVisible();
 
   await page.goto(canonicalThesisPath);
   await expect(page.getByRole("heading", { name: "SpaceX IPO liquidity rotation" })).toBeVisible();

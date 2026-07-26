@@ -71,8 +71,12 @@ test("Dynamic auth consumers hydrate inside their provider boundary", async ({ p
   });
 
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "public predictions need proof objects." })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Connect Dynamic test" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Public predictions need proof." })).toBeVisible();
+  if ((page.viewportSize()?.width ?? 0) > 920) {
+    await expect(page.getByRole("button", { name: "Connect Dynamic test" })).toBeVisible();
+  } else {
+    await expect(page.getByRole("button", { name: "Connect Dynamic test" })).toHaveCount(0);
+  }
 
   await page.goto("/compose");
   await expect(page.getByTestId("compose-auth-gate")).toBeVisible();

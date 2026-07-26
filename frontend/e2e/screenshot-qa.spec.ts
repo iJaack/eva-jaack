@@ -1,5 +1,6 @@
 import { expect, test, type Page, type Route } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
+import { stubEvaRpc } from "./eva-rpc";
 
 const market = {
   marketId: "spacex-ipo-before-2027",
@@ -137,17 +138,19 @@ async function expectNoHorizontalOverflow(page: Page) {
 }
 
 const qaTargets = [
-  { slug: "home", path: "/", heading: "public predictions need proof objects." },
+  { slug: "home", path: "/", heading: "Public predictions need proof." },
   { slug: "markets", path: "/markets", heading: "Markets are source material." },
   { slug: "market-detail", path: "/markets/spacex-ipo-before-2027", heading: "Will SpaceX IPO before 2027?" },
   { slug: "thesis-detail", path: "/thesis/thesis-0fdef25794b38b6e8eed7524", heading: "SpaceX IPO liquidity rotation" },
   { slug: "predictors", path: "/predictors", heading: "Judge predictors by their thesis trail." },
   { slug: "predictor-detail", path: "/predictors/spacethesis", heading: "@spacethesis" },
-  { slug: "compose-auth-gate", path: "/compose", heading: "Connect before drafting a public thesis." },
+  { slug: "compose-auth-gate", path: "/compose", heading: "Build the argument. Keep the receipts." },
+  { slug: "eva-token", path: "/eva", heading: "$EVA, on Avalanche." },
 ] as const;
 
 test("captures desktop and mobile browser QA screenshots for thesis surfaces @screenshot-qa", async ({ page }, testInfo) => {
   await stubProductApis(page);
+  await stubEvaRpc(page);
   const projectName = testInfo.project.name.replace(/[^a-z0-9-]/gi, "-").toLowerCase();
   const outputDir = testInfo.outputPath("screenshot-qa");
   await mkdir(outputDir, { recursive: true });
