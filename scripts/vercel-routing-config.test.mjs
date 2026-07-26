@@ -25,7 +25,10 @@ test("Vercel leaves frontend dynamic paths for the Next builder to resolve", () 
   );
   assert.ok(
     vercelConfig.routes.some(
-      (route) => route.src === "/(.*)" && route.dest === "/frontend/$1",
+      (route) =>
+        route.src === "/(.*)" &&
+        route.dest === "/frontend/$1" &&
+        route.continue === true,
     ),
   );
 });
