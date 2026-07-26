@@ -47,18 +47,6 @@
       "dest": "/frontend/curator/[address]?nxtPaddress=$1"
     },
     {
-      "src": "/markets/([^/]+)",
-      "dest": "/frontend/markets/[marketId]?nxtPmarketId=$1"
-    },
-    {
-      "src": "/predictors/([^/]+)",
-      "dest": "/frontend/predictors/[id]?nxtPid=$1"
-    },
-    {
-      "src": "/thesis/([^/]+)",
-      "dest": "/frontend/thesis/[thesisId]?nxtPthesisId=$1"
-    },
-    {
       "handle": "filesystem"
     },
     {
