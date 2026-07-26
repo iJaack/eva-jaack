@@ -200,7 +200,16 @@ export function matchingEvaUsageReceiptId(
       eventName: "EvaUsedAndRetired",
       data: log.data,
       topics: [...log.topics] as [] | [signature: Hex, ...args: Hex[]],
-    });
+    }) as {
+      args: {
+        receiptId: Hash;
+        account: `0x${string}`;
+        usageKind: number;
+        referenceHash: Hash;
+        amount: bigint;
+        burnSink: `0x${string}`;
+      };
+    };
     const args = decoded.args;
     if (
       args.account.toLowerCase() === quote.account.toLowerCase() &&

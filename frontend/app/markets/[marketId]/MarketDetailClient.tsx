@@ -13,9 +13,9 @@ function formatOdds(value: number): string {
   return `${Math.round(value * 100)}%`;
 }
 
-export default function MarketDetailClient() {
-  const params = useParams();
-  const marketId = params.marketId as string;
+export default function MarketDetailClient({ marketId: providedMarketId }: { marketId?: string } = {}) {
+  const params = useParams<{ marketId?: string }>();
+  const marketId = providedMarketId ?? params.marketId ?? "";
   const [detail, setDetail] = useState<PredictionMarketDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
