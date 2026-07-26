@@ -1,53 +1,29 @@
 "use client";
 
-import { useEffect, useState, type ComponentType, type ReactNode } from "react";
+import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
+import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
+import type { ReactNode } from "react";
 
 type EvaProvidersProps = {
   children: ReactNode;
 };
 
-type DynamicProvider = ComponentType<{
-  children: ReactNode;
-  settings: {
-    environmentId: string;
-    walletConnectors: unknown[];
-  };
-}>;
-
 export default function EvaProviders({ children }: EvaProvidersProps) {
-  const environmentId = process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
-  const [dynamic, setDynamic] = useState<{ Provider: DynamicProvider; walletConnectors: unknown[] } | null>(null);
+  const environmentId =
+    process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID ||
+    (process.env.NEXT_PUBLIC_DYNAMIC_TEST_CONTEXT === "1" ? "dynamic-test-environment" : undefined);
+  if (!environmentId) return <>{children}</>;
 
-  useEffect(() => {
-    if (!environmentId) return;
-    let cancelled = false;
-    Promise.all([import("@dynamic-labs/sdk-react-core"), import("@dynamic-labs/ethereum")])
-      .then(([core, ethereum]) => {
-        if (cancelled) return;
-        setDynamic({
-          Provider: core.DynamicContextProvider as DynamicProvider,
-          walletConnectors: [ethereum.EthereumWalletConnectors],
-        });
-      })
-      .catch(() => setDynamic(null));
-    return () => {
-      cancelled = true;
-    };
-  }, [environmentId]);
-
-  if (!environmentId || !dynamic) {
-    return <>{children}</>;
-  }
-
-  const Provider = dynamic.Provider;
+  // Dynamic consumers can render anywhere in the app chrome. Keep their provider
+  // present on the first render to avoid out-of-context hooks and whole-app remounts.
   return (
-    <Provider
+    <DynamicContextProvider
       settings={{
         environmentId,
-        walletConnectors: dynamic.walletConnectors,
+        walletConnectors: [EthereumWalletConnectors],
       }}
     >
       {children}
-    </Provider>
+    </DynamicContextProvider>
   );
 }

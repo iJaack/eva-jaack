@@ -4,7 +4,9 @@ import { useEffect, useState, type ComponentType } from "react";
 
 export default function DynamicAuthControl() {
   const [Widget, setWidget] = useState<ComponentType | null>(null);
-  const environmentId = process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
+  const environmentId =
+    process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID ||
+    (process.env.NEXT_PUBLIC_DYNAMIC_TEST_CONTEXT === "1" ? "dynamic-test-environment" : undefined);
 
   useEffect(() => {
     if (!environmentId) return;

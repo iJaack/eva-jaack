@@ -143,5 +143,16 @@ jobs:
           SMOKE_BASE_URL: ${{ steps.smoke-url.outputs.base_url }}
           SMOKE_CURATORS_MAX_MS: '5000'
           SMOKE_ALLOW_PROTECTED_SKIP: 'true'
+          SMOKE_REQUIRE_DYNAMIC_AUTH: 'true'
           SMOKE_VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: pnpm smoke:deploy
+
+      - name: Install deployed-browser smoke browser
+        run: pnpm --filter frontend exec playwright install --with-deps chromium
+
+      - name: Browser-smoke deployed authoring and proof routes
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.smoke-url.outputs.base_url }}
+          SMOKE_ALLOW_PROTECTED_SKIP: 'true'
+          SMOKE_VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: pnpm --filter frontend exec playwright test e2e/deployment.spec.ts --project=desktop-chromium --project=mobile-chromium

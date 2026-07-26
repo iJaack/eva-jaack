@@ -62,6 +62,24 @@ test("compose hides the preview identity and editor until Dynamic identity is re
   await expect(page.getByRole("button", { name: "Publish anchored thesis" })).toHaveCount(0);
 });
 
+test("Dynamic auth consumers hydrate inside their provider boundary", async ({ page }) => {
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+
+  await page.route("**/api/markets", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(marketsPayload) });
+  });
+
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "public predictions need proof objects." })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Connect Dynamic test" })).toBeVisible();
+
+  await page.goto("/compose");
+  await expect(page.getByTestId("compose-auth-gate")).toBeVisible();
+  await expect(page.getByTestId("compose-auth-gate").getByRole("button", { name: "Connect Dynamic test" })).toBeVisible();
+  expect(pageErrors).toEqual([]);
+});
+
 test("compose page guides required thesis inputs before enabling publish", async ({ page }) => {
   let publishedBody = "";
   let publishedAnchorPreparationId = "";
