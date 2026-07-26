@@ -1,11 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useMemo, useState, type ComponentType } from "react";
 import DynamicAuthControl from "@/components/DynamicAuthControl";
 import PageShell from "@/components/ui/PageShell";
-import { createThesis, getMarkets, prepareDraftThesisAnchor, type PredictionMarket, type Thesis, type ThesisCreateRequest } from "@/lib/api";
+import {
+  createThesis,
+  getMarkets,
+  prepareDraftThesisAnchor,
+  type EvaUsageQuote,
+  type PredictionMarket,
+  type Thesis,
+  type ThesisCreateRequest,
+} from "@/lib/api";
 import type { DynamicIdentityState, DynamicThesisIdentity } from "@/lib/dynamic-identity";
 import { formatEvaAmount, readEvaTokenSnapshot } from "@/lib/eva-token";
 import { protocol } from "@/lib/protocol";
@@ -46,6 +55,11 @@ const dynamicIdentityRequired = dynamicTestMode || Boolean(dynamicEnvironmentId)
 const dynamicUnavailableMessage = dynamicEnvironmentId
   ? "Connect with Dynamic before drafting a public thesis."
   : "Dynamic identity is required before drafting a public thesis. Configure Dynamic auth before enabling the editor.";
+
+const DynamicEvaUsageCheckout = dynamic(
+  () => import("@/components/DynamicEvaUsageCheckout"),
+  { ssr: false },
+);
 
 const initialBlocks: DraftBlock[] = [
   {
@@ -108,6 +122,8 @@ function ComposeInner() {
   const [anchorPrepared, setAnchorPrepared] = useState(false);
   const [anchorPreparationId, setAnchorPreparationId] = useState<string | null>(null);
   const [anchorTxHash, setAnchorTxHash] = useState("");
+  const [evaUsageQuote, setEvaUsageQuote] = useState<EvaUsageQuote | null>(null);
+  const [evaUsageTxHash, setEvaUsageTxHash] = useState("");
   const [draftState, setDraftState] = useState("Private draft");
   const [created, setCreated] = useState<Thesis | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -133,7 +149,8 @@ function ComposeInner() {
   const identityReady = !dynamicIdentityRequired || identityState?.status === "ready";
   const identityMessage = dynamicIdentityRequired ? identityState?.message ?? dynamicUnavailableMessage : "Preview identity active for local compose.";
   const anchorConfirmed = isTxHash(anchorTxHash);
-  const canPublish = Boolean(title.trim() && body.trim() && attachedSignals.length > 0 && identityReady && anchorPrepared && anchorPreparationId && anchorConfirmed && !submitting && !preparingAnchor);
+  const evaUsageConfirmed = isTxHash(evaUsageTxHash);
+  const canPublish = Boolean(title.trim() && body.trim() && attachedSignals.length > 0 && identityReady && anchorPrepared && anchorPreparationId && anchorConfirmed && evaUsageQuote && evaUsageConfirmed && !submitting && !preparingAnchor);
   const publishBlocker = preparingAnchor
     ? "Preparing anchor"
     : !identityReady
@@ -142,9 +159,13 @@ function ComposeInner() {
         ? "Prepare anchor before publishing"
         : !anchorConfirmed
           ? "Confirm anchor transaction before publishing"
-          : !attachedSignals.length
-            ? "Attach at least one signal before publishing"
-            : null;
+          : !evaUsageQuote
+            ? "Prepare the EVA usage quote before publishing"
+            : !evaUsageConfirmed
+              ? "Use EVA and confirm its receipt before publishing"
+              : !attachedSignals.length
+                ? "Attach at least one signal before publishing"
+                : null;
   const showComposeWorkspace = !dynamicIdentityRequired || identityReady;
   const authGateMessage = identityState?.message ?? dynamicUnavailableMessage;
   const nextSignalLabel = `S${attachedSignals.length + 1}`;
@@ -184,6 +205,8 @@ function ComposeInner() {
     setAnchorPrepared(false);
     setAnchorPreparationId(null);
     setAnchorTxHash("");
+    setEvaUsageQuote(null);
+    setEvaUsageTxHash("");
   };
 
   const updateTitle = (nextTitle: string) => {
@@ -323,10 +346,13 @@ function ComposeInner() {
       setAnchorPreparationId(prepared.anchorPreparationId);
       setAnchorPrepared(true);
       setAnchorTxHash("");
-      setDraftState("Anchor prepared");
+      setEvaUsageQuote(prepared.evaUsageQuote);
+      setEvaUsageTxHash("");
+      setDraftState("Anchor and EVA quote prepared");
     } catch (reason) {
       setAnchorPrepared(false);
       setAnchorPreparationId(null);
+      setEvaUsageQuote(null);
       setError(reason instanceof Error ? reason.message : "Unable to prepare thesis anchor.");
     } finally {
       setPreparingAnchor(false);
@@ -346,6 +372,7 @@ function ComposeInner() {
         ...thesisPayload(),
         anchorPreparationId: anchorPreparationId ?? undefined,
         anchorTxHash: anchorTxHash.trim(),
+        evaUsageTxHash: evaUsageTxHash.trim(),
       });
       setCreated(response.thesis);
     } catch (reason) {
@@ -366,6 +393,7 @@ function ComposeInner() {
             <li>Identity — {identityReady ? "Ready" : "Required"}</li>
             <li>Sources — {attachedSignals.length} attached</li>
             <li>Anchor — {anchorPrepared ? "Prepared" : "Not prepared"}</li>
+            <li>$EVA — {evaUsageConfirmed ? "Receipt ready" : "Required to publish"}</li>
           </ul>
         </section>
 
@@ -445,7 +473,9 @@ function ComposeInner() {
                     <strong>{evaBalance}</strong>
                   </div>
                 </div>
-                <p className="compose-token-boundary">$EVA balance is author context, never a publishing gate or credibility score.</p>
+                <p className="compose-token-boundary">
+                  Balance never changes credibility or score. Publishing consumes the exact quoted EVA proof receipt.
+                </p>
               </div>
               <div className="compose-editor-heading">
                 <div>
@@ -495,8 +525,15 @@ function ComposeInner() {
                   <input className="field-input" value={anchorTxHash} onChange={(event) => setAnchorTxHash(event.target.value)} placeholder="0x..." />
                 </label>
               ) : null}
+              {evaUsageQuote ? (
+                <DynamicEvaUsageCheckout
+                  quote={evaUsageQuote}
+                  txHash={evaUsageTxHash}
+                  onTxHash={setEvaUsageTxHash}
+                />
+              ) : null}
               <div className="compose-publish-gate">
-                {publishBlocker ? <span>{publishBlocker}</span> : <span>Anchor prepared</span>}
+                {publishBlocker ? <span>{publishBlocker}</span> : <span>Anchor and EVA receipt ready</span>}
                 <button className="mobile-action mobile-action-primary compose-submit" type="submit" disabled={!canPublish}>
                   {submitting ? "Publishing..." : "Publish anchored thesis"}
                 </button>

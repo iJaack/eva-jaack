@@ -22,6 +22,28 @@ async function seedDynamicContext(page: Page, context: DynamicTestContext = embe
   }, context);
 }
 
+function evaUsageQuote(resourceId: string, account = embeddedWalletAddress) {
+  return {
+    quoteVersion: "eva-usage-v1",
+    quoteId: `0x${"9".repeat(64)}`,
+    action: "publish_thesis",
+    label: "Publish a proof-backed thesis",
+    chainId: 43_114,
+    account,
+    token: "0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672",
+    burner: "0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296",
+    burnSink: "0x000000000000000000000000000000000000dEaD",
+    usageKind: 0,
+    resourceId,
+    referenceHash: `0x${"8".repeat(64)}`,
+    amountWei: "100000000000000000000000",
+    approvalTransaction: { to: "0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672", data: "0x095ea7b3", description: "Approve EVA" },
+    retirementTransaction: { to: "0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296", data: "0x1234", description: "Use EVA" },
+    paymentBoundary: "wallet_approval_and_broadcast_required",
+    permit2: false,
+  };
+}
+
 const marketsPayload = {
   count: 1,
   markets: [
@@ -188,6 +210,7 @@ test("compose page guides required thesis inputs before enabling publish", async
         thesisId: "thesis-fed-hold",
         anchorStatus: "prepared",
         transactions: [],
+        evaUsageQuote: evaUsageQuote("draft-anchor-compose-1"),
       }),
     });
   });
@@ -226,6 +249,8 @@ test("compose page guides required thesis inputs before enabling publish", async
   expect(String(preparedPayloads[0].body)).toContain("[S1]");
   await expect(publishButton).toBeDisabled();
   await page.getByLabel("Anchor transaction hash").fill("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  await expect(publishButton).toBeDisabled();
+  await page.getByLabel("EVA usage receipt transaction hash").fill(`0x${"d".repeat(64)}`);
   await expect(publishButton).toBeEnabled();
 
   await publishButton.click();
@@ -338,6 +363,7 @@ test("compose supports private structured block drafts with anchored signal cita
         thesisId: "thesis-fed-hold",
         anchorStatus: "prepared",
         transactions: [],
+        evaUsageQuote: evaUsageQuote("draft-anchor-compose-2"),
       }),
     });
   });
@@ -383,10 +409,12 @@ test("compose supports private structured block drafts with anchored signal cita
   await page.getByRole("button", { name: "Prepare anchor" }).click();
   expect(preparedPayloads).toHaveLength(1);
   expect(String(preparedPayloads[0].body)).toContain("[S1]");
-  await expect(page.getByTestId("compose-draft-state")).toHaveText("Anchor prepared");
+  await expect(page.getByTestId("compose-draft-state")).toHaveText("Anchor and EVA quote prepared");
   await expect(publishButton).toBeDisabled();
   await expect(page.getByText("Confirm anchor transaction before publishing")).toBeVisible();
   await page.getByLabel("Anchor transaction hash").fill("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  await expect(page.getByText("Use EVA and confirm its receipt before publishing")).toBeVisible();
+  await page.getByLabel("EVA usage receipt transaction hash").fill(`0x${"d".repeat(64)}`);
   await expect(publishButton).toBeEnabled();
 
   await publishButton.click();
@@ -429,6 +457,7 @@ test("compose maps external Dynamic X and wallet identity into prepared anchor p
         thesisId: "thesis-fed-hold",
         anchorStatus: "prepared",
         transactions: [],
+        evaUsageQuote: evaUsageQuote("draft-anchor-external-wallet", externalWalletAddress),
       }),
     });
   });

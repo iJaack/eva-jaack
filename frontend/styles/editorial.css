@@ -2629,6 +2629,63 @@ select {
   color: inherit;
 }
 
+.eva-quote-checkout {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--color-rule-strong);
+  background: color-mix(in srgb, var(--color-accent) 4%, transparent);
+}
+
+.eva-quote-heading,
+.eva-quote-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.eva-quote-heading h3,
+.eva-quote-heading p,
+.eva-quote-checkout > p {
+  margin: 0;
+}
+
+.eva-quote-heading h3 {
+  margin-top: 5px;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 420;
+}
+
+.eva-quote-heading strong {
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.eva-quote-checkout > p,
+.eva-quote-actions span {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  line-height: 1.65;
+}
+
+.eva-quote-checkout code {
+  color: var(--color-ink-2);
+}
+
+.eva-quote-actions {
+  justify-content: flex-start;
+}
+
+.eva-quote-actions span {
+  margin-left: auto;
+}
+
 .eva-usage-disclosure {
   grid-column: 1 / -1;
   display: grid;
@@ -3270,6 +3327,20 @@ select {
   }
 
   .eva-usage-actions button {
+    width: 100%;
+  }
+
+  .eva-quote-heading,
+  .eva-quote-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .eva-quote-actions span {
+    margin-left: 0;
+  }
+
+  .eva-quote-actions button {
     width: 100%;
   }
 

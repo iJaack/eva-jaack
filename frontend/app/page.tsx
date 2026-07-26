@@ -322,7 +322,7 @@ export default function HomePage() {
           </div>
           <div>
             <dt>Not active</dt>
-            <dd>Staking, gating, yield, governance, trading</dd>
+            <dd>Staking, balance-based access, yield, governance, trading</dd>
           </div>
         </dl>
       </section>

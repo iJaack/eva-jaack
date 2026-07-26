@@ -18,8 +18,8 @@ export default function EvaTokenPage() {
         <p className="eyebrow">Platform token / Avalanche C-Chain</p>
         <h1>$EVA, on Avalanche.</h1>
         <p>
-          Read the canonical token directly from Avalanche. Use $EVA for a thesis proof, forecast receipt, or agent
-          verification—and retire it irreversibly with an onchain receipt.
+          Read the canonical token directly from Avalanche. Public theses, revisions, and agent proof bundles consume
+          an exact quoted amount of $EVA and retire it irreversibly with an onchain receipt.
         </p>
         <div className="eva-token-actions">
           <a className="eva-inline-link" href={contractUrl} target="_blank" rel="noreferrer">

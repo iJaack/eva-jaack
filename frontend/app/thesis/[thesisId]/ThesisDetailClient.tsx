@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
+import { formatUnits } from "viem";
 import FadeIn from "@/components/motion/FadeIn";
 import PageShell from "@/components/ui/PageShell";
 import {
@@ -11,11 +13,17 @@ import {
   prepareThesisAnchor,
   prepareThesisRevisionAnchor,
   recordThesisRevision,
+  type EvaUsageQuote,
   type PredictionThesisDetail,
   type Thesis,
 } from "@/lib/api";
 import { protocol } from "@/lib/protocol";
 import { scoreUiStatus, statusClassName, statusLabel, thesisUiStatus } from "@/lib/status";
+
+const DynamicEvaUsageCheckout = dynamic(
+  () => import("@/components/DynamicEvaUsageCheckout"),
+  { ssr: false },
+);
 
 type SignalUpdateDraft = {
   currentOddsPercent: string;
@@ -150,6 +158,8 @@ export default function ThesisDetailClient() {
   const [updatePending, setUpdatePending] = useState(false);
   const [revisionAnchorPreparationId, setRevisionAnchorPreparationId] = useState<string | null>(null);
   const [revisionAnchorTxHash, setRevisionAnchorTxHash] = useState("");
+  const [revisionEvaUsageQuote, setRevisionEvaUsageQuote] = useState<EvaUsageQuote | null>(null);
+  const [revisionEvaUsageTxHash, setRevisionEvaUsageTxHash] = useState("");
   const [revisionAnchorPending, setRevisionAnchorPending] = useState(false);
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
   const [loading, setLoading] = useState(true);
@@ -226,6 +236,8 @@ export default function ThesisDetailClient() {
   const resetRevisionAnchor = () => {
     setRevisionAnchorPreparationId(null);
     setRevisionAnchorTxHash("");
+    setRevisionEvaUsageQuote(null);
+    setRevisionEvaUsageTxHash("");
     setUpdateState(null);
   };
 
@@ -243,9 +255,12 @@ export default function ThesisDetailClient() {
       const transactionLabel = prepared.transactions.length === 1 ? "transaction" : "transactions";
       setRevisionAnchorPreparationId(prepared.anchorPreparationId);
       setRevisionAnchorTxHash("");
-      setUpdateState(`${prepared.transactions.length} update anchor ${transactionLabel} prepared.`);
+      setRevisionEvaUsageQuote(prepared.evaUsageQuote);
+      setRevisionEvaUsageTxHash("");
+      setUpdateState(`${prepared.transactions.length} update anchor ${transactionLabel} and EVA quote prepared.`);
     } catch (reason) {
       setRevisionAnchorPreparationId(null);
+      setRevisionEvaUsageQuote(null);
       setUpdateState(reason instanceof Error ? reason.message : "Unable to prepare update anchor.");
     } finally {
       setRevisionAnchorPending(false);
@@ -267,17 +282,28 @@ export default function ThesisDetailClient() {
       setUpdateState("Confirm update anchor transaction before publishing.");
       return;
     }
+    if (!revisionEvaUsageQuote || !isTxHash(revisionEvaUsageTxHash)) {
+      setUpdateState("Use EVA and confirm its receipt before publishing.");
+      return;
+    }
 
     setUpdatePending(true);
     setUpdateState(null);
 
     try {
-      const response = await recordThesisRevision(detail.thesis.thesisId, { ...input, anchorPreparationId: revisionAnchorPreparationId, anchorTxHash: revisionAnchorTxHash.trim() });
+      const response = await recordThesisRevision(detail.thesis.thesisId, {
+        ...input,
+        anchorPreparationId: revisionAnchorPreparationId,
+        anchorTxHash: revisionAnchorTxHash.trim(),
+        evaUsageTxHash: revisionEvaUsageTxHash.trim(),
+      });
       setDetail(response);
       setUpdateBody("");
       setUpdateNote("");
       setRevisionAnchorPreparationId(null);
       setRevisionAnchorTxHash("");
+      setRevisionEvaUsageQuote(null);
+      setRevisionEvaUsageTxHash("");
       setUpdateState(`Published update v${response.thesis.currentRevision.version}.`);
     } catch (reason) {
       setRevisionAnchorPreparationId(null);
@@ -287,7 +313,15 @@ export default function ThesisDetailClient() {
     }
   };
 
-  const revisionPublishReady = Boolean(updateBody.trim() && revisionAnchorPreparationId && isTxHash(revisionAnchorTxHash) && !updatePending && !revisionAnchorPending);
+  const revisionPublishReady = Boolean(
+    updateBody.trim() &&
+    revisionAnchorPreparationId &&
+    isTxHash(revisionAnchorTxHash) &&
+    revisionEvaUsageQuote &&
+    isTxHash(revisionEvaUsageTxHash) &&
+    !updatePending &&
+    !revisionAnchorPending,
+  );
   const timelineEntries = detail
     ? [...detail.thesis.timeline]
         .filter((entry) => timelineFilter === "all" || entry.action === timelineFilter)
@@ -406,6 +440,28 @@ export default function ThesisDetailClient() {
                       <small>{shortValue(detail.thesis.anchor.contractAddress ?? protocol.contracts.evaThesisProtocol)}</small>
                     </dd>
                   </div>
+                  {detail.thesis.evaUsageReceipts?.length ? (
+                    <div>
+                      <dt><span aria-hidden="true" />$EVA use</dt>
+                      <dd>
+                        <strong>
+                          {formatUnits(
+                            BigInt(detail.thesis.evaUsageReceipts.at(-1)!.amountWei),
+                            protocol.tokens.eva.decimals,
+                          )} EVA retired
+                        </strong>
+                        <small>
+                          <a
+                            href={`${protocol.chain.explorerUrl}/tx/${detail.thesis.evaUsageReceipts.at(-1)!.txHash}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {shortValue(detail.thesis.evaUsageReceipts.at(-1)!.receiptId)}
+                          </a>
+                        </small>
+                      </dd>
+                    </div>
+                  ) : null}
                 </dl>
                 <div className="eva-thesis-signal-heading">
                   <span>Supporting signals</span>
@@ -565,6 +621,13 @@ export default function ThesisDetailClient() {
                     <span className="field-label">Update anchor transaction hash</span>
                     <input className="field-input" value={revisionAnchorTxHash} onChange={(event) => setRevisionAnchorTxHash(event.target.value)} placeholder="0x..." />
                   </label>
+                ) : null}
+                {revisionEvaUsageQuote ? (
+                  <DynamicEvaUsageCheckout
+                    quote={revisionEvaUsageQuote}
+                    txHash={revisionEvaUsageTxHash}
+                    onTxHash={setRevisionEvaUsageTxHash}
+                  />
                 ) : null}
                 <div className="thesis-update-actions">
                   <button className="mobile-action" type="button" onClick={prepareUpdateAnchor} disabled={revisionAnchorPending || updatePending || !updateBody.trim()}>

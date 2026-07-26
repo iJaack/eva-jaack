@@ -29,7 +29,9 @@ test("$EVA is a live, bounded core platform surface", async ({ page }) => {
   await expect(relationship).toContainText("$EVA balance");
   await expect(relationship).toContainText("Platform use");
   await expect(relationship).toContainText("Burn receipt");
-  await expect(page.locator(".eva-token-boundaries")).toContainText("Staking, gating, yield, governance, trade execution");
+  await expect(page.locator(".eva-token-boundaries")).toContainText("Thesis 100,000 EVA");
+  await expect(page.locator(".eva-token-boundaries")).toContainText("no Permit2");
+  await expect(page.locator(".eva-token-boundaries")).toContainText("Staking, balance-based access, yield, governance, trade execution");
   await expect(page.getByText(/price chart|buy \$EVA|swap \$EVA/i)).toHaveCount(0);
   await expect.poll(async () =>
     page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1),

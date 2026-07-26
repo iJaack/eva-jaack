@@ -206,13 +206,15 @@ export default function EvaTokenLedger() {
           <p id="eva-boundary-ledger">Boundary ledger</p>
         </div>
         <div className="eva-token-boundaries">
-          <p><strong>Live now</strong> Contract metadata, holder readback, author context, usage burns, receipts</p>
-          <p><strong>Not active</strong> Staking, gating, yield, governance, trade execution</p>
+          <p><strong>Live now</strong> Paid thesis publishing, paid revisions, paid agent proof bundles, usage receipts</p>
+          <p><strong>Exact v1 uses</strong> Thesis 100,000 EVA · revision 25,000 EVA · agent bundle 10,000 EVA</p>
+          <p><strong>Payment path</strong> Direct ERC-20 allowance; no Permit2 and no server spending authority</p>
+          <p><strong>Not active</strong> Staking, balance-based access, yield, governance, trade execution</p>
         </div>
       </section>
 
       <div className="eva-token-followup">
-        <p>$EVA holder state is context, not a credibility score or publishing gate.</p>
+        <p>$EVA balance never changes credibility or score; valuable public actions consume an exact usage receipt.</p>
         <Link href="/compose">Start a thesis →</Link>
       </div>
     </div>
