@@ -44,63 +44,29 @@ describe("MCP HTTP endpoint", () => {
     });
   });
 
-  it("exposes Dynamic auth runtime readiness without leaking the environment id", async () => {
-    const previousDynamicEnv = process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
-    process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID = "test-dynamic-env";
-    try {
-      const app = createApp();
+  it("exposes launch-ready self-custodial wallet runtime boundaries", async () => {
+    const app = createApp();
 
-      const response = await fetchJson(app, "/api/runtime-readiness");
+    const response = await fetchJson(app, "/api/runtime-readiness");
 
-      expect(response.status).toBe(200);
-      expect(response.body).toMatchObject({
-        status: "ok",
-        service: "Eva Protocol",
-        dynamicAuth: {
-          configured: true,
-          composeGate: "user_connect",
-          reason: "NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID is configured",
-        },
-        authoring: {
-          ready: true,
-          composeGate: "user_connect",
-          requiredEnv: ["NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID"],
-          nextAction: "Connect with Dynamic before drafting a public thesis.",
-        },
-      });
-      expect(JSON.stringify(response.body)).not.toContain("test-dynamic-env");
-    } finally {
-      if (previousDynamicEnv === undefined) delete process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
-      else process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID = previousDynamicEnv;
-    }
-  });
-
-  it("reports missing Dynamic auth runtime readiness as a launch blocker", async () => {
-    const previousDynamicEnv = process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
-    delete process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
-    try {
-      const app = createApp();
-
-      const response = await fetchJson(app, "/api/runtime-readiness");
-
-      expect(response.status).toBe(200);
-      expect(response.body).toMatchObject({
-        dynamicAuth: {
-          configured: false,
-          composeGate: "configuration",
-          reason: "missing NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID",
-        },
-        authoring: {
-          ready: false,
-          composeGate: "configuration",
-          requiredEnv: ["NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID"],
-          nextAction: "Configure Dynamic auth before enabling the editor.",
-        },
-      });
-    } finally {
-      if (previousDynamicEnv === undefined) delete process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID;
-      else process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID = previousDynamicEnv;
-    }
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      status: "ok",
+      service: "Eva Protocol",
+      walletConnection: {
+        ready: true,
+        mode: "self_custody",
+        composeGate: "self_custody_wallet",
+        embeddedWallets: false,
+        serverCanSign: false,
+      },
+      authoring: {
+        ready: true,
+        composeGate: "self_custody_wallet",
+        requiredEnv: [],
+        nextAction: "Connect your own EVM wallet and add the public X handle for the thesis.",
+      },
+    });
   });
 
   it("serves discovery metadata and agent-safe boundaries for plain GET health checks", async () => {

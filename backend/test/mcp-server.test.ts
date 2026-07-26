@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
+import { createThesisDraftToolSchema } from "../src/mcp-schemas.js";
 import { evaMcpToolDescriptions, evaMcpToolNames } from "../src/mcp-server.js";
 
 describe("Eva MCP server discovery", () => {
@@ -22,5 +24,17 @@ describe("Eva MCP server discovery", () => {
       expect(description, `${toolName} should preserve no-broadcast scope`).toContain("broadcast");
       expect(description, `${toolName} should preserve storage boundary scope`).toContain("storage durability");
     }
+  });
+
+  it("rejects embedded wallet sources from agent draft preparation", () => {
+    const parsed = z.object(createThesisDraftToolSchema).safeParse({
+      title: "External signer only",
+      body: "The agent must control and sign with its own wallet.",
+      xHandle: "@agentalpha",
+      walletAddress: "0x1111111111111111111111111111111111111111",
+      walletSource: "embedded",
+    });
+
+    expect(parsed.success).toBe(false);
   });
 });

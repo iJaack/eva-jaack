@@ -27,6 +27,29 @@
       "decimals": 18
     }
   },
+  "evaUsage": {
+    "quoteVersion": "eva-usage-v1",
+    "walletMode": "self_custody",
+    "embeddedWallets": false,
+    "serverCanSign": false,
+    "actions": {
+      "publish_thesis": {
+        "usageKind": 0,
+        "amountWei": "100000000000000000000000",
+        "label": "Publish a proof-backed thesis"
+      },
+      "publish_revision": {
+        "usageKind": 0,
+        "amountWei": "25000000000000000000000",
+        "label": "Publish a thesis revision"
+      },
+      "agent_proof_bundle": {
+        "usageKind": 2,
+        "amountWei": "10000000000000000000000",
+        "label": "Unlock an agent proof bundle"
+      }
+    }
+  },
   "agents": {
     "eva": {
       "id": "1599",

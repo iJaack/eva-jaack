@@ -16,6 +16,12 @@ import type {
 } from "../lib/api-types.js";
 import { createAvalancheAnchorVerifier, type AnchorVerifier } from "../services/anchor-verifier.js";
 import {
+  createAvalancheEvaUsageVerifier,
+  createEvaUsageQuote,
+  isEvaUsageAction,
+  type EvaUsageVerifier,
+} from "../services/eva-usage.js";
+import {
   getPredictionLayerService,
   type LocalPredictionLayerService,
   type ThesisCreateInput,
@@ -27,6 +33,7 @@ import { prepareThesisAnchorTransactions, prepareThesisRevisionAnchorTransaction
 type PredictionRouteDeps = {
   predictions: LocalPredictionLayerService;
   anchorVerifier: AnchorVerifier;
+  usageVerifier: EvaUsageVerifier;
 };
 
 type PredictionSignalInputItem = NonNullable<ThesisCreateInput["predictionSignals"]>[number];
@@ -131,6 +138,7 @@ export function createPredictionRoutes(
   deps: PredictionRouteDeps = {
     predictions: getPredictionLayerService(),
     anchorVerifier: createAvalancheAnchorVerifier(),
+    usageVerifier: createAvalancheEvaUsageVerifier(),
   },
 ) {
   const routes = new Hono();
@@ -157,6 +165,22 @@ export function createPredictionRoutes(
       author: c.req.query("author") ?? null,
     });
     return c.json<ThesisListResponse>(response);
+  });
+
+  routes.post("/eva/usage/quote", async (c) => {
+    const body = await readJsonBody(c);
+    if (!body) return c.json({ error: "Invalid JSON body" }, 400);
+    const action = body.action;
+    const account = normalizeString(body.account);
+    const resourceId = normalizeString(body.resourceId);
+    if (!isEvaUsageAction(action) || !account || !resourceId) {
+      return c.json({ error: "Missing or invalid required fields: action, account, resourceId" }, 400);
+    }
+    try {
+      return c.json(createEvaUsageQuote({ action, account, resourceId }));
+    } catch (error) {
+      return c.json({ error: error instanceof Error ? error.message : "Failed to create EVA usage quote" }, 400);
+    }
   });
 
   routes.post("/theses", async (c) => {
@@ -195,8 +219,38 @@ export function createPredictionRoutes(
         return c.json({ error: verification.error }, 400);
       }
 
+      const evaUsageTxHash = normalizeTxHash(body.evaUsageTxHash);
+      if (!evaUsageTxHash) {
+        return c.json({ error: "Use EVA and submit its Avalanche receipt before publishing thesis" }, 400);
+      }
+      const usageQuote = createEvaUsageQuote({
+        action: "publish_thesis",
+        account: input.identity.walletAddress ?? "",
+        resourceId: anchorPreparationId,
+      });
+      const usageVerification = await deps.usageVerifier.verifyUsage({
+        txHash: evaUsageTxHash,
+        quote: usageQuote,
+      });
+      if (!usageVerification.ok) {
+        return c.json({ error: usageVerification.error }, 400);
+      }
+
       const response = await deps.predictions.createThesis(input);
-      const anchored = await deps.predictions.markThesisAnchorConfirmed(response.thesis.thesisId, anchorTxHash, verification.confirmedAt);
+      const anchored = await deps.predictions.markThesisAnchorConfirmed(
+        response.thesis.thesisId,
+        anchorTxHash,
+        verification.confirmedAt,
+        {
+          action: "publish_thesis",
+          txHash: evaUsageTxHash,
+          receiptId: usageVerification.receiptId,
+          amountWei: usageQuote.amountWei,
+          referenceHash: usageQuote.referenceHash,
+          confirmedAt: usageVerification.confirmedAt,
+          blockNumber: usageVerification.blockNumber,
+        },
+      );
       if (response.created) await deps.predictions.deleteAnchorPreparation(anchorPreparationId);
       return c.json<ThesisCreateResponse>(
         {
@@ -234,6 +288,11 @@ export function createPredictionRoutes(
         thesisId: detail.thesis.thesisId,
         anchorStatus: "prepared",
         transactions: prepareThesisAnchorTransactions(detail.thesis),
+        evaUsageQuote: createEvaUsageQuote({
+          action: "publish_thesis",
+          account: input.identity.walletAddress ?? "",
+          resourceId: anchorPreparationId,
+        }),
       });
     } catch (error) {
       return c.json({ error: error instanceof Error ? error.message : "Failed to prepare draft anchor transactions" }, 400);
@@ -284,6 +343,11 @@ export function createPredictionRoutes(
         thesisId: detail.thesis.thesisId,
         anchorStatus: "prepared",
         transactions: prepareThesisRevisionAnchorTransactions(detail.thesis),
+        evaUsageQuote: createEvaUsageQuote({
+          action: "publish_revision",
+          account: input.identity.walletAddress ?? "",
+          resourceId: anchorPreparationId,
+        }),
       });
     } catch (error) {
       return c.json({ error: error instanceof Error ? error.message : "Failed to prepare revision anchor transactions" }, 400);
@@ -331,11 +395,39 @@ export function createPredictionRoutes(
         return c.json({ error: verification.error }, 400);
       }
 
-      const response = await deps.predictions.recordRevision(c.req.param("thesisId"), input);
+      const evaUsageTxHash = normalizeTxHash(body.evaUsageTxHash);
+      if (!evaUsageTxHash) {
+        return c.json({ error: "Use EVA and submit its Avalanche receipt before publishing thesis update" }, 400);
+      }
+      const usageQuote = createEvaUsageQuote({
+        action: "publish_revision",
+        account: input.identity.walletAddress ?? "",
+        resourceId: anchorPreparationId,
+      });
+      const usageVerification = await deps.usageVerifier.verifyUsage({
+        txHash: evaUsageTxHash,
+        quote: usageQuote,
+      });
+      if (!usageVerification.ok) {
+        return c.json({ error: usageVerification.error }, 400);
+      }
+
+      const response = await deps.predictions.recordRevision(c.req.param("thesisId"), input, {
+        txHash: anchorTxHash,
+        confirmedAt: verification.confirmedAt,
+        usageReceipt: {
+          action: "publish_revision",
+          txHash: evaUsageTxHash,
+          receiptId: usageVerification.receiptId,
+          amountWei: usageQuote.amountWei,
+          referenceHash: usageQuote.referenceHash,
+          confirmedAt: usageVerification.confirmedAt,
+          blockNumber: usageVerification.blockNumber,
+        },
+      });
       if (!response) return c.json({ error: "Thesis not found" }, 404);
-      const anchored = await deps.predictions.markCurrentRevisionAnchorConfirmed(response.thesis.thesisId, anchorTxHash, verification.confirmedAt);
       await deps.predictions.deleteAnchorPreparation(anchorPreparationId);
-      return c.json<ThesisDetailResponse>(anchored ?? response);
+      return c.json<ThesisDetailResponse>(response);
     } catch (error) {
       return c.json({ error: error instanceof Error ? error.message : "Failed to revise thesis" }, 400);
     }

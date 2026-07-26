@@ -24,22 +24,22 @@ Milestone 1 is not complete until discovered regressions are fixed.
 
 ## Milestone 2: Identity And Wallet Readiness
 
-Goal: make X plus wallet connection production-ready without changing the thesis data model.
+Goal: make public X attribution plus self-custodial wallet connection production-ready without
+changing the thesis data model.
 
 Atomic tasks:
 
-- Select auth/wallet provider for X login plus embedded wallet creation.
-- Prefer free or generous-start providers first; evaluate Privy, Dynamic, Web3Auth, and Coinbase Developer Platform.
-- Map provider user IDs into `ThesisAuthorDto.dynamicUserId`.
-- Support both injected wallets and embedded wallets.
-- Add explicit wallet-source display and failure states.
+- Connect EIP-1193 wallets already controlled by humans or agents.
+- Derive `ThesisAuthorDto.dynamicUserId` from the connected external wallet address.
+- Reject embedded wallet sources before draft, quote, or write preparation.
+- Add explicit self-custody display, missing-provider, account-mismatch, and wrong-chain states.
 
 Checks and regressions:
 
 - Unit tests for identity validation and author normalization.
-- Frontend E2E for external wallet, embedded wallet, missing X, missing wallet, and wrong-chain states.
+- Frontend E2E for connected wallet, missing public X handle, missing wallet, account mismatch, and wrong-chain states.
 - Browser screenshots for connected and disconnected compose states.
-- Security review for identity spoofing and wallet-source trust boundaries.
+- Security review for public X-label spoofing, wallet control, and wallet-source trust boundaries.
 
 Milestone 2 is not complete until invalid identity states cannot publish.
 
@@ -75,6 +75,8 @@ Atomic tasks:
 - Support thesis-proof, forecast-receipt, and agent-verification usage references.
 - Transfer approved `$EVA` atomically to the irrecoverable `0xdead` sink and emit a receipt.
 - Add exact-amount approval and use/burn controls to `/eva`.
+- Require exact wallet/action/resource-bound receipts for public thesis and revision release.
+- Add direct-allowance quote and paid proof-bundle tools for agents without Permit2.
 - Disclose that circulating supply falls while legacy `totalSupply()` remains unchanged.
 - State that demand and supply pressure do not guarantee price appreciation.
 
@@ -85,6 +87,7 @@ Checks and regressions:
 - Live Avalanche deployment receipt, immutable token/sink getters, and runtime code hash.
 - Backend/frontend manifest parity and deployment-smoke validation.
 - Desktop/mobile E2E for disconnected and connected burn states.
+- Security tests for wrong wallet, action, amount, reference, burner, sink, and replayed resource.
 
 Milestone 2C is not complete until the onchain receipt, chain readback, UI copy, and manifests agree.
 

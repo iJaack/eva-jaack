@@ -53,7 +53,7 @@ const proofLayers = [
   },
   {
     label: "author proof",
-    body: "X identity plus wallet identity gives every thesis a record that can survive outside one social feed or screenshot thread.",
+    body: "A public X author label plus a self-custodial wallet trail gives every thesis a record that can survive outside one social feed or screenshot thread.",
   },
   {
     label: "anchor proof",

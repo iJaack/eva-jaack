@@ -1,25 +1,29 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { stubEvaRpc } from "./eva-rpc";
+import { seedSelfCustodyWallet } from "./self-custody-wallet";
 
-const embeddedWalletAddress = "0x0fe61780bd5508b3C99e420662050e5560608cA4";
 const externalWalletAddress = "0x1111111111111111111111111111111111111111";
 
-type DynamicTestContext = { primaryWallet: unknown; user: unknown };
-
-const embeddedDynamicContext: DynamicTestContext = {
-  primaryWallet: { address: embeddedWalletAddress, connector: { key: "dynamic-embedded-wallet" } },
-  user: {
-    userId: "dyn-spacethesis",
-    verifiedCredentials: [
-      { oauthProvider: "twitter", username: "spacethesis" },
-      { address: embeddedWalletAddress, walletProvider: "dynamic embedded wallet" },
-    ],
-  },
-};
-
-async function seedDynamicContext(page: Page, context: DynamicTestContext = embeddedDynamicContext) {
-  await page.addInitScript((dynamicContext) => {
-    (window as Window & { __evaDynamicContext?: unknown }).__evaDynamicContext = dynamicContext;
-  }, context);
+function evaUsageQuote(resourceId: string, account = externalWalletAddress) {
+  return {
+    quoteVersion: "eva-usage-v1",
+    quoteId: `0x${"9".repeat(64)}`,
+    action: "publish_thesis",
+    label: "Publish a proof-backed thesis",
+    chainId: 43_114,
+    account,
+    token: "0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672",
+    burner: "0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296",
+    burnSink: "0x000000000000000000000000000000000000dEaD",
+    usageKind: 0,
+    resourceId,
+    referenceHash: `0x${"8".repeat(64)}`,
+    amountWei: "100000000000000000000000",
+    approvalTransaction: { to: "0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672", data: "0x095ea7b3", description: "Approve EVA" },
+    retirementTransaction: { to: "0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296", data: "0x1234", description: "Use EVA" },
+    paymentBoundary: "wallet_approval_and_broadcast_required",
+    permit2: false,
+  };
 }
 
 const marketsPayload = {
@@ -47,7 +51,7 @@ const marketsPayload = {
   ],
 };
 
-test("compose hides the preview identity and editor until Dynamic identity is ready", async ({ page }) => {
+test("compose hides the editor until a self-custodial wallet and public handle are ready", async ({ page }) => {
   await page.route("**/api/markets", async (route) => {
     await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(marketsPayload) });
   });
@@ -55,14 +59,14 @@ test("compose hides the preview identity and editor until Dynamic identity is re
   await page.goto("/compose");
 
   await expect(page.getByTestId("compose-auth-gate")).toBeVisible();
-  await expect(page.getByTestId("compose-auth-gate")).toContainText(/Connect with Dynamic before/);
+  await expect(page.getByTestId("compose-auth-gate")).toContainText(/Connect your own self-custodial EVM wallet/);
   await expect(page.getByText("@spacethesis")).toHaveCount(0);
-  await expect(page.getByText("embedded wallet")).toHaveCount(0);
+  await expect(page.getByText(/embedded wallet/i)).toHaveCount(0);
   await expect(page.getByLabel("Thesis title")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Publish anchored thesis" })).toHaveCount(0);
 });
 
-test("Dynamic auth consumers hydrate inside their provider boundary", async ({ page }) => {
+test("self-custodial wallet consumers hydrate inside their provider boundary", async ({ page }) => {
   const pageErrors: string[] = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
@@ -73,14 +77,14 @@ test("Dynamic auth consumers hydrate inside their provider boundary", async ({ p
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Public predictions need proof." })).toBeVisible();
   if ((page.viewportSize()?.width ?? 0) > 920) {
-    await expect(page.getByRole("button", { name: "Connect Dynamic test" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Connect wallet" })).toBeVisible();
   } else {
-    await expect(page.getByRole("button", { name: "Connect Dynamic test" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Connect wallet" })).toHaveCount(0);
   }
 
   await page.goto("/compose");
   await expect(page.getByTestId("compose-auth-gate")).toBeVisible();
-  await expect(page.getByTestId("compose-auth-gate").getByRole("button", { name: "Connect Dynamic test" })).toBeVisible();
+  await expect(page.getByTestId("compose-auth-gate").getByRole("button", { name: "Connect wallet" })).toBeVisible();
   expect(pageErrors).toEqual([]);
 });
 
@@ -89,7 +93,8 @@ test("compose page guides required thesis inputs before enabling publish", async
   let publishedAnchorPreparationId = "";
   const preparedPayloads: Array<Record<string, unknown>> = [];
 
-  await seedDynamicContext(page);
+  await seedSelfCustodyWallet(page);
+  await stubEvaRpc(page);
 
   await page.route("**/api/markets", async (route) => {
     await route.fulfill({
@@ -116,11 +121,11 @@ test("compose page guides required thesis inputs before enabling publish", async
           title: "Fed hold liquidity thesis",
           body: payload.body,
           author: {
-            dynamicUserId: "local-dynamic-preview",
+            dynamicUserId: `wallet:${externalWalletAddress}`,
             xHandle: "@spacethesis",
-            xProfileId: "local-x-preview",
-            walletAddress: "0x0fe61780bd5508b3C99e420662050e5560608cA4",
-            walletSource: "embedded",
+            xProfileId: "x:spacethesis",
+            walletAddress: externalWalletAddress,
+            walletSource: "external",
           },
           currentRevision: {
             revisionId: "rev-fed-hold-1",
@@ -188,6 +193,7 @@ test("compose page guides required thesis inputs before enabling publish", async
         thesisId: "thesis-fed-hold",
         anchorStatus: "prepared",
         transactions: [],
+        evaUsageQuote: evaUsageQuote("draft-anchor-compose-1"),
       }),
     });
   });
@@ -197,7 +203,7 @@ test("compose page guides required thesis inputs before enabling publish", async
   const publishButton = page.getByRole("button", { name: "Publish anchored thesis" });
   await expect(page.getByRole("heading", { name: "Thesis body" })).toBeVisible();
   await expect(page.getByTestId("compose-identity-panel")).toContainText("Ready to publish");
-  await expect(page.getByTestId("compose-identity-panel")).toContainText("embedded");
+  await expect(page.getByTestId("compose-identity-panel")).toContainText("Self-custodial");
   await expect(publishButton).toBeDisabled();
   await page.getByLabel("Thesis title").fill("");
   await expect(publishButton).toBeDisabled();
@@ -224,8 +230,25 @@ test("compose page guides required thesis inputs before enabling publish", async
   await page.getByRole("button", { name: "Prepare anchor" }).click();
   expect(preparedPayloads).toHaveLength(1);
   expect(String(preparedPayloads[0].body)).toContain("[S1]");
+  await page.getByRole("button", { name: "Approve exactly 100000 EVA" }).click();
+  await expect.poll(() =>
+    page.evaluate(() => {
+      const transactions = (window as Window & { __evaSelfCustodyTransactions?: unknown[] }).__evaSelfCustodyTransactions;
+      return transactions?.length ?? 0;
+    }),
+  ).toBe(1);
+  const allowanceRequest = await page.evaluate(() => {
+    const transactions = (window as Window & { __evaSelfCustodyTransactions?: unknown[][] }).__evaSelfCustodyTransactions;
+    return transactions?.[0]?.[0] as { from?: string; to?: string; data?: string } | undefined;
+  });
+  expect(allowanceRequest).toMatchObject({
+    from: externalWalletAddress,
+    to: "0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672",
+  });
   await expect(publishButton).toBeDisabled();
   await page.getByLabel("Anchor transaction hash").fill("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  await expect(publishButton).toBeDisabled();
+  await page.getByLabel("EVA usage receipt transaction hash").fill(`0x${"d".repeat(64)}`);
   await expect(publishButton).toBeEnabled();
 
   await publishButton.click();
@@ -241,7 +264,7 @@ test("compose supports private structured block drafts with anchored signal cita
   const publishedPayloads: Array<Record<string, unknown>> = [];
   const preparedPayloads: Array<Record<string, unknown>> = [];
 
-  await seedDynamicContext(page);
+  await seedSelfCustodyWallet(page);
 
   await page.route("**/api/markets", async (route) => {
     await route.fulfill({
@@ -266,11 +289,11 @@ test("compose supports private structured block drafts with anchored signal cita
           title: payload.title,
           body: payload.body,
           author: {
-            dynamicUserId: "local-dynamic-preview",
+            dynamicUserId: `wallet:${externalWalletAddress}`,
             xHandle: "@spacethesis",
-            xProfileId: "local-x-preview",
-            walletAddress: "0x0fe61780bd5508b3C99e420662050e5560608cA4",
-            walletSource: "embedded",
+            xProfileId: "x:spacethesis",
+            walletAddress: externalWalletAddress,
+            walletSource: "external",
           },
           currentRevision: {
             revisionId: "rev-fed-hold-1",
@@ -338,6 +361,7 @@ test("compose supports private structured block drafts with anchored signal cita
         thesisId: "thesis-fed-hold",
         anchorStatus: "prepared",
         transactions: [],
+        evaUsageQuote: evaUsageQuote("draft-anchor-compose-2"),
       }),
     });
   });
@@ -383,10 +407,12 @@ test("compose supports private structured block drafts with anchored signal cita
   await page.getByRole("button", { name: "Prepare anchor" }).click();
   expect(preparedPayloads).toHaveLength(1);
   expect(String(preparedPayloads[0].body)).toContain("[S1]");
-  await expect(page.getByTestId("compose-draft-state")).toHaveText("Anchor prepared");
+  await expect(page.getByTestId("compose-draft-state")).toHaveText("Anchor and EVA quote prepared");
   await expect(publishButton).toBeDisabled();
   await expect(page.getByText("Confirm anchor transaction before publishing")).toBeVisible();
   await page.getByLabel("Anchor transaction hash").fill("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  await expect(page.getByText("Use EVA and confirm its receipt before publishing")).toBeVisible();
+  await page.getByLabel("EVA usage receipt transaction hash").fill(`0x${"d".repeat(64)}`);
   await expect(publishButton).toBeEnabled();
 
   await publishButton.click();
@@ -397,19 +423,10 @@ test("compose supports private structured block drafts with anchored signal cita
   await expect(page.getByRole("heading", { name: "Fed hold liquidity thesis" })).toBeVisible();
 });
 
-test("compose maps external Dynamic X and wallet identity into prepared anchor payloads", async ({ page }) => {
+test("compose maps the public X handle and connected self-custodial wallet into prepared anchor payloads", async ({ page }) => {
   const preparedPayloads: Array<Record<string, unknown>> = [];
 
-  await seedDynamicContext(page, {
-    primaryWallet: { address: externalWalletAddress, connector: { key: "metamask" } },
-    user: {
-      userId: "dyn-macrodesk",
-      verifiedCredentials: [
-        { oauthProvider: "twitter", username: "macrodesk" },
-        { address: externalWalletAddress, walletProvider: "metamask" },
-      ],
-    },
-  });
+  await seedSelfCustodyWallet(page, { address: externalWalletAddress, xHandle: "@macrodesk" });
 
   await page.route("**/api/markets", async (route) => {
     await route.fulfill({
@@ -429,6 +446,7 @@ test("compose maps external Dynamic X and wallet identity into prepared anchor p
         thesisId: "thesis-fed-hold",
         anchorStatus: "prepared",
         transactions: [],
+        evaUsageQuote: evaUsageQuote("draft-anchor-external-wallet", externalWalletAddress),
       }),
     });
   });
@@ -437,7 +455,7 @@ test("compose maps external Dynamic X and wallet identity into prepared anchor p
 
   await expect(page.getByTestId("compose-identity-panel")).toContainText("Ready to publish");
   await expect(page.getByTestId("compose-identity-panel")).toContainText("@macrodesk");
-  await expect(page.getByTestId("compose-identity-panel")).toContainText("external");
+  await expect(page.getByTestId("compose-identity-panel")).toContainText("Self-custodial");
 
   await page.getByLabel("Thesis title").fill("External wallet thesis");
   await page.getByLabel("Thesis block 1").fill("External wallet authorship should flow into anchor preparation.");
@@ -448,38 +466,25 @@ test("compose maps external Dynamic X and wallet identity into prepared anchor p
 
   expect(preparedPayloads).toHaveLength(1);
   expect(preparedPayloads[0]).toMatchObject({
-    dynamicUserId: "dyn-macrodesk",
+    dynamicUserId: `wallet:${externalWalletAddress}`,
     xHandle: "@macrodesk",
-    xProfileId: "dyn-macrodesk",
+    xProfileId: "x:macrodesk",
     walletAddress: externalWalletAddress,
     walletSource: "external",
   });
 });
 
-test("compose blocks Dynamic sessions without X or wallet identity", async ({ page }) => {
-  await seedDynamicContext(page, {
-    primaryWallet: { address: externalWalletAddress, connector: { key: "metamask" } },
-    user: { userId: "dyn-no-x", verifiedCredentials: [{ address: externalWalletAddress, walletProvider: "metamask" }] },
-  });
+test("compose blocks a connected wallet until a valid public X handle is supplied", async ({ page }) => {
+  await seedSelfCustodyWallet(page, { address: externalWalletAddress, xHandle: null });
 
   await page.route("**/api/markets", async (route) => {
     await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(marketsPayload) });
   });
 
   await page.goto("/compose");
-  await expect(page.getByTestId("compose-auth-gate")).toContainText("Connect an X account in Dynamic before publishing a thesis.");
+  await expect(page.getByTestId("compose-auth-gate")).toContainText("Add the public X handle");
   await expect(page.getByText("@spacethesis")).toHaveCount(0);
   await expect(page.getByLabel("Thesis title")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Prepare anchor" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Publish anchored thesis" })).toHaveCount(0);
-
-  await page.addInitScript(() => {
-    (window as Window & { __evaDynamicContext?: unknown }).__evaDynamicContext = {
-      primaryWallet: null,
-      user: { userId: "dyn-no-wallet", verifiedCredentials: [{ oauthProvider: "twitter", username: "spacethesis" }] },
-    };
-  });
-  await page.goto("/compose?case=missing-wallet");
-  await expect(page.getByTestId("compose-auth-gate")).toContainText("Connect or create an Ethereum wallet before publishing a thesis.");
-  await expect(page.getByLabel("Thesis title")).toHaveCount(0);
 });

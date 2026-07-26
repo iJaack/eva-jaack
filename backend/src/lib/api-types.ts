@@ -133,6 +133,16 @@ export interface ThesisTimelineEntryDto {
   scoreAfter: number;
 }
 
+export interface EvaUsageReceiptDto {
+  action: "publish_thesis" | "publish_revision";
+  txHash: `0x${string}`;
+  receiptId: `0x${string}`;
+  amountWei: string;
+  referenceHash: `0x${string}`;
+  confirmedAt: string;
+  blockNumber: string;
+}
+
 export interface ThesisDto {
   thesisId: string;
   title: string;
@@ -152,6 +162,7 @@ export interface ThesisDto {
   status: ThesisStatus;
   resolution: ThesisResolutionDto;
   timeline: ThesisTimelineEntryDto[];
+  evaUsageReceipts?: EvaUsageReceiptDto[];
   anchor: ThesisAnchorDto;
   createdAt: string;
   updatedAt: string;
@@ -208,9 +219,29 @@ export interface ThesisCreateResponse {
 }
 
 export interface PreparedProtocolTransactionDto {
-  to: string;
-  data: string;
+  to: `0x${string}`;
+  data: `0x${string}`;
   description: string;
+}
+
+export interface EvaUsageQuoteDto {
+  quoteVersion: string;
+  quoteId: `0x${string}`;
+  action: "publish_thesis" | "publish_revision" | "agent_proof_bundle";
+  label: string;
+  chainId: number;
+  account: `0x${string}`;
+  token: `0x${string}`;
+  burner: `0x${string}`;
+  burnSink: `0x${string}`;
+  usageKind: number;
+  resourceId: string;
+  referenceHash: `0x${string}`;
+  amountWei: string;
+  approvalTransaction: PreparedProtocolTransactionDto;
+  retirementTransaction: PreparedProtocolTransactionDto;
+  paymentBoundary: "wallet_approval_and_broadcast_required";
+  permit2: false;
 }
 
 export interface ThesisDraftAnchorPrepareResponse {
@@ -218,6 +249,7 @@ export interface ThesisDraftAnchorPrepareResponse {
   thesisId: string;
   anchorStatus: "prepared";
   transactions: PreparedProtocolTransactionDto[];
+  evaUsageQuote: EvaUsageQuoteDto;
 }
 
 export interface PredictorListResponse {

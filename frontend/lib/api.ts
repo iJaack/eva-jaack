@@ -1,6 +1,7 @@
 import { protocol, getApiBase } from "./protocol";
 import type {
   CopyThesisPreviewResponse,
+  EvaUsageQuoteDto,
   MarketDetailResponse,
   MarketListResponse,
   PredictionMarketDto,
@@ -21,6 +22,7 @@ export type PredictionSummary = PredictionNetworkSummaryResponse;
 export type PredictionMarketDetail = MarketDetailResponse;
 export type PredictionThesisDetail = ThesisDetailResponse;
 export type PredictionPredictorDetail = PredictorDetailResponse;
+export type EvaUsageQuote = EvaUsageQuoteDto;
 
 async function fetchJson<T>(input: string, init?: RequestInit): Promise<T> {
   const response = await fetch(input, init);
@@ -61,7 +63,7 @@ export type ThesisCreateRequest = {
   xHandle: string;
   xProfileId?: string;
   walletAddress: string;
-  walletSource: "external" | "embedded";
+  walletSource: "external";
   title: string;
   body: string;
   predictionSignals?: Array<{
@@ -95,6 +97,7 @@ export type ThesisCreateRequest = {
   counterToThesisId?: string;
   anchorPreparationId?: string;
   anchorTxHash?: string;
+  evaUsageTxHash?: string;
 };
 
 export async function createThesis(input: ThesisCreateRequest): Promise<ThesisCreateResponse> {
@@ -112,6 +115,7 @@ export async function prepareDraftThesisAnchor(input: Omit<ThesisCreateRequest, 
   thesisId: string;
   anchorStatus: "prepared";
   transactions: Array<{ to: string; data: string; description: string }>;
+  evaUsageQuote: EvaUsageQuote;
 }> {
   return fetchJson(`${getApiBase()}/thesis-drafts/protocol/prepare-anchor`, {
     method: "POST",
@@ -129,7 +133,7 @@ export async function recordThesisRevision(
     xHandle: string;
     xProfileId?: string | null;
     walletAddress: string;
-    walletSource: "external" | "embedded";
+    walletSource: "external";
     body: string;
     note?: string;
     signalUpdates?: Array<{
@@ -141,6 +145,7 @@ export async function recordThesisRevision(
     }>;
     anchorPreparationId?: string;
     anchorTxHash?: string;
+    evaUsageTxHash?: string;
   },
 ): Promise<ThesisDetailResponse> {
   return fetchJson<ThesisDetailResponse>(`${getApiBase()}/theses/${thesisId}/revisions`, {
@@ -159,7 +164,7 @@ export async function prepareThesisRevisionAnchor(
     xHandle: string;
     xProfileId?: string | null;
     walletAddress: string;
-    walletSource: "external" | "embedded";
+    walletSource: "external";
     body: string;
     note?: string;
     signalUpdates?: Array<{
@@ -175,12 +180,25 @@ export async function prepareThesisRevisionAnchor(
   thesisId: string;
   anchorStatus: "prepared";
   transactions: Array<{ to: string; data: string; description: string }>;
+  evaUsageQuote: EvaUsageQuote;
 }> {
   return fetchJson(`${getApiBase()}/theses/${thesisId}/revision-drafts/protocol/prepare-anchor`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function getEvaUsageQuote(input: {
+  action: EvaUsageQuote["action"];
+  account: string;
+  resourceId: string;
+}): Promise<EvaUsageQuote> {
+  return fetchJson<EvaUsageQuote>(`${getApiBase()}/eva/usage/quote`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
   });
 }

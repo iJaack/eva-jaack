@@ -8,6 +8,7 @@ import { config } from "../config.js";
 import type {
   ClaimVerdict,
   CopyThesisPreviewResponse,
+  EvaUsageReceiptDto,
   MarketDetailResponse,
   MarketListResponse,
   PredictionMarketDto,
@@ -444,7 +445,7 @@ function confirmedAnchor(txHash: `0x${string}`, confirmedAt: string): ThesisAnch
 
 function normalizeHandle(handle: string): string {
   const trimmed = handle.trim();
-  if (!trimmed) throw new Error("Connected X identity and wallet are required");
+  if (!trimmed) throw new Error("Public X handle and connected wallet are required");
   return trimmed.startsWith("@") ? trimmed : `@${trimmed}`;
 }
 
@@ -452,7 +453,10 @@ function normalizeIdentity(identity: ThesisIdentityInput): ThesisAuthorDto {
   const wallet = identity.walletAddress?.trim();
   const source = identity.walletSource ?? null;
   if (!identity.dynamicUserId?.trim() || !identity.xHandle?.trim() || !wallet || !source || !wallet.match(/^0x[0-9a-fA-F]{40}$/)) {
-    throw new Error("Connected X identity and wallet are required");
+    throw new Error("Public X handle and connected wallet are required");
+  }
+  if (source !== "external") {
+    throw new Error("A self-custodial external wallet is required");
   }
   return {
     dynamicUserId: identity.dynamicUserId.trim(),
@@ -484,7 +488,7 @@ function assertSameAuthorIdentity(expected: ThesisAuthorDto, actual: ThesisAutho
 }
 
 function assertNoAuthorIdentityConflict(theses: ThesisDto[], author: ThesisAuthorDto): void {
-  const incomingDynamicUserId = author.dynamicUserId.toLowerCase();
+  const incomingAuthorUserId = author.dynamicUserId.toLowerCase();
   const incomingHandle = author.xHandle.toLowerCase();
   const incomingProfileId = author.xProfileId?.toLowerCase() ?? null;
   const incomingWallet = author.walletAddress.toLowerCase();
@@ -494,7 +498,7 @@ function assertNoAuthorIdentityConflict(theses: ThesisDto[], author: ThesisAutho
     if (sameAuthorIdentity(existing, author)) return false;
 
     return (
-      existing.dynamicUserId.toLowerCase() === incomingDynamicUserId ||
+      existing.dynamicUserId.toLowerCase() === incomingAuthorUserId ||
       existing.xHandle.toLowerCase() === incomingHandle ||
       (!!incomingProfileId && existing.xProfileId?.toLowerCase() === incomingProfileId) ||
       existing.walletAddress.toLowerCase() === incomingWallet
@@ -788,7 +792,7 @@ function seedSpaceXThesis(markets: PredictionMarketDto[]): ThesisDto {
     xHandle: "@spacethesis",
     xProfileId: "spaceX-ipo-liquidity",
     walletAddress: "0x0fe61780bd5508b3C99e420662050e5560608cA4",
-    walletSource: "embedded",
+    walletSource: "external",
   };
   const thesisId = `thesis-${stableHash({ title: title.toLowerCase(), author: author.xHandle.toLowerCase(), body })}`;
   const signals: ThesisSignalDto[] = [
@@ -1408,7 +1412,15 @@ export class LocalPredictionLayerService {
     };
   }
 
-  async recordRevision(thesisId: string, input: ThesisRevisionInput): Promise<ThesisDetailResponse | null> {
+  async recordRevision(
+    thesisId: string,
+    input: ThesisRevisionInput,
+    confirmation?: {
+      txHash: `0x${string}`;
+      confirmedAt: string;
+      usageReceipt: EvaUsageReceiptDto;
+    },
+  ): Promise<ThesisDetailResponse | null> {
     const actor = normalizeIdentity(input.identity);
     const store = await this.readStore();
     const thesis = store.theses.find((entry) => entry.thesisId === thesisId || entry.slug === thesisId);
@@ -1422,7 +1434,10 @@ export class LocalPredictionLayerService {
     if (!bodyChanged && !signalsChanged) {
       throw new Error(noOpRevisionError);
     }
-    const revision = revisionFor(thesis.revisions.length + 1, body, input.note?.trim() || null, signals, scoreBefore, now);
+    const preparedRevision = revisionFor(thesis.revisions.length + 1, body, input.note?.trim() || null, signals, scoreBefore, now);
+    const revision = confirmation
+      ? { ...preparedRevision, anchor: confirmedAnchor(confirmation.txHash, confirmation.confirmedAt) }
+      : preparedRevision;
     thesis.body = body;
     thesis.signals = signals;
     thesis.currentRevision = revision;
@@ -1437,11 +1452,35 @@ export class LocalPredictionLayerService {
       scoreBefore,
       scoreAfter: thesis.currentScore,
     });
+    if (confirmation) {
+      thesis.updatedAt = confirmation.confirmedAt;
+      thesis.timeline.push({
+        timelineId: `tl-${stableHash({
+          thesisId,
+          revisionId: revision.revisionId,
+          txHash: confirmation.txHash,
+          action: "revision-anchor-confirmed",
+        })}`,
+        action: "anchored",
+        at: confirmation.confirmedAt,
+        note: `Revision v${revision.version} anchor transaction confirmed.`,
+        scoreBefore: null,
+        scoreAfter: thesis.currentScore,
+      });
+      if (!(thesis.evaUsageReceipts ?? []).some((receipt) => receipt.receiptId === confirmation.usageReceipt.receiptId)) {
+        thesis.evaUsageReceipts = [...(thesis.evaUsageReceipts ?? []), confirmation.usageReceipt];
+      }
+    }
     await this.writeStore(store);
     return this.getThesis(thesis.thesisId);
   }
 
-  async markThesisAnchorConfirmed(thesisId: string, txHash: `0x${string}`, confirmedAt: string): Promise<ThesisDetailResponse | null> {
+  async markThesisAnchorConfirmed(
+    thesisId: string,
+    txHash: `0x${string}`,
+    confirmedAt: string,
+    usageReceipt?: EvaUsageReceiptDto,
+  ): Promise<ThesisDetailResponse | null> {
     const store = await this.readStore();
     const thesis = store.theses.find((entry) => entry.thesisId === thesisId || entry.slug === thesisId);
     if (!thesis) return null;
@@ -1459,12 +1498,20 @@ export class LocalPredictionLayerService {
       scoreBefore: null,
       scoreAfter: thesis.currentScore,
     });
+    if (usageReceipt && !(thesis.evaUsageReceipts ?? []).some((receipt) => receipt.receiptId === usageReceipt.receiptId)) {
+      thesis.evaUsageReceipts = [...(thesis.evaUsageReceipts ?? []), usageReceipt];
+    }
 
     await this.writeStore(store);
     return this.getThesis(thesis.thesisId);
   }
 
-  async markCurrentRevisionAnchorConfirmed(thesisId: string, txHash: `0x${string}`, confirmedAt: string): Promise<ThesisDetailResponse | null> {
+  async markCurrentRevisionAnchorConfirmed(
+    thesisId: string,
+    txHash: `0x${string}`,
+    confirmedAt: string,
+    usageReceipt?: EvaUsageReceiptDto,
+  ): Promise<ThesisDetailResponse | null> {
     const store = await this.readStore();
     const thesis = store.theses.find((entry) => entry.thesisId === thesisId || entry.slug === thesisId);
     if (!thesis) return null;
@@ -1481,6 +1528,9 @@ export class LocalPredictionLayerService {
       scoreBefore: null,
       scoreAfter: thesis.currentScore,
     });
+    if (usageReceipt && !(thesis.evaUsageReceipts ?? []).some((receipt) => receipt.receiptId === usageReceipt.receiptId)) {
+      thesis.evaUsageReceipts = [...(thesis.evaUsageReceipts ?? []), usageReceipt];
+    }
 
     await this.writeStore(store);
     return this.getThesis(thesis.thesisId);

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import DynamicAuthControl from "./DynamicAuthControl";
+import SelfCustodyWalletControl from "./SelfCustodyWalletControl";
 
 const navItems = [
   { href: "/markets", label: "Markets" },
@@ -60,7 +60,7 @@ export default function Nav() {
         </nav>
 
         <div className="topbar-actions">
-          <DynamicAuthControl />
+          <SelfCustodyWalletControl compact />
           <Link href="/compose" className="nav-edge-cta">
             Start thesis
           </Link>

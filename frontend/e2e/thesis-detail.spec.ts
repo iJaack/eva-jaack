@@ -9,6 +9,28 @@ const author = {
   walletSource: "external",
 } as const;
 
+function revisionEvaUsageQuote(resourceId: string) {
+  return {
+    quoteVersion: "eva-usage-v1",
+    quoteId: `0x${"9".repeat(64)}`,
+    action: "publish_revision",
+    label: "Publish a thesis revision",
+    chainId: 43_114,
+    account: author.walletAddress,
+    token: "0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672",
+    burner: "0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296",
+    burnSink: "0x000000000000000000000000000000000000dEaD",
+    usageKind: 0,
+    resourceId,
+    referenceHash: `0x${"8".repeat(64)}`,
+    amountWei: "25000000000000000000000",
+    approvalTransaction: { to: "0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672", data: "0x095ea7b3", description: "Approve EVA" },
+    retirementTransaction: { to: "0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296", data: "0x1234", description: "Use EVA" },
+    paymentBoundary: "wallet_approval_and_broadcast_required",
+    permit2: false,
+  };
+}
+
 const predictionSignal: ThesisPredictionSignalDto = {
   signalId: "sig-fed-hold",
   kind: "prediction_market",
@@ -335,6 +357,7 @@ test("publishing an update appends it to the thesis and creates the next revisio
         thesisId: "thesis-fed-hold",
         anchorStatus: "prepared",
         transactions: [{ to: "0x1111111111111111111111111111111111111111", data: "0x1234", description: "Record revision v2 for Fed hold liquidity thesis" }],
+        evaUsageQuote: revisionEvaUsageQuote("revision-anchor-detail-1"),
       }),
     });
   });
@@ -351,9 +374,11 @@ test("publishing an update appends it to the thesis and creates the next revisio
   await page.getByLabel("S1 resolved outcome").fill("Hold");
   await expect(publishButton).toBeDisabled();
   await page.getByRole("button", { name: "Prepare update anchor" }).click();
-  await expect(page.getByRole("status")).toContainText("1 update anchor transaction prepared.");
+  await expect(page.getByRole("status")).toContainText("1 update anchor transaction and EVA quote prepared.");
   await expect(publishButton).toBeDisabled();
   await page.getByLabel("Update anchor transaction hash").fill("0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+  await expect(publishButton).toBeDisabled();
+  await page.getByLabel("EVA usage receipt transaction hash").fill(`0x${"d".repeat(64)}`);
   await expect(publishButton).toBeEnabled();
   await publishButton.click();
 
@@ -371,6 +396,7 @@ test("publishing an update appends it to the thesis and creates the next revisio
     note: "CPI update moved signal.",
     anchorPreparationId: "revision-anchor-detail-1",
     anchorTxHash: "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    evaUsageTxHash: `0x${"d".repeat(64)}`,
     signalUpdates: [{ signalId: "sig-fed-hold", currentOdds: 0.74, weight: 80, status: "resolved", resolvedOutcomeLabel: "Hold" }],
   });
   expect(String(revisionPayloads[0].body)).toContain("Inflation prints are not soft enough");

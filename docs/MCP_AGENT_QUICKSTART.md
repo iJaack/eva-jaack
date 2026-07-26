@@ -10,7 +10,7 @@ Eva MCP is draft-and-anchor-prep only.
 
 README API surface is not an agent permission map. If an agent starts from the repo README or an API
 route list, it must come back to this quickstart and the live tool matrix before composing payloads.
-Use only the five live MCP tools here unless a separate approved execution path is explicitly named
+Use only the seven live MCP tools here unless a separate approved execution path is explicitly named
 and evidenced.
 
 The broader app has HTTP routes for thesis creation and anchor preparation, but those are not agent-default publish powers. Do not call `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or production write endpoints as a workaround for MCP limits. Direct REST writes require a separate approved path, scoped credentials, and receipt/readback evidence before any stronger claim.
@@ -49,8 +49,8 @@ Use this before a new MCP client, agent, or runtime runs any write-adjacent rehe
 ```text
 read-only MCP smoke:
 - local stdio server: `eva-thesis` starts from the repo root with `pnpm --filter backend mcp`
-- optional HTTP discovery smoke: `GET /api/mcp` returns the same five tool names, `toolDescriptions`, and an `agentSafeBoundary` with `defaultWriteScope: "draft_and_anchor_prep_only"`, `mcpOutputCeiling: "anchor_prepared"`, `storageClaimDefault: "storage_not_assessed"`, `safeResultVerbs`, and `notEvidenceForStrongerClaims`
-- tool list smoke: exactly `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, `prepare_anchor_transaction`
+- optional HTTP discovery smoke: `GET /api/mcp` returns the same seven tool names, `toolDescriptions`, and an `agentSafeBoundary` with `defaultWriteScope: "draft_and_anchor_prep_only"`, `mcpOutputCeiling: "anchor_prepared"`, `storageClaimDefault: "storage_not_assessed"`, `safeResultVerbs`, and `notEvidenceForStrongerClaims`
+- tool list smoke: exactly `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, `prepare_anchor_transaction`, `prepare_eva_proof_quote`, `get_paid_thesis_proof_bundle`
 - description boundary smoke: write-adjacent tool descriptions say they do not publish, broadcast, call direct REST writes, or prove storage durability
 - read-only call smoke: run `search_markets` with a low-risk query and report only `read-only` / `found candidates`
 - write-adjacent rehearsal: blocked until there is explicit onboarding or task-time approval for exact `xHandle`, `walletAddress`, and `walletSource`, and it must use the local server unless a separate approved remote path exists
@@ -59,6 +59,14 @@ read-only MCP smoke:
 Discovery JSON is a downgrade card, not a permission upgrade. If all an agent has is a route URL, bearer token, browser session, green deploy, issue/PR status, `anchorPreparationId`, or prepared calldata, keep the output on the MCP rung named by `mcpOutputCeiling` and `safeResultVerbs`. `requiredForSubmitted` and `requiredForPublishedLive` must be satisfied before saying submitted, published/live, confirmed, or storage verified.
 
 Do not use `create_thesis_draft`, `prepare_revision_draft`, or `prepare_anchor_transaction` as a generic connectivity smoke test. If the HTTP discovery metadata or MCP tool list differs, descriptions omit the boundary, the local server fails, or the only available path is remote/production, report `blocked: client setup failure` or `blocked: live allowlist drift` and do not fall back to `POST /api/theses`, `POST /api/thesis-anchor/prepare`, UI scraping, or production write routes.
+
+## Consume EVA For An Agent Proof Bundle
+
+Call `prepare_eva_proof_quote` with the exact `thesisId` and the agent/operator-owned
+self-custodial `walletAddress`. That external wallet—not Eva—signs a standard exact ERC-20 approval
+and `retireForUsage`. Pass the confirmed transaction hash
+to `get_paid_thesis_proof_bundle`. It releases only when the burner event matches the wallet, action,
+amount, reference, and dead-address sink. Permit2 is not used.
 
 ## No-Guesswork Preflight
 
@@ -145,7 +153,7 @@ Identity fields are authority-bearing. Copy them from task-time approval or fres
 |---|---|---|
 | `xHandle` | explicit task-time handle, or matching live thesis author handle for revisions | display name, bio text, old issue comment, or guessed handle |
 | `walletAddress` | exact approved `0x...` EVM address, or matching live thesis author wallet for revisions | ENS/name, shortened address, remembered Eva wallet, deployer wallet, private key, seed phrase, or "same as last time" |
-| `walletSource` | explicit `external` / `embedded` approval when the tool accepts it | schema default, wallet UI label, or inferred custody model |
+| `walletSource` | explicit approval for the exact self-custodial `external` signer when the tool accepts it | embedded wallet, schema default, wallet UI label, or inferred authority |
 | `thesisId` | exact id from the task or `get_thesis`/approved readback | title, slug guess, screenshot text, `anchorPreparationId`, or stale metadata |
 
 Safe repair is narrow: trim surrounding whitespace and preserve address casing as supplied. The live schema now rejects malformed `walletAddress` values; pass only a full `0x`-prefixed 40-hex-character EVM address. Do not resolve ENS, expand shortened addresses, choose between two wallets, or swap in Eva's wallet to make the payload pass. If the exact identity is missing or mismatched, return `blocked: exact identity input missing` and do not prepare calldata.

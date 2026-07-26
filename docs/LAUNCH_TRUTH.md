@@ -29,8 +29,10 @@ Eva can claim:
 - the canonical thesis proxy runs protocol version 2 and preserves its thesis state
 - the app has MCP/agent-facing thesis tools
 - the app reads `$EVA` contract metadata and holder balances from Avalanche
-- `$EVA` holder state is visible author context, not a publishing gate or credibility score
-- holders can opt into a named platform use that retires approved `$EVA` to `0xdead` and emits a receipt
+- `$EVA` balance is author context, never a credibility score or balance-threshold access rule
+- public theses and revisions require exact action-bound `$EVA` retirement receipts
+- agents can unlock a formatted proof bundle after an exact agent-verification receipt
+- usage uses canonical ERC-20 allowance directly to `EvaUsageBurner`, not Permit2
 - usage burns can create demand and circulating-supply pressure
 
 Eva should not claim:
@@ -41,7 +43,7 @@ Eva should not claim:
 - curator onboarding
 - article verification
 - claim staking or settlement
-- `$EVA` staking, gating, yield, governance, or trade execution
+- `$EVA` staking, balance-based access, yield, governance, or trade execution
 - a reduced `$EVA totalSupply()` value from usage burns; the legacy total remains unchanged
 - guaranteed `$EVA` demand, liquidity, valuation, or price appreciation
 - x402 payment enforcement
@@ -50,9 +52,9 @@ Eva should not claim:
 ## Launch Checks
 
 - Home, markets, compose, thesis detail, predictors, and health routes load.
-- `/compose` requires Dynamic identity before the mutable editor renders. If Dynamic is not configured, the route must show a read-only auth/configuration gate, not the seeded preview author, wallet, ready-to-publish state, source selector, or draft editor.
-- `/api/runtime-readiness` must report `authoring.ready=true` and `authoring.composeGate="user_connect"` before launch authoring is considered ready; it must not leak the Dynamic environment ID.
-- Final launch-authoring smoke must run with `SMOKE_REQUIRE_DYNAMIC_AUTH=true`; that mode fails while `/api/runtime-readiness` reports missing Dynamic configuration or a non-`user_connect` authoring gate, and passes only once production serves the Dynamic user-connect gate.
+- `/compose` requires an externally connected self-custodial EVM wallet and a valid public X handle before the mutable editor renders. It must never expose an embedded-wallet or server-signer fallback.
+- `/api/runtime-readiness` must report `walletConnection.mode="self_custody"`, `embeddedWallets=false`, `serverCanSign=false`, and `authoring.composeGate="self_custody_wallet"`.
+- Final launch-authoring smoke must run with `SMOKE_REQUIRE_SELF_CUSTODY_WALLET=true`; that mode fails if runtime readiness exposes an embedded/server wallet path or a non-self-custodial compose gate.
 - `/verify`, `/claims`, `/curators`, `/blog`, and `/whitepaper` are absent.
 - SpaceX thesis page shows market signals, fact signals, revision history, and anchor status.
 - Agent manifest and MCP endpoint respond.

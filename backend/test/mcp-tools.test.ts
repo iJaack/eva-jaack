@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { createEvaMcpToolHandlers } from "../src/mcp-tools.js";
+import type { EvaUsageVerifier } from "../src/services/eva-usage.js";
 import { LocalPredictionLayerService } from "../src/services/prediction-layer.js";
 
 const cleanupDirs: string[] = [];
@@ -12,11 +13,11 @@ afterEach(async () => {
   await Promise.all(cleanupDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })));
 });
 
-async function makeService() {
+async function makeService(usageVerifier?: EvaUsageVerifier) {
   const dir = await mkdtemp(join(tmpdir(), "eva-mcp-tools-"));
   cleanupDirs.push(dir);
   const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => [], async () => []);
-  return { service, handlers: createEvaMcpToolHandlers(service) };
+  return { service, handlers: createEvaMcpToolHandlers(service, usageVerifier) };
 }
 
 function parseToolJson(result: { content: Array<{ type: "text"; text: string }> }) {
@@ -144,5 +145,97 @@ describe("Eva MCP tool handlers", () => {
       nextStep: expect.stringContaining("approve and confirm"),
     });
     expect(body).toHaveProperty("anchorPreparationId");
+  });
+
+  it("releases an agent proof bundle only after exact EVA receipt verification", async () => {
+    const usageVerifier: EvaUsageVerifier = {
+      async verifyUsage({ txHash, quote }) {
+        if (txHash !== `0x${"d".repeat(64)}` || quote.action !== "agent_proof_bundle" || quote.permit2) {
+          return { ok: false, error: "EVA usage receipt does not match this quote" };
+        }
+        return {
+          ok: true,
+          receiptId: `0x${"e".repeat(64)}`,
+          confirmedAt: "2026-07-26T18:00:00.000Z",
+          blockNumber: "90000000",
+        };
+      },
+    };
+    const { service, handlers } = await makeService(usageVerifier);
+    const created = await service.createThesis({
+      identity: {
+        dynamicUserId: "seed:@agentalpha",
+        xHandle: "@agentalpha",
+        xProfileId: null,
+        walletAddress,
+        walletSource: "external",
+      },
+      title: "Paid proof bundle seed",
+      body: "Initial thesis body.",
+      predictionSignals: [{
+        marketUrl: "https://example.com/market/paid-proof",
+        selectedOutcomeLabel: "Yes",
+        oddsAtAdd: 0.3,
+        currentOdds: 0.3,
+        weight: 100,
+      }],
+    });
+
+    const quoteResult = await handlers.prepareEvaProofQuote({
+      thesisId: created.thesis.thesisId,
+      walletAddress,
+    });
+    expect(parseToolJson(quoteResult)).toMatchObject({
+      action: "agent_proof_bundle",
+      amountWei: "10000000000000000000000",
+      permit2: false,
+    });
+
+    const released = await handlers.getPaidThesisProofBundle({
+      thesisId: created.thesis.thesisId,
+      walletAddress,
+      evaUsageTxHash: `0x${"d".repeat(64)}`,
+    });
+    expect(parseToolJson(released)).toMatchObject({
+      releaseState: "paid_proof_bundle_released",
+      payment: {
+        txHash: `0x${"d".repeat(64)}`,
+        permit2: false,
+      },
+      proofBundle: {
+        thesisId: created.thesis.thesisId,
+        title: "Paid proof bundle seed",
+        sources: ["https://example.com/market/paid-proof"],
+      },
+    });
+  });
+
+  it("does not release an agent proof bundle for a non-matching receipt", async () => {
+    const usageVerifier: EvaUsageVerifier = {
+      async verifyUsage() {
+        return { ok: false, error: "EVA usage receipt does not match this wallet, action, amount, and resource" };
+      },
+    };
+    const { service, handlers } = await makeService(usageVerifier);
+    const created = await service.createThesis({
+      identity: {
+        dynamicUserId: "seed:@agentalpha",
+        xHandle: "@agentalpha",
+        xProfileId: null,
+        walletAddress,
+        walletSource: "external",
+      },
+      title: "Rejected proof bundle seed",
+      body: "Initial thesis body.",
+      predictionSignals: [{ selectedOutcomeLabel: "Yes", oddsAtAdd: 0.3, currentOdds: 0.3, weight: 100 }],
+    });
+
+    const rejected = await handlers.getPaidThesisProofBundle({
+      thesisId: created.thesis.thesisId,
+      walletAddress,
+      evaUsageTxHash: `0x${"c".repeat(64)}`,
+    });
+    expect(rejected.isError).toBe(true);
+    expect(rejected.content[0]!.text).toMatch(/does not match/);
   });
 });

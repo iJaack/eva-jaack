@@ -47,7 +47,7 @@ export default function PredictorDetailClient() {
             title={detail.predictor.handle}
             description={
               detail.predictor.profileState === "registered"
-                ? "This author is linked to an X identity and wallet. Published thesis activity and resolved accuracy remain separate."
+                ? "This author has a public X label and wallet trail. Published thesis activity and resolved accuracy remain separate."
                 : "This public record can be linked later by connecting X and a wallet. Published thesis activity and resolved accuracy remain separate."
             }
           />

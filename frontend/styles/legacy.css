@@ -180,7 +180,7 @@ button {
   gap: var(--space-xs);
 }
 
-.dynamic-auth-control {
+.self-custody-wallet-control {
   min-height: 44px;
   display: inline-flex;
   align-items: center;

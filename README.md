@@ -44,6 +44,7 @@ gate or credibility score, and usage does not guarantee market-price appreciatio
 - `POST /api/x/ingest`
 - `POST /api/copy-preview`
 - `POST /api/thesis-anchor/prepare`
+- `POST /api/eva/usage/quote`
 - `GET /api/mcp`
 - `GET /.well-known/agent.json`
 - `GET /health`
@@ -51,9 +52,9 @@ gate or credibility score, and usage does not guarantee market-price appreciatio
 ## Agent MCP Boundary
 
 README API surface is not an agent permission map. Agents that need to create or revise theses
-should start with `docs/MCP_AGENT_QUICKSTART.md`, then use only the five live MCP tools documented
-there: `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, and
-`prepare_anchor_transaction`.
+should start with `docs/MCP_AGENT_QUICKSTART.md`, then use only the seven live MCP tools documented
+there: `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`,
+`prepare_anchor_transaction`, `prepare_eva_proof_quote`, and `get_paid_thesis_proof_bundle`.
 
 `POST /api/theses`, `POST /api/thesis-anchor/prepare`, and other production write routes are
 app/runtime surfaces, not default agent publish powers. Agent-safe MCP work stops at draft/revision
@@ -94,13 +95,14 @@ pnpm confirm:deployer -- --deployer 0x0fe61780bd5508b3C99e420662050e5560608cA4
 
 It only compares wallet identity against `protocol.config.json`; it does not load keys, sign, deploy, call Eva APIs, or broadcast transactions.
 
-For final launch-authoring smoke, require Dynamic auth to be configured on `/compose`:
+For final launch-authoring smoke, require the self-custodial wallet boundary on `/compose`:
 
 ```bash
-SMOKE_BASE_URL=https://eva.jaack.me SMOKE_REQUIRE_DYNAMIC_AUTH=true pnpm smoke:deploy
+SMOKE_BASE_URL=https://eva.jaack.me SMOKE_REQUIRE_SELF_CUSTODY_WALLET=true pnpm smoke:deploy
 ```
 
-That strict mode fails if production is still serving the Dynamic configuration gate instead of the user-connect gate.
+That strict mode fails if production can create an embedded wallet, sign server-side, or serves any
+compose gate other than the external self-custodial wallet connection.
 
 ## Docs
 

@@ -21,7 +21,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Use `docs/MCP_AGENT_EXAMPLES.md` for known-good payload shapes before improvising schema fields.
 - Use `docs/MCP_AGENT_DECISION_CARDS.md` when a prompt mixes drafting, revision, patch/append requests, anchoring, verification/scoring, publishing, storage readiness, API routes, credentials, or platform coordination status.
 - Use `docs/AGENT_SAFE_OUTPUTS.md` before summarizing MCP write results to a user.
-- For new clients/runtimes, run the read-only MCP smoke first: local stdio server from the repo root, optional `GET /api/mcp` discovery boundary check (`toolDescriptions` plus `agentSafeBoundary.defaultWriteScope: "draft_and_anchor_prep_only"`, `mcpOutputCeiling: "anchor_prepared"`, `storageClaimDefault: "storage_not_assessed"`, `safeResultVerbs`, and `notEvidenceForStrongerClaims`), exact five-tool allowlist, discovery description boundary, and a read-only `search_markets` call. Do not use write-adjacent tools as connectivity smoke.
+- For new clients/runtimes, run the read-only MCP smoke first: local stdio server from the repo root, optional `GET /api/mcp` discovery boundary check (`toolDescriptions` plus `agentSafeBoundary.defaultWriteScope: "draft_and_anchor_prep_only"`, `mcpOutputCeiling: "anchor_prepared"`, `storageClaimDefault: "storage_not_assessed"`, `safeResultVerbs`, and `notEvidenceForStrongerClaims`), exact seven-tool allowlist, discovery description boundary, and a read-only `search_markets` call. Do not use write-adjacent tools as connectivity smoke.
 - Treat `create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction` rehearsal as blocked until exact onboarding or task-time `xHandle`, `walletAddress`, and `walletSource` approval exists. Keep rehearsal local unless a separate approved remote path with scoped credentials and receipt/readback requirements exists.
 - Use the no silent fallback ladder in `docs/MCP_AGENT_ERROR_HANDLING.md` when MCP work fails: classify client setup failure, live allowlist drift, input schema mismatch, missing thesis/identity readback, protocol readback gap, or approved non-MCP execution gap before choosing a lower-rung recovery.
 - Check the live input field matrix in `docs/MCP_AGENT_GUIDE.md` or `docs/MCP_AGENT_QUICKSTART.md` before composing payloads: `walletSource` is only accepted by `create_thesis_draft`, `note` is only accepted by `prepare_revision_draft`, and result markers such as `publishState`, `anchorStatus`, `anchorPreparationId`, tx hash, receipt/readback, and storage wording are never input fields.
@@ -50,7 +50,7 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Treat remote MCP write tools as unavailable unless the agent has scoped credentials and the operator explicitly approved that path.
 - If the local stdio server cannot start, report that setup blocker instead of scraping the UI, using unauthenticated HTTP, or switching to remote write tools.
 - Do not bypass MCP by calling app HTTP routes such as `POST /api/theses`, `POST /api/thesis-anchor/prepare`, or production write endpoints. Direct REST writes require a separate approved execution path, scoped credentials, and receipt/readback evidence.
-- Treat README API entries and app/runtime surfaces as non-authorizing context. Only the five live MCP tools grant default agent-safe preparation scope.
+- Treat README API entries and app/runtime surfaces as non-authorizing context. Only the seven live MCP tools grant default agent-safe preparation or paid-proof scope.
 - If a separate approved execution path is supplied, fill the receipt card from `docs/AGENT_SAFE_OUTPUTS.md`: approved execution path, approval evidence, credential scope, write receipt, readback evidence, and safe claim after execution. Missing rows mean stay at `draft prepared` / `anchor prepared`.
 - Confirm X identity, wallet address, and wallet source before preparing protocol transactions.
 - Treat identity inputs as exact authority, not fuzzy hints. `xHandle`, `walletAddress`, `walletSource`, and `thesisId` must come from task-time approval or fresh `get_thesis` readback. `walletAddress` must be a full `0x`-prefixed 40-hex-character EVM address; the live schema rejects ENS names, shortened addresses, and missing `0x` prefixes. Do not resolve ENS, expand shortened addresses, use private keys/seed phrases, choose between wallets, reuse "same as last time", treat titles/slugs/screenshots/old metadata as thesis ids, or swap in Eva's wallet as a convenience fallback. If the exact identity is missing or mismatched, return `blocked: exact identity input missing` or `blocked: revision identity mismatch` before preparing calldata.
@@ -64,6 +64,9 @@ Safe output wording: `docs/AGENT_SAFE_OUTPUTS.md`.
 - Existing thesis update: call `get_thesis` first, then `prepare_revision_draft` with a concise delta note.
 - New thesis preview: use `create_thesis_draft`.
 - Existing thesis calldata rebuild with no text change: use `prepare_anchor_transaction`.
+- Paid proof bundle: use `prepare_eva_proof_quote`, have the exact payer wallet sign standard ERC-20
+  approval plus `retireForUsage`, then use `get_paid_thesis_proof_bundle` with `evaUsageTxHash`.
+  Permit2 and server spending authority are forbidden.
 - Publish, broadcast, direct REST writes, article/blog output, claims, staking, challenge/settlement, paid verification, or LLM verification: stop unless a separate approved path and evidence exist.
 
 Mixed prompt shortcut:
@@ -87,7 +90,7 @@ Use this drill for a new agent before it touches a real user-requested thesis. I
 read-only MCP smoke:
 - local stdio server: `eva-thesis` from repo root via `pnpm --filter backend mcp`
 - optional HTTP discovery smoke: `GET /api/mcp` returns matching `toolDescriptions` and an `agentSafeBoundary` with `defaultWriteScope: "draft_and_anchor_prep_only"`, `mcpOutputCeiling: "anchor_prepared"`, `storageClaimDefault: "storage_not_assessed"`, `safeResultVerbs`, and `notEvidenceForStrongerClaims`
-- tool list smoke: exactly `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, `prepare_anchor_transaction`
+- tool list smoke: exactly `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, `prepare_anchor_transaction`, `prepare_eva_proof_quote`, `get_paid_thesis_proof_bundle`
 - description boundary smoke: write-adjacent tools say no publish, no broadcast, no direct REST writes, and no storage-durability proof
 - read-only call smoke: `search_markets` works and the result stays `read-only`
 - write-adjacent rehearsal: blocked until exact onboarding-approved identity exists

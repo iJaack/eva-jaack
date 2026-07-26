@@ -213,6 +213,68 @@ describe("prediction layer service", () => {
     expect(reRevised?.thesis.timeline.map((entry) => entry.scoreAfter)).toEqual([50, 70, 85]);
   });
 
+  it("persists a paid revision, confirmed anchor, and EVA receipt in one revision write", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
+    cleanupDirs.push(dir);
+    const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => [], async () => []);
+    const created = await service.createThesis({
+      identity: auth(),
+      title: "Atomic paid revision",
+      body: "Initial thesis.",
+      predictionSignals: [
+        {
+          provider: "manual",
+          marketTitle: "Will the atomic path work?",
+          selectedOutcomeLabel: "Yes",
+          oddsAtAdd: 0.5,
+          currentOdds: 0.5,
+          weight: 100,
+          role: "core",
+          status: "open",
+        },
+      ],
+    });
+    const txHash = `0x${"b".repeat(64)}` as `0x${string}`;
+    const receiptTxHash = `0x${"c".repeat(64)}` as `0x${string}`;
+    const confirmedAt = "2026-07-26T12:00:00.000Z";
+
+    const revised = await service.recordRevision(
+      created.thesis.thesisId,
+      {
+        identity: auth(),
+        body: "Updated thesis with an atomic paid receipt.",
+        note: "Atomic paid revision.",
+      },
+      {
+        txHash,
+        confirmedAt,
+        usageReceipt: {
+          action: "publish_revision",
+          txHash: receiptTxHash,
+          receiptId: "usage-receipt-atomic",
+          amountWei: "25000000000000000000000",
+          referenceHash: `0x${"d".repeat(64)}`,
+          confirmedAt,
+          blockNumber: "76543210",
+        },
+      },
+    );
+
+    expect(revised?.thesis.currentRevision.anchor).toMatchObject({
+      status: "confirmed",
+      txHash,
+      confirmedAt,
+    });
+    expect(revised?.thesis.evaUsageReceipts).toEqual([
+      expect.objectContaining({
+        receiptId: "usage-receipt-atomic",
+        action: "publish_revision",
+        txHash: receiptTxHash,
+      }),
+    ]);
+    expect(revised?.thesis.timeline.slice(-2).map((entry) => entry.action)).toEqual(["revised", "anchored"]);
+  });
+
   it("scores closed prediction signals from resolved outcomes", async () => {
     const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
     cleanupDirs.push(dir);
@@ -244,7 +306,7 @@ describe("prediction layer service", () => {
     });
   });
 
-  it("requires verified X and wallet identity for thesis writes", async () => {
+  it("requires a public X handle and connected wallet identity for thesis writes", async () => {
     const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
     cleanupDirs.push(dir);
     const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => [], async () => []);
@@ -261,7 +323,21 @@ describe("prediction layer service", () => {
         title: "Missing identity",
         body: "This should fail.",
       }),
-    ).rejects.toThrow("Connected X identity and wallet are required");
+    ).rejects.toThrow("Public X handle and connected wallet are required");
+  });
+
+  it("rejects embedded wallets from new thesis writes", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
+    cleanupDirs.push(dir);
+    const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => [], async () => []);
+
+    await expect(
+      service.createThesis({
+        identity: { ...auth(), walletSource: "embedded" },
+        title: "Embedded signer",
+        body: "Eva must never create or use an embedded wallet for a platform write.",
+      }),
+    ).rejects.toThrow("A self-custodial external wallet is required");
   });
 
   it("rejects spoofed author identity payloads for existing thesis authors", async () => {
@@ -272,7 +348,7 @@ describe("prediction layer service", () => {
     const created = await service.createThesis({
       identity: auth(),
       title: "Author binding thesis",
-      body: "The first thesis binds X, Dynamic, and wallet identity.",
+      body: "The first thesis binds a public X handle and a self-custodial wallet identity.",
       predictionSignals: [
         {
           provider: "manual",

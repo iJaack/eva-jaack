@@ -1,10 +1,7 @@
 "use client";
 
-import { isEthereumWallet } from "@dynamic-labs/ethereum";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { keccak256, parseUnits, toBytes, type Hash } from "viem";
-import { avalanche } from "viem/chains";
+import { useCallback, useEffect, useState } from "react";
+import { encodeFunctionData, keccak256, parseUnits, toBytes, type Hash } from "viem";
 import {
   evaPublicClient,
   evaTokenUsageAbi,
@@ -14,6 +11,7 @@ import {
 } from "@/lib/eva-usage";
 import { formatEvaAmount } from "@/lib/eva-token";
 import { protocol } from "@/lib/protocol";
+import { useSelfCustodyWallet } from "@/lib/self-custody-wallet";
 
 const usageKinds = [
   { value: 0, label: "Thesis proof" },
@@ -35,25 +33,20 @@ function transactionError(error: unknown): string {
   return "The wallet transaction failed.";
 }
 
-export default function DynamicEvaUsagePanel() {
-  const { primaryWallet } = useDynamicContext();
-  const walletAddress =
-    primaryWallet?.address && /^0x[0-9a-fA-F]{40}$/.test(primaryWallet.address)
-      ? (primaryWallet.address as `0x${string}`)
-      : null;
+export default function SelfCustodyEvaUsagePanel() {
+  const { address: walletAddress, sendTransaction } = useSelfCustodyWallet();
   const [snapshot, setSnapshot] = useState<EvaUsageSnapshot | null>(null);
   const [amount, setAmount] = useState("10");
   const [usageKind, setUsageKind] = useState(0);
   const [reference, setReference] = useState("");
   const [state, setState] = useState<TransactionState>({ phase: "idle", hash: null, message: null });
 
-  const amountWei = useMemo(() => {
-    try {
-      return parseUnits(amount || "0", protocol.tokens.eva.decimals);
-    } catch {
-      return 0n;
-    }
-  }, [amount]);
+  let amountWei = 0n;
+  try {
+    amountWei = parseUnits(amount || "0", protocol.tokens.eva.decimals);
+  } catch {
+    amountWei = 0n;
+  }
 
   const refresh = useCallback(async () => {
     const nextSnapshot = await readEvaUsageSnapshot(walletAddress);
@@ -84,29 +77,17 @@ export default function DynamicEvaUsagePanel() {
   const busy = state.phase === "submitting" || state.phase === "confirming";
   const explorerHref = state.hash ? `${protocol.chain.explorerUrl}/tx/${state.hash}` : null;
 
-  async function walletClients() {
-    if (!primaryWallet || !walletAddress || !isEthereumWallet(primaryWallet)) {
-      throw new Error("Connect an EVM wallet with Dynamic first.");
-    }
-    const walletClient = await primaryWallet.getWalletClient();
-    if (walletClient.chain?.id !== avalanche.id) {
-      await walletClient.switchChain({ id: avalanche.id });
-    }
-    return { walletClient, account: walletAddress };
-  }
-
   async function approve() {
     try {
       setState({ phase: "submitting", hash: null, message: "Confirm the exact $EVA allowance in your wallet." });
-      const { walletClient, account } = await walletClients();
-      const simulation = await evaPublicClient.simulateContract({
-        account,
-        address: protocol.tokens.eva.address as `0x${string}`,
-        abi: evaTokenUsageAbi,
-        functionName: "approve",
-        args: [protocol.contracts.evaUsageBurner as `0x${string}`, amountWei],
+      const hash = await sendTransaction({
+        to: protocol.tokens.eva.address as `0x${string}`,
+        data: encodeFunctionData({
+          abi: evaTokenUsageAbi,
+          functionName: "approve",
+          args: [protocol.contracts.evaUsageBurner as `0x${string}`, amountWei],
+        }),
       });
-      const hash = await walletClient.writeContract(simulation.request);
       setState({ phase: "confirming", hash, message: "Allowance submitted. Waiting for Avalanche." });
       await evaPublicClient.waitForTransactionReceipt({ hash });
       await refresh();
@@ -119,16 +100,15 @@ export default function DynamicEvaUsagePanel() {
   async function retire() {
     try {
       setState({ phase: "submitting", hash: null, message: "Confirm the irreversible $EVA retirement in your wallet." });
-      const { walletClient, account } = await walletClients();
       const referenceHash = keccak256(toBytes(reference.trim()));
-      const simulation = await evaPublicClient.simulateContract({
-        account,
-        address: protocol.contracts.evaUsageBurner as `0x${string}`,
-        abi: evaUsageBurnerAbi,
-        functionName: "retireForUsage",
-        args: [usageKind, referenceHash, amountWei],
+      const hash = await sendTransaction({
+        to: protocol.contracts.evaUsageBurner as `0x${string}`,
+        data: encodeFunctionData({
+          abi: evaUsageBurnerAbi,
+          functionName: "retireForUsage",
+          args: [usageKind, referenceHash, amountWei],
+        }),
       });
-      const hash = await walletClient.writeContract(simulation.request);
       setState({ phase: "confirming", hash, message: "Usage submitted. Waiting for the burn receipt." });
       await evaPublicClient.waitForTransactionReceipt({ hash });
       await refresh();
@@ -196,10 +176,10 @@ export default function DynamicEvaUsagePanel() {
                 Use &amp; burn {amount || "0"} EVA
               </button>
             )}
-            <span>{walletAddress.slice(0, 6)}…{walletAddress.slice(-4)} · Avalanche</span>
+            <span>{walletAddress.slice(0, 6)}…{walletAddress.slice(-4)} · self-custody · Avalanche</span>
           </div>
         ) : (
-          <p className="eva-usage-connect">Connect a wallet above to approve an exact amount and create a receipt.</p>
+          <p className="eva-usage-connect">Connect your own wallet above to approve an exact amount and create a receipt.</p>
         )}
 
         {state.message ? (

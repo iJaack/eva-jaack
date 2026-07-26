@@ -292,7 +292,8 @@ export default function HomePage() {
           <span>Platform token / Avalanche</span>
           <h2 id="home-token-title">$EVA is used for public proof receipts.</h2>
           <p>
-            Read the canonical token and wallet balance from Avalanche, then use $EVA for a named platform proof.
+            Connect your own self-custodial wallet, read the canonical token balance from Avalanche,
+            then use $EVA for a named platform proof.
             Used tokens are retired to 0xdead with an onchain receipt; usage cannot guarantee market price.
           </p>
           <Link href="/eva" className="eva-text-action">
@@ -322,7 +323,7 @@ export default function HomePage() {
           </div>
           <div>
             <dt>Not active</dt>
-            <dd>Staking, gating, yield, governance, trading</dd>
+            <dd>Staking, balance-based access, yield, governance, trading</dd>
           </div>
         </dl>
       </section>

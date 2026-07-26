@@ -11,7 +11,7 @@ Eva has five live product surfaces:
 2. Thesis compose and detail pages for interactive, evolving market posts.
 3. Predictor records derived from X handles, linked wallets, and thesis history.
 4. Agent/MCP surfaces for creating, inspecting, and anchoring theses.
-5. `$EVA` metadata, holder balances, and opt-in platform-use burns with Avalanche receipts.
+5. `$EVA` metadata, holder balances, and required usage burns for valuable public outputs.
 
 Eva is not a native exchange. It does not place trades, custody funds, operate a claim market, run a
 curator onboarding funnel, or publish a platform blog in the narrowed product.
@@ -29,7 +29,7 @@ curator onboarding funnel, or publish a platform blog in the narrowed product.
 │ Backend (Hono)                                             │
 │ /api/markets · /api/theses · /api/predictors               │
 │ /api/x/ingest · /api/copy-preview                          │
-│ /api/thesis-anchor/prepare · /api/mcp                       │
+│ /api/thesis-anchor/prepare · /api/eva/usage/quote · /api/mcp│
 │ /.well-known/agent.json · /health                          │
 └──────────────┬──────────────────────────────┬───────────────┘
                │                              │
@@ -50,8 +50,8 @@ curator onboarding funnel, or publish a platform blog in the narrowed product.
 | `ThesisFactSignalDto` | A lateral fact or operating rule used inside a thesis. |
 | `ThesisRevisionDto` | Immutable history entry showing body, signal snapshot, score before/after, and anchor state. |
 | `PredictorDto` | X-handle record with optional wallet link and app-derived track record. |
-| `$EVA` holder state | ERC-20 metadata and wallet balance used as author context, never as a publishing gate or credibility score. |
-| `$EVA` usage receipt | An opt-in dead-address retirement linked to a thesis proof, forecast receipt, or agent verification reference. |
+| `$EVA` holder state | ERC-20 metadata and wallet balance used as author context, never as a credibility score or balance-threshold access rule. |
+| `$EVA` usage receipt | A dead-address retirement required to publish a thesis/revision or unlock an agent proof bundle. |
 
 Fact signals still use `claimText`/`claimHash` field names in DTOs and Solidity because the field is
 an atomic factual assertion inside a thesis. That is not the removed claims-market product.
@@ -60,29 +60,30 @@ an atomic factual assertion inside a thesis. That is not the removed claims-mark
 
 Writes require:
 
-- X identity
-- wallet address
-- wallet source: external injected wallet or embedded wallet
+- public X handle
+- externally connected self-custodial EVM wallet
+- wallet source fixed to `external`
 
-The current implementation accepts the identity payload directly. Production auth should plug in a
-provider such as Privy or Dynamic for X login plus embedded wallets, while keeping the same thesis
-author shape.
+Eva does not create wallets, hold private keys, or expose an embedded-wallet fallback. The current
+implementation accepts the public X handle as an author label; it is not proof of X account
+ownership. Wallet control is proven by the action-bound Avalanche transactions required for a
+paid write.
 
-When a wallet is connected, Eva reads its `$EVA` balance from Avalanche C-Chain. A holder can
-approve an exact amount and retire it through `EvaUsageBurner` for a named platform use. The
-readback and burn do not grant publishing rights, change thesis scores, or imply staking,
-governance, yield, or trading functionality.
+When a wallet is connected, Eva reads its `$EVA` balance from Avalanche C-Chain. Publishing and
+paid agent outputs require an exact action-bound usage receipt rather than a minimum holder
+balance. The balance does not change thesis scores or imply staking, governance, yield, or trading.
 
 ## Request Flows
 
 ### Create A Thesis
 
-1. User connects X plus wallet.
+1. User connects a self-custodial wallet and supplies the public X author label.
 2. User writes a thesis body and attaches market/fact signals.
 3. Backend validates identity and previews the thesis without storing it.
 4. Eva prepares Avalanche anchor transactions for the thesis and signals.
 5. Publishing stays disabled until the prepared anchor matches the current draft and a submitted transaction hash is recorded.
-6. Eva stores the submitted-anchor thesis as revision 1 and renders the thesis page with markets, facts, score, and history.
+6. Eva recomputes and verifies the exact `$EVA` usage receipt for this wallet and draft.
+7. Eva stores the submitted-anchor thesis as revision 1 and renders the thesis page with markets, facts, score, and history.
 
 ### Evolve A Thesis
 
@@ -90,8 +91,9 @@ governance, yield, or trading functionality.
 2. User or agent prepares a revision draft with signal updates.
 3. Eva prepares the revision anchor transaction and keeps the current thesis unchanged.
 4. Publishing the update requires the matching prepared revision anchor and submitted transaction hash.
-5. Eva appends immutable revision/timeline entries.
-6. Readers can inspect how the thesis changed over time.
+5. Eva verifies the exact `$EVA` usage receipt for this revision.
+6. Eva appends immutable revision/timeline entries.
+7. Readers can inspect how the thesis changed over time.
 
 ### X And Agent Use
 
@@ -99,14 +101,21 @@ governance, yield, or trading functionality.
 2. MCP exposes market search, thesis inspection, draft-anchor preparation, and revision-anchor preparation primitives for agents.
 3. Agent draft tools return `publishState: "anchor_prepared_not_published"` rather than silently storing public theses.
 4. Agent outputs must preserve source URLs, signal weights, and revision notes.
+5. Agents quote a proof bundle, sign direct ERC-20 allowance and usage transactions, then present
+   the receipt to unlock the formatted bundle.
 
 ### Use And Burn `$EVA`
 
-1. User connects an EVM wallet on Avalanche.
-2. User selects a platform use, amount, and unique proof reference.
-3. User approves exactly that amount to `EvaUsageBurner`.
+1. Eva derives an action price and reference from quote version, chain, burner, wallet, action, and resource.
+2. User or agent connects the quoted EVM wallet on Avalanche.
+3. The wallet approves exactly that amount to `EvaUsageBurner` using canonical ERC-20 `approve`.
 4. `retireForUsage` transfers `$EVA` to `0x000000000000000000000000000000000000dEaD`.
 5. The contract emits `EvaUsedAndRetired` and increments its receipt and platform-retirement totals.
+6. Eva verifies the successful event matches the wallet, use kind, reference, amount, and sink
+   before releasing the action or proof bundle.
+
+This path does not use Permit2. Eva never receives token allowance and the backend has no key or
+authority that can spend a user or agent wallet.
 
 The canonical token has an owner-only `burn(address,uint256)` function, but ownership is renounced,
 so that supply-reducing function is inaccessible. The live usage contract instead reduces

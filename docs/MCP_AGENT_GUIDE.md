@@ -70,7 +70,7 @@ When a client can read the discovery JSON, use it as a machine-readable downgrad
 When onboarding a new MCP client or runtime, prove client wiring with read-only evidence before any draft-prep rehearsal:
 
 1. Start the local `eva-thesis` stdio server from the repo root with `pnpm --filter backend mcp`.
-2. Run the client's tool list smoke and verify the exact five live tools: `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`.
+2. Run the client's tool list smoke and verify the exact seven live tools: `search_markets`, `get_thesis`, `create_thesis_draft`, `prepare_revision_draft`, `prepare_anchor_transaction`, `prepare_eva_proof_quote`, and `get_paid_thesis_proof_bundle`.
 3. If using HTTP discovery, verify `GET /api/mcp` exposes matching `toolDescriptions`, `agentSafeBoundary.defaultWriteScope: "draft_and_anchor_prep_only"`, `agentSafeBoundary.mcpOutputCeiling: "anchor_prepared"`, and `agentSafeBoundary.storageClaimDefault: "storage_not_assessed"` before any write-adjacent rehearsal.
 4. Run a description boundary smoke: every write-adjacent discovery description must still say the tool does not publish, broadcast, call direct REST writes, or prove storage durability.
 5. Run only a read-only call smoke, such as `search_markets` with a low-risk query, and report the result as `read-only` / `found candidates`.
@@ -88,6 +88,13 @@ If the tool list differs, HTTP discovery omits the agent-safe boundary card, a w
 | `create_thesis_draft` | Preview a new thesis and prepare anchor calldata. | No |
 | `prepare_revision_draft` | Preview a new revision and prepare revision-anchor calldata. | No |
 | `prepare_anchor_transaction` | Rebuild anchor calldata for an existing thesis. | No |
+| `prepare_eva_proof_quote` | Prepare direct-allowance and usage-burn calldata for a proof bundle. | No |
+| `get_paid_thesis_proof_bundle` | Verify EVA usage and release the formatted proof bundle. | No |
+
+The paid proof flow is `prepare_eva_proof_quote` → the agent/operator-owned self-custodial wallet
+signs standard ERC-20 `approve` plus
+`retireForUsage` → `get_paid_thesis_proof_bundle` verifies `EvaUsedAndRetired`. It does not use
+Permit2, and neither MCP nor the Eva backend can spend wallet funds.
 
 Every write-adjacent MCP tool (`create_thesis_draft`, `prepare_revision_draft`, and `prepare_anchor_transaction`) returns `publishState: "anchor_prepared_not_published"`. That is the boundary. A prepared anchor is not a published thesis, not a confirmed revision, and not evidence of an onchain record.
 
@@ -168,7 +175,7 @@ All draft or revision preparation requires:
 
 - `xHandle`
 - `walletAddress` as a full `0x`-prefixed 40-hex-character EVM address (ENS, shortened addresses, and missing `0x` prefixes are rejected by the live schema)
-- wallet source where supported (`external` or `embedded`)
+- wallet source fixed to `external`; embedded wallets are rejected
 
 Use Eva's sovereign wallet (`0x0fe61780bd5508b3C99e420662050e5560608cA4`) only when the operator explicitly approved that signer for the task. Transaction broadcast always needs explicit approval at action time.
 
@@ -191,7 +198,7 @@ Safe sources:
 
 - task-time approval that names the exact X handle and EVM wallet address,
 - fresh `get_thesis` readback when preparing a revision for the same author,
-- explicit signer/source approval for `external` or `embedded` when the live tool accepts `walletSource`,
+- explicit approval for the exact self-custodial external signer when the live tool accepts `walletSource`,
 - canonical `thesisId` from the task or approved readback.
 
 Unsafe substitutions:
@@ -517,7 +524,7 @@ Use `docs/AGENT_SAFE_OUTPUTS.md` for short user-facing snippets. Use `docs/MCP_A
 
 1. `search_markets` for candidate market signals.
 2. Draft the thesis body and collect fact sources.
-3. Call `create_thesis_draft` with X plus wallet identity.
+3. Call `create_thesis_draft` with the public X author label plus exact self-custodial wallet identity.
 4. Show the prepared summary and transactions to the user.
 5. Wait for explicit approval before any broadcast or public publish path.
 6. For updates, call `get_thesis`, then `prepare_revision_draft`, then repeat the approval boundary.

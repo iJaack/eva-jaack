@@ -51,6 +51,10 @@ const liveProof = [
     body: "Eva's deployed Avalanche thesis protocol and agent identity are visible in the product source of truth.",
   },
   {
+    label: "self-custodial authoring",
+    body: "Compose now connects an external EIP-1193 wallet directly. Eva does not create wallets, hold keys, or expose an embedded signer.",
+  },
+  {
     label: "campaign routes",
     body: "Trust receipts, agent receipts, reply sprint, policy-safe theses, and launch-truth status pages already carry measurable UTMs.",
   },
@@ -62,26 +66,22 @@ const currentBlockers = [
     body: "The live provider feed recently exposed sports markets again. @evapredicts should keep the wider public push gated until /api/markets proves the V1 source basket is policy-safe in production.",
   },
   {
-    label: "authoring gate",
-    body: "The compose route remains safely locked behind the Dynamic auth/configuration gate. That is the right failure mode, but it is not a launch-clear authoring path yet.",
-  },
-  {
     label: "signer and runtime parity",
-    body: "Production identity and environment assumptions still need final parity confirmation before the launch thread widens beyond proof-reading CTAs.",
+    body: "The exact merge revision and production wallet boundary still need final parity confirmation before the launch thread widens beyond proof-reading CTAs.",
   },
 ] as const;
 
 const guardedGates = [
   "do not widen the public @evapredicts push while the live market feed leaks prohibited sports or other V1-excluded markets",
-  "do not send cold readers into compose until Dynamic authoring is launch-clear instead of only safe-locked",
+  "do not send cold readers into compose until the production self-custodial wallet path matches the reviewed merge revision",
   "do not claim users, revenue, accuracy, testimonials, or native trading without measured evidence",
 ] as const;
 
 const statusPost = [
   "prediction products get trust from restraint, not from pretending every market is launch-safe.",
-  "Eva's public push stays gated while the live source basket still needs policy-safe proof and authoring is not launch-clear yet.",
-  "what is live: cited theses, revisions, author records, durable storage readiness, Avalanche thesis protocol.",
-  "what is not getting hand-waved: sports-market leakage, Dynamic authoring configuration, and runtime parity.",
+  "Eva's public push stays gated while the live source basket still needs policy-safe proof and the reviewed self-custodial path needs production parity.",
+  "what is live: cited theses, revisions, author records, durable storage readiness, Avalanche thesis protocol, external-wallet authoring.",
+  "what is not getting hand-waved: sports-market leakage, exact-revision deployment, and runtime parity.",
   `follow @evapredicts for the first public thesis loop when the receipts are clean: ${xPostHref}`,
 ] as const;
 

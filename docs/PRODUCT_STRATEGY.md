@@ -37,7 +37,7 @@ can combine:
 
 ## Design Rules
 
-- X plus wallet is the write identity.
+- A public X author label plus a self-custodial external wallet is the write identity.
 - Embedded wallets are acceptable when the user does not bring a wallet.
 - Market odds and factual truth status must stay separate.
 - Closed predictions can become historical evidence inside a thesis.
