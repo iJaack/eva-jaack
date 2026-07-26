@@ -17,3 +17,14 @@ No contract or product claim guarantees price appreciation.
 ```
 
 Deployment receipts live in `deployments/mainnet.json`.
+
+## Verified source
+
+The production contracts have keyless Sourcify exact matches for both creation and runtime
+bytecode:
+
+- [EvaThesisProtocol v2](https://repo.sourcify.dev/43114/0x51cBB77D3b5Df8031F1A916548df07D3B05ae9BB)
+- [EvaUsageBurner](https://repo.sourcify.dev/43114/0xFfEA6272e6C7e035FE529a226A9aA5D9cD98B296)
+
+These records were submitted through Sourcify API v2 with the exact Foundry standard JSON input
+and deployment transaction hash. They do not require a Snowtrace API key.
