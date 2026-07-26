@@ -153,5 +153,6 @@ jobs:
       - name: Browser-smoke deployed authoring and proof routes
         env:
           PLAYWRIGHT_BASE_URL: ${{ steps.smoke-url.outputs.base_url }}
+          SMOKE_ALLOW_PROTECTED_SKIP: 'true'
           SMOKE_VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: pnpm --filter frontend exec playwright test e2e/deployment.spec.ts --project=desktop-chromium --project=mobile-chromium

@@ -14,6 +14,11 @@ test("deployed authoring and proof routes hydrate without client errors @deploym
   });
 
   await page.goto("/");
+  test.skip(
+    process.env.SMOKE_ALLOW_PROTECTED_SKIP === "true" &&
+      (await page.getByRole("heading", { name: "Log in to Vercel" }).isVisible()),
+    "Vercel preview authentication is enabled and no automation bypass secret is configured.",
+  );
   await expect(page.getByRole("heading", { name: "public predictions need proof objects." })).toBeVisible();
 
   await page.goto("/compose");
