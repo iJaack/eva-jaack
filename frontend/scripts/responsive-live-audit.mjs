@@ -21,9 +21,25 @@ const viewports = [
 
 const staticRoutes = [
   { path: "/", label: "home" },
+  { path: "/campaigns", label: "campaigns" },
+  { path: "/campaigns/agent-forecast-interface", label: "campaign-agent-forecast-interface" },
+  { path: "/campaigns/agent-receipts", label: "campaign-agent-receipts" },
+  { path: "/campaigns/ai-forecast-receipts", label: "campaign-ai-forecast-receipts" },
+  { path: "/campaigns/forecast-provenance", label: "campaign-forecast-provenance" },
+  { path: "/campaigns/forecast-qa-checklist", label: "campaign-forecast-qa-checklist" },
+  { path: "/campaigns/forecast-trust-loop", label: "campaign-forecast-trust-loop" },
+  { path: "/campaigns/launch-truth-status", label: "campaign-launch-truth-status" },
+  { path: "/campaigns/policy-safe-theses", label: "campaign-policy-safe-theses" },
+  { path: "/campaigns/prediction-memory", label: "campaign-prediction-memory" },
+  { path: "/campaigns/protocol-proof", label: "campaign-protocol-proof" },
+  { path: "/campaigns/reply-sprint", label: "campaign-reply-sprint" },
+  { path: "/campaigns/source-quality-sprint", label: "campaign-source-quality-sprint" },
+  { path: "/campaigns/trust-receipts", label: "campaign-trust-receipts" },
+  { path: "/campaigns/verifier-adoption", label: "campaign-verifier-adoption" },
   { path: "/markets", label: "markets" },
   { path: "/compose", label: "compose" },
   { path: "/predictors", label: "predictors" },
+  { path: "/eva", label: "eva" },
 ];
 
 async function fetchJson(url) {
@@ -102,6 +118,19 @@ async function auditRoute(page, route, viewport) {
     const visibleText = body.innerText.trim();
     const horizontalOverflow = Math.max(body.scrollWidth, root.scrollWidth) - root.clientWidth;
     const tinyViewport = root.clientWidth < 430;
+    const overflowingElements = Array.from(document.querySelectorAll("main, main *"))
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          tag: element.tagName.toLowerCase(),
+          className: typeof element.className === "string" ? element.className.slice(0, 120) : "",
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+        };
+      })
+      .filter((item) => item.left < -2 || item.right > root.clientWidth + 2)
+      .slice(0, 8);
     const clippedElements = Array.from(document.querySelectorAll("button, a, input, textarea, select, [role='button']"))
       .map((element) => {
         const rect = element.getBoundingClientRect();
@@ -120,17 +149,27 @@ async function auditRoute(page, route, viewport) {
 
     return {
       hasMain: Boolean(main),
+      designVersion: main?.dataset.evaDesign ?? null,
       mainHeight: main?.getBoundingClientRect().height ?? 0,
       visibleTextLength: visibleText.length,
       horizontalOverflow,
+      overflowingElements,
       clippedElements: tinyViewport ? clippedElements : [],
     };
   });
 
   if (!metrics.hasMain) errors.push("Missing <main>");
+  if (metrics.designVersion !== "v2") errors.push("Missing Eva v2 design shell");
   if (metrics.mainHeight < 120) errors.push(`Main content too short (${Math.round(metrics.mainHeight)}px)`);
   if (metrics.visibleTextLength < 80) errors.push("Page rendered with too little visible text");
-  if (metrics.horizontalOverflow > 4) errors.push(`Horizontal overflow ${Math.round(metrics.horizontalOverflow)}px`);
+  if (metrics.horizontalOverflow > 4) {
+    errors.push(
+      `Horizontal overflow ${Math.round(metrics.horizontalOverflow)}px: ${
+        metrics.overflowingElements.map((item) => `${item.tag}.${item.className || "(no-class)"}@${item.left}..${item.right}`).join(", ") ||
+        "source unknown"
+      }`,
+    );
+  }
   if (metrics.clippedElements.length > 0) {
     errors.push(`Clipped controls: ${metrics.clippedElements.map((item) => `${item.tag}:${item.text}`).join(", ")}`);
   }

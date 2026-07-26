@@ -21,7 +21,7 @@ export default function PageShell({ children, className, variant = "mobile", id 
   return (
     <>
       <Nav />
-      <main id={id} className={cn(shellClass, className)}>
+      <main id={id} className={cn(shellClass, className)} data-eva-design="v2">
         {children}
       </main>
       <SiteFooter />

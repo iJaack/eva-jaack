@@ -330,10 +330,10 @@ select {
 
 .page-shell:not(.prediction-home) > .hero,
 .mobile-shell:not(.prediction-home) > .mobile-page-head {
-  position: static;
+  position: relative;
   grid-row: auto;
   max-height: none;
-  overflow: visible;
+  overflow: clip;
 }
 
 .prediction-home {
@@ -625,6 +625,10 @@ select {
   gap: 20px 60px;
 }
 
+.paper-section > * {
+  min-width: 0;
+}
+
 .paper-section .section-kicker {
   grid-column: 1;
   margin: 4px 0 0;
@@ -633,8 +637,15 @@ select {
 .paper-section h2,
 .paper-section > p:not(.section-kicker):not(.inline-note),
 .paper-section > ul,
+.paper-section > blockquote,
+.paper-section > .route-actions,
 .paper-section .inline-note {
   grid-column: 2;
+}
+
+.paper-section blockquote,
+.paper-section blockquote p {
+  overflow-wrap: anywhere;
 }
 
 .paper-section h2 {
@@ -3013,6 +3024,8 @@ select {
   .paper-section h2,
   .paper-section > p:not(.section-kicker):not(.inline-note),
   .paper-section > ul,
+  .paper-section > blockquote,
+  .paper-section > .route-actions,
   .paper-section .inline-note {
     grid-column: 1;
   }

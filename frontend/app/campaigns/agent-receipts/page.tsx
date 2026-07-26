@@ -38,47 +38,36 @@ const audienceCards = [
 export default function AgentReceiptsCampaignPage() {
   return (
     <PageShell variant="page">
-        <FadeIn className="mobile-hero home-command">
+        <FadeIn className="hero">
           <p className="eyebrow">campaign · @evapredicts</p>
           <h1>agent market calls need receipts.</h1>
           <p>
             Prediction agents are about to flood the timeline with confident takes. Eva is the layer
             that makes those takes inspectable: cited signals, visible revisions, and a public author record.
           </p>
-          <div className="mobile-hero-actions">
-            <Link href={composeHref} className="mobile-action mobile-action-primary">
+          <div className="hero-actions">
+            <Link href={composeHref} className="btn btn-primary">
               Draft a sourced thesis
             </Link>
-            <a href={followHref} className="mobile-action" target="_blank" rel="noreferrer">
+            <a href={followHref} className="btn" target="_blank" rel="noreferrer">
               Follow @evapredicts
             </a>
           </div>
-          <aside className="home-hero-artifact" aria-label="Campaign proof object">
-            <div className="artifact-header">
-              <span>campaign hypothesis</span>
-              <strong>receipt layer</strong>
-            </div>
-            <h2>trust shifts from predictions to records.</h2>
-            <p>
-              The winning prediction surface will not be the one with the loudest calls. It will be the one
-              where every call can show what changed, when, and why.
-            </p>
-            <div className="artifact-signal-grid" aria-label="Receipt requirements">
-              <div>
-                <span>S1 · source</span>
-                <strong>market / fact / effect</strong>
-              </div>
-              <div>
-                <span>S2 · revision</span>
-                <strong>visible history</strong>
-              </div>
-              <div>
-                <span>S3 · author</span>
-                <strong>X + wallet trail</strong>
-              </div>
-            </div>
-          </aside>
         </FadeIn>
+
+        <section className="paper-section" aria-label="Campaign proof object">
+          <p className="section-kicker">campaign hypothesis</p>
+          <h2>trust shifts from predictions to records.</h2>
+          <p>
+            The winning prediction surface will not be the one with the loudest calls. It will be the one
+            where every call can show what changed, when, and why.
+          </p>
+          <ul aria-label="Receipt requirements">
+            <li>S1 · source — market / fact / effect</li>
+            <li>S2 · revision — visible history</li>
+            <li>S3 · author — X + wallet trail</li>
+          </ul>
+        </section>
 
         <section className="prediction-section quest-board" aria-label="Campaign argument">
           <div className="quest-board-copy">
@@ -120,14 +109,14 @@ export default function AgentReceiptsCampaignPage() {
           </div>
         </section>
 
-        <section className="prediction-card" aria-label="Campaign measurement">
+        <section className="paper-section" aria-label="Campaign measurement">
           <p className="section-kicker">metric to watch</p>
           <h2>does the receipt framing create intent?</h2>
           <p>
             Watch sessions and CTA clicks with <strong>utm_campaign=agent_receipts</strong>, then compare follow clicks,
             example-thesis clicks, and compose starts against the SpaceX launch thesis campaign.
           </p>
-          <div className="mobile-hero-actions">
+          <div className="route-actions">
             <a href={followHref} className="mobile-action mobile-action-primary" target="_blank" rel="noreferrer">
               Follow the public feed
             </a>
