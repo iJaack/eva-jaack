@@ -18,6 +18,14 @@
     "deployBlock": 87265823,
     "evaThesisProtocol": "0x5eDBd1eea3228662326e60634E53AB8975D6641c"
   },
+  "tokens": {
+    "eva": {
+      "address": "0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672",
+      "name": "evajaack",
+      "symbol": "EVA",
+      "decimals": 18
+    }
+  },
   "agents": {
     "eva": {
       "id": "1599",

@@ -292,6 +292,30 @@ select {
   padding: 78px 0 120px;
 }
 
+.mobile-shell:not(.prediction-home),
+.page-shell:not(.prediction-home) {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 58px;
+}
+
+.mobile-shell:not(.prediction-home) > *,
+.page-shell:not(.prediction-home) > * {
+  grid-column: 1;
+}
+
+.page-shell:not(.prediction-home) > :not(.hero):not(.mobile-page-head):not(.site-footer):not(.footer):not(.back-row):not(.tight-back-row),
+.mobile-shell:not(.prediction-home) > :not(.hero):not(.mobile-page-head):not(.site-footer):not(.footer):not(.back-row):not(.tight-back-row) {
+  grid-column: 1;
+}
+
+.page-shell:not(.prediction-home) > .hero,
+.mobile-shell:not(.prediction-home) > .mobile-page-head {
+  position: static;
+  grid-row: auto;
+  max-height: none;
+  overflow: visible;
+}
+
 .prediction-home {
   width: min(calc(100% - 64px), var(--max));
   max-width: none;
@@ -1358,6 +1382,73 @@ select {
   font-style: normal;
 }
 
+.eva-home-token {
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(500px, 1.22fr);
+  gap: 70px;
+  padding: 74px 10px;
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.eva-home-token > div > span {
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.eva-home-token h2 {
+  max-width: 12ch;
+  margin: 20px 0 22px;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 4.6vw, 5rem);
+  font-weight: 370;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+}
+
+.eva-home-token > div > p {
+  max-width: 34rem;
+  margin: 0 0 30px;
+  color: var(--color-neutral);
+  line-height: 1.7;
+}
+
+.eva-home-token dl {
+  align-self: center;
+  margin: 0;
+  border-top: 1px solid var(--color-rule-strong);
+}
+
+.eva-home-token dl > div {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.32fr) minmax(0, 1fr);
+  gap: 20px;
+  padding: 19px 0;
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.eva-home-token dt {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.eva-home-token dd {
+  margin: 0;
+  color: var(--color-ink-2);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.eva-home-token dd a {
+  color: var(--color-accent);
+}
+
 .eva-campaign-strip {
   display: flex;
   align-items: center;
@@ -1903,6 +1994,16 @@ select {
   background: transparent;
 }
 
+.compose-token-boundary {
+  margin: 18px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-rule);
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  line-height: 1.55;
+}
+
 .compose-editor-panel h2,
 .compose-source-panel h2,
 .compose-attached-panel h2,
@@ -2204,6 +2305,295 @@ select {
   box-shadow: none;
 }
 
+/* $EVA platform token */
+.eva-token-page {
+  padding-top: 58px;
+}
+
+.eva-token-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.42fr);
+  gap: 24px 78px;
+  padding: 44px 18px 54px;
+  border-bottom: 1px solid var(--color-rule-strong);
+}
+
+.eva-token-hero .eyebrow {
+  grid-column: 1 / -1;
+}
+
+.eva-token-hero h1 {
+  max-width: 12ch;
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: clamp(4.6rem, 8vw, 8.4rem);
+  font-weight: 350;
+  letter-spacing: -0.058em;
+  line-height: 0.88;
+}
+
+.eva-token-hero > p:not(.eyebrow) {
+  align-self: end;
+  max-width: 41rem;
+  margin: 0;
+  color: var(--color-neutral);
+  font-family: var(--font-display);
+  font-size: clamp(1.24rem, 1.8vw, 1.62rem);
+  line-height: 1.45;
+}
+
+.eva-token-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-top: 14px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.eva-token-actions a {
+  color: var(--color-ink-2);
+  text-underline-offset: 5px;
+}
+
+.eva-token-actions .eva-inline-link {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.eva-token-ledger {
+  padding: 0 18px;
+}
+
+.eva-token-row {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.24fr) minmax(0, 1fr);
+  border-bottom: 1px solid var(--color-rule-strong);
+  content-visibility: auto;
+  contain-intrinsic-size: 260px;
+}
+
+.eva-token-row-label {
+  padding: 28px 28px 28px 0;
+  border-right: 1px solid var(--color-rule);
+}
+
+.eva-token-row-label span {
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+}
+
+.eva-token-row-label p {
+  max-width: 13ch;
+  margin: 18px 0 0;
+  color: var(--color-ink-2);
+  font-family: var(--font-mono);
+  font-size: 0.73rem;
+  letter-spacing: 0.12em;
+  line-height: 1.55;
+  text-transform: uppercase;
+}
+
+.eva-token-receipt {
+  display: grid;
+  align-content: center;
+  margin: 0;
+  padding: 24px 0 24px 44px;
+}
+
+.eva-token-receipt > div {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.28fr) minmax(0, 1fr);
+  gap: 20px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.eva-token-receipt > div:last-child {
+  border-bottom: 0;
+}
+
+.eva-token-receipt dt {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.73rem;
+}
+
+.eva-token-receipt dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-ink-2);
+  font-family: var(--font-mono);
+  font-size: 0.77rem;
+}
+
+.eva-token-receipt a {
+  color: var(--color-accent);
+}
+
+.eva-token-wallet {
+  position: relative;
+  display: grid;
+  align-content: center;
+  min-height: 224px;
+  padding: 34px 300px 34px 44px;
+}
+
+.eva-token-wallet > p {
+  margin: 0 0 10px;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+}
+
+.eva-token-wallet > strong {
+  color: var(--color-accent);
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 4vw, 4.5rem);
+  font-weight: 380;
+  line-height: 1;
+}
+
+.eva-token-wallet > span {
+  margin-top: 10px;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.eva-token-wallet .dynamic-auth-control {
+  justify-self: start;
+}
+
+.eva-protocol-holding {
+  position: absolute;
+  top: 34px;
+  right: 0;
+  bottom: 34px;
+  display: grid;
+  align-content: center;
+  width: 255px;
+  padding-left: 28px;
+  border-left: 1px solid var(--color-rule);
+}
+
+.eva-protocol-holding span,
+.eva-protocol-holding small {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+}
+
+.eva-protocol-holding strong {
+  margin: 12px 0;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 380;
+}
+
+.eva-token-error {
+  color: var(--color-warning);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.eva-token-sequence {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 34px 0 34px 44px;
+  list-style: none;
+}
+
+.eva-token-sequence li {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  padding-right: 34px;
+}
+
+.eva-token-sequence li:not(:last-child)::after {
+  position: absolute;
+  top: 50%;
+  right: 24px;
+  color: var(--color-muted);
+  content: "→";
+  transform: translateY(-50%);
+}
+
+.eva-token-sequence span {
+  width: 24px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+}
+
+.eva-token-sequence strong {
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 390;
+}
+
+.eva-token-boundaries {
+  display: grid;
+  align-content: center;
+  margin-left: 44px;
+}
+
+.eva-token-boundaries p {
+  margin: 0;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--color-rule);
+  color: var(--color-ink-2);
+  font-family: var(--font-display);
+  font-size: 1.32rem;
+}
+
+.eva-token-boundaries p:last-child {
+  border-bottom: 0;
+}
+
+.eva-token-boundaries strong {
+  display: inline-block;
+  min-width: 118px;
+  margin-right: 16px;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 520;
+  text-transform: uppercase;
+}
+
+.eva-token-boundaries p:last-child strong {
+  color: var(--color-muted);
+}
+
+.eva-token-followup {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 24px 18px 0;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.eva-token-followup p {
+  margin: 0;
+}
+
+.eva-token-followup a {
+  color: var(--color-accent);
+}
+
 /* Footer */
 .site-footer {
   display: grid;
@@ -2322,6 +2712,41 @@ select {
 }
 
 @media (max-width: 920px) {
+  .eva-home-token {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .eva-token-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .eva-token-hero > p:not(.eyebrow) {
+    max-width: 46rem;
+  }
+
+  .eva-token-wallet {
+    padding-right: 44px;
+  }
+
+  .eva-protocol-holding {
+    position: static;
+    width: auto;
+    margin-top: 28px;
+    padding: 24px 0 0;
+    border-top: 1px solid var(--color-rule);
+    border-left: 0;
+  }
+
+  .eva-token-sequence {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 34px;
+  }
+
+  .eva-token-sequence li:nth-child(2)::after {
+    display: none;
+  }
+
   .hero {
     grid-template-columns: 1fr;
   }
@@ -2582,6 +3007,101 @@ select {
 
   .prediction-home {
     padding-top: 0;
+  }
+
+  .eva-home-token {
+    gap: 36px;
+    padding: 54px 0;
+  }
+
+  .eva-home-token dl > div {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .eva-token-page {
+    padding-top: 34px;
+  }
+
+  .eva-token-hero,
+  .eva-token-ledger {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .eva-token-hero {
+    gap: 22px;
+    padding-top: 24px;
+    padding-bottom: 38px;
+  }
+
+  .eva-token-hero h1 {
+    font-size: clamp(4rem, 19vw, 5.5rem);
+  }
+
+  .eva-token-actions {
+    align-items: start;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .eva-token-row {
+    grid-template-columns: 1fr;
+    contain-intrinsic-size: 420px;
+  }
+
+  .eva-token-row-label {
+    display: flex;
+    gap: 18px;
+    align-items: baseline;
+    padding: 22px 0 14px;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-rule);
+  }
+
+  .eva-token-row-label p {
+    max-width: none;
+    margin: 0;
+  }
+
+  .eva-token-receipt,
+  .eva-token-wallet,
+  .eva-token-sequence {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .eva-token-receipt > div {
+    grid-template-columns: minmax(96px, 0.3fr) minmax(0, 1fr);
+  }
+
+  .eva-token-sequence {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .eva-token-sequence li {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .eva-token-sequence li::after {
+    display: none;
+  }
+
+  .eva-token-boundaries {
+    margin-left: 0;
+  }
+
+  .eva-token-boundaries strong {
+    display: block;
+    margin: 0 0 9px;
+  }
+
+  .eva-token-followup {
+    display: grid;
+    padding-right: 0;
+    padding-left: 0;
   }
 
   .hero {

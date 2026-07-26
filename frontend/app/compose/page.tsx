@@ -7,6 +7,7 @@ import DynamicAuthControl from "@/components/DynamicAuthControl";
 import PageShell from "@/components/ui/PageShell";
 import { createThesis, getMarkets, prepareDraftThesisAnchor, type PredictionMarket, type Thesis, type ThesisCreateRequest } from "@/lib/api";
 import type { DynamicIdentityState, DynamicThesisIdentity } from "@/lib/dynamic-identity";
+import { formatEvaAmount, readEvaTokenSnapshot } from "@/lib/eva-token";
 import { protocol } from "@/lib/protocol";
 
 type ThesisIdentity = DynamicThesisIdentity;
@@ -114,6 +115,7 @@ function ComposeInner() {
   const [preparingAnchor, setPreparingAnchor] = useState(false);
   const [identity, setIdentity] = useState<ThesisIdentity>(defaultIdentity);
   const [identityState, setIdentityState] = useState<DynamicIdentityState | null>(null);
+  const [evaBalance, setEvaBalance] = useState("Not read");
 
   useEffect(() => {
     getMarkets().then((response) => setMarkets(response.markets)).catch(() => setMarkets([]));
@@ -146,6 +148,23 @@ function ComposeInner() {
   const showComposeWorkspace = !dynamicIdentityRequired || identityReady;
   const authGateMessage = identityState?.message ?? dynamicUnavailableMessage;
   const nextSignalLabel = `S${attachedSignals.length + 1}`;
+
+  useEffect(() => {
+    if (!showComposeWorkspace) return;
+    let cancelled = false;
+    readEvaTokenSnapshot(identity.walletAddress as `0x${string}`)
+      .then((snapshot) => {
+        if (!cancelled && snapshot.walletBalance !== null) {
+          setEvaBalance(`${formatEvaAmount(snapshot.walletBalance, snapshot.decimals)} EVA`);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setEvaBalance("Unavailable");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [identity.walletAddress, showComposeWorkspace]);
 
   const marketSignalText = selectedMarket
     ? `Prediction signal: ${selectedMarket.title} - ${selectedOutcomeLabel} is priced at ${Math.round(selectedOutcomePrice * 100)}%.`
@@ -421,7 +440,12 @@ function ComposeInner() {
                     <span>Wallet</span>
                     <strong>{identityReady || !dynamicIdentityRequired ? shortWallet(identity.walletAddress) : "Not connected"}</strong>
                   </div>
+                  <div>
+                    <span>$EVA holder state</span>
+                    <strong>{evaBalance}</strong>
+                  </div>
                 </div>
+                <p className="compose-token-boundary">$EVA balance is author context, never a publishing gate or credibility score.</p>
               </div>
               <div className="compose-editor-heading">
                 <div>

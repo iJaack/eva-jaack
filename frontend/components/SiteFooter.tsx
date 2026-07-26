@@ -5,6 +5,7 @@ const links = [
   { href: "/markets", label: "Markets" },
   { href: "/compose", label: "Compose" },
   { href: "/predictors", label: "Predictors" },
+  { href: "/eva", label: "$EVA" },
   { href: "/campaigns", label: "Campaigns" },
 ] as const;
 
@@ -14,6 +15,7 @@ function shortAddress(address: string): string {
 
 export default function SiteFooter() {
   const contractUrl = `${protocol.chain.explorerUrl}/address/${protocol.contracts.evaThesisProtocol}`;
+  const tokenUrl = `${protocol.chain.explorerUrl}/address/${protocol.tokens.eva.address}`;
 
   return (
     <footer className="site-footer">
@@ -28,7 +30,10 @@ export default function SiteFooter() {
           </Link>
         ))}
         <a href={contractUrl} target="_blank" rel="noreferrer">
-          Contract {shortAddress(protocol.contracts.evaThesisProtocol)}
+          Thesis contract {shortAddress(protocol.contracts.evaThesisProtocol)}
+        </a>
+        <a href={tokenUrl} target="_blank" rel="noreferrer">
+          $EVA contract {shortAddress(protocol.tokens.eva.address)}
         </a>
         <a href="https://github.com/iJaack/eva-jaack" target="_blank" rel="noreferrer">
           GitHub

@@ -21,6 +21,12 @@ function agentManifest() {
       localMcp: 'eva-mcp stdio',
       writePolicy: 'X identity plus wallet required; transaction broadcasts require explicit approval.',
     },
+    platformToken: {
+      contract: `eip155:${protocol.chain.id}:${config.evaToken}`,
+      symbol: protocol.tokens.eva.symbol,
+      liveCapabilities: ['contract_metadata', 'holder_balance_readback', 'author_context'],
+      notActive: ['staking', 'gating', 'yield', 'governance', 'trade_execution'],
+    },
   };
 }
 

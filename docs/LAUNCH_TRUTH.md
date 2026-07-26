@@ -9,6 +9,7 @@
 | Eva wallet | `0x0fe61780bd5508b3C99e420662050e5560608cA4` |
 | Eva agent ID | `1599` |
 | Thesis protocol | `0x5eDBd1eea3228662326e60634E53AB8975D6641c` |
+| `$EVA` token | `0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672` |
 | First thesis | SpaceX IPO liquidity rotation thesis |
 | Market policy | V1 provider markets filtered against `docs/MARKET_POLICY.md` |
 
@@ -22,6 +23,8 @@ Eva can claim:
 - the app prepares thesis anchor transactions
 - the deployed thesis protocol exists on Avalanche
 - the app has MCP/agent-facing thesis tools
+- the app reads `$EVA` contract metadata and holder balances from Avalanche
+- `$EVA` holder state is visible author context, not a publishing gate or credibility score
 
 Eva should not claim:
 
@@ -31,6 +34,7 @@ Eva should not claim:
 - curator onboarding
 - article verification
 - claim staking or settlement
+- `$EVA` staking, gating, yield, governance, or trade execution
 - x402 payment enforcement
 - traction, revenue, testimonials, or active user counts without measurement
 
@@ -44,3 +48,5 @@ Eva should not claim:
 - SpaceX thesis page shows market signals, fact signals, revision history, and anchor status.
 - Agent manifest and MCP endpoint respond.
 - Contract deployment config matches `protocol.config.json`.
+- `/eva` shows the canonical `$EVA` contract and current Avalanche readback.
+- Compose keeps `$EVA` holder state separate from identity and publishing requirements.

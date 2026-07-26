@@ -43,6 +43,27 @@ Checks and regressions:
 
 Milestone 2 is not complete until invalid identity states cannot publish.
 
+## Milestone 2B: $EVA Core Chain Context
+
+Goal: make the canonical `$EVA` token an inspectable platform primitive without inventing inactive
+economic utility.
+
+Atomic tasks:
+
+- Add the `$EVA` contract to shared runtime configuration and the agent manifest.
+- Add a first-class `/eva` route with live ERC-20 metadata and holder balance readback.
+- Attach read-only `$EVA` holder state to wallet/author context in compose.
+- Keep holder balance separate from publishing rights, credibility, and thesis scoring.
+
+Checks and regressions:
+
+- Unit tests for the canonical Avalanche address and bounded manifest capabilities.
+- Live Avalanche readback for name, symbol, decimals, total supply, and wallet balance.
+- Desktop and mobile browser checks for the token receipt and signed-out wallet state.
+- Text scan preventing unsupported staking, gating, yield, governance, or trading claims.
+
+Milestone 2B is not complete until live chain state and visible product copy agree.
+
 ## Milestone 3: Agent-Ready Thesis Creation
 
 Goal: let agents create, revise, inspect, and anchor theses safely.

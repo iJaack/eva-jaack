@@ -160,6 +160,7 @@ export default function HomePage() {
   const markets = summary?.markets.slice(0, 3) ?? [];
   const predictors = summary?.predictors.slice(0, 3) ?? [];
   const contractUrl = `${protocol.chain.explorerUrl}/address/${protocol.contracts.evaThesisProtocol}`;
+  const tokenUrl = `${protocol.chain.explorerUrl}/address/${protocol.tokens.eva.address}`;
 
   return (
     <PageShell variant="home">
@@ -284,6 +285,38 @@ export default function HomePage() {
           </div>
         </section>
       ) : null}
+
+      <section className="eva-home-token" aria-labelledby="home-token-title">
+        <div>
+          <span>Platform token / Avalanche</span>
+          <h2 id="home-token-title">$EVA holder state, attached to the author record.</h2>
+          <p>
+            Eva reads the canonical token contract and wallet balance from Avalanche. Holder state adds inspectable
+            context; it does not buy credibility or unlock publishing.
+          </p>
+          <Link href="/eva" className="eva-text-action">
+            Inspect $EVA <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+        <dl>
+          <div>
+            <dt>Contract</dt>
+            <dd>
+              <a href={tokenUrl} target="_blank" rel="noreferrer">
+                {shortAddress(protocol.tokens.eva.address)}
+              </a>
+            </dd>
+          </div>
+          <div>
+            <dt>Live relationship</dt>
+            <dd>Wallet → $EVA balance → author → thesis</dd>
+          </div>
+          <div>
+            <dt>Not active</dt>
+            <dd>Staking, gating, yield, governance, trading</dd>
+          </div>
+        </dl>
+      </section>
 
       <section className="eva-campaign-strip" aria-label="Protocol proof campaign">
         <div>

@@ -9,15 +9,17 @@ IPO timing markets, private-liquidity facts, and second/third-order market effec
 
 Eva does not custody funds, execute trades, or run a native prediction exchange in this product
 version. It loads broad prediction markets while excluding sports for now, records thesis/copy
-intent, and anchors thesis state to Avalanche through `EvaThesisProtocol`.
+intent, and anchors thesis state to Avalanche through `EvaThesisProtocol`. The platform also reads
+the canonical `$EVA` contract and wallet balances from Avalanche as inspectable author context;
+holder state is not a publishing gate or credibility score.
 
 ## Monorepo
 
-- `frontend/` - Next.js app for markets, compose, thesis pages, and predictor records
+- `frontend/` - Next.js app for markets, compose, thesis pages, predictor records, and `$EVA`
 - `backend/` - Hono API for markets, theses, predictors, X ingest, MCP, and thesis anchor prep
 - `contracts/` - Foundry workspace containing `EvaThesisProtocol`
 - `docs/` - product boundary, roadmap, launch truth, and agent onboarding notes
-- `protocol.config.json` - shared site, chain, agent, and thesis-protocol source of truth
+- `protocol.config.json` - shared site, chain, agent, thesis-protocol, and `$EVA` source of truth
 
 ## Live Constants
 
@@ -26,6 +28,7 @@ intent, and anchors thesis state to Avalanche through `EvaThesisProtocol`.
 - Eva agent ID: `1599`
 - Eva wallet: `0x0fe61780bd5508b3C99e420662050e5560608cA4`
 - Thesis protocol: `0x5eDBd1eea3228662326e60634E53AB8975D6641c`
+- `$EVA`: `0x6Ae3b236d5546369db49AFE3AecF7e32c5F27672`
 
 ## API Surface
 

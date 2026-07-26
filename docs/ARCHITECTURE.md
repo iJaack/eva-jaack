@@ -5,12 +5,13 @@
 
 ## Product Boundary
 
-Eva has four live product surfaces:
+Eva has five live product surfaces:
 
 1. Market discovery across prediction providers, excluding sports for now.
 2. Thesis compose and detail pages for interactive, evolving market posts.
 3. Predictor records derived from X handles, linked wallets, and thesis history.
 4. Agent/MCP surfaces for creating, inspecting, and anchoring theses.
+5. `$EVA` contract metadata and read-only holder balances attached to wallet/author context.
 
 Eva is not a native exchange. It does not place trades, custody funds, operate a claim market, run a
 curator onboarding funnel, or publish a platform blog in the narrowed product.
@@ -21,7 +22,7 @@ curator onboarding funnel, or publish a platform blog in the narrowed product.
 ┌─────────────────────────────────────────────────────────────┐
 │ Frontend (Next.js)                                         │
 │ / · /markets · /markets/:id · /compose                    │
-│ /thesis/:id · /predictors · /predictors/:id               │
+│ /thesis/:id · /predictors · /predictors/:id · /eva        │
 └───────────────────────────┬─────────────────────────────────┘
                             │
 ┌───────────────────────────▼─────────────────────────────────┐
@@ -34,8 +35,8 @@ curator onboarding funnel, or publish a platform blog in the narrowed product.
                │                              │
 ┌──────────────▼─────────────┐  ┌─────────────▼───────────────┐
 │ Prediction/thesis storage   │  │ Avalanche C-Chain           │
-│ markets, theses, commands   │  │ EvaThesisProtocol           │
-│ predictor records, history  │  │ thesis + signal anchors     │
+│ markets, theses, commands   │  │ EvaThesisProtocol + $EVA    │
+│ predictor records, history  │  │ thesis anchors + balances   │
 └────────────────────────────┘  └─────────────────────────────┘
 ```
 
@@ -49,6 +50,7 @@ curator onboarding funnel, or publish a platform blog in the narrowed product.
 | `ThesisFactSignalDto` | A lateral fact or operating rule used inside a thesis. |
 | `ThesisRevisionDto` | Immutable history entry showing body, signal snapshot, score before/after, and anchor state. |
 | `PredictorDto` | X-handle record with optional wallet link and app-derived track record. |
+| `$EVA` holder state | Read-only ERC-20 metadata and wallet balance used as author context, never as a publishing gate or credibility score. |
 
 Fact signals still use `claimText`/`claimHash` field names in DTOs and Solidity because the field is
 an atomic factual assertion inside a thesis. That is not the removed claims-market product.
@@ -64,6 +66,10 @@ Writes require:
 The current implementation accepts the identity payload directly. Production auth should plug in a
 provider such as Privy or Dynamic for X login plus embedded wallets, while keeping the same thesis
 author shape.
+
+When a wallet is connected, Eva reads its `$EVA` balance from Avalanche C-Chain. The readback does
+not grant publishing rights, change thesis scores, or imply staking, governance, yield, or trading
+functionality.
 
 ## Request Flows
 
@@ -99,6 +105,7 @@ author shape.
 - site URL and API base
 - Avalanche chain and explorer metadata
 - deployed `EvaThesisProtocol`
+- canonical `$EVA` token address and metadata
 - Eva agent ID and wallet
 - X channel handle
 

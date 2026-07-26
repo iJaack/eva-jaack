@@ -9,7 +9,7 @@ const navItems = [
   { href: "/markets", label: "Markets" },
   { href: "/compose", label: "Compose" },
   { href: "/predictors", label: "Predictors" },
-  { href: "/campaigns", label: "Campaigns" },
+  { href: "/eva", label: "$EVA" },
 ] as const;
 
 function EvaGlyph() {
