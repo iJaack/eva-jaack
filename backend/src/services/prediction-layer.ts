@@ -675,7 +675,7 @@ async function loadPolymarketMarketPages(initialUrl: string): Promise<{ markets:
     try {
       const page = await fetchJsonWithTimeout<PolymarketKeysetMarketResponse | Record<string, unknown>[]>(url);
       markets.push(...polymarketPageMarkets(page));
-      if (Array.isArray(page) || !page.next_cursor || markets.length >= providerMarketLimit) break;
+      if (Array.isArray(page) || !page.next_cursor) break;
       url = appendPolymarketCursor(initialUrl, page.next_cursor);
     } catch (error) {
       return { markets, error: error instanceof Error ? error.message : String(error) };
@@ -696,7 +696,7 @@ async function loadKalshiMarketPages(initialUrl: string): Promise<{ markets: Rec
     try {
       const page = await fetchJsonWithTimeout<KalshiMarketListResponse>(url);
       markets.push(...(page.markets ?? []));
-      if (!page.cursor || markets.length >= providerMarketLimit) break;
+      if (!page.cursor) break;
       url = appendCursor(initialUrl, page.cursor);
     } catch (error) {
       return { markets, error: error instanceof Error ? error.message : String(error) };
