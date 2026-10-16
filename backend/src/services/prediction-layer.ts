@@ -671,6 +671,8 @@ function finishProviderLoad(
 async function loadPolymarketMarketPages(initialUrl: string): Promise<{ markets: Record<string, unknown>[]; error: string | null }> {
   const markets: Record<string, unknown>[] = [];
   let url = initialUrl;
+  // Read every allowed page before the keep-limit. High-volume prohibited rows
+  // would otherwise fill the raw cap and hide later macro and crypto markets.
   for (let pageIndex = 0; pageIndex < providerMarketMaxPages; pageIndex++) {
     try {
       const page = await fetchJsonWithTimeout<PolymarketKeysetMarketResponse | Record<string, unknown>[]>(url);
