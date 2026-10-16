@@ -190,9 +190,26 @@ export interface PredictorDetailResponse {
   theses: ThesisDto[];
 }
 
+export interface MarketPolicyProviderStatus {
+  provider: "polymarket" | "kalshi";
+  ok: boolean;
+  error: string | null;
+  fetched: number;
+  kept: number;
+  rejected: number;
+  rejectedByReason: Record<string, number>;
+}
+
+export interface MarketPolicyStatus {
+  version: string;
+  providers: MarketPolicyProviderStatus[];
+  rejectedByReason: Record<string, number>;
+}
+
 export interface MarketListResponse {
   count: number;
   markets: PredictionMarketDto[];
+  marketPolicy?: MarketPolicyStatus;
 }
 
 export interface MarketDetailResponse {

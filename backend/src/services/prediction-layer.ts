@@ -11,6 +11,8 @@ import type {
   EvaUsageReceiptDto,
   MarketDetailResponse,
   MarketListResponse,
+  MarketPolicyProviderStatus,
+  MarketPolicyStatus,
   PredictionMarketDto,
   PredictionMarketOutcomeDto,
   PredictionNetworkSummaryResponse,
@@ -35,6 +37,15 @@ import type {
   XCommandIngestResponse,
   XCommandType,
 } from "../lib/api-types.js";
+import {
+  buildMarketPolicyReport,
+  canonicalAllowedCategory,
+  classifyTitleCategory,
+  emptyMarketPolicyReport,
+  evaluateMarketPolicy,
+  failedMarketPolicyReport,
+  summarizeInjectedProviderMarkets,
+} from "../lib/market-policy.mjs";
 
 export interface ThesisIdentityInput {
   dynamicUserId: string;
@@ -132,7 +143,15 @@ type RegisteredIdentity = {
   trustScore: number;
 };
 
-type LiveMarketLoader = () => Promise<PredictionMarketDto[]>;
+type LiveMarketLoadResult = {
+  markets: PredictionMarketDto[];
+  policy: MarketPolicyStatus;
+};
+type LiveMarketLoader = () => Promise<PredictionMarketDto[] | LiveMarketLoadResult>;
+type ProviderLoadResult = {
+  status: MarketPolicyProviderStatus;
+  markets: PredictionMarketDto[];
+};
 type PolymarketKeysetMarketResponse = {
   markets?: Record<string, unknown>[];
   next_cursor?: string;
@@ -308,8 +327,10 @@ const liveMarketCacheTtlMs = 60_000;
 const providerMarketLimit = 250;
 const providerMarketPageLimit = 100;
 const providerMarketMaxPages = 5;
+// Gamma /markets/keyset rejects order=volume_num with HTTP 422
+// ("order fields are not valid"). The numeric field is volumeNum.
 const polymarketMarketsUrl =
-  "https://gamma-api.polymarket.com/markets/keyset?closed=false&limit=100&order=volume_num&ascending=false";
+  "https://gamma-api.polymarket.com/markets/keyset?closed=false&limit=100&order=volumeNum&ascending=false";
 const kalshiTradeApiBaseUrl = "https://external-api.kalshi.com/trade-api/v2";
 const kalshiMarketsUrl = `${kalshiTradeApiBaseUrl}/markets?status=open&mve_filter=exclude&limit=${providerMarketPageLimit}`;
 const kalshiSeriesTickers = ["KXCPI", "KXFED", "KXBTC", "KXETH"];
@@ -369,35 +390,18 @@ function parseUsd(value: unknown): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-function titleCategory(title: string, fallback: string): string {
-  const normalized = title.toLowerCase();
-  if (/\b(bitcoin|btc|ethereum|crypto|solana)\b/.test(normalized)) return "Crypto";
-  if (/\b(fed|inflation|rates?|cpi|gdp|recession|treasury)\b/.test(normalized)) return "Macro";
-  if (/\b(election|president|senate|congress|nomination|endorse|trump|biden|bernie|macron|erdo(?:g|ğ)?an)\b/.test(normalized)) return "Politics";
-  if (/\b(nba|nfl|mlb|nhl|soccer|football|basketball|baseball|hockey|kbo|match|game|wins?|inning|run line|moneyline)\b/.test(normalized)) return "Sports";
-  if (/\b(oil|iran|israel|russia|china|war|ceasefire)\b/.test(normalized)) return "Geopolitics";
-  return fallback;
+function resolveMarketCategory(rawCategory: string, title: string): string {
+  const fromTitle = classifyTitleCategory(title);
+  if (fromTitle && !canonicalAllowedCategory(fromTitle)) return fromTitle;
+  return canonicalAllowedCategory(rawCategory) ?? (fromTitle || rawCategory.trim());
 }
 
-const v1ProhibitedCategoryPattern = /\b(sports?|politics?|elections?|geopolitics?|war|crime|criminal)\b/i;
-const v1ProhibitedMarketPatterns = [
-  /\b(nba|nfl|mlb|nhl|soccer|football|basketball|baseball|hockey|kbo|ufc|mma|tennis|golf|f1|formula 1|match|game|inning|first inning|run line|moneyline|point spread|home run|touchdown|pitcher|batter|super bowl|world cup|champions league|premier league|sports? event(?:s)?|sports? contract(?:s)?)\b/i,
-  /\b(kt wiz|hanwha eagles|lg twins|kiwoom heroes|lotte giants|doosan bears|kia tigers|samsung lions|nc dinos|ssg landers)\b/i,
-  /\b(elections?|presidential|president|nomination|nominee|primary|caucus|senate|senator|congress|parliament|prime minister|mayor|governor|supreme court|scotus|balance of power|trump|biden|harris|putin|xi jinping|jinping|netanyahu|starmer|macron|erdo(?:g|ğ)?an|bernie|sanders)\b/i,
-  /\b(war|invade|invasion|blockade|ceasefire|missile|nuclear|airstrike|bombing|attack|terror|taiwan|ukraine|gaza|israel|iran|russia)\b/i,
-  /\b(assassinat(?:e|ed|ion)?|murder|killed|shooting|death|die|dies|dead|hospitalized|illness|injury|pregnan(?:t|cy)|marriage|divorce)\b/i,
-  /\b(jesus christ|messiah|rapture|second coming)\b/i,
-  /\b(criminal|indict(?:ed|ment)?|convict(?:ed|ion)?|arrest(?:ed)?|prison|jail|trial|investigation|charged with)\b/i,
-  /\b(tweet|tweets|post on x|post on twitter|instagram|tiktok|youtube|say on (?:x|twitter)|mention on (?:x|twitter)|endorse(?:s|d|ment)?)\b/i,
-  /\b(gta\s*(?:vi|6)|grand theft auto)\b/i,
-  /\b(james bond|next bond)\b/i,
-  /\b(new\s+[^?]{1,80}\s+album|album\s+(?:before|released?|drops?|drop|by))\b/i,
-];
-
 function isAllowedV1Market(market: PredictionMarketDto): boolean {
-  const category = market.category.trim();
-  const searchable = `${market.title} ${category} ${market.url ?? ""}`;
-  return !v1ProhibitedCategoryPattern.test(category) && !v1ProhibitedMarketPatterns.some((pattern) => pattern.test(searchable));
+  return evaluateMarketPolicy(market).allowed;
+}
+
+function bumpReason(counts: Record<string, number>, reason: string, amount = 1): void {
+  counts[reason] = (counts[reason] ?? 0) + amount;
 }
 
 function applyV1MarketPolicy(markets: PredictionMarketDto[]): PredictionMarketDto[] {
@@ -518,7 +522,10 @@ async function fetchJsonWithTimeout<T>(url: string): Promise<T> {
       signal: controller.signal,
       headers: { accept: "application/json" },
     });
-    if (!response.ok) throw new Error(`Market provider returned ${response.status}`);
+    if (!response.ok) {
+      const detail = (await response.text()).trim().replace(/\s+/g, " ").slice(0, 180);
+      throw new Error(detail ? `Market provider returned ${response.status}: ${detail}` : `Market provider returned ${response.status}`);
+    }
     return (await response.json()) as T;
   } finally {
     clearTimeout(timeout);
@@ -560,7 +567,7 @@ function normalizePolymarketMarket(raw: Record<string, unknown>, index: number):
     .filter((outcome): outcome is PredictionMarketOutcomeDto => outcome !== null);
   if (outcomes.length === 0) return null;
   const slug = String(raw.slug ?? id);
-  const category = String(raw.category ?? "").trim();
+  const rawCategory = typeof raw.category === "string" ? raw.category : "";
   const timestamp = String(raw.updatedAt ?? raw.createdAt ?? new Date().toISOString());
   return {
     marketId: `polymarket-${slugify(slug) || id || index}`,
@@ -568,7 +575,7 @@ function normalizePolymarketMarket(raw: Record<string, unknown>, index: number):
     externalId: id,
     url: `https://polymarket.com/event/${slug}`,
     title,
-    category: category || titleCategory(title, "Polymarket"),
+    category: resolveMarketCategory(rawCategory, title),
     status: "open",
     volumeUsd: parseUsd(raw.volumeNum) ?? parseUsd(raw.volume),
     liquidityUsd: parseUsd(raw.liquidityNum) ?? parseUsd(raw.liquidity),
@@ -597,7 +604,7 @@ function normalizeKalshiMarket(raw: Record<string, unknown>): PredictionMarketDt
     externalId: ticker,
     url: `https://kalshi.com/markets/${ticker.toLowerCase()}`,
     title,
-    category: titleCategory(title, "Kalshi"),
+    category: resolveMarketCategory("", title),
     status: "open",
     volumeUsd: parseUsd(raw.volume_dollars) ?? parseUsd(raw.volume_fp) ?? parseUsd(raw.volume),
     liquidityUsd: parseUsd(raw.liquidity_dollars),
@@ -625,63 +632,113 @@ function dedupeRawMarkets(markets: Record<string, unknown>[]): Record<string, un
   return [...byId.values()];
 }
 
-async function loadPolymarketMarketPages(initialUrl: string): Promise<Record<string, unknown>[]> {
+function finishProviderLoad(
+  provider: "polymarket" | "kalshi",
+  deduped: Record<string, unknown>[],
+  normalize: (raw: Record<string, unknown>, index: number) => PredictionMarketDto | null,
+  error: string | null,
+): ProviderLoadResult {
+  const rejectedByReason: Record<string, number> = {};
+  const allowed: PredictionMarketDto[] = [];
+  deduped.forEach((raw, index) => {
+    const market = normalize(raw, index);
+    if (!market) {
+      bumpReason(rejectedByReason, "invalid_market");
+      return;
+    }
+    const decision = evaluateMarketPolicy(market);
+    if (decision.allowed) allowed.push(market);
+    else bumpReason(rejectedByReason, decision.reason ?? "prohibited_pattern");
+  });
+  allowed.sort((left, right) => marketRank(right) - marketRank(left));
+  const kept = allowed.slice(0, providerMarketLimit);
+  const trimmed = allowed.length - kept.length;
+  if (trimmed > 0) bumpReason(rejectedByReason, "over_limit", trimmed);
+  return {
+    markets: kept,
+    status: {
+      provider,
+      ok: error === null,
+      error,
+      fetched: deduped.length,
+      kept: kept.length,
+      rejected: deduped.length - kept.length,
+      rejectedByReason,
+    },
+  };
+}
+
+async function loadPolymarketMarketPages(initialUrl: string): Promise<{ markets: Record<string, unknown>[]; error: string | null }> {
   const markets: Record<string, unknown>[] = [];
   let url = initialUrl;
   for (let pageIndex = 0; pageIndex < providerMarketMaxPages; pageIndex++) {
-    const page = await fetchJsonWithTimeout<PolymarketKeysetMarketResponse | Record<string, unknown>[]>(url);
-    markets.push(...polymarketPageMarkets(page));
-    if (Array.isArray(page) || !page.next_cursor || markets.length >= providerMarketLimit) break;
-    url = appendPolymarketCursor(initialUrl, page.next_cursor);
+    try {
+      const page = await fetchJsonWithTimeout<PolymarketKeysetMarketResponse | Record<string, unknown>[]>(url);
+      markets.push(...polymarketPageMarkets(page));
+      if (Array.isArray(page) || !page.next_cursor || markets.length >= providerMarketLimit) break;
+      url = appendPolymarketCursor(initialUrl, page.next_cursor);
+    } catch (error) {
+      return { markets, error: error instanceof Error ? error.message : String(error) };
+    }
   }
-  return markets;
+  return { markets, error: null };
 }
 
-async function loadPolymarketMarkets(): Promise<PredictionMarketDto[]> {
-  const rawMarkets = await loadPolymarketMarketPages(polymarketMarketsUrl);
-  return dedupeRawMarkets(rawMarkets)
-    .map((market, index) => normalizePolymarketMarket(market, index))
-    .filter((market): market is PredictionMarketDto => market !== null)
-    .filter(isAllowedV1Market)
-    .sort((left, right) => marketRank(right) - marketRank(left))
-    .slice(0, providerMarketLimit);
+async function loadPolymarketMarkets(): Promise<ProviderLoadResult> {
+  const page = await loadPolymarketMarketPages(polymarketMarketsUrl);
+  return finishProviderLoad("polymarket", dedupeRawMarkets(page.markets), normalizePolymarketMarket, page.error);
 }
 
-async function loadKalshiMarketPages(initialUrl: string): Promise<Record<string, unknown>[]> {
+async function loadKalshiMarketPages(initialUrl: string): Promise<{ markets: Record<string, unknown>[]; error: string | null }> {
   const markets: Record<string, unknown>[] = [];
   let url = initialUrl;
   for (let pageIndex = 0; pageIndex < providerMarketMaxPages; pageIndex++) {
-    const page = await fetchJsonWithTimeout<KalshiMarketListResponse>(url);
-    markets.push(...(page.markets ?? []));
-    if (!page.cursor || markets.length >= providerMarketLimit) break;
-    url = appendCursor(initialUrl, page.cursor);
+    try {
+      const page = await fetchJsonWithTimeout<KalshiMarketListResponse>(url);
+      markets.push(...(page.markets ?? []));
+      if (!page.cursor || markets.length >= providerMarketLimit) break;
+      url = appendCursor(initialUrl, page.cursor);
+    } catch (error) {
+      return { markets, error: error instanceof Error ? error.message : String(error) };
+    }
   }
-  return markets;
+  return { markets, error: null };
 }
 
-async function loadKalshiMarkets(): Promise<PredictionMarketDto[]> {
-  const responses = await Promise.allSettled([
-    loadKalshiMarketPages(kalshiMarketsUrl),
-    ...kalshiSeriesTickers.map((ticker) =>
-      loadKalshiMarketPages(
-        `${kalshiTradeApiBaseUrl}/markets?status=open&series_ticker=${encodeURIComponent(ticker)}&limit=100`,
-      ),
-    ),
-  ]);
-  return dedupeRawMarkets(responses.flatMap((result) => (result.status === "fulfilled" ? result.value : [])))
-    .map((market) => normalizeKalshiMarket(market))
-    .filter((market): market is PredictionMarketDto => market !== null)
-    .filter(isAllowedV1Market)
-    .sort((left, right) => marketRank(right) - marketRank(left))
-    .slice(0, providerMarketLimit);
-}
-
-async function loadProviderMarkets(): Promise<PredictionMarketDto[]> {
-  const [polymarket, kalshi] = await Promise.allSettled([loadPolymarketMarkets(), loadKalshiMarkets()]);
-  return [
-    ...(polymarket.status === "fulfilled" ? polymarket.value : []),
-    ...(kalshi.status === "fulfilled" ? kalshi.value : []),
+async function loadKalshiMarkets(): Promise<ProviderLoadResult> {
+  // The general open feed stays. Series alone would miss company, technology, and
+  // private-market titles; the allowlist drops the sports that dominate status=open.
+  const jobs = [
+    { label: "open feed", url: kalshiMarketsUrl },
+    ...kalshiSeriesTickers.map((ticker) => ({
+      label: `series ${ticker}`,
+      url: `${kalshiTradeApiBaseUrl}/markets?status=open&series_ticker=${encodeURIComponent(ticker)}&limit=${providerMarketPageLimit}`,
+    })),
   ];
+  const pages = await Promise.all(
+    jobs.map(async (job) => {
+      const page = await loadKalshiMarketPages(job.url);
+      return { label: job.label, ...page };
+    }),
+  );
+  const errorText = pages
+    .filter((page) => page.error)
+    .map((page) => `${page.label}: ${page.error}`)
+    .join("; ");
+  return finishProviderLoad(
+    "kalshi",
+    dedupeRawMarkets(pages.flatMap((page) => page.markets)),
+    (raw) => normalizeKalshiMarket(raw),
+    errorText || null,
+  );
+}
+
+async function loadProviderMarkets(): Promise<LiveMarketLoadResult> {
+  const [polymarket, kalshi] = await Promise.all([loadPolymarketMarkets(), loadKalshiMarkets()]);
+  return {
+    markets: [...polymarket.markets, ...kalshi.markets],
+    policy: buildMarketPolicyReport([polymarket.status, kalshi.status]),
+  };
 }
 
 function mergeProviderMarkets(store: PredictionStore, providerMarkets: PredictionMarketDto[]): PredictionStore {
@@ -1139,7 +1196,7 @@ function avgOddsEdgeFor(theses: ThesisDto[]): number | null {
 }
 
 export class LocalPredictionLayerService {
-  private liveMarketCache: { loadedAt: number; markets: PredictionMarketDto[] } | null = null;
+  private liveMarketCache: { loadedAt: number; markets: PredictionMarketDto[]; policy: MarketPolicyStatus } | null = null;
   private readonly storage = resolvePredictionStorageReadiness();
 
   constructor(
@@ -1147,6 +1204,10 @@ export class LocalPredictionLayerService {
     private readonly registeredIdentityLoader: () => Promise<PredictorIdentityDto[]> = async () => [],
     private readonly liveMarketLoader: LiveMarketLoader = loadProviderMarkets,
   ) {}
+
+  getMarketPolicyReport(): MarketPolicyStatus {
+    return this.liveMarketCache?.policy ?? emptyMarketPolicyReport();
+  }
 
   getStorageReadiness(): PredictionStorageReadiness {
     if (this.storage.mode === "vercel_blob") return this.storage;
@@ -1278,7 +1339,7 @@ export class LocalPredictionLayerService {
       if (liveDelta !== 0) return liveDelta;
       return (right.volumeUsd ?? 0) - (left.volumeUsd ?? 0);
     });
-    return { count: markets.length, markets };
+    return { count: markets.length, markets, marketPolicy: this.getMarketPolicyReport() };
   }
 
   async getMarket(marketId: string): Promise<MarketDetailResponse | null> {
@@ -1744,10 +1805,13 @@ export class LocalPredictionLayerService {
       return this.liveMarketCache.markets;
     }
     try {
-      const markets = await this.liveMarketLoader();
-      this.liveMarketCache = { loadedAt: Date.now(), markets };
-      return markets;
-    } catch {
+      const loaded = await this.liveMarketLoader();
+      const normalized = Array.isArray(loaded) ? summarizeInjectedProviderMarkets(loaded) : loaded;
+      this.liveMarketCache = { loadedAt: Date.now(), markets: normalized.markets, policy: normalized.policy };
+      return normalized.markets;
+    } catch (error) {
+      const policy = failedMarketPolicyReport(error);
+      this.liveMarketCache = { loadedAt: Date.now(), markets: [], policy };
       return [];
     }
   }

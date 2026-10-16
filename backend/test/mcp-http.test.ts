@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createApp } from "../src/app.js";
+import { createApp, resolveBuildRevision } from "../src/app.js";
 import { evaMcpToolDescriptions, evaMcpToolNames } from "../src/mcp-server.js";
 import { fetchJson } from "./helpers.js";
 
@@ -50,6 +50,14 @@ describe("MCP HTTP endpoint", () => {
     const response = await fetchJson(app, "/api/runtime-readiness");
 
     expect(response.status).toBe(200);
+    expect(resolveBuildRevision({})).toBe("unknown");
+    expect(resolveBuildRevision({ VERCEL_GIT_COMMIT_SHA: " abc123 " })).toBe("abc123");
+    expect(response.body.revision).toBe(process.env.VERCEL_GIT_COMMIT_SHA?.trim() || "unknown");
+    expect(response.body.marketPolicy).toMatchObject({
+      version: "v1-allowlist",
+      rejectedByReason: {},
+    });
+    expect(Array.isArray(response.body.marketPolicy.providers)).toBe(true);
     expect(response.body).toMatchObject({
       status: "ok",
       service: "Eva Protocol",
