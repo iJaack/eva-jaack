@@ -8,7 +8,7 @@
     "mcp": "tsx src/mcp.ts",
     "deploy:thesis-protocol:evalanche": "tsx scripts/deploy-thesis-protocol-evalanche.ts",
     "anchor:thesis:evalanche": "tsx scripts/broadcast-thesis-anchor-evalanche.ts",
-    "build": "tsc",
+    "build": "tsc && cp src/lib/market-policy.mjs dist/lib/market-policy.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "upgrade:thesis-protocol:evalanche": "tsx scripts/upgrade-thesis-protocol-evalanche.ts"

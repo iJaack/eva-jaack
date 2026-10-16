@@ -102,10 +102,17 @@ function mcpDiscovery(c: Context) {
   });
 }
 
+export function resolveBuildRevision(env: NodeJS.ProcessEnv = process.env): string {
+  const revision = env.VERCEL_GIT_COMMIT_SHA?.trim();
+  return revision ? revision : 'unknown';
+}
+
 function runtimeReadiness(c: Context) {
   return c.json({
     status: 'ok',
     service: protocol.app.name,
+    revision: resolveBuildRevision(),
+    marketPolicy: getPredictionLayerService().getMarketPolicyReport(),
     walletConnection: {
       ready: true,
       mode: protocol.evaUsage.walletMode,

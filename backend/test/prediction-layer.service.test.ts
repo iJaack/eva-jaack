@@ -2,6 +2,8 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { ALLOWED_SEED_MARKET_IDS } from "../src/lib/market-policy.mjs";
+import type { PredictionMarketDto } from "../src/lib/api-types.js";
 import { LocalPredictionLayerService, resolvePredictionIndexPath, resolvePredictionStorageReadiness } from "../src/services/prediction-layer.js";
 import { samplePredictorIdentity } from "./fixtures.js";
 
@@ -15,6 +17,38 @@ function auth() {
     walletAddress: samplePredictorIdentity.address,
     walletSource: "external" as const,
   };
+}
+
+function sampleMarket(overrides: Partial<PredictionMarketDto> = {}): PredictionMarketDto {
+  const now = new Date().toISOString();
+  return {
+    marketId: "polymarket-sample",
+    provider: "polymarket",
+    externalId: "sample",
+    url: "https://polymarket.com/event/sample",
+    title: "Will the Fed hold rates at the next meeting?",
+    category: "Macro",
+    status: "open",
+    volumeUsd: 1_000_000,
+    liquidityUsd: 100_000,
+    closeTime: null,
+    outcomes: [
+      { outcomeId: "yes", label: "Yes", price: 0.5 },
+      { outcomeId: "no", label: "No", price: 0.5 },
+    ],
+    linkedClaimIds: [],
+    createdAt: now,
+    updatedAt: now,
+    ...overrides,
+  };
+}
+
+async function serviceWithLoader(loader: () => Promise<PredictionMarketDto[]>) {
+  const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
+  cleanupDirs.push(dir);
+  const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => [], loader);
+  const listed = await service.listMarkets();
+  return { service, listed };
 }
 
 describe("prediction layer service", () => {
@@ -877,5 +911,141 @@ describe("prediction layer service", () => {
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-erdogan-out");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-macron-out");
     expect(markets.markets.map((market) => market.marketId)).not.toContain("polymarket-bernie-endorse-senate");
+  });
+
+  it("rejects unclassified markets, foreign domains, and unlisted seed ids", async () => {
+    const { service, listed } = await serviceWithLoader(async () => [
+      sampleMarket({
+        marketId: "polymarket-unclassified",
+        externalId: "unclassified-1",
+        url: "https://polymarket.com/event/observatory-bulletin",
+        title: "Will the observatory publish its next bulletin?",
+        category: "",
+      }),
+      sampleMarket({
+        marketId: "polymarket-provider-name",
+        externalId: "unclassified-2",
+        url: "https://polymarket.com/event/provider-name-fallback",
+        title: "Will the observatory publish a second bulletin?",
+        category: "Polymarket",
+      }),
+      sampleMarket({
+        marketId: "polymarket-foreign",
+        externalId: "foreign-1",
+        url: "https://example.com/fed-rates",
+        title: "Will the Fed hold rates at the next meeting?",
+        category: "Macro",
+      }),
+      sampleMarket({
+        marketId: "manual-not-allowlisted",
+        provider: "manual",
+        externalId: "rogue-seed",
+        url: "https://polymarket.com/event/fed-hold",
+        title: "Will the Fed hold rates at the next meeting?",
+        category: "Macro",
+      }),
+    ]);
+
+    const ids = listed.markets.map((market) => market.marketId);
+    expect(ids).not.toContain("polymarket-unclassified");
+    expect(ids).not.toContain("polymarket-provider-name");
+    expect(ids).not.toContain("polymarket-foreign");
+    expect(ids).not.toContain("manual-not-allowlisted");
+    for (const seedId of ALLOWED_SEED_MARKET_IDS) expect(ids).toContain(seedId);
+
+    const polymarket = listed.marketPolicy?.providers.find((provider) => provider.provider === "polymarket");
+    expect(polymarket?.rejectedByReason.unclassified).toBe(2);
+    expect(polymarket?.rejectedByReason.foreign_domain).toBe(1);
+    expect(service.getMarketPolicyReport().rejectedByReason.unclassified).toBe(2);
+  });
+
+  it("reports a provider failure instead of dropping it", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
+    cleanupDirs.push(dir);
+    const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => [], async () => {
+      throw new Error("polymarket unavailable");
+    });
+
+    const listed = await service.listMarkets();
+
+    expect(listed.markets.map((market) => market.marketId)).toContain("spacex-ipo-before-2027");
+    expect(listed.marketPolicy?.providers).toEqual([
+      expect.objectContaining({ provider: "polymarket", ok: false, error: "polymarket unavailable", fetched: 0, kept: 0 }),
+      expect.objectContaining({ provider: "kalshi", ok: false, error: "polymarket unavailable", fetched: 0, kept: 0 }),
+    ]);
+  });
+
+  it("parses the repaired Polymarket keyset payload and applies the allowlist", async () => {
+    const calls: string[] = [];
+    vi.stubGlobal("fetch", async (input: unknown) => {
+      const url = String(input);
+      calls.push(url);
+      if (url.includes("gamma-api.polymarket.com")) {
+        expect(url).toContain("order=volumeNum");
+        expect(url).not.toContain("volume_num");
+        return new Response(
+          JSON.stringify({
+            markets: [
+              {
+                id: "101",
+                question: "Will the Fed cut rates before September?",
+                slug: "fed-cut-before-september",
+                outcomes: JSON.stringify(["Yes", "No"]),
+                outcomePrices: JSON.stringify(["0.42", "0.58"]),
+                volumeNum: 12_000_000,
+                liquidityNum: 1_000_000,
+                endDate: "2026-09-01T00:00:00Z",
+                createdAt: "2026-08-01T00:00:00Z",
+                updatedAt: "2026-08-02T00:00:00Z",
+              },
+              {
+                id: "102",
+                question: "Will the Lakers win the NBA game?",
+                slug: "lakers-nba-game",
+                outcomes: JSON.stringify(["Yes", "No"]),
+                outcomePrices: JSON.stringify(["0.45", "0.55"]),
+                volumeNum: 9_000_000,
+                liquidityNum: 500_000,
+              },
+              { id: "103" },
+            ],
+            next_cursor: "",
+          }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        );
+      }
+      if (url.includes("external-api.kalshi.com")) {
+        return new Response(JSON.stringify({ markets: [], cursor: "" }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      throw new Error(`unexpected url ${url}`);
+    });
+
+    const dir = await mkdtemp(join(tmpdir(), "eva-predictions-"));
+    cleanupDirs.push(dir);
+    const service = new LocalPredictionLayerService(join(dir, "index.json"), async () => []);
+    const listed = await service.listMarkets();
+    const ids = listed.markets.map((market) => market.marketId);
+
+    expect(calls.some((url) => url.includes("order=volumeNum"))).toBe(true);
+    expect(calls.some((url) => url.includes("volume_num"))).toBe(false);
+    expect(ids).toContain("polymarket-fed-cut-before-september");
+    expect(ids).not.toContain("polymarket-lakers-nba-game");
+    const fed = listed.markets.find((market) => market.marketId === "polymarket-fed-cut-before-september");
+    expect(fed).toMatchObject({ provider: "polymarket", category: "Macro", volumeUsd: 12_000_000 });
+    expect(fed?.outcomes[0]).toMatchObject({ label: "Yes", price: 0.42 });
+    const polymarket = listed.marketPolicy?.providers.find((provider) => provider.provider === "polymarket");
+    expect(polymarket).toMatchObject({
+      ok: true,
+      error: null,
+      fetched: 3,
+      kept: 1,
+      rejected: 2,
+      rejectedByReason: { prohibited_pattern: 1, invalid_market: 1 },
+    });
+    const kalshi = listed.marketPolicy?.providers.find((provider) => provider.provider === "kalshi");
+    expect(kalshi).toMatchObject({ ok: true, error: null, fetched: 0, kept: 0 });
   });
 });
