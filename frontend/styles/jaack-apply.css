@@ -210,6 +210,7 @@ html.jk-th-fade .eva-glass {
   align-items: center;
   gap: var(--jk-s2);
   width: 100%;
+  min-width: 0;
   min-height: 52px;
   margin: 0;
   padding: 6px 8px 6px 16px;
@@ -794,18 +795,34 @@ select,
   animation: none;
 }
 
+/* The top bar is the only glass. Proof, preview, and action rows stay open. */
+.eva-glass,
+.eva-proof-sheet,
+.compose-preview-panel,
+.mobile-bottom-actions,
+.thesis-action-row,
+.sticky-action-row {
+  position: relative;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.market-chip {
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
 .eva-glass,
 .eva-proof-sheet,
 .compose-preview-panel {
-  position: relative;
   isolation: isolate;
   padding: var(--jk-s5);
-  border: 0;
-  border-radius: var(--jk-r-panel);
-  background: radial-gradient(130% 125% at 50% 45%, var(--jk-tint) 62%, var(--jk-tint-edge) 100%);
-  box-shadow: var(--jk-drop);
-  -webkit-backdrop-filter: blur(18px) saturate(1.8);
-  backdrop-filter: blur(18px) saturate(1.8);
 }
 
 .eva-proof-sheet > h2 {
@@ -850,6 +867,19 @@ select,
   letter-spacing: 0;
 }
 
+.site-footer-links {
+  min-width: 0;
+}
+
+.site-footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 0;
+  overflow-wrap: anywhere;
+}
+
 .skip-link {
   border-color: var(--jk-accent-text);
   border-radius: var(--jk-r-pill);
@@ -858,6 +888,40 @@ select,
 }
 
 @media (max-width: 920px) {
+  .topbar-inner,
+  .brand,
+  .topbar-actions,
+  .eva-theme-host,
+  .jk-thsw {
+    min-width: 0;
+  }
+
+  .brand,
+  .topbar-actions,
+  .jk-thsw {
+    flex-shrink: 1;
+  }
+
+  .brand {
+    flex: 1 1 auto;
+  }
+
+  .brand-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .topbar-actions {
+    flex: 0 1 auto;
+  }
+
+  .jk-thsw {
+    flex: 0 1 auto;
+    max-width: 100%;
+  }
+
   .topbar-inner {
     display: flex;
     grid-template-columns: none;
@@ -950,6 +1014,144 @@ select,
     padding: 12px 0;
     border-right: 0;
     border-bottom: 1px solid var(--jk-hair);
+  }
+}
+
+@media (max-width: 420px) {
+  .topbar-inner {
+    gap: 6px;
+    padding-left: 10px;
+    padding-right: 6px;
+  }
+
+  .jk-thsw button {
+    min-width: 36px;
+    min-height: 36px;
+    padding-inline: 6px;
+  }
+}
+
+/* Mobile type floor. Editorial mono labels sit between 9px and 11px; keep them readable. */
+@media (max-width: 768px) {
+  .eva-evidence-item span:not(.eva-evidence-node),
+  .eva-evidence-item em,
+  .eva-evidence-item strong,
+  .eva-market-forecast small,
+  .eva-market-forecast strong,
+  .eva-market-row > .status-chip,
+  .eva-market-volume,
+  .eva-market-index,
+  .eva-source-row small,
+  .eva-source-row strong,
+  .eva-source-process span,
+  .eva-source-process small,
+  .eva-source-process i,
+  .eva-thesis-proof-ledger dt,
+  .eva-thesis-proof-ledger dd strong,
+  .eva-thesis-proof-ledger dd small,
+  .thesis-update-disclosure > summary small,
+  .eva-thesis-receipt,
+  .eva-thesis-signal-heading,
+  .eva-proof-facts dt,
+  .eva-proof-facts small,
+  .eva-proof-loading span,
+  .eva-ruled-loading,
+  .eva-revision-trace,
+  .eva-chain-receipt strong,
+  .eva-chain-receipt small,
+  .eva-chain-receipt span,
+  .eva-home-token dt,
+  .eva-home-token dd,
+  .eva-home-token span,
+  .eva-home-token > div > span,
+  .eva-home-token small,
+  .eva-token-row-label p,
+  .eva-token-row-label span,
+  .eva-token-receipt dt,
+  .eva-token-receipt dd,
+  .eva-token-followup a,
+  .eva-token-followup p,
+  .eva-token-boundaries p,
+  .eva-token-boundaries strong,
+  .eva-protocol-holding small,
+  .eva-protocol-holding span,
+  .eva-usage-panel p,
+  .eva-usage-panel span,
+  .eva-usage-panel label,
+  .eva-usage-panel code,
+  .eva-usage-disclosure p,
+  .status-chip,
+  .filter-chip,
+  .card-topline,
+  .field-label,
+  .compose-editor-core .field-label,
+  .compose-source-core .field-label,
+  .compose-identity-panel .field-label,
+  .compose-identity-actions .field-label,
+  .compose-publish-gate > span,
+  .inline-note,
+  .compose-token-boundary,
+  .compose-readiness-rail strong,
+  .compose-readiness-rail span,
+  .compose-form > .card-topline,
+  .compose-draft-permission,
+  .market-chip,
+  .market-chip small,
+  .market-chip span,
+  .quest-card-cta,
+  .campaign-card span,
+  .eyebrow,
+  .compose-head-copy .eyebrow,
+  .eva-token-hero .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+
+  .eva-evidence-item strong,
+  .eva-evidence-item em,
+  .eva-source-row small,
+  .eva-source-row strong,
+  .eva-thesis-proof-ledger dd small,
+  .eva-thesis-proof-ledger dd strong,
+  .eva-chain-receipt,
+  .eva-chain-receipt span,
+  .eva-market-forecast small,
+  .eva-market-forecast strong,
+  .quest-card-cta,
+  .eva-token-followup,
+  .eva-protocol-holding {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+
+  .eva-market-forecast {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    min-width: 0;
+  }
+
+  .eva-thesis-proof-ledger > div,
+  .eva-proof-facts div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    min-height: 0;
+    height: auto;
+    padding-inline: 0;
+  }
+
+  .eva-proof-facts dd {
+    overflow: visible;
+    text-align: left;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .eva-thesis-proof-ledger > div {
+    padding-left: 22px;
   }
 }
 
