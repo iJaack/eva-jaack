@@ -1,9 +1,10 @@
-/* Jaack presentation layer.
-   Uses Eva class names so Tailwind utilities and jk- component classes do not collide.
+/* Forma presentation, tuned for Eva.
+   Claims and titles use Newsreader. Controls, rows, and metadata use Geist.
+   Mint fills carry dark ink. One glass panel per screen, besides the top bar.
    The only jk- classes here are the ones theme.js mounts (.jk-thsw) plus motion hooks (.jk-rm, .jk-th-fade). */
 
 :root {
-  --font-display: var(--jk-font);
+  --font-display: var(--font-newsreader), Georgia, "Iowan Old Style", serif;
   --font-body: var(--jk-font);
   --radius-pill: var(--jk-r-pill);
   --radius-card: 0px;
@@ -20,11 +21,16 @@ html {
 body {
   background: transparent;
   color: var(--jk-ink);
-  font-family: var(--jk-font);
+  font-family: var(--font-body);
   font-size: var(--jk-fs-body);
   line-height: var(--jk-lh);
   letter-spacing: -0.011em;
   font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: var(--jk-accent);
+  color: var(--jk-on-accent);
 }
 
 body::before {
@@ -33,13 +39,18 @@ body::before {
 
 h1,
 h2,
-h3,
-h4,
 .brand-title,
 .site-footer-brand > span {
-  font-family: var(--jk-font);
-  font-weight: 700;
-  letter-spacing: var(--jk-track-title);
+  font-family: var(--font-display);
+  font-weight: 560;
+  letter-spacing: -0.02em;
+}
+
+h3,
+h4 {
+  font-family: var(--font-body);
+  font-weight: 650;
+  letter-spacing: -0.015em;
 }
 
 a:focus-visible,
@@ -220,9 +231,10 @@ html.jk-th-fade .eva-glass {
 }
 
 .brand-title {
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
 }
 
 .nav-links {
@@ -247,10 +259,15 @@ html.jk-th-fade .eva-glass {
   content: none;
 }
 
-.nav-link:hover,
-.nav-link-active {
+.nav-link:hover {
   transform: none;
   background: var(--jk-tint-hi);
+  color: var(--jk-ink);
+}
+
+.nav-link-active {
+  transform: none;
+  background: var(--jk-accent-wash);
   color: var(--jk-ink);
 }
 
@@ -271,9 +288,11 @@ html.jk-th-fade .eva-glass {
   padding: 0 14px;
   border: 0;
   border-radius: var(--jk-r-pill);
-  background: var(--jk-ink);
-  color: var(--jk-bg);
+  background: var(--jk-accent);
+  color: var(--jk-on-accent);
   font-family: var(--jk-font);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   font-size: var(--jk-fs-sm);
   font-weight: 650;
   box-shadow: none;
@@ -286,7 +305,7 @@ html.jk-th-fade .eva-glass {
 .button-primary:hover,
 .btn-primary:hover {
   transform: none;
-  background: var(--jk-accent-text);
+  background: var(--jk-accent-hover);
   color: var(--jk-on-accent);
 }
 
@@ -388,6 +407,7 @@ html.jk-th-fade .eva-glass {
   padding: 0 0 var(--jk-s5);
 }
 
+.eyebrow,
 .mobile-page-head .eyebrow,
 .hero .eyebrow,
 .section-kicker,
@@ -407,6 +427,18 @@ html.jk-th-fade .eva-glass {
   text-transform: uppercase;
 }
 
+.eyebrow,
+.mobile-page-head .eyebrow,
+.hero .eyebrow,
+.compose-head-copy .eyebrow,
+.eva-token-hero .eyebrow {
+  color: var(--jk-accent-text);
+  font-family: var(--font-mono);
+  font-size: var(--jk-fs-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
 .eyebrow::before {
   background: var(--jk-accent);
   box-shadow: none;
@@ -415,11 +447,13 @@ html.jk-th-fade .eva-glass {
 .mobile-shell:not(.prediction-home) > .mobile-page-head .eyebrow,
 .page-shell:not(.prediction-home) > .mobile-page-head .eyebrow,
 .mobile-shell:not(.prediction-home) > .hero .eyebrow,
-.page-shell:not(.prediction-home) > .hero .eyebrow {
+.page-shell:not(.prediction-home) > .hero .eyebrow,
+.compose-head-copy .eyebrow,
+.eva-token-hero .eyebrow {
   font-size: var(--jk-fs-xs);
-  color: var(--jk-t2);
-  font-family: var(--jk-font);
-  letter-spacing: var(--jk-track-label);
+  color: var(--jk-accent-text);
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
 }
 
 .mobile-page-head h1,
@@ -432,15 +466,18 @@ html.jk-th-fade .eva-glass {
 .eva-record-copy h2,
 .eva-home-token h2,
 .paper-section h2,
+.eva-token-hero h1,
+.compose-head-copy h1,
 .compose-page-head h1 {
-  max-width: 28ch;
+  max-width: 22ch;
   margin: 0;
   background: none;
   color: var(--jk-ink);
+  font-family: var(--font-display);
   font-size: var(--jk-fs-title);
-  font-weight: 700;
-  letter-spacing: var(--jk-track-title);
-  line-height: 1.08;
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
   -webkit-text-fill-color: currentColor;
 }
 
@@ -588,10 +625,11 @@ html.jk-th-fade .eva-glass {
 .predictor-row h3,
 .thesis-list-item h2,
 .thesis-list-item h3 {
+  font-family: var(--font-display);
   font-size: var(--jk-fs-body);
-  font-weight: 650;
+  font-weight: 560;
   letter-spacing: -0.02em;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .eva-market-row {
@@ -641,11 +679,17 @@ html.jk-th-fade .eva-glass {
   font-weight: 600;
 }
 
-.filter-chip-active,
 .filter-chip:hover {
   border: 0;
   background: var(--jk-bg);
   color: var(--jk-ink);
+}
+
+.filter-chip.filter-chip-active,
+.status-chip.status-chip-forecast {
+  border: 0;
+  background: var(--jk-accent);
+  color: var(--jk-on-accent);
 }
 
 .field-input,
@@ -672,10 +716,15 @@ select,
 
 .compose-title-input {
   min-height: 48px !important;
+  font-family: var(--font-display);
   font-size: var(--jk-fs-title) !important;
+  font-weight: 560;
+  letter-spacing: -0.02em;
 }
 
 /* Open layout. Boxes become hairlines. One earned glass per screen, besides the top bar. */
+.campaign-card,
+.product-module,
 .prediction-card,
 .prediction-section,
 .route-panel,
@@ -704,6 +753,27 @@ select,
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
   transform: none;
+}
+
+.campaign-card,
+.product-module {
+  min-height: 0;
+  padding: 16px 0;
+  border-top: 1px solid var(--jk-hair);
+}
+
+.campaign-grid .campaign-card:nth-child(even) {
+  border-left: 1px solid var(--jk-hair);
+}
+
+.campaign-card h3,
+.product-module h3 {
+  margin: 6px 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
 }
 
 .prediction-card,
@@ -741,10 +811,11 @@ select,
 .eva-proof-sheet > h2 {
   padding: 8px 0 12px;
   border-bottom: 1px solid var(--jk-hair);
+  font-family: var(--font-display);
   font-size: clamp(22px, 2vw, 32px);
-  font-weight: 700;
-  letter-spacing: var(--jk-track-title);
-  line-height: 1.1;
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  line-height: 1.14;
 }
 
 .eva-proof-topline,
@@ -845,6 +916,8 @@ select,
     border: 0;
     background: transparent;
     color: var(--jk-ink);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 
   .nav-hamburger span {

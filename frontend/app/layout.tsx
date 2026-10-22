@@ -53,7 +53,7 @@ export default function RootLayout({
         <meta name="color-scheme" content="light dark" />
         {/* Parser-blocking on purpose: next/script beforeInteractive runs after first paint and would flash the wrong theme. */}
         {/* eslint-disable-next-line @next/next/no-sync-scripts */}
-        <script src="/jaack-theme.js" data-light-from="7" data-light-to="19" data-key="jaack.theme" />
+        <script src="/jaack-theme.js" data-light-from="7" data-light-to="19" data-key="eva.theme" />
       </head>
       <body>
         <SoftBackdrop />

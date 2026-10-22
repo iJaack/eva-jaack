@@ -26,9 +26,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ["var(--jk-font)", "system-ui", "sans-serif"],
-        body: ["var(--jk-font)", "system-ui", "sans-serif"],
-        sans: ["var(--jk-font)", "system-ui", "sans-serif"],
+        display: ["var(--font-newsreader)", "Georgia", "serif"],
+        body: ["var(--font-geist)", "system-ui", "sans-serif"],
+        sans: ["var(--font-geist)", "system-ui", "sans-serif"],
       },
       fontSize: {
         "jk-xs": "var(--jk-fs-xs)",
