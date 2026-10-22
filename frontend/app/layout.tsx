@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import { MotionProvider } from "@/components/motion/MotionProvider";
+import SoftBackdrop from "@/components/motion/SoftBackdrop";
 import EvaProviders from "@/components/EvaProviders";
-import { fontVariables, geist } from "@/lib/fonts";
+import { fontVariables } from "@/lib/fonts";
 import { protocol } from "@/lib/protocol";
 
 const title = `${protocol.app.name} — Public thesis publishing for prediction markets`;
@@ -47,8 +48,15 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en" className={fontVariables}>
-      <body className={geist.className}>
+    <html lang="en" className={fontVariables} suppressHydrationWarning>
+      <head>
+        <meta name="color-scheme" content="light dark" />
+        {/* Parser-blocking on purpose: next/script beforeInteractive runs after first paint and would flash the wrong theme. */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="/jaack-theme.js" data-light-from="7" data-light-to="19" data-key="eva.theme" />
+      </head>
+      <body>
+        <SoftBackdrop />
         <MotionProvider>
           <EvaProviders>{children}</EvaProviders>
         </MotionProvider>

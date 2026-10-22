@@ -1,10 +1,74 @@
-/* Eva Protocol · MotionSites-inspired design tokens · dark default + light override */
-:root {
-  --font-display: var(--font-space-grotesk, "Space Grotesk"), ui-sans-serif, system-ui, sans-serif;
-  --font-body: var(--font-manrope, "Manrope"), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", monospace;
+/* Forma structure, Eva palette.
+   Shared scale, spacing, and theme logic stay on --jk-*.
+   Colour is Eva's: mint accent, green-black ink, brand-hued washes.
+   jaack-theme.js sets data-theme before first paint
+   (local clock 07:00–18:59 light, else dark; Auto/Chiaro/Scuro). */
 
-  /* Brand gradient (eva-logo-mark.svg) */
+:root {
+  --jk-font: var(--font-geist), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --jk-fs-xs: 12.5px;
+  --jk-fs-sm: 13px;
+  --jk-fs-note: 14px;
+  --jk-fs-body: 16px;
+  --jk-fs-lede: 17px;
+  --jk-fs-title: clamp(30px, 2.6vw, 44px);
+  --jk-fs-mid: clamp(36px, 3vw, 52px);
+  --jk-fs-big: clamp(56px, 7.5vw, 120px);
+  --jk-fs-deco: clamp(96px, 8vw, 150px);
+  --jk-lh-tight: 1.02;
+  --jk-lh: 1.5;
+  --jk-track-label: 0.06em;
+  --jk-track-big: -0.05em;
+  --jk-track-mid: -0.04em;
+  --jk-track-title: -0.03em;
+
+  --jk-s1: 4px;
+  --jk-s2: 8px;
+  --jk-s3: 12px;
+  --jk-s4: 16px;
+  --jk-s5: 20px;
+  --jk-s6: 24px;
+  --jk-s7: 28px;
+  --jk-s8: 32px;
+  --jk-s10: 40px;
+  --jk-s12: 48px;
+  --jk-s16: 64px;
+  --jk-s18: 72px;
+  --jk-row-pad: 7px;
+  --jk-group-gap: 28px;
+  --jk-hero-gap: 24px;
+  --jk-chapter-gap: 64px;
+  --jk-chapter-gap-m: 40px;
+  --jk-page-x: clamp(16px, 4.4vw, 72px);
+  --jk-topbar-h: 72px;
+  --jk-max: 1200px;
+
+  --jk-r-xs: 8px;
+  --jk-r-s: 14px;
+  --jk-r-m: 20px;
+  --jk-r-panel: 24px;
+  --jk-r-l: 26px;
+  --jk-r-xl: 34px;
+  --jk-r-pill: 999px;
+
+  --jk-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --jk-d-fast: 0.15s;
+  --jk-d-fade: 0.4s;
+  --jk-d-theme: 0.4s;
+  --jk-d-draw: 0.6s;
+  --jk-d-pill: 0.35s;
+
+  /* Chart marks only — not body text. */
+  --jk-c-blue: #0a84ff;
+  --jk-c-orange: #ff9f0a;
+  --jk-c-yellow: #ffd60a;
+  --jk-c-green: #30d158;
+  --jk-c-cyan: #64d2ff;
+  --jk-c-purple: #bf5af2;
+  --jk-c-pink: #ff375f;
+  --jk-c-red: #ff453a;
+
+  /* Eva mark. The same hues tint the page wash; UI text uses --jk-accent-text. */
   --color-brand-cyan: #7ed8e7;
   --color-brand-lavender: #b5a1d2;
   --color-brand-coral: #f29c79;
@@ -16,158 +80,195 @@
     var(--color-brand-coral) 68%,
     var(--color-brand-lime) 100%
   );
-  --gradient-brand-soft: linear-gradient(
-    135deg,
-    color-mix(in oklch, var(--color-brand-cyan) 24%, transparent),
-    color-mix(in oklch, var(--color-brand-lavender) 18%, transparent),
-    color-mix(in oklch, var(--color-brand-coral) 14%, transparent)
-  );
 
-  /* Dark theme (default) */
-  --color-paper: oklch(11% 0.018 260);
-  --color-paper-2: oklch(14.5% 0.022 260);
-  --color-paper-3: oklch(19% 0.026 260);
-  --color-ink: oklch(97% 0.008 260);
-  --color-ink-2: oklch(88% 0.012 260);
-  --color-neutral: oklch(72% 0.012 260);
-  --color-muted: oklch(68% 0.014 260);
-  --color-subtle: oklch(48% 0.016 260);
-  --color-rule: oklch(32% 0.022 260);
-  --color-rule-strong: oklch(46% 0.028 260);
-  --color-surface: oklch(16% 0.024 260);
-  --color-surface-strong: oklch(21% 0.028 260);
-  --color-accent: oklch(78% 0.16 195);
-  --color-accent-strong: oklch(86% 0.14 185);
-  --color-accent-soft: oklch(28% 0.08 195);
-  --color-accent-ink: oklch(10% 0.02 260);
-  --color-focus: oklch(80% 0.16 195);
-  --color-success: oklch(78% 0.14 155);
-  --color-warning: oklch(79% 0.14 82);
-  --color-caution: oklch(72% 0.15 46);
-  --color-danger: oklch(68% 0.18 24);
-  --color-evidence: oklch(76% 0.13 190);
-  --color-resolution: oklch(74% 0.15 318);
-  --color-market-hot: oklch(74% 0.16 34);
-  --color-provider-polymarket: oklch(72% 0.14 248);
-  --color-provider-kalshi: oklch(78% 0.13 150);
-  --color-avalanche: oklch(68% 0.2 25);
-
-  /* MotionSites semantic aliases */
-  --bg-base: var(--color-paper);
-  --bg-elevated: var(--color-surface);
-  --bg-glass: color-mix(in oklch, var(--color-surface) 72%, transparent);
-  --border-subtle: color-mix(in oklch, var(--color-rule) 80%, transparent);
-  --glow-accent: 0 0 40px color-mix(in oklch, var(--color-accent) 35%, transparent);
-  --blur-glass: 18px;
-  --radius-card: 16px;
-  --shadow-glow: 0 0 0 1px color-mix(in oklch, var(--color-accent) 22%, transparent),
-    0 24px 64px color-mix(in oklch, var(--color-ink) 12%, transparent);
+  --font-display: var(--font-newsreader), Georgia, "Iowan Old Style", serif;
+  --font-body: var(--jk-font);
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --space-3xs: 2px;
-  --space-2xs: 4px;
-  --space-xs: 8px;
-  --space-sm: 12px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 40px;
-  --space-2xl: 64px;
-  --space-3xl: 96px;
-  --space-4xl: 144px;
+  --space-2xs: var(--jk-s1);
+  --space-xs: var(--jk-s2);
+  --space-sm: var(--jk-s3);
+  --space-md: var(--jk-s4);
+  --space-lg: var(--jk-s6);
+  --space-xl: var(--jk-s10);
+  --space-2xl: var(--jk-s16);
+  --space-3xl: var(--jk-s18);
+  --space-4xl: 80px;
 
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-md: 1.125rem;
-  --text-lg: 1.375rem;
-  --text-xl: 1.75rem;
-  --text-2xl: 2.25rem;
-  --text-3xl: 3rem;
-  --text-4xl: 3.75rem;
-  --text-display-s: clamp(2.5rem, 5vw, 4rem);
-  --text-display: clamp(3rem, 7vw, 5.25rem);
-  --text-hero: clamp(3.25rem, 8vw, 6.5rem);
+  --text-xs: var(--jk-fs-xs);
+  --text-sm: var(--jk-fs-note);
+  --text-base: var(--jk-fs-body);
+  --text-md: var(--jk-fs-lede);
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: var(--jk-fs-title);
+  --text-3xl: var(--jk-fs-mid);
+  --text-4xl: var(--jk-fs-mid);
+  --text-display-s: var(--jk-fs-title);
+  --text-display: var(--jk-fs-mid);
+  --text-hero: var(--jk-fs-title);
 
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 18px;
-  --radius-pill: 999px;
-  --rule-hairline: 1px solid var(--border-subtle);
-  --shadow-wide: 0 32px 80px color-mix(in oklch, var(--color-ink) 10%, transparent);
-  --shadow-float: 0 16px 48px color-mix(in oklch, var(--color-ink) 14%, transparent);
-  --shadow-soft: 0 8px 24px color-mix(in oklch, var(--color-ink) 8%, transparent);
-  --shadow-card: var(--shadow-glow);
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --radius-xs: var(--jk-r-xs);
+  --radius-sm: var(--jk-r-xs);
+  --radius-md: var(--jk-r-s);
+  --radius-lg: var(--jk-r-m);
+  --radius-pill: var(--jk-r-pill);
+  --radius-card: 0px;
+  --ease-out: var(--jk-ease);
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --dur-fast: 120ms;
+  --dur-fast: 150ms;
   --dur-mid: 220ms;
-  --dur-slow: 420ms;
-
-  --bg0: var(--color-paper);
-  --ink: var(--color-ink);
-  --muted: var(--color-muted);
-  --faint: var(--color-rule);
-  --card: var(--color-surface);
-  --card2: var(--color-surface-strong);
-  --p-mint: var(--color-evidence);
-  --p-lime: var(--color-success);
-  --p-coral: var(--color-caution);
-  --p-sky: var(--color-accent);
-  --p-peri: var(--color-resolution);
-  --p-lav: var(--color-resolution);
-  --radius: var(--radius-md);
-  --pad: clamp(18px, 4vw, 48px);
-  --max: 1280px;
+  --dur-slow: 400ms;
+  --max: var(--jk-max);
+  --pad: var(--jk-page-x);
   --mono: var(--font-mono);
-  --accent: var(--color-accent);
-  --topbar-bg: color-mix(in oklch, var(--color-paper) 78%, transparent);
-  --nav-dropdown-bg: var(--color-surface);
-  --nav-dropdown-shadow: var(--shadow-soft);
-  --hero-kicker-bg: color-mix(in oklch, var(--color-surface) 88%, transparent);
-  --btn-ghost-bg: transparent;
-  --surface-muted-bg: var(--color-paper-3);
-  --diagram-bg: var(--color-paper-3);
-  --formula-bg: var(--color-paper-3);
-  --grid-line-h: color-mix(in oklch, var(--color-rule) 55%, transparent);
-  --grid-line-v: color-mix(in oklch, var(--color-rule) 55%, transparent);
-  --detail-link: var(--color-accent-strong);
-  --nav-active-bg: color-mix(in oklch, var(--color-accent) 18%, transparent);
-  --nav-active-border: color-mix(in oklch, var(--color-accent) 45%, transparent);
-  --nav-active-color: var(--color-accent-strong);
-  --market-tape-bg: color-mix(in oklch, var(--color-surface) 90%, transparent);
-  --row-hover-bg: color-mix(in oklch, var(--color-accent) 10%, var(--color-surface));
 }
 
-:root[data-theme="light"] {
-  --color-paper: oklch(98% 0.006 260);
-  --color-paper-2: oklch(95% 0.008 260);
-  --color-paper-3: oklch(90% 0.01 260);
-  --color-ink: oklch(14% 0.02 260);
-  --color-ink-2: oklch(28% 0.02 260);
-  --color-neutral: oklch(44% 0.014 260);
-  --color-muted: oklch(48% 0.014 260);
-  --color-subtle: oklch(62% 0.012 260);
-  --color-rule: oklch(82% 0.012 260);
-  --color-rule-strong: oklch(62% 0.016 260);
-  --color-surface: oklch(99% 0.004 260);
-  --color-surface-strong: oklch(94% 0.008 260);
-  --color-accent: oklch(48% 0.14 195);
-  --color-accent-strong: oklch(38% 0.13 195);
-  --color-accent-soft: oklch(90% 0.05 195);
-  --color-accent-ink: oklch(98% 0.004 260);
-  --color-focus: oklch(48% 0.15 195);
-  --color-success: oklch(48% 0.12 155);
-  --color-warning: oklch(57% 0.13 82);
-  --color-caution: oklch(55% 0.14 46);
-  --color-danger: oklch(51% 0.17 24);
-  --color-evidence: oklch(51% 0.12 190);
-  --color-resolution: oklch(50% 0.14 318);
-  --color-market-hot: oklch(58% 0.16 34);
-  --color-provider-polymarket: oklch(43% 0.16 248);
-  --color-provider-kalshi: oklch(45% 0.12 150);
-  --color-avalanche: oklch(52% 0.2 25);
-  --bg-glass: color-mix(in oklch, var(--color-surface) 85%, transparent);
-  --topbar-bg: color-mix(in oklch, var(--color-paper) 88%, transparent);
-  --row-hover-bg: color-mix(in oklch, var(--color-accent) 8%, var(--color-paper));
+html[data-theme="light"] {
+  color-scheme: light;
+  --jk-bg: #f4f7f4;
+  --jk-surface: #ffffff;
+  --jk-surface-2: #e6eee8;
+  --jk-ink: #12211a;
+  --jk-ink-2: #3d5248;
+  --jk-t2: rgba(18, 33, 26, 0.7);
+  --jk-t3: rgba(18, 33, 26, 0.64);
+  --jk-hair: rgba(18, 33, 26, 0.12);
+  --jk-accent: #62e6a7;
+  --jk-accent-strong: #0c5a3e;
+  --jk-accent-hover: #3eae7c;
+  --jk-accent-text: #0f6e4c;
+  --jk-on-accent: #07120c;
+  --jk-accent-wash: rgba(98, 230, 167, 0.22);
+  --jk-amb: #7a4e00;
+  --jk-ok: #0f6e4c;
+  --jk-fail: #9c3b32;
+  --jk-info: #1f5c66;
+  --jk-tint: rgba(255, 255, 255, 0.66);
+  --jk-tint-hi: rgba(255, 255, 255, 0.8);
+  --jk-tint-edge: rgba(255, 255, 255, 0.34);
+  --jk-rim: rgba(255, 255, 255, 0.95);
+  --jk-rim-lo: rgba(255, 255, 255, 0.25);
+  --jk-glow: rgba(126, 216, 231, 0.35);
+  --jk-drop: 0 24px 60px -28px rgba(18, 42, 32, 0.28), 0 2px 6px -2px rgba(18, 42, 32, 0.08);
+  --jk-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  --jk-bg-1: rgba(126, 216, 231, 0.34);
+  --jk-bg-1b: rgba(126, 216, 231, 0.12);
+  --jk-bg-2: rgba(181, 161, 210, 0.28);
+  --jk-bg-2b: rgba(181, 161, 210, 0.1);
+  --jk-bg-3: rgba(242, 156, 121, 0.2);
+  --jk-bg-3b: rgba(242, 156, 121, 0.08);
+}
+
+html[data-theme="dark"],
+html:not([data-theme]) {
+  color-scheme: dark;
+  --jk-bg: #0a0c0b;
+  --jk-surface: #111512;
+  --jk-surface-2: #161b18;
+  --jk-ink: #f2f0e8;
+  --jk-ink-2: #c9c6bc;
+  --jk-t2: rgba(242, 240, 232, 0.7);
+  --jk-t3: rgba(242, 240, 232, 0.56);
+  --jk-hair: rgba(242, 240, 232, 0.12);
+  --jk-accent: #62e6a7;
+  --jk-accent-strong: #84f0bd;
+  --jk-accent-hover: #84f0bd;
+  --jk-accent-text: #62e6a7;
+  --jk-on-accent: #07120c;
+  --jk-accent-wash: rgba(98, 230, 167, 0.14);
+  --jk-amb: #e3b65d;
+  --jk-ok: #84f0bd;
+  --jk-fail: #f07a6d;
+  --jk-info: #7ed8e7;
+  --jk-tint: rgba(12, 18, 15, 0.62);
+  --jk-tint-hi: rgba(18, 26, 22, 0.76);
+  --jk-tint-edge: rgba(10, 12, 11, 0.28);
+  --jk-rim: rgba(190, 236, 220, 0.38);
+  --jk-rim-lo: rgba(126, 216, 231, 0.08);
+  --jk-glow: rgba(126, 216, 231, 0.16);
+  --jk-drop: 0 28px 70px -30px rgba(0, 0, 0, 0.85), 0 2px 8px -2px rgba(0, 0, 0, 0.5);
+  --jk-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --jk-bg-1: rgba(126, 216, 231, 0.16);
+  --jk-bg-1b: rgba(126, 216, 231, 0.06);
+  --jk-bg-2: rgba(181, 161, 210, 0.14);
+  --jk-bg-2b: rgba(181, 161, 210, 0.05);
+  --jk-bg-3: rgba(242, 156, 121, 0.12);
+  --jk-bg-3b: rgba(242, 156, 121, 0.04);
+}
+
+/* Higher specificity than editorial.css :root hex, so those literals no longer paint. */
+html[data-theme="light"],
+html[data-theme="dark"],
+html:not([data-theme]) {
+  --color-paper: var(--jk-bg);
+  --color-paper-2: var(--jk-surface-2);
+  --color-paper-3: var(--jk-surface-2);
+  --color-ink: var(--jk-ink);
+  --color-ink-2: var(--jk-ink-2);
+  --color-neutral: var(--jk-t2);
+  --color-muted: var(--jk-t3);
+  --color-subtle: var(--jk-t3);
+  --color-rule: var(--jk-hair);
+  --color-rule-strong: var(--jk-hair);
+  --color-surface: var(--jk-surface);
+  --color-surface-strong: var(--jk-surface-2);
+  --color-accent: var(--jk-accent-text);
+  --color-accent-strong: var(--jk-accent-strong);
+  --color-accent-soft: var(--jk-accent-wash);
+  --color-accent-ink: var(--jk-on-accent);
+  --color-focus: var(--jk-accent-text);
+  --color-success: var(--jk-ok);
+  --color-warning: var(--jk-amb);
+  --color-caution: var(--jk-amb);
+  --color-danger: var(--jk-fail);
+  --color-evidence: var(--jk-info);
+  --color-resolution: var(--jk-info);
+  --color-market-hot: var(--jk-fail);
+  --color-provider-polymarket: var(--jk-info);
+  --color-provider-kalshi: var(--jk-ok);
+  --color-avalanche: var(--jk-fail);
+  --border-subtle: var(--jk-hair);
+  --bg-base: var(--jk-bg);
+  --bg-elevated: transparent;
+  --bg-glass: var(--jk-tint);
+  --glow-accent: none;
+  --blur-glass: 18px;
+  --shadow-glow: none;
+  --shadow-wide: var(--jk-drop);
+  --shadow-float: var(--jk-drop);
+  --shadow-soft: none;
+  --shadow-card: none;
+  --rule-hairline: 1px solid var(--jk-hair);
+  --bg0: var(--jk-bg);
+  --ink: var(--jk-ink);
+  --muted: var(--jk-t3);
+  --faint: var(--jk-hair);
+  --card: transparent;
+  --card2: transparent;
+  --accent: var(--jk-accent-text);
+  --topbar-bg: var(--jk-tint);
+  --nav-dropdown-bg: var(--jk-bg);
+  --hero-kicker-bg: transparent;
+  --btn-ghost-bg: transparent;
+  --surface-muted-bg: transparent;
+  --diagram-bg: transparent;
+  --formula-bg: transparent;
+  --grid-line-h: var(--jk-hair);
+  --grid-line-v: var(--jk-hair);
+  --detail-link: var(--jk-accent-text);
+  --nav-active-bg: var(--jk-tint-hi);
+  --nav-active-border: transparent;
+  --nav-active-color: var(--jk-ink);
+  --market-tape-bg: transparent;
+  --row-hover-bg: var(--jk-accent-wash);
+  --p-mint: var(--jk-ok);
+  --p-lime: var(--jk-ok);
+  --p-coral: var(--jk-fail);
+  --p-sky: var(--jk-info);
+  --p-peri: var(--jk-info);
+  --p-lav: var(--jk-info);
+  --radius: 0px;
 }
