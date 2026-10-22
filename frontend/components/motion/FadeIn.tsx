@@ -8,15 +8,16 @@ type FadeInProps = HTMLMotionProps<"div"> & {
   y?: number;
 };
 
-export default function FadeIn({ children, delay = 0, y = 18, ...props }: FadeInProps) {
+export default function FadeIn({ children, delay = 0, y: _ignoredShift = 0, ...props }: FadeInProps) {
   const reducedMotion = useReducedMotion();
+  void _ignoredShift;
 
   return (
     <motion.div
-      initial={reducedMotion ? false : { opacity: 0, y }}
-      whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+      initial={reducedMotion ? false : { opacity: 0 }}
+      whileInView={reducedMotion ? undefined : { opacity: 1 }}
       viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: reducedMotion ? 0 : 0.55, delay, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: reducedMotion ? 0 : 0.4, delay, ease: "easeOut" }}
       {...props}
     >
       {children}

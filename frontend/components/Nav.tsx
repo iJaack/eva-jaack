@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import SelfCustodyWalletControl from "./SelfCustodyWalletControl";
+import ThemeSwitch from "./ThemeToggle";
 
 const navItems = [
   { href: "/markets", label: "Markets" },
@@ -60,6 +61,7 @@ export default function Nav() {
         </nav>
 
         <div className="topbar-actions">
+          <ThemeSwitch />
           <SelfCustodyWalletControl compact />
           <Link href="/compose" className="nav-edge-cta">
             Start thesis
