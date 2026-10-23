@@ -24,6 +24,7 @@ export default function ThemeSwitch() {
     let cancelled = false;
     let tries = 0;
     let frame = 0;
+    let removeReducedMotionListener = () => {};
 
     const mount = () => {
       if (cancelled) return;
@@ -34,9 +35,13 @@ export default function ThemeSwitch() {
         return;
       }
 
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        document.documentElement.classList.add("jk-rm");
-      }
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const syncReducedMotion = () => {
+        document.documentElement.classList.toggle("jk-rm", reducedMotion.matches);
+      };
+      syncReducedMotion();
+      reducedMotion.addEventListener("change", syncReducedMotion);
+      removeReducedMotionListener = () => reducedMotion.removeEventListener("change", syncReducedMotion);
       theme.apply(false);
       theme.mount(host);
       theme.sync();
@@ -47,6 +52,7 @@ export default function ThemeSwitch() {
     return () => {
       cancelled = true;
       if (frame) window.cancelAnimationFrame(frame);
+      removeReducedMotionListener();
     };
   }, []);
 

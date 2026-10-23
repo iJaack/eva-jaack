@@ -1,0 +1,387 @@
+/* iPhone Duo container band.
+   Folded landscape and the unfolded inner display land around 600–960px.
+   Layout follows the window width, not a device name or orientation.
+   Safe-area and dvh rules apply at every width; env() is 0 without a cutout. */
+
+.topbar {
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  width: min(
+    calc(100% - 20px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)),
+    1180px
+  );
+}
+
+.mobile-shell,
+.page-shell,
+.prediction-home,
+.site-footer {
+  width: min(
+    var(--jk-max),
+    calc(
+      100% - max(var(--jk-page-x), env(safe-area-inset-left, 0px)) -
+        max(var(--jk-page-x), env(safe-area-inset-right, 0px))
+    )
+  );
+}
+
+.mobile-shell,
+.page-shell {
+  padding-top: calc(var(--jk-topbar-h) + 8px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+}
+
+.prediction-home {
+  padding-top: calc(var(--jk-topbar-h) + 4px + env(safe-area-inset-top, 0px));
+}
+
+.mobile-shell.compose-publication-shell,
+.page-shell.compose-publication-shell {
+  padding-top: calc(var(--jk-topbar-h) + 8px + env(safe-area-inset-top, 0px));
+}
+
+.site-footer {
+  padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+}
+
+img,
+video {
+  max-inline-size: 100%;
+}
+
+@media (max-width: 920px) {
+  .nav-links.nav-open {
+    max-height: min(
+      70dvh,
+      calc(100dvh - var(--jk-topbar-h) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px)
+    );
+  }
+}
+
+/* Touch size for foldable and phone pointers. Desktop mice stay on the compact controls. */
+@media (pointer: coarse) {
+  .nav-hamburger,
+  .nav-link,
+  .nav-edge-cta,
+  .nav-mobile-cta,
+  .eva-primary-action,
+  .eva-text-action,
+  .filter-chip,
+  .jk-thsw button,
+  .mobile-action,
+  .eva-market-actions a,
+  .eva-source-row,
+  .site-footer-links a {
+    min-height: 44px;
+  }
+
+  .nav-hamburger,
+  .jk-thsw button {
+    min-width: 44px;
+  }
+}
+
+/* 600–920px is where the ledger collapsed into one long phone column.
+   Outer portrait stays below this band. Inner landscape above 920 already
+   uses the wide tracks. */
+@media (min-width: 600px) and (max-width: 920px) {
+  .eva-record-section,
+  .eva-home-token,
+  .compose-layout,
+  .thesis-publication-layout,
+  .compose-head-copy,
+  .eva-token-hero,
+  .paper-section {
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    gap: 16px 24px;
+  }
+
+  .eva-hero {
+    grid-template-columns: minmax(0, 0.86fr) minmax(250px, 1.14fr);
+    gap: 16px 24px;
+  }
+
+  .eva-hero-copy {
+    align-self: start;
+  }
+
+  .eva-hero,
+  .eva-record-section,
+  .compose-layout,
+  .thesis-publication-layout {
+    align-items: start;
+  }
+
+  .eva-hero > *,
+  .eva-record-section > *,
+  .eva-home-token > *,
+  .compose-layout > *,
+  .thesis-publication-layout > *,
+  .paper-section > *,
+  .eva-source-row > *,
+  .eva-market-row > *,
+  .eva-author-list > a > * {
+    min-width: 0;
+  }
+
+  .eva-hero-copy > p,
+  .eva-record-copy > p,
+  .eva-home-token p,
+  .thesis-article-body {
+    max-width: 42rem;
+  }
+
+  .eva-proof-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .eva-evidence-column {
+    border-right: 0;
+    border-bottom: 1px solid var(--jk-hair);
+  }
+
+  .eva-hero .eva-evidence-item span:not(.eva-evidence-node),
+  .eva-hero .eva-evidence-item strong,
+  .eva-hero .eva-evidence-item em,
+  .eva-hero .eva-proof-facts dd {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .eva-proof-facts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .eva-proof-facts div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    min-height: 0;
+    padding: 10px 12px;
+  }
+
+  .eva-proof-facts div:nth-child(odd) {
+    border-right: 1px solid var(--jk-hair);
+  }
+
+  .eva-proof-facts dd {
+    text-align: left;
+  }
+
+  .eva-process {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .eva-process > div,
+  .eva-process article {
+    min-width: 0;
+    padding: 12px 16px 16px 0;
+    border-right: 1px solid var(--jk-hair);
+    border-bottom: 1px solid var(--jk-hair);
+  }
+
+  .eva-process > :nth-child(2n) {
+    padding-right: 0;
+    padding-left: 16px;
+    border-right: 0;
+  }
+
+  .eva-process > :nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .eva-section-head,
+  .eva-campaign-strip {
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 8px 16px;
+    min-height: 0;
+  }
+
+  .eva-section-head > div,
+  .eva-campaign-strip > div {
+    flex: 1 1 220px;
+    min-width: 0;
+  }
+
+  .eva-section-head > a,
+  .eva-campaign-strip a,
+  .eva-source-title strong,
+  .eva-market-identity h2,
+  .eva-author-list strong,
+  .eva-author-list span {
+    white-space: normal;
+  }
+
+  .eva-source-row {
+    grid-template-columns: 32px minmax(0, 1.5fr) minmax(0, 0.75fr) minmax(0, 0.6fr) 16px;
+    gap: 8px 12px;
+  }
+
+  .eva-source-row > div:not(.eva-source-title) {
+    display: grid;
+  }
+
+  .eva-source-row > div:nth-of-type(4) {
+    display: none;
+  }
+
+  .eva-source-row small,
+  .eva-source-row strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .eva-source-title strong {
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .eva-market-columns {
+    display: none;
+  }
+
+  .eva-market-row {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.8fr) auto;
+    gap: 6px 12px;
+    align-items: center;
+  }
+
+  .eva-market-identity {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .eva-market-forecast {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .eva-market-volume {
+    display: block;
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .eva-market-row > .status-chip {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .eva-market-actions {
+    grid-column: 3;
+    grid-row: 2;
+    justify-content: flex-end;
+  }
+
+  .eva-record-ledger > div,
+  .eva-home-token dl > div {
+    grid-template-columns: minmax(0, 0.42fr) minmax(0, 1fr);
+  }
+
+  .eva-author-list > a {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr) auto;
+    gap: 8px;
+  }
+
+  .eva-author-list > a span:nth-of-type(2) {
+    display: none;
+  }
+
+  .eva-token-sequence,
+  .eva-source-process {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .eva-source-process > span {
+    grid-column: 1 / -1;
+  }
+
+  .paper-section .section-kicker {
+    grid-column: 1;
+  }
+
+  .paper-section h2,
+  .paper-section > p:not(.section-kicker):not(.inline-note),
+  .paper-section > ul,
+  .paper-section > blockquote,
+  .paper-section > .route-actions,
+  .paper-section .inline-note {
+    grid-column: 2;
+  }
+
+  .compose-head-copy > p:not(.eyebrow) {
+    max-width: none;
+  }
+
+  .thesis-article-panel {
+    padding-right: 20px;
+  }
+
+  .thesis-article-panel h1 {
+    max-width: 18ch;
+    font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+  }
+
+  .thesis-signal-panel,
+  .thesis-update-panel {
+    padding-left: 16px;
+  }
+
+  .thesis-signal-rail {
+    position: sticky;
+    top: calc(var(--jk-topbar-h) + 12px + env(safe-area-inset-top, 0px));
+  }
+
+  .predictor-list-large {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  }
+
+  .revision-card,
+  .timeline-card {
+    grid-template-columns: minmax(0, 0.4fr) minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 720px) and (max-width: 920px) {
+  .eva-author-list > a {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) minmax(0, 0.8fr) auto;
+  }
+
+  .eva-author-list > a span:nth-of-type(2) {
+    display: inline;
+  }
+}
+
+/* Inner landscape sits just under the old 72rem detail split. */
+@media (min-width: 600px) and (max-width: 71.999rem) {
+  .market-detail-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--jk-s6);
+  }
+
+  .market-detail-layout .market-detail-head {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .market-detail-layout .market-detail-signal-panel {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .market-detail-layout > .prediction-section {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-height: 520px) and (min-width: 600px) {
+  .eva-hero,
+  .eva-process,
+  .eva-record-section,
+  .eva-home-token {
+    padding-top: 8px;
+    padding-bottom: 12px;
+  }
+}

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SelfCustodyWalletControl from "./SelfCustodyWalletControl";
 import ThemeSwitch from "./ThemeToggle";
 
@@ -28,6 +28,15 @@ export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const closeMenu = () => setMenuOpen(false);
+
+  useEffect(() => {
+    const wide = window.matchMedia("(min-width: 921px)");
+    const closeWhenWide = () => {
+      if (wide.matches) setMenuOpen(false);
+    };
+    wide.addEventListener("change", closeWhenWide);
+    return () => wide.removeEventListener("change", closeWhenWide);
+  }, []);
 
   return (
     <header className="topbar">

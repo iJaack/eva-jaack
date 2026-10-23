@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import { MotionProvider } from "@/components/motion/MotionProvider";
@@ -10,6 +10,12 @@ import { protocol } from "@/lib/protocol";
 const title = `${protocol.app.name} — Public thesis publishing for prediction markets`;
 const description =
   "Eva turns prediction markets, facts, and second-order signals into public thesis posts with anchors and visible revision history.";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(protocol.app.siteUrl),
