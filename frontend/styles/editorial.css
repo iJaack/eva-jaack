@@ -60,6 +60,7 @@ html {
 
 body {
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   overflow-x: hidden;
   background: var(--color-paper);
@@ -751,6 +752,7 @@ select {
   gap: clamp(56px, 7vw, 116px);
   align-items: center;
   min-height: calc(100vh - 72px);
+  min-height: calc(100dvh - 72px);
   padding: 72px 0 76px;
   border-bottom: 1px solid var(--color-rule);
 }
@@ -3323,6 +3325,7 @@ select {
 
   .nav-links.nav-open {
     max-height: calc(100vh - 64px);
+    max-height: calc(100dvh - 64px);
     padding-top: 18px;
     padding-bottom: 30px;
     border-bottom-width: 1px;
