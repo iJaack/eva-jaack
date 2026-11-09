@@ -1,6 +1,6 @@
 /* Forma presentation, tuned for Eva.
    Claims and titles use Newsreader. Controls, rows, and metadata use Geist.
-   Mint fills carry dark ink. One glass panel per screen, besides the top bar.
+   Accent fills use theme-specific ink. The top bar is the only glass surface.
    The only jk- classes here are the ones theme.js mounts (.jk-thsw) plus motion hooks (.jk-rm, .jk-th-fade). */
 
 :root {
@@ -65,86 +65,8 @@ select:focus-visible,
   outline-offset: 3px;
 }
 
-/* Soft gradient. Static when motion is reduced. */
 .eva-soft-bg {
-  position: fixed;
-  inset: 0;
-  bottom: -30vh;
-  z-index: -1;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.eva-soft-bg i {
-  position: absolute;
-  display: block;
-  width: var(--s);
-  height: var(--s);
-  left: var(--x);
-  top: var(--y);
-  margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
-  border-radius: 50%;
-  background: radial-gradient(closest-side, var(--c) 0%, var(--c2) 45%, transparent 100%);
-  animation: eva-soft-drift var(--d) ease-in-out infinite alternate;
-  animation-delay: var(--dl);
-}
-
-.eva-soft-bg i:nth-child(1) {
-  --s: max(82vw, 82vh);
-  --x: 14%;
-  --y: 10%;
-  --d: 38s;
-  --dl: -6s;
-  --tx: 8vw;
-  --ty: 6vh;
-  --c: var(--jk-bg-1);
-  --c2: var(--jk-bg-1b);
-}
-
-.eva-soft-bg i:nth-child(2) {
-  --s: max(74vw, 74vh);
-  --x: 90%;
-  --y: 30%;
-  --d: 32s;
-  --dl: -14s;
-  --tx: -7vw;
-  --ty: 8vh;
-  --c: var(--jk-bg-2);
-  --c2: var(--jk-bg-2b);
-}
-
-.eva-soft-bg i:nth-child(3) {
-  --s: max(88vw, 88vh);
-  --x: 56%;
-  --y: 100%;
-  --d: 40s;
-  --dl: -3s;
-  --tx: -8vw;
-  --ty: -7vh;
-  --c: var(--jk-bg-3);
-  --c2: var(--jk-bg-3b);
-}
-
-@keyframes eva-soft-drift {
-  0% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(calc(var(--tx) * 0.6), calc(var(--ty) * -0.5), 0) scale(1.08);
-  }
-  100% {
-    transform: translate3d(var(--tx), var(--ty), 0) scale(0.95);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .eva-soft-bg i {
-    animation: none;
-  }
-}
-
-html.jk-rm .eva-soft-bg i {
-  animation: none;
+  display: none;
 }
 
 html.jk-th-fade,
@@ -173,34 +95,14 @@ html.jk-th-fade .eva-glass {
   overflow: visible;
   border: 0;
   border-radius: var(--jk-r-pill);
-  background: radial-gradient(130% 125% at 50% 45%, var(--jk-tint) 62%, var(--jk-tint-edge) 100%);
+  background: var(--jk-tint);
   box-shadow: var(--jk-drop);
   -webkit-backdrop-filter: blur(18px) saturate(1.8);
   backdrop-filter: blur(18px) saturate(1.8);
 }
 
 .topbar::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  padding: 1.5px;
-  border-radius: inherit;
-  pointer-events: none;
-  background: conic-gradient(
-    from 210deg at 50% 50%,
-    var(--jk-rim),
-    var(--jk-rim-lo) 22%,
-    var(--jk-rim-lo) 45%,
-    var(--jk-rim) 55%,
-    var(--jk-rim-lo) 72%,
-    var(--jk-rim-lo) 92%,
-    var(--jk-rim)
-  );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
+  content: none;
 }
 
 .topbar-inner {
@@ -362,7 +264,7 @@ html.jk-th-fade .eva-glass {
 .jk-thsw button[aria-pressed="true"] {
   background: var(--jk-bg);
   color: var(--jk-ink);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px rgba(8, 6, 4, 0.12);
 }
 
 .jk-thsw .i {
@@ -379,7 +281,7 @@ html.jk-th-fade .eva-glass {
   }
 }
 
-/* Page frame: compact, content clears the floating bar. */
+/* Page rhythm; content clears the floating bar. */
 .mobile-shell,
 .page-shell,
 .prediction-home,
@@ -391,11 +293,11 @@ html.jk-th-fade .eva-glass {
 .page-shell {
   min-height: 0;
   padding: calc(var(--jk-topbar-h) + 8px) 0 40px;
-  gap: var(--jk-s7);
+  gap: var(--jk-group-gap);
 }
 
 .prediction-home {
-  gap: 0;
+  gap: var(--jk-chapter-gap);
   padding-top: calc(var(--jk-topbar-h) + 4px);
 }
 
@@ -488,7 +390,7 @@ html.jk-th-fade .eva-glass {
 .paper-section > p,
 .eva-record-copy > p,
 .eva-home-token p {
-  max-width: 68ch;
+  max-width: var(--jk-measure);
   margin: 0;
   color: var(--jk-t2);
   font-size: var(--jk-fs-lede);
@@ -515,10 +417,10 @@ html.jk-th-fade .eva-glass {
   color: var(--jk-ink);
 }
 
-/* Home: copy beside the one glass summary. */
+/* Home: copy beside the proof summary. */
 .eva-hero {
   grid-template-columns: minmax(0, 1fr) minmax(280px, 1fr);
-  gap: var(--jk-s7);
+  gap: var(--jk-hero-gap);
   align-items: start;
   min-height: 0;
   padding: 4px 0 var(--jk-s7);
@@ -591,7 +493,7 @@ html.jk-th-fade .eva-glass {
 .eva-section-head {
   align-items: end;
   gap: 16px;
-  margin-bottom: var(--jk-s4);
+  margin-bottom: var(--jk-group-gap);
 }
 
 .eva-source-row,
@@ -604,9 +506,9 @@ html.jk-th-fade .eva-glass {
 }
 
 .eva-source-row {
-  min-height: 44px;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  min-height: 46px;
+  padding-top: var(--jk-row-pad);
+  padding-bottom: var(--jk-row-pad);
   gap: 12px;
 }
 
@@ -634,8 +536,8 @@ html.jk-th-fade .eva-glass {
 }
 
 .eva-market-row {
-  padding-top: 8px;
-  padding-bottom: 8px;
+  padding-top: var(--jk-row-pad);
+  padding-bottom: var(--jk-row-pad);
 }
 
 .eva-market-columns,
@@ -1000,7 +902,7 @@ select,
   }
 
   .eva-hero {
-    gap: var(--jk-s6);
+    gap: var(--jk-hero-gap);
     padding-top: 8px;
     padding-bottom: var(--jk-s6);
   }
@@ -1162,5 +1064,11 @@ select,
   .eva-market-row,
   .eva-source-row {
     transition: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .prediction-home {
+    gap: var(--jk-chapter-gap-m);
   }
 }

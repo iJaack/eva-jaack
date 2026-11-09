@@ -1,6 +1,6 @@
 /* Forma structure, Eva palette.
    Shared scale, spacing, and theme logic stay on --jk-*.
-   Colour is Eva's: mint accent, green-black ink, brand-hued washes.
+   Colour is Eva's: mint accent, warm dark surfaces, mint washes.
    jaack-theme.js sets data-theme before first paint
    (local clock 07:00–18:59 light, else dark; Auto/Chiaro/Scuro). */
 
@@ -9,14 +9,14 @@
   --jk-fs-xs: 12.5px;
   --jk-fs-sm: 13px;
   --jk-fs-note: 14px;
-  --jk-fs-body: 16px;
-  --jk-fs-lede: 17px;
+  --jk-fs-body: 17px;
+  --jk-fs-lede: 20px;
   --jk-fs-title: clamp(30px, 2.6vw, 44px);
   --jk-fs-mid: clamp(36px, 3vw, 52px);
   --jk-fs-big: clamp(56px, 7.5vw, 120px);
   --jk-fs-deco: clamp(96px, 8vw, 150px);
   --jk-lh-tight: 1.02;
-  --jk-lh: 1.5;
+  --jk-lh: 1.6;
   --jk-track-label: 0.06em;
   --jk-track-big: -0.05em;
   --jk-track-mid: -0.04em;
@@ -34,12 +34,17 @@
   --jk-s12: 48px;
   --jk-s16: 64px;
   --jk-s18: 72px;
-  --jk-row-pad: 7px;
-  --jk-group-gap: 28px;
-  --jk-hero-gap: 24px;
-  --jk-chapter-gap: 64px;
-  --jk-chapter-gap-m: 40px;
-  --jk-page-x: clamp(16px, 4.4vw, 72px);
+  --jk-s20: 80px;
+  --jk-s24: 96px;
+  --jk-s32: 128px;
+  --jk-measure: 64ch;
+  --jk-row-pad-data: 9px;
+  --jk-row-pad: 12px;
+  --jk-group-gap: 48px;
+  --jk-hero-gap: 32px;
+  --jk-chapter-gap: 128px;
+  --jk-chapter-gap-m: 72px;
+  --jk-page-x: clamp(20px, 6vw, 120px);
   --jk-topbar-h: 72px;
   --jk-max: 1200px;
 
@@ -51,12 +56,19 @@
   --jk-r-xl: 34px;
   --jk-r-pill: 999px;
 
-  --jk-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --jk-d-fast: 0.15s;
-  --jk-d-fade: 0.4s;
-  --jk-d-theme: 0.4s;
-  --jk-d-draw: 0.6s;
-  --jk-d-pill: 0.35s;
+  --jk-ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --jk-ease-inout: cubic-bezier(0.4, 0, 0.2, 1);
+  --jk-d-1: 120ms;
+  --jk-d-2: 200ms;
+  --jk-d-3: 280ms;
+  /* Compatibility aliases. */
+  --jk-ease: var(--jk-ease-out);
+  --jk-spring: var(--jk-ease-inout);
+  --jk-d-fast: var(--jk-d-1);
+  --jk-d-fade: var(--jk-d-2);
+  --jk-d-theme: var(--jk-d-2);
+  --jk-d-pill: var(--jk-d-2);
+  --jk-d-draw: var(--jk-d-3);
 
   /* Chart marks only — not body text. */
   --jk-c-blue: #0a84ff;
@@ -68,7 +80,7 @@
   --jk-c-pink: #ff375f;
   --jk-c-red: #ff453a;
 
-  /* Eva mark. The same hues tint the page wash; UI text uses --jk-accent-text. */
+  /* Eva logo only. UI colours and washes use the theme palette. */
   --color-brand-cyan: #7ed8e7;
   --color-brand-lavender: #b5a1d2;
   --color-brand-coral: #f29c79;
@@ -94,7 +106,7 @@
   --space-xl: var(--jk-s10);
   --space-2xl: var(--jk-s16);
   --space-3xl: var(--jk-s18);
-  --space-4xl: 80px;
+  --space-4xl: var(--jk-s20);
 
   --text-xs: var(--jk-fs-xs);
   --text-sm: var(--jk-fs-note);
@@ -115,12 +127,12 @@
   --radius-lg: var(--jk-r-m);
   --radius-pill: var(--jk-r-pill);
   --radius-card: 0px;
-  --ease-out: var(--jk-ease);
-  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --dur-fast: 150ms;
-  --dur-mid: 220ms;
-  --dur-slow: 400ms;
+  --ease-out: var(--jk-ease-out);
+  --ease-in: var(--jk-ease-inout);
+  --ease-in-out: var(--jk-ease-inout);
+  --dur-fast: var(--jk-d-1);
+  --dur-mid: var(--jk-d-2);
+  --dur-slow: var(--jk-d-3);
   --max: var(--jk-max);
   --pad: var(--jk-page-x);
   --mono: var(--font-mono);
@@ -132,15 +144,15 @@ html[data-theme="light"] {
   --jk-surface: #ffffff;
   --jk-surface-2: #e6eee8;
   --jk-ink: #12211a;
-  --jk-ink-2: #3d5248;
-  --jk-t2: rgba(18, 33, 26, 0.7);
+  --jk-ink-2: #3d4f46;
+  --jk-t2: rgba(18, 33, 26, 0.72);
   --jk-t3: rgba(18, 33, 26, 0.64);
   --jk-hair: rgba(18, 33, 26, 0.12);
-  --jk-accent: #62e6a7;
+  --jk-accent: #0f6e4c;
   --jk-accent-strong: #0c5a3e;
-  --jk-accent-hover: #3eae7c;
+  --jk-accent-hover: #0c5a3e;
   --jk-accent-text: #0f6e4c;
-  --jk-on-accent: #07120c;
+  --jk-on-accent: #ffffff;
   --jk-accent-wash: rgba(98, 230, 167, 0.22);
   --jk-amb: #7a4e00;
   --jk-ok: #0f6e4c;
@@ -154,49 +166,37 @@ html[data-theme="light"] {
   --jk-glow: rgba(126, 216, 231, 0.35);
   --jk-drop: 0 24px 60px -28px rgba(18, 42, 32, 0.28), 0 2px 6px -2px rgba(18, 42, 32, 0.08);
   --jk-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-  --jk-bg-1: rgba(126, 216, 231, 0.34);
-  --jk-bg-1b: rgba(126, 216, 231, 0.12);
-  --jk-bg-2: rgba(181, 161, 210, 0.28);
-  --jk-bg-2b: rgba(181, 161, 210, 0.1);
-  --jk-bg-3: rgba(242, 156, 121, 0.2);
-  --jk-bg-3b: rgba(242, 156, 121, 0.08);
 }
 
 html[data-theme="dark"],
 html:not([data-theme]) {
   color-scheme: dark;
-  --jk-bg: #0a0c0b;
-  --jk-surface: #111512;
-  --jk-surface-2: #161b18;
+  --jk-bg: #12120e;
+  --jk-surface: #1a1a15;
+  --jk-surface-2: #24241e;
   --jk-ink: #f2f0e8;
-  --jk-ink-2: #c9c6bc;
-  --jk-t2: rgba(242, 240, 232, 0.7);
-  --jk-t3: rgba(242, 240, 232, 0.56);
+  --jk-ink-2: #cbc8bc;
+  --jk-t2: rgba(242, 240, 232, 0.72);
+  --jk-t3: rgba(242, 240, 232, 0.58);
   --jk-hair: rgba(242, 240, 232, 0.12);
   --jk-accent: #62e6a7;
   --jk-accent-strong: #84f0bd;
   --jk-accent-hover: #84f0bd;
   --jk-accent-text: #62e6a7;
-  --jk-on-accent: #07120c;
+  --jk-on-accent: #0d1f16;
   --jk-accent-wash: rgba(98, 230, 167, 0.14);
   --jk-amb: #e3b65d;
   --jk-ok: #84f0bd;
   --jk-fail: #f07a6d;
   --jk-info: #7ed8e7;
-  --jk-tint: rgba(12, 18, 15, 0.62);
-  --jk-tint-hi: rgba(18, 26, 22, 0.76);
-  --jk-tint-edge: rgba(10, 12, 11, 0.28);
+  --jk-tint: rgba(18, 18, 14, 0.62);
+  --jk-tint-hi: rgba(26, 26, 21, 0.76);
+  --jk-tint-edge: rgba(18, 18, 14, 0.28);
   --jk-rim: rgba(190, 236, 220, 0.38);
   --jk-rim-lo: rgba(126, 216, 231, 0.08);
   --jk-glow: rgba(126, 216, 231, 0.16);
-  --jk-drop: 0 28px 70px -30px rgba(0, 0, 0, 0.85), 0 2px 8px -2px rgba(0, 0, 0, 0.5);
-  --jk-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --jk-bg-1: rgba(126, 216, 231, 0.16);
-  --jk-bg-1b: rgba(126, 216, 231, 0.06);
-  --jk-bg-2: rgba(181, 161, 210, 0.14);
-  --jk-bg-2b: rgba(181, 161, 210, 0.05);
-  --jk-bg-3: rgba(242, 156, 121, 0.12);
-  --jk-bg-3b: rgba(242, 156, 121, 0.04);
+  --jk-drop: 0 28px 70px -30px rgba(8, 6, 4, 0.8), 0 2px 8px -2px rgba(8, 6, 4, 0.45);
+  --jk-text-shadow: 0 1px 2px rgba(8, 6, 4, 0.45);
 }
 
 /* Higher specificity than editorial.css :root hex, so those literals no longer paint. */
@@ -271,4 +271,23 @@ html:not([data-theme]) {
   --p-peri: var(--jk-info);
   --p-lav: var(--jk-info);
   --radius: 0px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --jk-d-1: 0ms;
+    --jk-d-2: 0ms;
+    --jk-d-3: 0ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
 }
