@@ -34,10 +34,7 @@
   font-size: var(--text-hero);
   line-height: 0.95;
   max-width: 14ch;
-  background: linear-gradient(135deg, var(--color-ink) 0%, color-mix(in oklch, var(--color-ink) 75%, var(--color-accent)) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--jk-ink);
 }
 
 .mobile-page-head > p,
